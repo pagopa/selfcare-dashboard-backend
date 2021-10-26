@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.connector.rest.model;
+package it.pagopa.selfcare.dashboard.connector.rest.model.process;
 
 import java.util.ArrayList;
 
