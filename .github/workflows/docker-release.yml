@@ -31,7 +31,7 @@ jobs:
           distribution: 'adopt'
           cache: maven
       - name: Build with Maven
-        run: mvn clean verify package -B --update-snapshots
+        run: mvn clean verify package -B --update-snapshots -DaltDeploymentRepository=selc::https://pkgs.dev.azure.com/pagopaspa/selfcare-projects/_packaging/selfcare/maven/v1
       - run: mkdir artifact && cp target/*.jar artifact
       - uses: actions/upload-artifact@v2
         with:
