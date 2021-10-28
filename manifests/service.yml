@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dashboardbackend
+  name: b4f-dashboard
 spec:
   type: ClusterIP
   ports:
     - port: 8080
   selector:
-    app: dashboardbackend
+    app: b4f-dashboard

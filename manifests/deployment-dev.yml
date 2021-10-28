@@ -2,20 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: dashboardbackend
-  name: dashboardbackend
+    app: b4f-dashboard
+  name: b4f-dashboard
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dashboardbackend
+      app: b4f-dashboard
   template:
     metadata:
       labels:
-        app: dashboardbackend
+        app: b4f-dashboard
     spec:
       containers:
-        - name: dashboardbackend
+        - name: b4f-dashboard
           image: selcdacr.azurecr.io/dashboardbackend
           imagePullPolicy: Always
           ports:
@@ -23,6 +23,8 @@ spec:
           envFrom:
             - secretRef:
                 name: application-insights
+            - configMapRef:
+                name: b4f-dashboard
           livenessProbe:
             httpGet:
               path: /actuator/health
