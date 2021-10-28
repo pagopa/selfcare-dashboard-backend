@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: b4f-dashboard
-          image: selcuacr.azurecr.io/dashboardbackend
+          image: selcuacr.azurecr.io/selfcaredashboardbackend
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
