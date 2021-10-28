@@ -28,3 +28,5 @@ info:
 logging:
   level:
     it.pagopa.selfcare.product: ${LOG_LEVEL_SELC_DASHBOARD:DEBUG}
+
+management.endpoint.health.probes.enabled: true
