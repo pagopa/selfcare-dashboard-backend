@@ -38,7 +38,7 @@ steps:
     displayName: 'download settings.xml for Maven'
     name: settingsxml
     inputs:
-      secureFile: '$(settingsXmlsecureFileName)'
+      secureFile: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
       retryCount: '2'
   - task: Maven@3
     inputs:
