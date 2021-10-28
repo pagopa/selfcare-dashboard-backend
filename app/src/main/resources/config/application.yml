@@ -1,0 +1,30 @@
+server:
+  port: ${SELC_DASHBOARD_PORT:8080}
+
+spring:
+  application:
+    name: "@project.parent.artifactId@"
+    version: "@project.version@"
+  profiles:
+    include:
+      # TO enable specific-language documentations
+      - swaggerEN
+#  jackson:
+#    default-property-inclusion: NON_NULL
+#    serialization.write-dates-as-timestamps: false
+#    serialization.fail-on-empty-beans: false
+#    deserialization.fail-on-unknown-properties: false
+#    visibility.all: NONE
+#    visibility.field: ANY
+
+info:
+  build:
+    artifact: "@project.parent.artifactId@"
+    name: "@project.parent.artifactId@"
+    description: "@project.description@"
+    version: "@project.version@"
+
+
+logging:
+  level:
+    it.pagopa.selfcare.product: ${LOG_LEVEL_SELC_DASHBOARD:DEBUG}

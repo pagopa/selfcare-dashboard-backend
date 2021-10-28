@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/relationships"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": [
+      {
+        "from": "institutionId1",
+        "role": "Manager",
+        "platformRole": "string",
+        "status": "pending"
+      }
+    ],
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
