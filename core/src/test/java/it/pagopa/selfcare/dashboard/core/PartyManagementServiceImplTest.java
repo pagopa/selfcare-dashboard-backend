@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
+import it.pagopa.selfcare.dashboard.core.party_mgmt.PartyManagementServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

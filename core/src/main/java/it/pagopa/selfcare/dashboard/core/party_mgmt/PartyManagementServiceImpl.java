@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.core;
+package it.pagopa.selfcare.dashboard.core.party_mgmt;
 
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PartyManagementServiceImpl implements PartyManagementService{
+public class PartyManagementServiceImpl implements PartyManagementService {
 
     private final PartyManagementRestClient restClient;
 
