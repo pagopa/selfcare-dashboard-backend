@@ -1,6 +1,7 @@
-package it.pagopa.selfcare.dashboard.core.products;
+package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.rest.client.ProductsRestClient;
+import it.pagopa.selfcare.dashboard.core.PartyProductsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

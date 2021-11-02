@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.core.products;
+package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.rest.model.products.Product;
 

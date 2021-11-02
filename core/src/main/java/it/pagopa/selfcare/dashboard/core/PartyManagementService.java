@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.core.party_mgmt;
+package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
 

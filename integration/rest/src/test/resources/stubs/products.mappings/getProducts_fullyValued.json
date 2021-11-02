@@ -5,14 +5,16 @@
   },
   "response": {
     "status": "200",
-    "jsonBody": {
-      "logo": "products logo",
-      "title": "products title",
-      "description": "products description",
-      "urlPublic": "urlPublic",
-      "urlBO": "urlBO",
-      "activationDateTime": "2021-10-29T12:51:11.104Z"
-    },
+    "jsonBody": [
+      {
+        "logo": "products logo",
+        "title": "products title",
+        "description": "products description",
+        "urlPublic": "urlPublic",
+        "urlBO": "urlBO",
+        "activationDateTime": "2021-10-29T12:51:11.104Z"
+      }
+    ],
     "headers": {
       "Content-Type": "application/json"
     }
