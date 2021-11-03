@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-class PartyProductsServiceImpl implements ProductsService {
+class ProductsServiceImpl implements ProductsService {
 
     private final ProductsRestClient restClient;
 
     @Autowired
-    public PartyProductsServiceImpl(ProductsRestClient restClient) {
+    public ProductsServiceImpl(ProductsRestClient restClient) {
         this.restClient = restClient;
     }
 
@@ -25,15 +25,20 @@ class PartyProductsServiceImpl implements ProductsService {
     public List<Product> getProducts() {
         List<Product> products = restClient.getProducts();
         // TODO call get org enabled product
-//        products = products.stream()// TODO filter org enabled product
+        products = products.stream()// TODO filter org enabled product
+                .filter(product -> product.getId().equals(""))
+                .collect(Collectors.toList());
+//        boolean isTechRef = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+//                .stream()
+//                .anyMatch(grantedAuthority -> "TECH_ADMIN".equals(grantedAuthority.getAuthority()));
+//        if (isTechRef) {
+//            // TODO filter user auth products
+//        }
+//        else {
+//                 products = products.stream()
 //                .filter(product -> product.getId().equals(""))
 //                .collect(Collectors.toList());
-        boolean isTechRef = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .stream()
-                .anyMatch(grantedAuthority -> "TECH_ADMIN".equals(grantedAuthority.getAuthority()));
-        if (isTechRef) {
-            // TODO filter user auth products
-        }
+//        }
 
         return products;
     }

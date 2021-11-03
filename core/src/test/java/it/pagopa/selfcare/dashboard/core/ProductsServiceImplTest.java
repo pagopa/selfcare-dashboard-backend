@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.rest.client.ProductsRestClient;
-import it.pagopa.selfcare.dashboard.core.PartyProductsServiceImpl;
+import it.pagopa.selfcare.dashboard.core.ProductsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ProductsServiceImplTest {
 
     @InjectMocks
-    private PartyProductsServiceImpl productsService;
+    private ProductsServiceImpl productsService;
     @Mock
     private ProductsRestClient restClient;
 
