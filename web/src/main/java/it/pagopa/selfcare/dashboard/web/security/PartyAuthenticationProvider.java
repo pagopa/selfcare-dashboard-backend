@@ -14,12 +14,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collections;
 
 
-public class SelfCareAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     private final PartyProcessRestClient restClient;
 
 
-    public SelfCareAuthenticationProvider(PartyProcessRestClient restClient) {
+    public PartyAuthenticationProvider(PartyProcessRestClient restClient) {
         this.restClient = restClient;
     }
 
