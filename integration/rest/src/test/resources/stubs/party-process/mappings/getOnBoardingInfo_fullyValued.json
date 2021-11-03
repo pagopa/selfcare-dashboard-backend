@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "person": {
+        "name": "Nome",
+        "surname": "Cognome",
+        "taxCode": "Codice"
+      },
+      "institutions": [
+        {
+          "description": "description",
+          "digitalAddress": "digitalAddress",
+          "status": "status",
+          "role": "role",
+          "platformRole": "platformRole",
+          "attributes": [
+            "attributes"
+          ]
+        }
+      ]
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

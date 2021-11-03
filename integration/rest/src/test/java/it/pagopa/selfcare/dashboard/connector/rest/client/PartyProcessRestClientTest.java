@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsSource;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
+import it.pagopa.selfcare.dashboard.connector.rest.model.process.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.RelationshipsResponse;
 import lombok.SneakyThrows;
@@ -84,10 +85,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionRelationships_fullyValued() {
-        List<StubMapping> stubMappings = wireMockRule.getStubMappings();
-        // given
-        String institutionId = UUID.randomUUID().toString();
-        // when
+        // given and when
         RelationshipsResponse response = restClient.getInstitutionRelationships(testCase2instIdMap.get(TestCase.FULLY_VALUED));
         // then
         Assert.assertNotNull(response);
@@ -101,9 +99,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionRelationships_fullyNull() {
-        // given
-        String institutionId = UUID.randomUUID().toString();
-        // when
+        // given and when
         RelationshipsResponse response = restClient.getInstitutionRelationships(testCase2instIdMap.get(TestCase.FULLY_NULL));
         // then
         Assert.assertNotNull(response);
@@ -117,13 +113,22 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionRelationships_emptyResult() {
-        // given
-        String institutionId = UUID.randomUUID().toString();
-        // when
+        // given and when
         RelationshipsResponse response = restClient.getInstitutionRelationships(testCase2instIdMap.get(TestCase.EMPTY_RESULT));
         // then
         Assert.assertNotNull(response);
         Assert.assertTrue(response.isEmpty());
+    }
+
+
+    @Test
+    public void getOnBoardingInfo_fullyValued() {
+        // given and when
+        OnBoardingInfo response = restClient.getOnBoardingInfo("");
+        // then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getPerson());
+        Assert.assertNotNull(response.getInstitutions());
     }
 
 }
