@@ -131,4 +131,12 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response.getInstitutions());
     }
 
+    @Test
+    public void getOnBoardingInfo_fullyNull() {
+        // given and when
+        OnBoardingInfo response = restClient.getOnBoardingInfo(null);
+        // then
+        Assert.assertNull(response.getInstitutions().get(0).getInstitutionId());
+    }
+
 }
