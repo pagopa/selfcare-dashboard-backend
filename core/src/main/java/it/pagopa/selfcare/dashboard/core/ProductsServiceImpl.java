@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,12 +29,20 @@ class ProductsServiceImpl implements ProductsService {
         products = products.stream()// TODO filter org enabled product
                 .filter(product -> product.getId().equals(""))
                 .collect(Collectors.toList());
-//        boolean isTechRef = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-//                .stream()
-//                .anyMatch(grantedAuthority -> "TECH_ADMIN".equals(grantedAuthority.getAuthority()));
-//        if (isTechRef) {
-//            // TODO filter user auth products
-//        }
+        Optional<? extends GrantedAuthority> techAdminAuthority = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> "TECH_ADMIN".equals(grantedAuthority.getAuthority()))
+                .findAny();
+        if (techAdminAuthority.isPresent()
+                // TODO: add && check instance of SelfCareGrantedAuthority
+                // TODO: cast to SelfCareGrantedAuthority and check if getProducts is not null
+        ) {
+            List<String> userAuthProducts = null; // TODO: ((SelfCareGrantedAuthority) techAdminAuthority.get()).getProducts()
+            // TODO filter user auth products
+            products = products.stream()// TODO filter org enabled product
+                    .filter(product -> userAuthProducts.contains(product.getId()))
+                    .collect(Collectors.toList());
+        }
 //        else {
 //                 products = products.stream()
 //                .filter(product -> product.getId().equals(""))
