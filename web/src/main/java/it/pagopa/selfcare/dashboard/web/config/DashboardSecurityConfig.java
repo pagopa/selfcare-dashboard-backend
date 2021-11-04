@@ -7,14 +7,16 @@ import it.pagopa.selfcare.dashboard.web.security.PartyAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.TestingAuthenticationProvider;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 
 @Slf4j
 @Configuration
 class DashboardSecurityConfig extends SecurityConfig {
+
+    private static final String ROLE_PREFIX = "";//TODO: remove me
 
     private final PartyProcessRestClient restClient;
 
@@ -28,19 +30,21 @@ class DashboardSecurityConfig extends SecurityConfig {
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
-        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
-        mapper.setConvertToUpperCase(true);
-        mapper.afterPropertiesSet();
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy(ROLE_PREFIX + "ADMIN > " + ROLE_PREFIX + "LEGAL\n" +
+                ROLE_PREFIX + "LEGAL > " + ROLE_PREFIX + "ADMIN_REF\n" +
+                ROLE_PREFIX + "ADMIN_REF > " + ROLE_PREFIX + "TECH_REF");
+        RoleHierarchyAuthoritiesMapper authoritiesMapper = new RoleHierarchyAuthoritiesMapper(roleHierarchy);
         PartyAuthenticationProvider authenticationProvider = new PartyAuthenticationProvider(restClient);
-        authenticationProvider.setAuthoritiesMapper(mapper);
+        authenticationProvider.setAuthoritiesMapper(authoritiesMapper);
         authenticationManagerBuilder.authenticationProvider(authenticationProvider);
-        authenticationManagerBuilder.authenticationProvider(new TestingAuthenticationProvider()); // FIXME: remove after implemented real role based authorization
     }
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/dashboard/products/**").hasAuthority("TECH_REF")
                 .anyRequest().permitAll();
         super.configure(http);
     }

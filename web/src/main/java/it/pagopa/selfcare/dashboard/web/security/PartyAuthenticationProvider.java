@@ -1,13 +1,13 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.web.security.JwtAuthenticationDetails;
+import it.pagopa.selfcare.commons.web.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.RelationshipsResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -48,7 +48,7 @@ public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticati
         if (!institutionRelationships.isEmpty()) {
             RelationshipInfo relationshipInfo = institutionRelationships.get(0);
             String role = relationshipInfo.getPlatformRole();
-            user = new User(username, authentication.getCredentials().toString(), Collections.singletonList(new SimpleGrantedAuthority(role)));
+            user = new User(username, authentication.getCredentials().toString(), Collections.singletonList(new SelfCareGrantedAuthority(role)));
         }
         // TODO: map RelationshipsResponse to UserDetails
 //        return new User("admin", "", Collections.singletonList(new SimpleGrantedAuthority(Role.ROLE_ADMIN.name())));// TODO: implement real logic
