@@ -25,5 +25,6 @@ class PartyManagementServiceImplTest {
         // then
         // verifica che il metodo getOrganization del restClientMock sia stato invocato una volta
         Mockito.verify(restClientMock, Mockito.times(1)).getOrganization(null);
+        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 }
