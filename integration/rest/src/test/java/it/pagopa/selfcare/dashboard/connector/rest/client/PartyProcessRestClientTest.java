@@ -1,11 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsSource;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
+import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.RelationshipInfo;
@@ -22,11 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 @TestPropertySource(
         locations = "classpath:config/party-process-rest-client.properties",
@@ -43,13 +37,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     public static WireMockClassRule wireMockRule;
 
     static {
-        String port = System.getenv("WIREMOCKPORT");
-        WireMockConfiguration config = wireMockConfig()
-                .port(port != null ? Integer.parseInt(port) : 0)
-                .bindAddress("localhost")
-                .withRootDirectory("src/test/resources")
-                .extensions(new ResponseTemplateTransformer(false));
-        config.mappingSource(new JsonFileMappingsSource(config.filesRoot().child("stubs/party-process")));
+        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/party-process");
         wireMockRule = new WireMockClassRule(config);
     }
 
@@ -59,7 +47,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
-                    String.format("rest-client.party-process.base-url=http://%s:%d/pdnd-interop-uservice-party-process/0.0.1",
+                    String.format("PARTY_PROCESS_BASE_URL=http://%s:%d/pdnd-interop-uservice-party-process/0.0.1",
                             wireMockRule.getOptions().bindAddress(),
                             wireMockRule.port())
             );

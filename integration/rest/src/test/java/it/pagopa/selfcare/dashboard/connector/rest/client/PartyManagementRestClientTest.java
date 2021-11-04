@@ -1,10 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsSource;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
+import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyManagementRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
 import lombok.SneakyThrows;
@@ -21,7 +20,6 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 @TestPropertySource(
         locations = "classpath:config/party-mgmt-rest-client.properties",
@@ -38,13 +36,7 @@ public class PartyManagementRestClientTest extends BaseFeignRestClientTest {
     public static WireMockClassRule wireMockRule;
 
     static {
-        String port = System.getenv("WIREMOCKPORT");
-        WireMockConfiguration config = wireMockConfig()
-                .port(port != null ? Integer.parseInt(port) : 0)
-                .bindAddress("localhost")
-                .withRootDirectory("src/test/resources")
-                .extensions(new ResponseTemplateTransformer(false));
-        config.mappingSource(new JsonFileMappingsSource(config.filesRoot().child("stubs/party-mgmt")));
+        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/party-mgmt");
         wireMockRule = new WireMockClassRule(config);
     }
 
@@ -54,7 +46,7 @@ public class PartyManagementRestClientTest extends BaseFeignRestClientTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
-                    String.format("rest-client.party-mgmt.base-url=http://%s:%d/pdnd-interop-uservice-party-management/0.1",
+                    String.format("PARTY_MGMT_BASE_URL=http://%s:%d/pdnd-interop-uservice-party-management/0.1",
                             wireMockRule.getOptions().bindAddress(),
                             wireMockRule.port())
             );
