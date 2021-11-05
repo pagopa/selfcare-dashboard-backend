@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
-import it.pagopa.selfcare.commons.web.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.process.OnBoardingInfo;
