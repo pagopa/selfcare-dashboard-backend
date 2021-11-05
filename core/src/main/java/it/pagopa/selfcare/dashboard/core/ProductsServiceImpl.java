@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.rest.client.ProductsRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.products.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,29 +26,26 @@ class ProductsServiceImpl implements ProductsService {
     @Override
     public List<Product> getProducts() {
         List<Product> products = restClient.getProducts();
-        // TODO call get org enabled product
-        products = products.stream()// TODO filter org enabled product
-                .filter(product -> product.getId().equals(""))
-                .collect(Collectors.toList());
-        Optional<? extends GrantedAuthority> techAdminAuthority = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .stream()
-                .filter(grantedAuthority -> "TECH_ADMIN".equals(grantedAuthority.getAuthority()))
-                .findAny();
-        if (techAdminAuthority.isPresent()
-                // TODO: add && check instance of SelfCareGrantedAuthority
-                // TODO: cast to SelfCareGrantedAuthority and check if getProducts is not null
-        ) {
-            List<String> userAuthProducts = null; // TODO: ((SelfCareGrantedAuthority) techAdminAuthority.get()).getProducts()
-            // TODO filter user auth products
-            products = products.stream()// TODO filter org enabled product
-                    .filter(product -> userAuthProducts.contains(product.getId()))
-                    .collect(Collectors.toList());
-        }
-//        else {
-//                 products = products.stream()
+        // TODO call get org enabled product (endpoint TBD)
+        // TODO filter org enabled product
+//        products = products.stream()
 //                .filter(product -> product.getId().equals(""))
 //                .collect(Collectors.toList());
-//        }
+        Optional<? extends GrantedAuthority> techAdminAuthority = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> "TECH_REF".equals(grantedAuthority.getAuthority())) //TODO: move role name into Utils class
+                .findAny();
+        if (techAdminAuthority.isPresent()
+                && SelfCareGrantedAuthority.class.isAssignableFrom(techAdminAuthority.get().getClass())
+        ) {
+            Collection<String> userAuthProducts = ((SelfCareGrantedAuthority) techAdminAuthority.get()).getProducts();
+            if (userAuthProducts != null) {
+                // TODO filter user auth products
+                products = products.stream()// TODO filter org enabled product
+                        .filter(product -> userAuthProducts.contains(product.getId()))
+                        .collect(Collectors.toList());
+            }
+        }
 
         return products;
     }
