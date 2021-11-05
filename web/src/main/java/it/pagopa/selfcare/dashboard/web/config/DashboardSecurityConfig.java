@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.web.config;
 
 import it.pagopa.selfcare.commons.web.config.SecurityConfig;
 import it.pagopa.selfcare.commons.web.security.JwtService;
-import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.web.security.PartyAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,28 +15,26 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 @Configuration
 class DashboardSecurityConfig extends SecurityConfig {
 
-    private static final String ROLE_PREFIX = "";//TODO: remove me
-
-    private final PartyProcessRestClient restClient;
+    private final PartyAuthenticationProvider authenticationProvider;
 
 
     @Autowired
-    public DashboardSecurityConfig(JwtService jwtService, PartyProcessRestClient restClient) {
+    public DashboardSecurityConfig(JwtService jwtService, PartyAuthenticationProvider authenticationProvider) {
         super(jwtService);
-        this.restClient = restClient;
+        this.authenticationProvider = authenticationProvider;
     }
 
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(ROLE_PREFIX + "ADMIN > " + ROLE_PREFIX + "LEGAL\n" +
-                ROLE_PREFIX + "LEGAL > " + ROLE_PREFIX + "ADMIN_REF\n" +
-                ROLE_PREFIX + "ADMIN_REF > " + ROLE_PREFIX + "TECH_REF");
+        roleHierarchy.setHierarchy("ADMIN > LEGAL\n" +
+                "LEGAL > ADMIN_REF\n" +
+                "ADMIN_REF > TECH_REF");
         RoleHierarchyAuthoritiesMapper authoritiesMapper = new RoleHierarchyAuthoritiesMapper(roleHierarchy);
-        PartyAuthenticationProvider authenticationProvider = new PartyAuthenticationProvider(restClient);
         authenticationProvider.setAuthoritiesMapper(authoritiesMapper);
         authenticationManagerBuilder.authenticationProvider(authenticationProvider);
+        authenticationManagerBuilder.eraseCredentials(false);
     }
 
 
