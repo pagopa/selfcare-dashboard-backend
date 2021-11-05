@@ -8,6 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.ScalarType;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
@@ -66,6 +67,7 @@ class SwaggerConfig {
                         .in(ParameterType.HEADER)
                         .required(true)
                         .description("Institution identifier")
+                        .query(psb -> psb.model(msb -> msb.scalarModel(ScalarType.STRING)))
                         .build()));
     }
 

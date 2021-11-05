@@ -41,7 +41,11 @@
             "name": "x-selc-institutionId",
             "in": "header",
             "description": "Institution identifier",
-            "required": true
+            "required": true,
+            "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -87,7 +91,11 @@
             "name": "x-selc-institutionId",
             "in": "header",
             "description": "Institution identifier",
-            "required": true
+            "required": true,
+            "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
