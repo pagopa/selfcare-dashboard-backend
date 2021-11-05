@@ -1,0 +1,208 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "selc-dashboard",
+    "description": "Dashboard API documentation",
+    "version": "0.0.1-SNAPSHOT"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Inferred Url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "dashboard",
+      "description": "Dashboard operations"
+    }
+  ],
+  "paths": {
+    "/dashboard/organization/{organizationId}": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "getOrganization",
+        "description": "The service allows the recovery of an Entity based on its id",
+        "operationId": "getOrganizationUsingGET",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "description": "organization's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-selc-institutionId",
+            "in": "header",
+            "description": "Institution identifier",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/dashboard/products": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "summary": "getProducts",
+        "description": "Service that returns the list of PagoPA products",
+        "operationId": "getProductsUsingGET",
+        "parameters": [
+          {
+            "name": "x-selc-institutionId",
+            "in": "header",
+            "description": "Institution identifier",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductsResource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrganizationResource": {
+        "title": "OrganizationResource",
+        "type": "object",
+        "properties": {
+          "IPACode": {
+            "type": "string",
+            "description": "code IPA"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "fiscal code corresponding to the organization"
+          },
+          "id": {
+            "type": "string",
+            "description": "organization's unique identifier"
+          },
+          "logo": {
+            "type": "string",
+            "description": "organization's logo"
+          },
+          "mailAddress": {
+            "type": "string",
+            "description": "organization email address"
+          },
+          "organizationName": {
+            "type": "string",
+            "description": "organization name"
+          },
+          "organizationType": {
+            "type": "string",
+            "description": "organization type"
+          }
+        }
+      },
+      "ProductsResource": {
+        "title": "ProductsResource",
+        "type": "object",
+        "properties": {
+          "activationDateTime": {
+            "type": "string",
+            "description": "${swagger.products.model.activationDateTime}",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string",
+            "description": "${swagger.products.model.description}"
+          },
+          "id": {
+            "type": "string",
+            "description": "${swagger.products.model.id}"
+          },
+          "logo": {
+            "type": "string",
+            "description": "${swagger.products.model.logo}"
+          },
+          "title": {
+            "type": "string",
+            "description": "${swagger.products.model.title}"
+          },
+          "urlBO": {
+            "type": "string",
+            "description": "${swagger.products.model.urlBO}"
+          },
+          "urlPublic": {
+            "type": "string",
+            "description": "${swagger.products.model.urlPublic}"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "A bearer token in the format of a JWS and conformed to the specifications included in [RFC8725](https://tools.ietf.org/html/RFC8725)",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
