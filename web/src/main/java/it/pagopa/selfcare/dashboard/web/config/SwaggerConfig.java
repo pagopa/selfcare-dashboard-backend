@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.ScalarType;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
@@ -45,25 +47,28 @@ class SwaggerConfig {
                                       @Value("${swagger.security.schema.bearer.description}") String authSchemaDesc
     ) {
         return (new Docket(DocumentationType.OAS_30))
-                .apiInfo(apiInfo(title, description, version))
+                .apiInfo(new ApiInfoBuilder()
+                        .title(title)
+                        .description(description)
+                        .version(version)
+                        .build())
                 .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.web")).build()
                 .tags(new Tag("dashboard", productApiDesc))
                 .directModelSubstitute(LocalTime.class, String.class)
-                .securityContexts(Collections.singletonList(securityContext()))
+                .securityContexts(Collections.singletonList(SecurityContext.builder()
+                        .securityReferences(defaultAuth())
+                        .build()))
                 .securitySchemes(Collections.singletonList(HttpAuthenticationScheme.JWT_BEARER_BUILDER
                         .name(AUTH_SCHEMA_NAME)
                         .description(authSchemaDesc)
+                        .build()))
+                .globalRequestParameters(Collections.singletonList(new RequestParameterBuilder()
+                        .name("x-selc-institutionId")
+                        .in(ParameterType.HEADER)
+                        .required(true)
+                        .description("Institution identifier")
+                        .query(psb -> psb.model(msb -> msb.scalarModel(ScalarType.STRING)))
                         .build()));
-    }
-
-
-    private ApiInfo apiInfo(String title, String description, String version) {
-        return new ApiInfoBuilder().title(title).description(description).version(version).build();
-    }
-
-
-    private SecurityContext securityContext() {
-        return SecurityContext.builder().securityReferences(defaultAuth()).build();
     }
 
 

@@ -1,5 +1,5 @@
 server:
-  port: ${SELC_DASHBOARD_PORT:8080}
+  port: ${B4F_DASHBOARD_SERVER_PORT:8080}
 
 spring:
   application:
@@ -27,6 +27,4 @@ info:
 
 logging:
   level:
-    it.pagopa.selfcare.product: ${LOG_LEVEL_SELC_DASHBOARD:DEBUG}
-
-management.endpoint.health.probes.enabled: true
+    it.pagopa.selfcare.dashboard: ${B4F_DASHBOARD_LOG_LEVEL:DEBUG}

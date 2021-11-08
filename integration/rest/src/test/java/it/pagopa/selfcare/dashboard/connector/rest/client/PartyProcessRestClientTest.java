@@ -112,19 +112,49 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getOnBoardingInfo_fullyValued() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo("");
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED));
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getPerson());
         Assert.assertNotNull(response.getInstitutions());
+        Assert.assertNotNull(response.getPerson().getName());
+        Assert.assertNotNull(response.getPerson().getSurname());
+        Assert.assertNotNull(response.getPerson().getTaxCode());
+        Assert.assertNotNull(response.getInstitutions().get(0).getDescription());
+        Assert.assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
+        Assert.assertNotNull(response.getInstitutions().get(0).getPlatformRole());
+        Assert.assertNotNull(response.getInstitutions().get(0).getRole());
+        Assert.assertNotNull(response.getInstitutions().get(0).getStatus());
+        Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
     }
 
     @Test
     public void getOnBoardingInfo_fullyNull() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(null);
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL));
         // then
-        Assert.assertNull(response.getInstitutions().get(0).getInstitutionId());
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getPerson());
+        Assert.assertNotNull(response.getInstitutions());
+        Assert.assertNull(response.getPerson().getName());
+        Assert.assertNull(response.getPerson().getSurname());
+        Assert.assertNull(response.getPerson().getTaxCode());
+        Assert.assertNull(response.getInstitutions().get(0).getDescription());
+        Assert.assertNull(response.getInstitutions().get(0).getDigitalAddress());
+        Assert.assertNull(response.getInstitutions().get(0).getPlatformRole());
+        Assert.assertNull(response.getInstitutions().get(0).getRole());
+        Assert.assertNull(response.getInstitutions().get(0).getStatus());
+        Assert.assertNull(response.getInstitutions().get(0).getAttributes());
+    }
+
+    @Test
+    public void getOnBoardingInfo_emptyResult() {
+        // given and when
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.EMPTY_RESULT));
+        // then
+        Assert.assertNotNull(response);
+        Assert.assertTrue(response.getInstitutions().isEmpty());
+        Assert.assertNull(response.getPerson());
     }
 
 }

@@ -2,45 +2,46 @@ package it.pagopa.selfcare.dashboard.web.config;
 
 import it.pagopa.selfcare.commons.web.config.SecurityConfig;
 import it.pagopa.selfcare.commons.web.security.JwtService;
-import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.web.security.PartyAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.TestingAuthenticationProvider;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 
 @Slf4j
 @Configuration
 class DashboardSecurityConfig extends SecurityConfig {
 
-    private final PartyProcessRestClient restClient;
+    private final PartyAuthenticationProvider authenticationProvider;
 
 
     @Autowired
-    public DashboardSecurityConfig(JwtService jwtService, PartyProcessRestClient restClient) {
+    public DashboardSecurityConfig(JwtService jwtService, PartyAuthenticationProvider authenticationProvider) {
         super(jwtService);
-        this.restClient = restClient;
+        this.authenticationProvider = authenticationProvider;
     }
 
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
-        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
-        mapper.setConvertToUpperCase(true);
-        mapper.afterPropertiesSet();
-        PartyAuthenticationProvider authenticationProvider = new PartyAuthenticationProvider(restClient);
-        authenticationProvider.setAuthoritiesMapper(mapper);
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ADMIN > LEGAL\n" +
+                "LEGAL > ADMIN_REF\n" +
+                "ADMIN_REF > TECH_REF");
+        RoleHierarchyAuthoritiesMapper authoritiesMapper = new RoleHierarchyAuthoritiesMapper(roleHierarchy);
+        authenticationProvider.setAuthoritiesMapper(authoritiesMapper);
         authenticationManagerBuilder.authenticationProvider(authenticationProvider);
-        authenticationManagerBuilder.authenticationProvider(new TestingAuthenticationProvider()); // FIXME: remove after implemented real role based authorization
+        authenticationManagerBuilder.eraseCredentials(false);
     }
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/dashboard/products/**").hasAuthority("TECH_REF")
                 .anyRequest().permitAll();
         super.configure(http);
     }

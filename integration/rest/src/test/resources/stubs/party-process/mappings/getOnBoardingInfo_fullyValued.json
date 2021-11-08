@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info"
+    "url": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info?institutionId=institutionId1"
   },
   "response": {
     "status": "200",

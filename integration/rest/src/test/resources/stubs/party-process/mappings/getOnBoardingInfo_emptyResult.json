@@ -1,15 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "url": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info?institutionId=institutionId2"
+    "url": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info?institutionId=institutionId3"
   },
   "response": {
     "status": "200",
     "jsonBody": {
-      "person": { },
-      "institutions": [
-        { }
-      ]
+      "person": null,
+      "institutions": [ ]
     },
     "headers": {
       "Content-Type": "application/json"
