@@ -37,9 +37,10 @@ public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticati
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         User user = null;
 
-        if (SelfCareAuthenticationDetails.class.isAssignableFrom(authentication.getDetails().getClass())) {
-            SelfCareAuthenticationDetails details = (SelfCareAuthenticationDetails) authentication.getDetails();
-            OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(details.getInstitutionId());
+        Object authenticationDetails = authentication.getDetails();
+        if (authenticationDetails != null
+                && SelfCareAuthenticationDetails.class.isAssignableFrom(authenticationDetails.getClass())) {
+            OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(((SelfCareAuthenticationDetails) authenticationDetails).getInstitutionId());
 
             if (onBoardingInfo != null && !onBoardingInfo.getInstitutions().isEmpty()) {
                 InstitutionInfo institutionInfo = onBoardingInfo.getInstitutions().get(0);
