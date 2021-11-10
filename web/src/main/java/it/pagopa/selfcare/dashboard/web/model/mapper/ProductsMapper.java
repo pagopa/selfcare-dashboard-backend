@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.products.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
 
 public class ProductsMapper {

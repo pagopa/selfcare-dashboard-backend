@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
+import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
 
 public interface PartyManagementService {
 

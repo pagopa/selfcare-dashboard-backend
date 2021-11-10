@@ -16,6 +16,16 @@
             <groupId>it.pagopa.selfcare</groupId>
             <artifactId>selc-dashboard-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>it.pagopa.selfcare</groupId>
+            <artifactId>selc-dashboard-connector-rest</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.pagopa.selfcare</groupId>
+            <artifactId>selc-dashboard-connector-azure-storage</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

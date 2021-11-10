@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
-import it.pagopa.selfcare.dashboard.connector.rest.client.ProductsRestClient;
+import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ class ProductsServiceImplTest {
     @InjectMocks
     private ProductsServiceImpl productsService;
     @Mock
-    private ProductsRestClient restClient;
+    private ProductsConnector productsConnectorMock;
 
     @Test
     void getProducts() {//FIXME
@@ -31,6 +31,6 @@ class ProductsServiceImplTest {
         //given and when
         productsService.getProducts();
         //then
-        Mockito.verify(restClient, Mockito.times(1)).getProducts();
+        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
     }
 }

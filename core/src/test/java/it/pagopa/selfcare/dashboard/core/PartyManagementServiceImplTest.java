@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
+import it.pagopa.selfcare.dashboard.connector.api.PartyManagementConnector;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +15,7 @@ class PartyManagementServiceImplTest {
     private PartyManagementServiceImpl partyManagementService;
 
     @Mock
-    private PartyManagementRestClient restClientMock;
+    private PartyManagementConnector partyManagementConnectorMock;
 
 
     @Test
@@ -24,7 +24,7 @@ class PartyManagementServiceImplTest {
         partyManagementService.getOrganization(null);
         // then
         // verifica che il metodo getOrganization del restClientMock sia stato invocato una volta
-        Mockito.verify(restClientMock, Mockito.times(1)).getOrganization(null);
-        Mockito.verifyNoMoreInteractions(restClientMock);
+        Mockito.verify(partyManagementConnectorMock, Mockito.times(1)).getOrganization(null);
+        Mockito.verifyNoMoreInteractions(partyManagementConnectorMock);
     }
 }

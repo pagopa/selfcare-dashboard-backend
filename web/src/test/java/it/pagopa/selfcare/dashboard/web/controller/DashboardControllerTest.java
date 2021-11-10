@@ -3,10 +3,11 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
-import it.pagopa.selfcare.dashboard.connector.rest.model.products.Product;
+import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.core.PartyManagementService;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
+import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(value = {DashboardController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = { DashboardController.class })
+@ContextConfiguration(classes = {DashboardController.class, WebTestConfig.class})
 class DashboardControllerTest {
 
     private static final String BASE_URL = "/dashboard";
@@ -58,9 +59,9 @@ class DashboardControllerTest {
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/organization/organizationId")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .get(BASE_URL + "/organization/organizationId")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -75,9 +76,9 @@ class DashboardControllerTest {
                 .thenReturn(null);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/organization/organizationId")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .get(BASE_URL + "/organization/organizationId")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -92,9 +93,9 @@ class DashboardControllerTest {
                 .thenReturn(Collections.singletonList(PRODUCT));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/products")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .get(BASE_URL + "/products")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -113,9 +114,9 @@ class DashboardControllerTest {
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/products")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .get(BASE_URL + "/products")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
         // then

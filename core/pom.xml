@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
-            <artifactId>selc-dashboard-integration-rest</artifactId>
+            <artifactId>selc-dashboard-connector-api</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,23 +1,22 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
-import it.pagopa.selfcare.dashboard.core.PartyManagementService;
+import it.pagopa.selfcare.dashboard.connector.api.PartyManagementConnector;
+import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 class PartyManagementServiceImpl implements PartyManagementService {
 
-    private final PartyManagementRestClient restClient;
+    private final PartyManagementConnector partyManagementConnector;
 
     @Autowired
-    public PartyManagementServiceImpl(PartyManagementRestClient restClient) {
-        this.restClient = restClient;
+    public PartyManagementServiceImpl(PartyManagementConnector partyManagementConnector) {
+        this.partyManagementConnector = partyManagementConnector;
     }
 
     @Override
     public Organization getOrganization(String organizationId) {
-        return restClient.getOrganization(organizationId);
+        return partyManagementConnector.getOrganization(organizationId);
     }
 }
