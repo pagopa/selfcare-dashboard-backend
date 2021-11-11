@@ -3,9 +3,10 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.core.PartyManagementService;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
@@ -39,7 +40,7 @@ class DashboardControllerTest {
     private ProductsService productsService;
 
     @MockBean
-    private PartyManagementService PartyManagementServiceMock;
+    private PartyConnector partyConnectorMock;
 
     @Autowired
     protected MockMvc mvc;
@@ -50,12 +51,14 @@ class DashboardControllerTest {
     @Test
     void getOrganizationNotNull() throws Exception {
         // given
-        Mockito.when(PartyManagementServiceMock.getOrganization(Mockito.anyString()))
+        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
-                    Organization p = new Organization();
-                    p.setInstitutionId(id);
-                    return p;
+                    InstitutionInfo institutionInfo = new InstitutionInfo();
+                    institutionInfo.setInstitutionId(id);
+                    OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+                    onBoardingInfo.setInstitutions(List.of(institutionInfo));
+                    return onBoardingInfo;
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -72,7 +75,7 @@ class DashboardControllerTest {
     @Test
     void getOrganizationNull() throws Exception {
         // given
-        Mockito.when(PartyManagementServiceMock.getOrganization(Mockito.anyString()))
+        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
                 .thenReturn(null);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders

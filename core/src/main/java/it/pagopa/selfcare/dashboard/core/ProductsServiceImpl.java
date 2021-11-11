@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 class ProductsServiceImpl implements ProductsService {
 
     private final ProductsConnector productsConnector;
+    @Autowired
+    private PartyConnector partyConnector;
 
     @Autowired
     public ProductsServiceImpl(ProductsConnector productsConnector) {
@@ -25,6 +28,13 @@ class ProductsServiceImpl implements ProductsService {
 
     @Override
     public List<Product> getProducts() {
+//        String institutionId = ((SelfCareAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails())
+//                .getInstitutionId();
+//        partyConnector.getOnBoardingInfo(institutionId)
+//                .getInstitutions()
+//                .stream()
+//                .map(InstitutionInfo::getAttributes)//FIXME: replace with org enabled product list
+//                .
         List<Product> products = productsConnector.getProducts();
         // TODO call get org enabled product (endpoint TBD)
         // TODO filter org enabled product

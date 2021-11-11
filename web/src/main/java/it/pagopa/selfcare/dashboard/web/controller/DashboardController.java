@@ -3,9 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.core.PartyManagementService;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
 import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
 @Api(tags = "dashboard")
 public class DashboardController {
 
-    private final PartyManagementService partyManagementService;
+    private final PartyConnector partyConnector;
     private final ProductsService productsService;
 
 
     @Autowired
-    public DashboardController(PartyManagementService partyManagementService, ProductsService productsService) {
-        this.partyManagementService = partyManagementService;
+    public DashboardController(PartyConnector partyConnector, ProductsService productsService) {
+        this.partyConnector = partyConnector;
         this.productsService = productsService;
     }
 
@@ -41,8 +41,8 @@ public class DashboardController {
     public OrganizationResource getOrganization(@ApiParam("${swagger.dashboard.model.id}")
                                                 @PathVariable("organizationId")
                                                         String organizationId) {
-        Organization organization = partyManagementService.getOrganization(organizationId);
-        return OrganizationMapper.toResource(organization);
+        OnBoardingInfo onBoardingInfo = partyConnector.getOnBoardingInfo(organizationId);
+        return OrganizationMapper.toResource(onBoardingInfo);
     }
 
 
