@@ -1,7 +1,12 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +14,20 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class})
@@ -26,8 +38,14 @@ class InstitutionControllerTest {
     @Autowired
     protected MockMvc mvc;
 
+    @Autowired
+    protected ObjectMapper objectMapper;
+
     @MockBean
-    private FileStorageService storageService;
+    private FileStorageService storageServiceMock;
+
+    @MockBean
+    private PartyConnector partyConnectorMock;
 
 
     @Test
@@ -47,11 +65,52 @@ class InstitutionControllerTest {
         });
         // when
         mvc.perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk());
         // then
-        Mockito.verify(storageService, Mockito.times(1))
+        Mockito.verify(storageServiceMock, Mockito.times(1))
                 .storeInstitutionLogo(Mockito.eq(institutionId), Mockito.any(), Mockito.eq(contentType), Mockito.eq(filename));
-        Mockito.verifyNoMoreInteractions(storageService);
+        Mockito.verifyNoMoreInteractions(storageServiceMock);
+    }
+
+
+    @Test
+    void getOnBoardingInfoNotNull() throws Exception {
+        // given
+        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
+                .thenAnswer(invocationOnMock -> {
+                    String id = invocationOnMock.getArgument(0, String.class);
+                    InstitutionInfo institutionInfo = new InstitutionInfo();
+                    institutionInfo.setInstitutionId(id);
+                    OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+                    onBoardingInfo.setInstitutions(List.of(institutionInfo));
+                    return onBoardingInfo;
+                });
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/institutionId")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        // then
+        InstitutionResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionResource.class);
+        assertNotNull(resource);
+    }
+
+    @Test
+    void getOnBoardingInfoNull() throws Exception {
+        // given
+        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
+                .thenReturn(null);
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/institutionId")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        // then
+        assertEquals("", result.getResponse().getContentAsString());
     }
 
 }

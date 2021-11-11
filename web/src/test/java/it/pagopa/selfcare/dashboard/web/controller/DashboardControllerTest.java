@@ -3,13 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,54 +35,11 @@ class DashboardControllerTest {
     @MockBean
     private ProductsService productsService;
 
-    @MockBean
-    private PartyConnector partyConnectorMock;
-
     @Autowired
     protected MockMvc mvc;
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @Test
-    void getOnBoardingInfoNotNull() throws Exception {
-        // given
-        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
-                .thenAnswer(invocationOnMock -> {
-                    String id = invocationOnMock.getArgument(0, String.class);
-                    InstitutionInfo institutionInfo = new InstitutionInfo();
-                    institutionInfo.setInstitutionId(id);
-                    OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-                    onBoardingInfo.setInstitutions(List.of(institutionInfo));
-                    return onBoardingInfo;
-                });
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/institutions/institutionId")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andReturn();
-        // then
-        InstitutionResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionResource.class);
-        assertNotNull(resource);
-    }
-
-    @Test
-    void getOnBoardingInfoNull() throws Exception {
-        // given
-        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
-                .thenReturn(null);
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/institutions/institutionId")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andReturn();
-        // then
-        assertEquals("", result.getResponse().getContentAsString());
-    }
 
 
     @Test

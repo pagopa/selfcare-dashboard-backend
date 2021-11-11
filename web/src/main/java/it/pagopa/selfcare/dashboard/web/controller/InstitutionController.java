@@ -3,7 +3,11 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,11 +22,13 @@ import java.io.IOException;
 public class InstitutionController {
 
     private final FileStorageService storageService;
+    private final PartyConnector partyConnector;
 
 
     @Autowired
-    public InstitutionController(FileStorageService storageService) {
+    public InstitutionController(FileStorageService storageService, PartyConnector partyConnector) {
         this.storageService = storageService;
+        this.partyConnector = partyConnector;
     }
 
 
@@ -35,6 +41,17 @@ public class InstitutionController {
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         return null;
+    }
+
+
+    @GetMapping("/{institutionId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
+    public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId")
+                                                      String institutionId) {
+        OnBoardingInfo onBoardingInfo = partyConnector.getOnBoardingInfo(institutionId);
+        return InstitutionMapper.toResource(onBoardingInfo);
     }
 
 }
