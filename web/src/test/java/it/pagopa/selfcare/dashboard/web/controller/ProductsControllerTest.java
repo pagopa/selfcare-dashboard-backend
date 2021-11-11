@@ -25,11 +25,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(value = {DashboardController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {DashboardController.class, WebTestConfig.class})
-class DashboardControllerTest {
+@WebMvcTest(value = {ProductsController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@ContextConfiguration(classes = {ProductsController.class, WebTestConfig.class})
+class ProductsControllerTest {
 
-    private static final String BASE_URL = "/dashboard";
+    private static final String BASE_URL = "/products";
     private static final Product PRODUCT = TestUtils.mockInstance(new Product());
 
     @MockBean
@@ -49,7 +49,7 @@ class DashboardControllerTest {
                 .thenReturn(Collections.singletonList(PRODUCT));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/products")
+                .get(BASE_URL + "/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -70,7 +70,7 @@ class DashboardControllerTest {
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/products")
+                .get(BASE_URL + "/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())

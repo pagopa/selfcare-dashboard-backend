@@ -18,20 +18,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/dashboard", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = "dashboard")
-public class DashboardController {
+@RequestMapping(value = "/products", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "products")
+public class ProductsController {
 
     private final ProductsService productsService;
 
 
     @Autowired
-    public DashboardController(ProductsService productsService) {
+    public ProductsController(ProductsService productsService) {
         this.productsService = productsService;
     }
 
 
-    @GetMapping("/products")
+    @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.products.api.getProducts}")
     public List<ProductsResource> getProducts() {
