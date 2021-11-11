@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping(value = "/institutions", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "institutions")
 public class InstitutionController {
 
@@ -50,8 +50,8 @@ public class InstitutionController {
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                                       String institutionId) {
-        OnBoardingInfo onBoardingInfo = partyConnector.getOnBoardingInfo(institutionId);
-        return InstitutionMapper.toResource(onBoardingInfo);
+        InstitutionInfo institutionInfo = partyConnector.getInstitutionInfo(institutionId);
+        return InstitutionMapper.toResource(institutionInfo);
     }
 
 }

@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.connector.model.onboarding;
+package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

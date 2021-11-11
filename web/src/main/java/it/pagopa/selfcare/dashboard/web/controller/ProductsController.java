@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/products", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "products")
 public class ProductsController {
 
@@ -31,7 +31,7 @@ public class ProductsController {
     }
 
 
-    @GetMapping("/")
+    @GetMapping(value = "/")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.products.api.getProducts}")
     public List<ProductsResource> getProducts() {

@@ -1,12 +1,9 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.web.DummyInstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -16,12 +13,10 @@ class InstitutionMapperTest {
     @Test
     void toResourceNotNull() {
         // given
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
-        OnBoardingInfo onBoardingInfo = TestUtils.mockInstance(new OnBoardingInfo());
-        onBoardingInfo.setInstitutions(List.of(institutionInfo));
+        DummyInstitutionInfo institutionInfo = TestUtils.mockInstance(new DummyInstitutionInfo());
 
         // when
-        InstitutionResource resource = InstitutionMapper.toResource(onBoardingInfo);
+        InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
         assertEquals(institutionInfo.getInstitutionId(), resource.getId());
         assertEquals(null, resource.getType());//TODO
@@ -29,8 +24,9 @@ class InstitutionMapperTest {
         assertEquals(null, resource.getFiscalCode());//TODO
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
         assertEquals(null, resource.getIPACode());//TODO
-        TestUtils.reflectionEqualsByName(onBoardingInfo, resource);
+        TestUtils.reflectionEqualsByName(institutionInfo, resource);
     }
+
 
     @Test
     void toResourceNull() {
@@ -39,4 +35,5 @@ class InstitutionMapperTest {
         // then
         assertNull(institutionResource);
     }
+
 }

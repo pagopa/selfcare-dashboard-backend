@@ -2,9 +2,8 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
+import it.pagopa.selfcare.dashboard.web.DummyInstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,6 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -74,16 +71,14 @@ class InstitutionControllerTest {
 
 
     @Test
-    void getOnBoardingInfoNotNull() throws Exception {
+    void getInstitution_institutionInfoNotNull() throws Exception {
         // given
-        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
+        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
-                    InstitutionInfo institutionInfo = new InstitutionInfo();
+                    DummyInstitutionInfo institutionInfo = new DummyInstitutionInfo();
                     institutionInfo.setInstitutionId(id);
-                    OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-                    onBoardingInfo.setInstitutions(List.of(institutionInfo));
-                    return onBoardingInfo;
+                    return institutionInfo;
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -98,9 +93,9 @@ class InstitutionControllerTest {
     }
 
     @Test
-    void getOnBoardingInfoNull() throws Exception {
+    void getInstitution_institutionInfoNull() throws Exception {
         // given
-        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.anyString()))
+        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.anyString()))
                 .thenReturn(null);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders

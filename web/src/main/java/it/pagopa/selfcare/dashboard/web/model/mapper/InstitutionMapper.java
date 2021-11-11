@@ -1,26 +1,21 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 
 public class InstitutionMapper {
 
-    public static InstitutionResource toResource(OnBoardingInfo model) {
-        InstitutionResource resource;
+    public static InstitutionResource toResource(InstitutionInfo model) {
+        InstitutionResource resource = null;
 
-        try {
-            InstitutionInfo institutionInfo = model.getInstitutions().get(0);
+        if (model != null) {
             resource = new InstitutionResource();
-            resource.setId(institutionInfo.getInstitutionId());
-            resource.setName(institutionInfo.getDescription());
+            resource.setId(model.getInstitutionId());
+            resource.setName(model.getDescription());
             resource.setType(null);//TODO
             resource.setIPACode(null);//TODO
             resource.setFiscalCode(null);//TODO
-            resource.setMailAddress(institutionInfo.getDigitalAddress());
-
-        } catch (Exception e) {
-            resource = null;
+            resource.setMailAddress(model.getDigitalAddress());
         }
 
         return resource;
