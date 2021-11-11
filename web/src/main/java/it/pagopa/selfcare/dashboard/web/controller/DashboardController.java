@@ -7,9 +7,9 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
-import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
-import it.pagopa.selfcare.dashboard.web.model.mapper.OrganizationMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,14 +35,14 @@ public class DashboardController {
     }
 
 
-    @GetMapping("/organization/{organizationId}")
+    @GetMapping("/institutions/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.api.getOrganization}")
-    public OrganizationResource getOrganization(@ApiParam("${swagger.dashboard.model.id}")
-                                                @PathVariable("organizationId")
-                                                        String organizationId) {
-        OnBoardingInfo onBoardingInfo = partyConnector.getOnBoardingInfo(organizationId);
-        return OrganizationMapper.toResource(onBoardingInfo);
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
+    public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId")
+                                                      String institutionId) {
+        OnBoardingInfo onBoardingInfo = partyConnector.getOnBoardingInfo(institutionId);
+        return InstitutionMapper.toResource(onBoardingInfo);
     }
 
 

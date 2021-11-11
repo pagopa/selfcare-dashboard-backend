@@ -3,7 +3,7 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class OrganizationMapperTest {
+class InstitutionMapperTest {
 
     @Test
     void toResourceNotNull() {
@@ -21,12 +21,11 @@ class OrganizationMapperTest {
         onBoardingInfo.setInstitutions(List.of(institutionInfo));
 
         // when
-        OrganizationResource resource = OrganizationMapper.toResource(onBoardingInfo);
+        InstitutionResource resource = InstitutionMapper.toResource(onBoardingInfo);
         // then
         assertEquals(institutionInfo.getInstitutionId(), resource.getId());
-        assertEquals(null, resource.getLogo());//TODO
-        assertEquals(null, resource.getOrganizationType());//TODO
-        assertEquals(institutionInfo.getDescription(), resource.getOrganizationName());
+        assertEquals(null, resource.getType());//TODO
+        assertEquals(institutionInfo.getDescription(), resource.getName());
         assertEquals(null, resource.getFiscalCode());//TODO
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
         assertEquals(null, resource.getIPACode());//TODO
@@ -36,8 +35,8 @@ class OrganizationMapperTest {
     @Test
     void toResourceNull() {
         // given and when
-        OrganizationResource organizationResource = OrganizationMapper.toResource(null);
+        InstitutionResource institutionResource = InstitutionMapper.toResource(null);
         // then
-        assertNull(organizationResource);
+        assertNull(institutionResource);
     }
 }
