@@ -11,10 +11,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.TimeZone;
 
 @Configuration
+@PropertySource("classpath:config/web-config.properties")
 class WebConfig {
 
     @Bean

@@ -41,7 +41,8 @@ class DashboardSecurityConfig extends SecurityConfig {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/dashboard/products/**").hasAuthority("TECH_REF")
+                .antMatchers("/dashboard/**").hasAuthority("TECH_REF")
+                .antMatchers("/institutions/**").hasAuthority("TECH_REF")
                 .anyRequest().permitAll();
         super.configure(http);
     }

@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
-import it.pagopa.selfcare.dashboard.connector.rest.client.ProductsRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.products.Product;
+import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,16 +16,16 @@ import java.util.stream.Collectors;
 @Service
 class ProductsServiceImpl implements ProductsService {
 
-    private final ProductsRestClient restClient;
+    private final ProductsConnector productsConnector;
 
     @Autowired
-    public ProductsServiceImpl(ProductsRestClient restClient) {
-        this.restClient = restClient;
+    public ProductsServiceImpl(ProductsConnector productsConnector) {
+        this.productsConnector = productsConnector;
     }
 
     @Override
     public List<Product> getProducts() {
-        List<Product> products = restClient.getProducts();
+        List<Product> products = productsConnector.getProducts();
         // TODO call get org enabled product (endpoint TBD)
         // TODO filter org enabled product
 //        products = products.stream()
@@ -46,6 +46,8 @@ class ProductsServiceImpl implements ProductsService {
                         .collect(Collectors.toList());
             }
         }
+
+        //TODO: add active flag to products
 
         return products;
     }

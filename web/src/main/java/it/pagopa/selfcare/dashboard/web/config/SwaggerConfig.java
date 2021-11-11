@@ -1,10 +1,8 @@
 package it.pagopa.selfcare.dashboard.web.config;
 
+import it.pagopa.selfcare.commons.web.handler.RestExceptionsHandler;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
@@ -22,6 +20,7 @@ import java.util.List;
  * The Class SwaggerConfig.
  */
 @Configuration
+@Import(RestExceptionsHandler.class)
 class SwaggerConfig {
 
     public static final String AUTH_SCHEMA_NAME = "bearerAuth";
@@ -44,6 +43,7 @@ class SwaggerConfig {
                                       @Value("${swagger.description:Api and Models}") String description,
                                       @Value("${swagger.version:${spring.application.version}}") String version,
                                       @Value("${swagger.dashboard.api.description}") String productApiDesc,
+                                      @Value("${swagger.dashboard.products.api.description}") String institutionApiDesc,
                                       @Value("${swagger.security.schema.bearer.description}") String authSchemaDesc
     ) {
         return (new Docket(DocumentationType.OAS_30))
@@ -53,7 +53,8 @@ class SwaggerConfig {
                         .version(version)
                         .build())
                 .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.web")).build()
-                .tags(new Tag("dashboard", productApiDesc))
+                .tags(new Tag("dashboard", productApiDesc),
+                        new Tag("institutions", institutionApiDesc))
                 .directModelSubstitute(LocalTime.class, String.class)
                 .securityContexts(Collections.singletonList(SecurityContext.builder()
                         .securityReferences(defaultAuth())

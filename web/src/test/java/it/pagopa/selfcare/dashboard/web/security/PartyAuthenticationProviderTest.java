@@ -1,9 +1,9 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
-import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.process.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.process.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PartyAuthenticationProviderTest {
 
     @Mock
-    private PartyProcessRestClient restClientMock;
+    private PartyConnector partyConnectorMock;
 
     @InjectMocks
     private PartyAuthenticationProvider authenticationProvider;
@@ -54,9 +54,9 @@ class PartyAuthenticationProviderTest {
         UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
         // then
         assertNull(userDetails);
-        Mockito.verify(restClientMock, Mockito.times(1))
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getOnBoardingInfo(Mockito.eq(institutionId));
-        Mockito.verifyNoMoreInteractions(restClientMock);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
     @Test
@@ -69,15 +69,15 @@ class PartyAuthenticationProviderTest {
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         onBoardingInfo.setInstitutions(Collections.emptyList());
-        Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any()))
+        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.any()))
                 .thenReturn(onBoardingInfo);
         // when
         UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
         // then
         assertNull(userDetails);
-        Mockito.verify(restClientMock, Mockito.times(1))
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getOnBoardingInfo(Mockito.eq(institutionId));
-        Mockito.verifyNoMoreInteractions(restClientMock);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
 
@@ -94,7 +94,7 @@ class PartyAuthenticationProviderTest {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setPlatformRole(role);
         onBoardingInfo.setInstitutions(Collections.singletonList(institutionInfo));
-        Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any()))
+        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.any()))
                 .thenReturn(onBoardingInfo);
         // when
         UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
@@ -105,9 +105,9 @@ class PartyAuthenticationProviderTest {
         Optional<? extends GrantedAuthority> grantedAuthority = userDetails.getAuthorities().stream().findAny();
         assertTrue(grantedAuthority.isPresent());
         assertEquals(role, grantedAuthority.get().getAuthority());
-        Mockito.verify(restClientMock, Mockito.times(1))
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getOnBoardingInfo(Mockito.eq(institutionId));
-        Mockito.verifyNoMoreInteractions(restClientMock);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
 
 
     }

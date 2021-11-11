@@ -1,11 +1,12 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
+import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
 import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OrganizationMapperTest {
 

@@ -7,15 +7,8 @@ spring:
     version: "@project.version@"
   profiles:
     include:
-      # TO enable specific-language documentations
       - swaggerEN
-#  jackson:
-#    default-property-inclusion: NON_NULL
-#    serialization.write-dates-as-timestamps: false
-#    serialization.fail-on-empty-beans: false
-#    deserialization.fail-on-unknown-properties: false
-#    visibility.all: NONE
-#    visibility.field: ANY
+      - AzureStorage
 
 info:
   build:

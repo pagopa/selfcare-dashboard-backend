@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.party_mgmt.Organization;
+import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
 import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
 
 public class OrganizationMapper {
