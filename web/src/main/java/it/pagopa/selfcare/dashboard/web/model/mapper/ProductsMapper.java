@@ -4,6 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
 
 public class ProductsMapper {
+
     public static ProductsResource toResource(Product model) {
         ProductsResource resource = null;
         if (model != null) {
@@ -15,8 +16,11 @@ public class ProductsMapper {
             resource.setUrlPublic(model.getUrlPublic());
             resource.setUrlBO(model.getUrlBO());
             resource.setActivationDateTime(model.getActivationDateTime());
+            resource.setActive(model.isActive());
+            resource.setAuthorized(model.isAuthorized());
         }
 
         return resource;
     }
+
 }

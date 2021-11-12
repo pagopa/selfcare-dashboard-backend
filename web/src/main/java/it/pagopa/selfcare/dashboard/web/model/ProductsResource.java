@@ -21,4 +21,8 @@ public class ProductsResource {
     private String urlBO;
     @ApiModelProperty("${swagger.products.model.activationDateTime}")
     private OffsetDateTime activationDateTime;
+    @ApiModelProperty("${swagger.products.model.active}")
+    private boolean active;
+    @ApiModelProperty("${swagger.products.model.authorized}")
+    private boolean authorized;
 }
