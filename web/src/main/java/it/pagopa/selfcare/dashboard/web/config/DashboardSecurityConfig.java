@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.web.security.PartyAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -42,6 +43,7 @@ class DashboardSecurityConfig extends SecurityConfig {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/dashboard/**").hasAuthority("TECH_REF")
+                .antMatchers(HttpMethod.PUT, "/institutions/**/logo").hasAuthority("ADMIN_REF")
                 .antMatchers("/institutions/**").hasAuthority("TECH_REF")
                 .anyRequest().permitAll();
         super.configure(http);
