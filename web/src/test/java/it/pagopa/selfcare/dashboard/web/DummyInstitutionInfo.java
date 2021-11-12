@@ -4,6 +4,8 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 public class DummyInstitutionInfo implements InstitutionInfo {
@@ -18,4 +20,7 @@ public class DummyInstitutionInfo implements InstitutionInfo {
     private String role;
 
     private String platformRole;
+
+    private List<String> activeProducts;
+
 }

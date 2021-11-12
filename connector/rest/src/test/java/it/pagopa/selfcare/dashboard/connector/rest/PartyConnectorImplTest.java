@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -59,25 +61,49 @@ class PartyConnectorImplTest {
 
 
     @Test
-    void getInstitutionInfo() {
+    void getInstitutionInfo_nullInstitutionProduct() {
         // given
         String institutionId = "institutionId";
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.InstitutionInfo instInfo =
-                TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.InstitutionInfo());
-        onBoardingInfo.setInstitutions(Collections.singletonList(instInfo));
+        OnboardingData onboardingData = TestUtils.mockInstance(new OnboardingData());
+        onBoardingInfo.setInstitutions(Collections.singletonList(onboardingData));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any()))
                 .thenReturn(onBoardingInfo);
         // when
         InstitutionInfo institutionInfo = partyConnector.getInstitutionInfo(institutionId);
         // then
         assertNotNull(institutionInfo);
-        assertEquals(instInfo.getDescription(), institutionInfo.getDescription());
-        assertEquals(instInfo.getDigitalAddress(), institutionInfo.getDigitalAddress());
-        assertEquals(instInfo.getInstitutionId(), institutionInfo.getInstitutionId());
-        assertEquals(instInfo.getPlatformRole(), institutionInfo.getPlatformRole());
-        assertEquals(instInfo.getRole(), institutionInfo.getRole());
-        assertEquals(instInfo.getStatus(), institutionInfo.getStatus());
+        assertNull(institutionInfo.getActiveProducts());
+        assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
+        assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
+        assertEquals(onboardingData.getInstitutionId(), institutionInfo.getInstitutionId());
+        assertEquals(onboardingData.getState().toString(), institutionInfo.getStatus());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getOnBoardingInfo(Mockito.eq(institutionId));
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    @Test
+    void getInstitutionInfo() {
+        // given
+        String institutionId = "institutionId";
+        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+        OnboardingData onboardingData = TestUtils.mockInstance(new OnboardingData());
+        onboardingData.setInstitutionProducts(List.of("prod_1"));
+        onBoardingInfo.setInstitutions(Collections.singletonList(onboardingData));
+        Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any()))
+                .thenReturn(onBoardingInfo);
+        // when
+        InstitutionInfo institutionInfo = partyConnector.getInstitutionInfo(institutionId);
+        // then
+        assertNotNull(institutionInfo);
+        assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
+        assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
+        assertEquals(onboardingData.getInstitutionId(), institutionInfo.getInstitutionId());
+        assertEquals(onboardingData.getState().toString(), institutionInfo.getStatus());
+        assertNotNull(institutionInfo.getActiveProducts());
+        assertIterableEquals(onboardingData.getInstitutionProducts(), institutionInfo.getActiveProducts());
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getOnBoardingInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -115,25 +141,47 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+
     @Test
-    void getAuthInfo() {
+    void getAuthInfo_nullRelationshipProducts() {
         // given
         String institutionId = "institutionId";
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.InstitutionInfo instInfo =
-                TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.InstitutionInfo());
-        onBoardingInfo.setInstitutions(Collections.singletonList(instInfo));
+        OnboardingData onboardingData = TestUtils.mockInstance(new OnboardingData());
+        onBoardingInfo.setInstitutions(Collections.singletonList(onboardingData));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any()))
                 .thenReturn(onBoardingInfo);
         // when
         AuthInfo authInfo = partyConnector.getAuthInfo(institutionId);
         // then
         assertNotNull(authInfo);
-        assertEquals(instInfo.getPlatformRole(), authInfo.getRole());
-//        assertNotNull(authInfo.getProducts());//TODO: test after swagger update
-//        assertFalse(authInfo.getProducts().isEmpty());//TODO: test after swagger update
+        assertNull(authInfo.getProducts());
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getOnBoardingInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
+
+
+    @Test
+    void getAuthInfo() {
+        // given
+        String institutionId = "institutionId";
+        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+        OnboardingData onboardingData = TestUtils.mockInstance(new OnboardingData());
+        onboardingData.setRelationshipProducts(List.of("prod_1"));
+        onBoardingInfo.setInstitutions(Collections.singletonList(onboardingData));
+        Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any()))
+                .thenReturn(onBoardingInfo);
+        // when
+        AuthInfo authInfo = partyConnector.getAuthInfo(institutionId);
+        // then
+        assertNotNull(authInfo);
+        assertEquals(onboardingData.getProductRole(), authInfo.getRole());
+        assertNotNull(authInfo.getProducts());
+        assertIterableEquals(onboardingData.getRelationshipProducts(), authInfo.getProducts());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getOnBoardingInfo(Mockito.eq(institutionId));
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
 }

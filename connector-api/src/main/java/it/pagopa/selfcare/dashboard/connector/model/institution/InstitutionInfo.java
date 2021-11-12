@@ -1,5 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.model.institution;
 
+import java.util.List;
+
 public interface InstitutionInfo {
 
     String getInstitutionId();
@@ -10,8 +12,6 @@ public interface InstitutionInfo {
 
     String getStatus();
 
-    String getRole();
-
-    String getPlatformRole();
+    List<String> getActiveProducts();
 
 }

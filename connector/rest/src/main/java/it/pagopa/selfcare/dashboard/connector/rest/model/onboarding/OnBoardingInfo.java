@@ -4,12 +4,8 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * OnBoardingInfo
- */
-
 @Data
 public class OnBoardingInfo {
     private PersonInfo person;
-    private List<InstitutionInfo> institutions;
+    private List<OnboardingData> institutions;
 }

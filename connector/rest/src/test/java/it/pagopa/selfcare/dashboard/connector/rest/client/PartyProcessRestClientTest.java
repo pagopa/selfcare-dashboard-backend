@@ -122,9 +122,9 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response.getPerson().getTaxCode());
         Assert.assertNotNull(response.getInstitutions().get(0).getDescription());
         Assert.assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNotNull(response.getInstitutions().get(0).getPlatformRole());
+        Assert.assertNotNull(response.getInstitutions().get(0).getProductRole());
         Assert.assertNotNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNotNull(response.getInstitutions().get(0).getStatus());
+        Assert.assertNotNull(response.getInstitutions().get(0).getState());
         Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
     }
 
@@ -141,9 +141,9 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNull(response.getPerson().getTaxCode());
         Assert.assertNull(response.getInstitutions().get(0).getDescription());
         Assert.assertNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNull(response.getInstitutions().get(0).getPlatformRole());
+        Assert.assertNull(response.getInstitutions().get(0).getProductRole());
         Assert.assertNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNull(response.getInstitutions().get(0).getStatus());
+        Assert.assertNull(response.getInstitutions().get(0).getState());
         Assert.assertNull(response.getInstitutions().get(0).getAttributes());
     }
 

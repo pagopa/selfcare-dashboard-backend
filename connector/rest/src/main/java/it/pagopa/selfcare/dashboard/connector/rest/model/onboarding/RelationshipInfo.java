@@ -33,7 +33,7 @@ public class RelationshipInfo {
             this.value = value;
         }
 
-        @JsonValue //TODO: move out jackson annotations
+        @JsonValue
         public String getValue() {
             return value;
         }
@@ -43,7 +43,7 @@ public class RelationshipInfo {
             return String.valueOf(value);
         }
 
-        @JsonCreator(mode = JsonCreator.Mode.DELEGATING) //TODO: move out jackson annotations
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
         public static RoleEnum fromValue(String text) {
             for (RoleEnum b : RoleEnum.values()) {
                 if (String.valueOf(b.value).equals(text)) {

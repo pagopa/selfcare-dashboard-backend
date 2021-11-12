@@ -2,13 +2,15 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 class PartyConnectorImpl implements PartyConnector {
@@ -23,39 +25,35 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo getInstitutionInfo(String institutionId) {
-        it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo institutionInfo = null;
+    public InstitutionInfo getInstitutionInfo(String institutionId) {
+        InstitutionInfo institutionInfo = null;
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);
         if (onBoardingInfo != null && !onBoardingInfo.getInstitutions().isEmpty()) {
-            institutionInfo = new it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo() {
+            OnboardingData onboardingData = onBoardingInfo.getInstitutions().get(0);
+            institutionInfo = new InstitutionInfo() {
                 @Override
                 public String getInstitutionId() {
-                    return onBoardingInfo.getInstitutions().get(0).getInstitutionId();
+                    return onboardingData.getInstitutionId();
                 }
 
                 @Override
                 public String getDescription() {
-                    return onBoardingInfo.getInstitutions().get(0).getDescription();
+                    return onboardingData.getDescription();
                 }
 
                 @Override
                 public String getDigitalAddress() {
-                    return onBoardingInfo.getInstitutions().get(0).getDigitalAddress();
+                    return onboardingData.getDigitalAddress();
                 }
 
                 @Override
                 public String getStatus() {
-                    return onBoardingInfo.getInstitutions().get(0).getStatus();
+                    return onboardingData.getState().toString();
                 }
 
                 @Override
-                public String getRole() {
-                    return onBoardingInfo.getInstitutions().get(0).getRole();
-                }
-
-                @Override
-                public String getPlatformRole() {
-                    return onBoardingInfo.getInstitutions().get(0).getPlatformRole();
+                public List<String> getActiveProducts() {
+                    return onboardingData.getInstitutionProducts();
                 }
             };
         }
@@ -69,16 +67,16 @@ class PartyConnectorImpl implements PartyConnector {
 
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);
         if (onBoardingInfo != null && !onBoardingInfo.getInstitutions().isEmpty()) {
-            InstitutionInfo institutionInfo = onBoardingInfo.getInstitutions().get(0);
+            OnboardingData onboardingData = onBoardingInfo.getInstitutions().get(0);
             authInfo = new AuthInfo() {
                 @Override
                 public String getRole() {
-                    return institutionInfo.getPlatformRole();
+                    return onboardingData.getProductRole();
                 }
 
                 @Override
                 public Collection<String> getProducts() {
-                    return null;
+                    return onboardingData.getRelationshipProducts();
                 }
             };
         }
