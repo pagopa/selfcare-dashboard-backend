@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN_REF;
+import static it.pagopa.selfcare.commons.base.security.Authority.TECH_REF;
+
 @ExtendWith(MockitoExtension.class)
 class ProductsServiceImplTest {
 
@@ -68,7 +71,7 @@ class ProductsServiceImplTest {
                 .thenReturn(institutionInfo);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority("TECH_REF")));
+                Collections.singletonList(new SelfCareGrantedAuthority(TECH_REF.name())));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -95,7 +98,7 @@ class ProductsServiceImplTest {
                 .thenReturn(institutionInfo);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority("ADMIN_REF")));
+                Collections.singletonList(new SelfCareGrantedAuthority(ADMIN_REF.name())));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when

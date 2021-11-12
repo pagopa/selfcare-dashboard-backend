@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static it.pagopa.selfcare.commons.base.security.Authority.TECH_REF;
+
 @Service
 class ProductsServiceImpl implements ProductsService {
 
@@ -48,7 +50,7 @@ class ProductsServiceImpl implements ProductsService {
                         .getActiveProducts();
                 Collection<String> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getProducts();
 
-                if ("TECH_REF".equals(selcAuthority.get().getAuthority())) {
+                if (TECH_REF.name().equals(selcAuthority.get().getAuthority())) {
                     products = products.stream()
                             .filter(product -> institutionsProducts.contains(product.getCode()))
                             .filter(product -> userAuthProducts.contains(product.getCode()))
