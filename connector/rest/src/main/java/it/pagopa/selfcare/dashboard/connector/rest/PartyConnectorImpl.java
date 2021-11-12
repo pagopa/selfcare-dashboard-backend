@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 
 @Service
 class PartyConnectorImpl implements PartyConnector {
@@ -28,35 +27,17 @@ class PartyConnectorImpl implements PartyConnector {
     public InstitutionInfo getInstitutionInfo(String institutionId) {
         InstitutionInfo institutionInfo = null;
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);
+
         if (onBoardingInfo != null && !onBoardingInfo.getInstitutions().isEmpty()) {
             OnboardingData onboardingData = onBoardingInfo.getInstitutions().get(0);
-            institutionInfo = new InstitutionInfo() {
-                @Override
-                public String getInstitutionId() {
-                    return onboardingData.getInstitutionId();
-                }
-
-                @Override
-                public String getDescription() {
-                    return onboardingData.getDescription();
-                }
-
-                @Override
-                public String getDigitalAddress() {
-                    return onboardingData.getDigitalAddress();
-                }
-
-                @Override
-                public String getStatus() {
-                    return onboardingData.getState().toString();
-                }
-
-                @Override
-                public List<String> getActiveProducts() {
-                    return onboardingData.getInstitutionProducts();
-                }
-            };
+            institutionInfo = new InstitutionInfo();
+            institutionInfo.setInstitutionId(onboardingData.getInstitutionId());
+            institutionInfo.setDescription(onboardingData.getDescription());
+            institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
+            institutionInfo.setStatus(onboardingData.getState().toString());
+            institutionInfo.setActiveProducts(onboardingData.getInstitutionProducts());
         }
+
         return institutionInfo;
     }
 

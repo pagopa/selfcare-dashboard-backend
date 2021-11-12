@@ -73,11 +73,8 @@ class PartyConnectorImplTest {
         InstitutionInfo institutionInfo = partyConnector.getInstitutionInfo(institutionId);
         // then
         assertNotNull(institutionInfo);
-        assertNull(institutionInfo.getActiveProducts());
-        assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
-        assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
-        assertEquals(onboardingData.getInstitutionId(), institutionInfo.getInstitutionId());
-        assertEquals(onboardingData.getState().toString(), institutionInfo.getStatus());
+        assertNotNull(institutionInfo.getActiveProducts());
+        assertTrue(institutionInfo.getActiveProducts().isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getOnBoardingInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(restClientMock);

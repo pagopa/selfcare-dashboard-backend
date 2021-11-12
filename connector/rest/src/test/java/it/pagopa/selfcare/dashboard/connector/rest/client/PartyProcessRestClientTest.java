@@ -126,7 +126,13 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response.getInstitutions().get(0).getRole());
         Assert.assertNotNull(response.getInstitutions().get(0).getState());
         Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
+        Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionId());
+        Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionProducts());
+        Assert.assertFalse(response.getInstitutions().get(0).getInstitutionProducts().isEmpty());
+        Assert.assertNotNull(response.getInstitutions().get(0).getRelationshipProducts());
+        Assert.assertFalse(response.getInstitutions().get(0).getInstitutionProducts().isEmpty());
     }
+
 
     @Test
     public void getOnBoardingInfo_fullyNull() {
@@ -146,6 +152,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNull(response.getInstitutions().get(0).getState());
         Assert.assertNull(response.getInstitutions().get(0).getAttributes());
     }
+
 
     @Test
     public void getOnBoardingInfo_emptyResult() {

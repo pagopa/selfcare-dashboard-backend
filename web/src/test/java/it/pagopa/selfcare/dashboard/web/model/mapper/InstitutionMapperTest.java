@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.web.DummyInstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ class InstitutionMapperTest {
     @Test
     void toResourceNotNull() {
         // given
-        DummyInstitutionInfo institutionInfo = TestUtils.mockInstance(new DummyInstitutionInfo());
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
 
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);

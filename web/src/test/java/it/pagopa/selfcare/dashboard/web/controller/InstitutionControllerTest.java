@@ -2,8 +2,8 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
-import it.pagopa.selfcare.dashboard.web.DummyInstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
@@ -76,7 +76,7 @@ class InstitutionControllerTest {
         Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
-                    DummyInstitutionInfo institutionInfo = new DummyInstitutionInfo();
+                    InstitutionInfo institutionInfo = new InstitutionInfo();
                     institutionInfo.setInstitutionId(id);
                     return institutionInfo;
                 });
