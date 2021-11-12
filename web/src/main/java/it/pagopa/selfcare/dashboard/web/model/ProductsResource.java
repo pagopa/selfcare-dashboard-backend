@@ -9,6 +9,8 @@ import java.time.OffsetDateTime;
 public class ProductsResource {
     @ApiModelProperty("${swagger.products.model.id}")
     private String id;
+    @ApiModelProperty("${swagger.products.model.code}")
+    private String code;
     @ApiModelProperty("${swagger.products.model.logo}")
     private String logo;
     @ApiModelProperty("${swagger.products.model.title}")

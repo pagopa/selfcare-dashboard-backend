@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 public class Product {
 
     private String id;
+    private String code;
     private String logo;
     private String title;
     private String description;

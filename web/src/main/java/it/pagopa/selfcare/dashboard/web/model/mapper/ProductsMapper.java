@@ -10,6 +10,7 @@ public class ProductsMapper {
         if (model != null) {
             resource = new ProductsResource();
             resource.setId(model.getId());
+            resource.setCode(model.getCode());
             resource.setLogo(model.getLogo());
             resource.setTitle(model.getTitle());
             resource.setDescription(model.getDescription());
