@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "selc-dashboard",
-    "description": "Dashboard API documentation",
+    "description": "Self Care Dashboard API documentation",
     "version": "0.0.1-SNAPSHOT"
   },
   "servers": [
@@ -13,24 +13,28 @@
   ],
   "tags": [
     {
-      "name": "dashboard",
-      "description": "Dashboard operations"
+      "name": "institutions",
+      "description": "Institution operations"
+    },
+    {
+      "name": "products",
+      "description": "Product operations"
     }
   ],
   "paths": {
-    "/dashboard/organization/{organizationId}": {
+    "/institutions/{institutionId}": {
       "get": {
         "tags": [
-          "dashboard"
+          "institutions"
         ],
-        "summary": "getOrganization",
+        "summary": "getInstitution",
         "description": "The service allows the recovery of an Entity based on its id",
-        "operationId": "getOrganizationUsingGET",
+        "operationId": "getInstitutionUsingGET",
         "parameters": [
           {
-            "name": "organizationId",
+            "name": "institutionId",
             "in": "path",
-            "description": "organization's unique identifier",
+            "description": "Institution's unique identifier",
             "required": true,
             "style": "simple",
             "schema": {
@@ -40,7 +44,7 @@
           {
             "name": "x-selc-institutionId",
             "in": "header",
-            "description": "Institution identifier",
+            "description": "Institution's unique identifier",
             "required": true,
             "allowReserved": false,
             "schema": {
@@ -52,9 +56,9 @@
           "200": {
             "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationResource"
+                  "$ref": "#/components/schemas/InstitutionResource"
                 }
               }
             }
@@ -78,10 +82,97 @@
         ]
       }
     },
-    "/dashboard/products": {
+    "/institutions/{institutionId}/logo": {
+      "put": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "saveInstitutionLogo",
+        "description": "Service to upload and store the institution's logo",
+        "operationId": "saveInstitutionLogoUsingPUT",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "${swagger.dashboard.model.id}",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-selc-institutionId",
+            "in": "header",
+            "description": "Institution's unique identifier",
+            "required": true,
+            "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "logo"
+                ],
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "description": "Institution's logo",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/products/": {
       "get": {
         "tags": [
-          "dashboard"
+          "products"
         ],
         "summary": "getProducts",
         "description": "Service that returns the list of PagoPA products",
@@ -90,7 +181,7 @@
           {
             "name": "x-selc-institutionId",
             "in": "header",
-            "description": "Institution identifier",
+            "description": "Institution's unique identifier",
             "required": true,
             "allowReserved": false,
             "schema": {
@@ -102,7 +193,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -134,37 +225,41 @@
   },
   "components": {
     "schemas": {
-      "OrganizationResource": {
-        "title": "OrganizationResource",
+      "InstitutionResource": {
+        "title": "InstitutionResource",
         "type": "object",
         "properties": {
           "IPACode": {
             "type": "string",
-            "description": "code IPA"
+            "description": "IPA code"
+          },
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
           "fiscalCode": {
             "type": "string",
-            "description": "fiscal code corresponding to the organization"
+            "description": "Fiscal code corresponding to the institution"
           },
           "id": {
             "type": "string",
-            "description": "organization's unique identifier"
-          },
-          "logo": {
-            "type": "string",
-            "description": "organization's logo"
+            "description": "Institution's unique identifier"
           },
           "mailAddress": {
             "type": "string",
-            "description": "organization email address"
+            "description": "Institution's email address"
           },
-          "organizationName": {
+          "name": {
             "type": "string",
-            "description": "organization name"
+            "description": "Institution's name"
           },
-          "organizationType": {
+          "status": {
             "type": "string",
-            "description": "organization type"
+            "description": "Institution's status"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
@@ -176,6 +271,20 @@
             "type": "string",
             "description": "${swagger.products.model.activationDateTime}",
             "format": "date-time"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "${swagger.products.model.active}",
+            "example": false
+          },
+          "authorized": {
+            "type": "boolean",
+            "description": "${swagger.products.model.authorized}",
+            "example": false
+          },
+          "code": {
+            "type": "string",
+            "description": "${swagger.products.model.code}"
           },
           "description": {
             "type": "string",
