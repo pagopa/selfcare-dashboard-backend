@@ -31,9 +31,9 @@ class DashboardSecurityConfig extends SecurityConfig {
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(ADMIN.name() + ">" + LEGAL.name() + "\n" +
-                LEGAL.name() + ">" + ADMIN_REF.name() + "\n" +
-                ADMIN_REF.name() + ">" + TECH_REF.name());
+        roleHierarchy.setHierarchy(ADMIN.name() + " > " + LEGAL.name() + "\n" +
+                LEGAL.name() + " > " + ADMIN_REF.name() + "\n" +
+                ADMIN_REF.name() + " > " + TECH_REF.name());
         RoleHierarchyAuthoritiesMapper authoritiesMapper = new RoleHierarchyAuthoritiesMapper(roleHierarchy);
         authenticationProvider.setAuthoritiesMapper(authoritiesMapper);
         authenticationManagerBuilder.authenticationProvider(authenticationProvider);
