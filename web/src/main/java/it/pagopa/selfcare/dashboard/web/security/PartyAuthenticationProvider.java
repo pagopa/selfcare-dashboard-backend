@@ -3,8 +3,7 @@ package it.pagopa.selfcare.dashboard.web.security;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -40,12 +39,11 @@ public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticati
         Object authenticationDetails = authentication.getDetails();
         if (authenticationDetails != null
                 && SelfCareAuthenticationDetails.class.isAssignableFrom(authenticationDetails.getClass())) {
-            OnBoardingInfo onBoardingInfo = partyConnector.getOnBoardingInfo(((SelfCareAuthenticationDetails) authenticationDetails).getInstitutionId());
+            AuthInfo authInfo = partyConnector.getAuthInfo(((SelfCareAuthenticationDetails) authenticationDetails).getInstitutionId());
 
-            if (onBoardingInfo != null && !onBoardingInfo.getInstitutions().isEmpty()) {
-                InstitutionInfo institutionInfo = onBoardingInfo.getInstitutions().get(0);
-                String role = institutionInfo.getPlatformRole();
-                List<SelfCareGrantedAuthority> authorities = Collections.singletonList(new SelfCareGrantedAuthority(role));
+            if (authInfo != null) {
+                SelfCareGrantedAuthority o = new SelfCareGrantedAuthority(authInfo.getRole(), authInfo.getProducts());
+                List<SelfCareGrantedAuthority> authorities = Collections.singletonList(o);
                 user = new User(username, authentication.getCredentials().toString(), authorities);
             }
         }

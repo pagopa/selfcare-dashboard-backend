@@ -4,10 +4,10 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.RelationshipInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.RelationshipInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.RelationshipsResponse;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -122,11 +122,17 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response.getPerson().getTaxCode());
         Assert.assertNotNull(response.getInstitutions().get(0).getDescription());
         Assert.assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNotNull(response.getInstitutions().get(0).getPlatformRole());
+        Assert.assertNotNull(response.getInstitutions().get(0).getProductRole());
         Assert.assertNotNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNotNull(response.getInstitutions().get(0).getStatus());
+        Assert.assertNotNull(response.getInstitutions().get(0).getState());
         Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
+        Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionId());
+        Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionProducts());
+        Assert.assertFalse(response.getInstitutions().get(0).getInstitutionProducts().isEmpty());
+        Assert.assertNotNull(response.getInstitutions().get(0).getRelationshipProducts());
+        Assert.assertFalse(response.getInstitutions().get(0).getInstitutionProducts().isEmpty());
     }
+
 
     @Test
     public void getOnBoardingInfo_fullyNull() {
@@ -141,11 +147,12 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNull(response.getPerson().getTaxCode());
         Assert.assertNull(response.getInstitutions().get(0).getDescription());
         Assert.assertNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNull(response.getInstitutions().get(0).getPlatformRole());
+        Assert.assertNull(response.getInstitutions().get(0).getProductRole());
         Assert.assertNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNull(response.getInstitutions().get(0).getStatus());
+        Assert.assertNull(response.getInstitutions().get(0).getState());
         Assert.assertNull(response.getInstitutions().get(0).getAttributes());
     }
+
 
     @Test
     public void getOnBoardingInfo_emptyResult() {

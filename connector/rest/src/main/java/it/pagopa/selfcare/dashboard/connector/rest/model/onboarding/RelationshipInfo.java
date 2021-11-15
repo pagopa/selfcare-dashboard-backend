@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.connector.model.onboarding;
+package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -33,7 +33,7 @@ public class RelationshipInfo {
             this.value = value;
         }
 
-        @JsonValue //TODO: move out jackson annotations
+        @JsonValue
         public String getValue() {
             return value;
         }
@@ -43,7 +43,7 @@ public class RelationshipInfo {
             return String.valueOf(value);
         }
 
-        @JsonCreator(mode = JsonCreator.Mode.DELEGATING) //TODO: move out jackson annotations
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
         public static RoleEnum fromValue(String text) {
             for (RoleEnum b : RoleEnum.values()) {
                 if (String.valueOf(b.value).equals(text)) {

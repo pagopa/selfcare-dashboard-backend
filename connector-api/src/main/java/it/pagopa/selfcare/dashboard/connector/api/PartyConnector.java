@@ -1,12 +1,12 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 
 public interface PartyConnector {
 
-    RelationshipsResponse getInstitutionRelationships(String institutionId);
+    InstitutionInfo getInstitutionInfo(String institutionId);
 
-    OnBoardingInfo getOnBoardingInfo(String institutionId);
+    AuthInfo getAuthInfo(String institutionId);
 
 }

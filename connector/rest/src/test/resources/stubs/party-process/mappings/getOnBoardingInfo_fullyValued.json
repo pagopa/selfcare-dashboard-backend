@@ -7,19 +7,26 @@
     "status": "200",
     "jsonBody": {
       "person": {
-        "name": "Nome",
-        "surname": "Cognome",
-        "taxCode": "Codice"
+        "name": "string",
+        "surname": "string",
+        "taxCode": "string"
       },
       "institutions": [
         {
-          "description": "description",
-          "digitalAddress": "digitalAddress",
-          "status": "status",
-          "role": "role",
-          "platformRole": "platformRole",
+          "institutionId": "string",
+          "description": "string",
+          "digitalAddress": "string",
+          "state": "PENDING",
+          "role": "MANAGER",
+          "relationshipProducts": [
+            "string"
+          ],
+          "productRole": "string",
+          "institutionProducts": [
+            "string"
+          ],
           "attributes": [
-            "attributes"
+            "string"
           ]
         }
       ]

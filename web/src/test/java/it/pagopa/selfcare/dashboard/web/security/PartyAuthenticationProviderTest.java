@@ -2,8 +2,7 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +42,7 @@ class PartyAuthenticationProviderTest {
 
 
     @Test
-    void retrieveUser_nullOnBoardingInfo() {
+    void retrieveUser_nullAuthInfo() {
         // given
         String username = "username";
         String credentials = "credentials";
@@ -55,28 +54,7 @@ class PartyAuthenticationProviderTest {
         // then
         assertNull(userDetails);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getOnBoardingInfo(Mockito.eq(institutionId));
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
-    }
-
-    @Test
-    void retrieveUser_emptyInstitutions() {
-        // given
-        String username = "username";
-        String credentials = "credentials";
-        String institutionId = "institutionId";
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
-        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        onBoardingInfo.setInstitutions(Collections.emptyList());
-        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.any()))
-                .thenReturn(onBoardingInfo);
-        // when
-        UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
-        // then
-        assertNull(userDetails);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getOnBoardingInfo(Mockito.eq(institutionId));
+                .getAuthInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -90,12 +68,18 @@ class PartyAuthenticationProviderTest {
         String role = "ADMIN";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
-        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setPlatformRole(role);
-        onBoardingInfo.setInstitutions(Collections.singletonList(institutionInfo));
-        Mockito.when(partyConnectorMock.getOnBoardingInfo(Mockito.any()))
-                .thenReturn(onBoardingInfo);
+        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+                .thenReturn(new AuthInfo() {
+                    @Override
+                    public String getRole() {
+                        return role;
+                    }
+
+                    @Override
+                    public Collection<String> getProducts() {
+                        return null;
+                    }
+                });
         // when
         UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
         // then
@@ -106,7 +90,7 @@ class PartyAuthenticationProviderTest {
         assertTrue(grantedAuthority.isPresent());
         assertEquals(role, grantedAuthority.get().getAuthority());
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getOnBoardingInfo(Mockito.eq(institutionId));
+                .getAuthInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
 
 

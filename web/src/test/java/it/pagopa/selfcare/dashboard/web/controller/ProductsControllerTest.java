@@ -3,12 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.organization.Organization;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.core.PartyManagementService;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.model.OrganizationResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,62 +25,21 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(value = {DashboardController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {DashboardController.class, WebTestConfig.class})
-class DashboardControllerTest {
+@WebMvcTest(value = {ProductsController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@ContextConfiguration(classes = {ProductsController.class, WebTestConfig.class})
+class ProductsControllerTest {
 
-    private static final String BASE_URL = "/dashboard";
+    private static final String BASE_URL = "/products";
     private static final Product PRODUCT = TestUtils.mockInstance(new Product());
 
     @MockBean
     private ProductsService productsService;
-
-    @MockBean
-    private PartyManagementService PartyManagementServiceMock;
 
     @Autowired
     protected MockMvc mvc;
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @Test
-    void getOrganizationNotNull() throws Exception {
-        // given
-        Mockito.when(PartyManagementServiceMock.getOrganization(Mockito.anyString()))
-                .thenAnswer(invocationOnMock -> {
-                    String id = invocationOnMock.getArgument(0, String.class);
-                    Organization p = new Organization();
-                    p.setInstitutionId(id);
-                    return p;
-                });
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/organization/organizationId")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andReturn();
-        // then
-        OrganizationResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), OrganizationResource.class);
-        assertNotNull(resource);
-    }
-
-    @Test
-    void getOrganizationNull() throws Exception {
-        // given
-        Mockito.when(PartyManagementServiceMock.getOrganization(Mockito.anyString()))
-                .thenReturn(null);
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/organization/organizationId")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
-                .andReturn();
-        // then
-        assertEquals("", result.getResponse().getContentAsString());
-    }
 
 
     @Test
@@ -93,7 +49,7 @@ class DashboardControllerTest {
                 .thenReturn(Collections.singletonList(PRODUCT));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/products")
+                .get(BASE_URL + "/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -114,7 +70,7 @@ class DashboardControllerTest {
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/products")
+                .get(BASE_URL + "/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())

@@ -1,8 +1,9 @@
 package it.pagopa.selfcare.dashboard.web.config;
 
 import it.pagopa.selfcare.commons.web.handler.RestExceptionsHandler;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
@@ -37,37 +38,39 @@ class SwaggerConfig {
     public static class enConfig {
     }
 
+    private final Environment environment;
+
+
+    @Autowired
+    SwaggerConfig(Environment environment) {
+        this.environment = environment;
+    }
+
 
     @Bean
-    public Docket swaggerSpringPlugin(@Value("${swagger.title:${spring.application.name}}") String title,
-                                      @Value("${swagger.description:Api and Models}") String description,
-                                      @Value("${swagger.version:${spring.application.version}}") String version,
-                                      @Value("${swagger.dashboard.api.description}") String productApiDesc,
-                                      @Value("${swagger.dashboard.products.api.description}") String institutionApiDesc,
-                                      @Value("${swagger.security.schema.bearer.description}") String authSchemaDesc
-    ) {
+    public Docket swaggerSpringPlugin() {
         return (new Docket(DocumentationType.OAS_30))
                 .apiInfo(new ApiInfoBuilder()
-                        .title(title)
-                        .description(description)
-                        .version(version)
+                        .title(environment.getProperty("swagger.title", environment.getProperty("spring.application.name")))
+                        .description(environment.getProperty("swagger.description", "Api and Models"))
+                        .version(environment.getProperty("swagger.version", environment.getProperty("spring.application.version")))
                         .build())
                 .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.web")).build()
-                .tags(new Tag("dashboard", productApiDesc),
-                        new Tag("institutions", institutionApiDesc))
+                .tags(new Tag("products", environment.getProperty("swagger.dashboard.products.api.description")),
+                        new Tag("institutions", environment.getProperty("swagger.dashboard.institutions.api.description")))
                 .directModelSubstitute(LocalTime.class, String.class)
                 .securityContexts(Collections.singletonList(SecurityContext.builder()
                         .securityReferences(defaultAuth())
                         .build()))
                 .securitySchemes(Collections.singletonList(HttpAuthenticationScheme.JWT_BEARER_BUILDER
                         .name(AUTH_SCHEMA_NAME)
-                        .description(authSchemaDesc)
+                        .description(environment.getProperty("swagger.security.schema.bearer.description"))
                         .build()))
                 .globalRequestParameters(Collections.singletonList(new RequestParameterBuilder()
                         .name("x-selc-institutionId")
                         .in(ParameterType.HEADER)
                         .required(true)
-                        .description("Institution identifier")
+                        .description(environment.getProperty("swagger.dashboard.institutions.model.id"))
                         .query(psb -> psb.model(msb -> msb.scalarModel(ScalarType.STRING)))
                         .build()));
     }
