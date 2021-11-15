@@ -10,7 +10,7 @@ public class InstitutionResource {
     private String id;
     @ApiModelProperty("${swagger.dashboard.institutions.model.name}")
     private String name;
-    @ApiModelProperty("${swagger.dashboard.institutions.model.type}")
+    @ApiModelProperty("${swagger.dashboard.institutions.model.category}")
     private String category;
     @ApiModelProperty("${swagger.dashboard.institutions.model.IPACode}")
     private String IPACode;
@@ -18,4 +18,6 @@ public class InstitutionResource {
     private String fiscalCode;
     @ApiModelProperty("${swagger.dashboard.institutions.model.mailAddress}")
     private String mailAddress;
+    @ApiModelProperty("${swagger.dashboard.institutions.model.userRole}")
+    private String userRole;
 }
