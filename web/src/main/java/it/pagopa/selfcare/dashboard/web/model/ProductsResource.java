@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -7,24 +8,31 @@ import java.time.OffsetDateTime;
 
 @Data
 public class ProductsResource {
-    @ApiModelProperty("${swagger.products.model.id}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.id}", required = true)
+    @JsonProperty(required = true)
     private String id;
-    @ApiModelProperty("${swagger.products.model.code}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.code}", required = true)
+    @JsonProperty(required = true)
     private String code;
-    @ApiModelProperty("${swagger.products.model.logo}")
+    @ApiModelProperty("${swagger.dashboard.products.model.logo}")
     private String logo;
-    @ApiModelProperty("${swagger.products.model.title}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.title}", required = true)
+    @JsonProperty(required = true)
     private String title;
-    @ApiModelProperty("${swagger.products.model.description}")
+    @ApiModelProperty("${swagger.dashboard.products.model.description}")
     private String description;
-    @ApiModelProperty("${swagger.products.model.urlPublic}")
+    @ApiModelProperty("${swagger.dashboard.products.model.urlPublic}")
     private String urlPublic;
-    @ApiModelProperty("${swagger.products.model.urlBO}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.urlBO}", required = true)
+    @JsonProperty(required = true)
     private String urlBO;
-    @ApiModelProperty("${swagger.products.model.activationDateTime}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.activationDateTime}", required = true)
+    @JsonProperty(required = true)
     private OffsetDateTime activationDateTime;
-    @ApiModelProperty("${swagger.products.model.active}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.active}", required = true)
+    @JsonProperty(required = true)
     private boolean active;
-    @ApiModelProperty("${swagger.products.model.authorized}")
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.authorized}", required = true)
+    @JsonProperty(required = true)
     private boolean authorized;
 }

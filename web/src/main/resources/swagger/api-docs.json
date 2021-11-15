@@ -227,6 +227,16 @@
     "schemas": {
       "InstitutionResource": {
         "title": "InstitutionResource",
+        "required": [
+          "IPACode",
+          "category",
+          "fiscalCode",
+          "id",
+          "mailAddress",
+          "name",
+          "status",
+          "userRole"
+        ],
         "type": "object",
         "properties": {
           "IPACode": {
@@ -265,50 +275,59 @@
       },
       "ProductsResource": {
         "title": "ProductsResource",
+        "required": [
+          "activationDateTime",
+          "active",
+          "authorized",
+          "code",
+          "id",
+          "title",
+          "urlBO"
+        ],
         "type": "object",
         "properties": {
           "activationDateTime": {
             "type": "string",
-            "description": "${swagger.products.model.activationDateTime}",
+            "description": "Date the products was activated/created",
             "format": "date-time"
           },
           "active": {
             "type": "boolean",
-            "description": "${swagger.products.model.active}",
+            "description": "flag indicating whether the institution has a valid contract related to the product",
             "example": false
           },
           "authorized": {
             "type": "boolean",
-            "description": "${swagger.products.model.authorized}",
+            "description": "flag indicating whether the logged user has the authorization to manage the product",
             "example": false
           },
           "code": {
             "type": "string",
-            "description": "${swagger.products.model.code}"
+            "description": "Product's code"
           },
           "description": {
             "type": "string",
-            "description": "${swagger.products.model.description}"
+            "description": "Product's description"
           },
           "id": {
             "type": "string",
-            "description": "${swagger.products.model.id}"
+            "description": "Product's unique identifier"
           },
           "logo": {
             "type": "string",
-            "description": "${swagger.products.model.logo}"
+            "description": "Product's logo"
           },
           "title": {
             "type": "string",
-            "description": "${swagger.products.model.title}"
+            "description": "Product's title"
           },
           "urlBO": {
             "type": "string",
-            "description": "${swagger.products.model.urlBO}"
+            "description": "URL that redirects to the back-office section, where is possible to manage the product"
           },
           "urlPublic": {
             "type": "string",
-            "description": "${swagger.products.model.urlPublic}"
+            "description": "URL that redirects to the public information webpage of the product"
           }
         }
       }
