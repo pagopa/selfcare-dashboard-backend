@@ -14,6 +14,7 @@ public class InstitutionInfo {
     private String description;
     private String digitalAddress;
     private String status;
+    private String category;
     private List<String> activeProducts = Collections.emptyList();
 
     public void setActiveProducts(List<String> activeProducts) {

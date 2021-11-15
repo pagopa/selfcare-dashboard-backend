@@ -36,6 +36,9 @@ class PartyConnectorImpl implements PartyConnector {
             institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
             institutionInfo.setStatus(onboardingData.getState().toString());
             institutionInfo.setActiveProducts(onboardingData.getInstitutionProducts());
+            if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
+                institutionInfo.setCategory(onboardingData.getAttributes().get(0));
+            }
         }
 
         return institutionInfo;

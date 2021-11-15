@@ -19,7 +19,7 @@ class InstitutionMapperTest {
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
         assertEquals(institutionInfo.getInstitutionId(), resource.getId());
-        assertEquals(null, resource.getType());//TODO
+        assertEquals(null, resource.getCategory());//TODO
         assertEquals(institutionInfo.getDescription(), resource.getName());
         assertEquals(null, resource.getFiscalCode());//TODO
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());

@@ -12,7 +12,7 @@ public class InstitutionMapper {
             resource = new InstitutionResource();
             resource.setId(model.getInstitutionId());
             resource.setName(model.getDescription());
-            resource.setType(null);//TODO
+            resource.setCategory(model.getCategory());
             resource.setIPACode(null);//TODO
             resource.setFiscalCode(null);//TODO
             resource.setMailAddress(model.getDigitalAddress());

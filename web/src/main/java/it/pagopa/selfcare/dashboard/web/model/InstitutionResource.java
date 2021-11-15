@@ -11,7 +11,7 @@ public class InstitutionResource {
     @ApiModelProperty("${swagger.dashboard.institutions.model.name}")
     private String name;
     @ApiModelProperty("${swagger.dashboard.institutions.model.type}")
-    private String type;
+    private String category;
     @ApiModelProperty("${swagger.dashboard.institutions.model.IPACode}")
     private String IPACode;
     @ApiModelProperty("${swagger.dashboard.institutions.model.fiscalCode}")
