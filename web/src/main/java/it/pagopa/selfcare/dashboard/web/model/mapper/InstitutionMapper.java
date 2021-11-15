@@ -22,6 +22,7 @@ public class InstitutionMapper {
             resource.setIPACode(null);//TODO
             resource.setFiscalCode(null);//TODO
             resource.setMailAddress(model.getDigitalAddress());
+            resource.setStatus(model.getStatus());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()

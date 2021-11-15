@@ -43,6 +43,7 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
         assertEquals(null, resource.getIPACode());//TODO
         assertEquals(role, resource.getUserRole());
+        assertEquals(institutionInfo.getStatus(), resource.getStatus());
         TestUtils.reflectionEqualsByName(institutionInfo, resource);
     }
 
@@ -51,7 +52,6 @@ class InstitutionMapperTest {
     void toResourceNotNullNoAuth() {
         // given
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
-
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then

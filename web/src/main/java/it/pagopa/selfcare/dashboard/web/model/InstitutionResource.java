@@ -20,4 +20,6 @@ public class InstitutionResource {
     private String mailAddress;
     @ApiModelProperty("${swagger.dashboard.institutions.model.userRole}")
     private String userRole;
+    @ApiModelProperty("${swagger.dashboard.institutions.model.status}")
+    private String status;
 }
