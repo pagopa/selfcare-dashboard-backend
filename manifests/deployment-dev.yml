@@ -23,6 +23,8 @@ spec:
           envFrom:
             - secretRef:
                 name: application-insights
+            - secretRef:
+                name: b4f-dashboard
             - configMapRef:
                 name: b4f-dashboard
             - configMapRef:
