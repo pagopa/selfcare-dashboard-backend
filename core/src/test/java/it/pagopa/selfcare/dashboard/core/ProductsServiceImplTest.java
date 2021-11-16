@@ -130,7 +130,7 @@ class ProductsServiceImplTest {
                 .thenReturn(institutionInfo);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority("TECH_REF", List.of(p2.getCode(), p3.getCode()))));
+                Collections.singletonList(new SelfCareGrantedAuthority(TECH_REF.name(), List.of(p2.getCode(), p3.getCode()))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -163,7 +163,7 @@ class ProductsServiceImplTest {
                 .thenReturn(institutionInfo);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority("ADMIN_REF", List.of(p2.getCode(), p3.getCode()))));
+                Collections.singletonList(new SelfCareGrantedAuthority(ADMIN_REF.name(), List.of(p2.getCode(), p3.getCode()))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when

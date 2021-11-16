@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Optional;
 
+import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,7 +66,7 @@ class PartyAuthenticationProviderTest {
         String username = "username";
         String credentials = "credentials";
         String institutionId = "institutionId";
-        String role = "ADMIN";
+        String role = ADMIN.name();
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
