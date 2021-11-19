@@ -1,8 +1,10 @@
 package it.pagopa.selfcare.dashboard.web.config;
 
-import it.pagopa.selfcare.commons.web.handler.RestExceptionsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -21,7 +23,6 @@ import java.util.List;
  * The Class SwaggerConfig.
  */
 @Configuration
-@Import(RestExceptionsHandler.class)
 class SwaggerConfig {
 
     public static final String AUTH_SCHEMA_NAME = "bearerAuth";

@@ -16,7 +16,7 @@ public class ProductsMapper {
             resource.setDescription(model.getDescription());
             resource.setUrlPublic(model.getUrlPublic());
             resource.setUrlBO(model.getUrlBO());
-            resource.setActivationDateTime(model.getActivationDateTime());
+            resource.setCreationDateTime(model.getActivationDateTime());
             resource.setActive(model.isActive());
             resource.setAuthorized(model.isAuthorized());
         }

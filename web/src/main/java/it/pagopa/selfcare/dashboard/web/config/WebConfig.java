@@ -8,15 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
+import it.pagopa.selfcare.commons.web.handler.RestExceptionsHandler;
+import org.springframework.context.annotation.*;
 
 import java.util.TimeZone;
 
 @Configuration
 @PropertySource("classpath:config/web-config.properties")
+@Import(RestExceptionsHandler.class)
 class WebConfig {
 
     @Bean
