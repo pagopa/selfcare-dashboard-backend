@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.validator;
 
 import it.pagopa.selfcare.dashboard.core.ProductsService;
+import it.pagopa.selfcare.dashboard.web.controller.DummyController;
 import it.pagopa.selfcare.dashboard.web.controller.ProductsController;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
-@SpringBootTest(classes = {ProductsController.class, DashboardControllerResponseValidator.class})
+@SpringBootTest(classes = {DummyController.class, DashboardControllerResponseValidator.class})
 @EnableAutoConfiguration
 class DashboardControllerResponseValidatorTest {
 
@@ -19,16 +20,13 @@ class DashboardControllerResponseValidatorTest {
     private DashboardControllerResponseValidator validatorSpy;
 
     @Autowired
-    private ProductsController controller;
-
-    @MockBean
-    private ProductsService productsServiceMock;
+    private DummyController controller;
 
     @Test
     void controllersPointcut_returnNotVoid() {
         // given
         // when
-        controller.getProducts();
+        controller.notVoidMethod();
         // then
         Mockito.verify(validatorSpy, Mockito.times(1))
                 .validateResponse(Mockito.any(), Mockito.any());
@@ -39,10 +37,15 @@ class DashboardControllerResponseValidatorTest {
     void controllersPointcut_returnVoid() {
         // given
         // when
-        controller.getProducts();
+        controller.voidMethod();
         // then
         Mockito.verify(validatorSpy, Mockito.times(1))
                 .validateResponse(Mockito.any(), Mockito.any());
         Mockito.verifyNoMoreInteractions(validatorSpy);
+    }
+
+    @Test
+    void controllersPointcut() {//sonar fix
+        validatorSpy.controllersPointcut();
     }
 }
