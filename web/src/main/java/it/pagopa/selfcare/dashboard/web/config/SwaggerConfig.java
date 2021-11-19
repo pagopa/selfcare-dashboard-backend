@@ -56,7 +56,7 @@ class SwaggerConfig {
                         .description(environment.getProperty("swagger.description", "Api and Models"))
                         .version(environment.getProperty("swagger.version", environment.getProperty("spring.application.version")))
                         .build())
-                .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.web")).build()
+                .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.web.controller")).build()
                 .tags(new Tag("products", environment.getProperty("swagger.dashboard.products.api.description")),
                         new Tag("institutions", environment.getProperty("swagger.dashboard.institutions.api.description")))
                 .directModelSubstitute(LocalTime.class, String.class)

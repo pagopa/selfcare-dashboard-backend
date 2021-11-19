@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080",
+      "url": "http://localhost:80",
       "description": "Inferred Url"
     }
   ],
@@ -232,6 +232,7 @@
           "category",
           "fiscalCode",
           "id",
+          "ipacode",
           "mailAddress",
           "name",
           "status",
@@ -255,6 +256,9 @@
             "type": "string",
             "description": "Institution's unique identifier"
           },
+          "ipacode": {
+            "type": "string"
+          },
           "mailAddress": {
             "type": "string",
             "description": "Institution's email address"
@@ -276,21 +280,17 @@
       "ProductsResource": {
         "title": "ProductsResource",
         "required": [
-          "activationDateTime",
           "active",
           "authorized",
           "code",
+          "description",
           "id",
+          "logo",
           "title",
           "urlBO"
         ],
         "type": "object",
         "properties": {
-          "activationDateTime": {
-            "type": "string",
-            "description": "Date the products was activated/created",
-            "format": "date-time"
-          },
           "active": {
             "type": "boolean",
             "description": "flag indicating whether the institution has a valid contract related to the product",
@@ -304,6 +304,11 @@
           "code": {
             "type": "string",
             "description": "Product's code"
+          },
+          "creationDateTime": {
+            "type": "string",
+            "description": "Date the products was activated/created",
+            "format": "date-time"
           },
           "description": {
             "type": "string",
