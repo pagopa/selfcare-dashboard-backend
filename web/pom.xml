@@ -18,6 +18,12 @@
         </dependency>
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
+            <artifactId>selc-commons-web</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.pagopa.selfcare</groupId>
             <artifactId>selc-dashboard-core</artifactId>
         </dependency>
         <dependency>
