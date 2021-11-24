@@ -11,11 +11,13 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthor
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import static it.pagopa.selfcare.commons.base.security.Authority.*;
 
 @Slf4j
 @Configuration
+@EnableWebSecurity
 class DashboardSecurityConfig extends SecurityConfig {
 
     private final PartyAuthenticationProvider authenticationProvider;
