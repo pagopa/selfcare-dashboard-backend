@@ -39,6 +39,7 @@ public class InstitutionController {
                                       @PathVariable("institutionId") String institutionId,
                                       @ApiParam("${swagger.dashboard.institutions.model.logo}")
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
+        //TODO check instId with header
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         return null;
     }
@@ -50,6 +51,7 @@ public class InstitutionController {
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                                       String institutionId) {
+        //TODO check instId with header
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         return InstitutionMapper.toResource(institutionInfo);
     }

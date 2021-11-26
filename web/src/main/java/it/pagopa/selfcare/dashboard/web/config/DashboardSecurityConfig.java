@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.web.security.PartyAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -19,6 +20,7 @@ import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@PropertySource("classpath:config/token-exchange.properties")
 class DashboardSecurityConfig extends SecurityConfig {
 
     private final PartyAuthenticationProvider authenticationProvider;

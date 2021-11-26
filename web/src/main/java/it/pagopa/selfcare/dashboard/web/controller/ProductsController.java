@@ -34,7 +34,7 @@ public class ProductsController {
     @GetMapping(value = "/")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.products.api.getProducts}")
-    public List<ProductsResource> getProducts() {
+    public List<ProductsResource> getProducts() {//TODO: move inside InstitutionController
         List<Product> products = productsService.getProducts();
         return products.stream()
                 .map(ProductsMapper::toResource)

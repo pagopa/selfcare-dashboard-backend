@@ -19,6 +19,10 @@
     {
       "name": "products",
       "description": "Product operations"
+    },
+    {
+      "name": "token",
+      "description": "Token Controller"
     }
   ],
   "paths": {
@@ -221,10 +225,147 @@
           }
         ]
       }
+    },
+    "/products/{id}/token": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "exchange",
+        "operationId": "exchangeUsingGET",
+        "parameters": [
+          {
+            "name": "realm",
+            "in": "query",
+            "description": "realm",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-selc-institutionId",
+            "in": "header",
+            "description": "Institution's unique identifier",
+            "required": true,
+            "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityTokenResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/token/exchange": {
+      "get": {
+        "tags": [
+          "token"
+        ],
+        "summary": "exchange",
+        "operationId": "exchangeUsingGET_1",
+        "parameters": [
+          {
+            "name": "productCode",
+            "in": "query",
+            "description": "productCode",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-selc-institutionId",
+            "in": "header",
+            "description": "Institution's unique identifier",
+            "required": true,
+            "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "realm",
+            "in": "query",
+            "description": "realm",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityTokenResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "IdentityTokenResource": {
+        "title": "IdentityTokenResource",
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
       "InstitutionResource": {
         "title": "InstitutionResource",
         "required": [
