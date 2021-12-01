@@ -10,13 +10,20 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
+package it.pagopa.selfcare.dashboard.connector.rest.model;
 
-import java.util.ArrayList;
+import lombok.Data;
 
 /**
- * RelationshipsResponse
+ * RelationshipInfo
  */
-public class RelationshipsResponse extends ArrayList<RelationshipInfo> {
+@Data
+public class RelationshipInfo {
+
+    private String id;
+    private String from;
+    private PartyRole role;
+    private ProductInfo product;
+    private RelationshipState state;
 
 }

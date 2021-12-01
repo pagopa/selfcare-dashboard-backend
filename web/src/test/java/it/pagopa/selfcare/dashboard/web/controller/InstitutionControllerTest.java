@@ -1,9 +1,9 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
+import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class InstitutionControllerTest {
     private FileStorageService storageServiceMock;
 
     @MockBean
-    private PartyConnector partyConnectorMock;
+    private InstitutionService institutionServiceMock;
 
 
     @Test
@@ -73,7 +73,7 @@ class InstitutionControllerTest {
     @Test
     void getInstitution_institutionInfoNotNull() throws Exception {
         // given
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.anyString()))
+        Mockito.when(institutionServiceMock.getInstitution(Mockito.anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
                     InstitutionInfo institutionInfo = new InstitutionInfo();
@@ -95,7 +95,7 @@ class InstitutionControllerTest {
     @Test
     void getInstitution_institutionInfoNull() throws Exception {
         // given
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.anyString()))
+        Mockito.when(institutionServiceMock.getInstitution(Mockito.anyString()))
                 .thenReturn(null);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders

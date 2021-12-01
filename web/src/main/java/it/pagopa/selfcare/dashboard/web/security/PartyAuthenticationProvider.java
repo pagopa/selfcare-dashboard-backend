@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
@@ -42,8 +44,12 @@ public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticati
             AuthInfo authInfo = partyConnector.getAuthInfo(((SelfCareAuthenticationDetails) authenticationDetails).getInstitutionId());
 
             if (authInfo != null) {
-                SelfCareGrantedAuthority o = new SelfCareGrantedAuthority(authInfo.getRole(), authInfo.getProducts());
-                List<SelfCareGrantedAuthority> authorities = Collections.singletonList(o);
+                List<ProductGrantedAuthority> authoritiesOnProducts = authInfo.getProductRoles().stream()
+                        .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(), productRole.getProductRole(), productRole.getProductCode()))
+                        .collect(Collectors.toList());
+
+                SelfCareGrantedAuthority selfCareGrantedAuthority = new SelfCareGrantedAuthority(authoritiesOnProducts);
+                List<SelfCareGrantedAuthority> authorities = Collections.singletonList(selfCareGrantedAuthority);
                 user = new User(username, authentication.getCredentials().toString(), authorities);
             }
         }

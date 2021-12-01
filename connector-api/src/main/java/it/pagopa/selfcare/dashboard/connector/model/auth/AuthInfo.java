@@ -1,11 +1,12 @@
 package it.pagopa.selfcare.dashboard.connector.model.auth;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public interface AuthInfo {
 
-    String getRole();
-
-    Collection<String> getProducts();
+    default Collection<ProductRole> getProductRoles() {
+        return Collections.emptyList();
+    }
 
 }

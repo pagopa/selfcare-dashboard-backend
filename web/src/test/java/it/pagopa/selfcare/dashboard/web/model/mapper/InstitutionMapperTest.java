@@ -1,5 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
+import it.pagopa.selfcare.commons.base.security.Authority;
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -11,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.TECH_REF;
+import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -26,11 +28,11 @@ class InstitutionMapperTest {
     @Test
     void toResourceNotNull() {
         // given
-        String role = TECH_REF.name();
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        Authority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(role)));
+                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(new ProductGrantedAuthority(selcRole, "", "")))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
@@ -39,10 +41,9 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getInstitutionId(), resource.getId());
         assertEquals(institutionInfo.getCategory(), resource.getCategory());
         assertEquals(institutionInfo.getDescription(), resource.getName());
-        assertEquals(null, resource.getFiscalCode());//TODO
+        assertEquals(institutionInfo.getTaxCode(), resource.getFiscalCode());
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
-        assertEquals(null, resource.getIPACode());//TODO
-        assertEquals(role, resource.getUserRole());
+        assertEquals(selcRole.name(), resource.getUserRole());
         assertEquals(institutionInfo.getStatus(), resource.getStatus());
         TestUtils.reflectionEqualsByName(institutionInfo, resource);
     }

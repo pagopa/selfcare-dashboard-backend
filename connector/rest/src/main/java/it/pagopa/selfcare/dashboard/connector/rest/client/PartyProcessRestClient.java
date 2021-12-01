@@ -1,7 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,10 @@ public interface PartyProcessRestClient {
     @GetMapping(value = "${rest-client.party-process.getInstitutionRelationships.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     RelationshipsResponse getInstitutionRelationships(@PathVariable("institutionId") String institutionId);
+
+    @GetMapping(value = "${rest-client.party-process.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    Products getInstitutionProducts(@PathVariable("institutionId") String institutionId);
 
     @GetMapping(value = "${rest-client.party-process.getOnBoardingInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

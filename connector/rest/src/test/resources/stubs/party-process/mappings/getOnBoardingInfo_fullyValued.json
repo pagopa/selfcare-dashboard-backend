@@ -15,18 +15,21 @@
         {
           "institutionId": "string",
           "description": "string",
+          "taxCode": "string",
           "digitalAddress": "string",
           "state": "PENDING",
           "role": "MANAGER",
-          "relationshipProducts": [
-            "string"
-          ],
-          "productRole": "string",
-          "institutionProducts": [
-            "string"
-          ],
+          "productInfo": {
+            "id": "string",
+            "role": "string",
+            "createdAt": "2021-11-29T15:18:04.026Z"
+          },
           "attributes": [
-            "string"
+            {
+              "id": "string",
+              "name": "string",
+              "description": "string"
+            }
           ]
         }
       ]

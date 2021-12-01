@@ -9,14 +9,13 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProductsResourceTest {
 
@@ -38,18 +37,14 @@ class ProductsResourceTest {
         toCheckMap.put("code", NotBlank.class);
         toCheckMap.put("title", NotBlank.class);
         toCheckMap.put("description", NotBlank.class);
-        toCheckMap.put("urlPublic", NotBlank.class);
         toCheckMap.put("urlBO", NotBlank.class);
-        toCheckMap.put("creationDateTime", NotNull.class);
         ProductsResource productsResource = new ProductsResource();
         productsResource.setId(null);
         productsResource.setLogo(null);
         productsResource.setCode(null);
         productsResource.setTitle(null);
         productsResource.setDescription(null);
-        productsResource.setUrlPublic(null);
         productsResource.setUrlBO(null);
-        productsResource.setCreationDateTime(null);
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
         // then

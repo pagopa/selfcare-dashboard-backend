@@ -19,8 +19,7 @@ public class InstitutionMapper {
             resource.setId(model.getInstitutionId());
             resource.setName(model.getDescription());
             resource.setCategory(model.getCategory());
-            resource.setIPACode(null);//TODO
-            resource.setFiscalCode(null);//TODO
+            resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());
             resource.setStatus(model.getStatus());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

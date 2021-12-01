@@ -3,9 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
+import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ import java.io.IOException;
 public class InstitutionController {
 
     private final FileStorageService storageService;
-    private final PartyConnector partyConnector;
+    private final InstitutionService institutionService;
 
 
     @Autowired
-    public InstitutionController(FileStorageService storageService, PartyConnector partyConnector) {
+    public InstitutionController(FileStorageService storageService, InstitutionService institutionService) {
         this.storageService = storageService;
-        this.partyConnector = partyConnector;
+        this.institutionService = institutionService;
     }
 
 
@@ -50,7 +50,7 @@ public class InstitutionController {
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                                       String institutionId) {
-        InstitutionInfo institutionInfo = partyConnector.getInstitutionInfo(institutionId);
+        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         return InstitutionMapper.toResource(institutionInfo);
     }
 

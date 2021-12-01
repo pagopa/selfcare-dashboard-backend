@@ -1,10 +1,13 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import it.pagopa.selfcare.commons.base.security.Authority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -14,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN;
@@ -61,24 +65,55 @@ class PartyAuthenticationProviderTest {
 
 
     @Test
-    void retrieveUser() {
+    void retrieveUser_notNullAuthInfoAndEmptyProductsRole() {
         // given
         String username = "username";
         String credentials = "credentials";
         String institutionId = "institutionId";
-        String role = ADMIN.name();
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
+        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
+        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+                .thenReturn(new AuthInfo() {
+                });
+        // when
+        Executable executable = () -> authenticationProvider.retrieveUser(username, authentication);
+        // then
+        assertThrows(IllegalArgumentException.class, executable);
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getAuthInfo(Mockito.eq(institutionId));
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+
+    @Test
+    void retrieveUser() {
+        // given
+        Authority role = ADMIN;
+        String username = "username";
+        String credentials = "credentials";
+        String institutionId = "institutionId";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(new AuthInfo() {
                     @Override
-                    public String getRole() {
-                        return role;
-                    }
+                    public Collection<ProductRole> getProductRoles() {
+                        return Collections.singleton(new ProductRole() {
+                            @Override
+                            public Authority getSelfCareRole() {
+                                return role;
+                            }
 
-                    @Override
-                    public Collection<String> getProducts() {
-                        return null;
+                            @Override
+                            public String getProductRole() {
+                                return "";
+                            }
+
+                            @Override
+                            public String getProductCode() {
+                                return "";
+                            }
+                        });
                     }
                 });
         // when
@@ -89,7 +124,7 @@ class PartyAuthenticationProviderTest {
         assertEquals(1, userDetails.getAuthorities().size());
         Optional<? extends GrantedAuthority> grantedAuthority = userDetails.getAuthorities().stream().findAny();
         assertTrue(grantedAuthority.isPresent());
-        assertEquals(role, grantedAuthority.get().getAuthority());
+        assertEquals(role.name(), grantedAuthority.get().getAuthority());
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(partyConnectorMock);

@@ -7,10 +7,15 @@
     "status": "200",
     "jsonBody": [
       {
-        "from": "institutionId1",
-        "role": "Manager",
-        "platformRole": "string",
-        "status": "pending"
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "from": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "role": "MANAGER",
+        "product": {
+          "id": "string",
+          "role": "string",
+          "createdAt": "2021-11-29T15:18:04.035Z"
+        },
+        "state": "PENDING"
       }
     ],
     "headers": {
