@@ -5,9 +5,9 @@ import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.RelationshipInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -78,10 +78,14 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
+        Assert.assertNotNull(response.get(0).getId());
         Assert.assertNotNull(response.get(0).getFrom());
-        Assert.assertEquals(RelationshipInfo.RoleEnum.MANAGER, response.get(0).getRole());
-        Assert.assertEquals(RelationshipInfo.StatusEnum.PENDING, response.get(0).getStatus());
-        Assert.assertNotNull(response.get(0).getPlatformRole());
+        Assert.assertNotNull(response.get(0).getRole());
+        Assert.assertNotNull(response.get(0).getState());
+        Assert.assertNotNull(response.get(0).getProduct());
+        Assert.assertNotNull(response.get(0).getProduct().getId());
+        Assert.assertNotNull(response.get(0).getProduct().getRole());
+        Assert.assertNotNull(response.get(0).getProduct().getCreatedAt());
     }
 
 
@@ -92,10 +96,11 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
+        Assert.assertNull(response.get(0).getId());
         Assert.assertNull(response.get(0).getFrom());
         Assert.assertNull(response.get(0).getRole());
-        Assert.assertNull(response.get(0).getStatus());
-        Assert.assertNull(response.get(0).getPlatformRole());
+        Assert.assertNull(response.get(0).getProduct());
+        Assert.assertNull(response.get(0).getState());
     }
 
 
@@ -110,6 +115,41 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
 
     @Test
+    public void getInstitutionProducts_fullyValued() {
+        // given and when
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_VALUED));
+        // then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getProducts());
+        Assert.assertFalse(response.getProducts().isEmpty());
+        Assert.assertNotNull(response.getProducts().get(0).getId());
+        Assert.assertNotNull(response.getProducts().get(0).getRole());
+        Assert.assertNotNull(response.getProducts().get(0).getCreatedAt());
+    }
+
+
+    @Test
+    public void getInstitutionProducts_fullyNull() {
+        // given and when
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_NULL));
+        // then
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getProducts());
+    }
+
+
+    @Test
+    public void getInstitutionProducts_emptyResult() {
+        // given and when
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.EMPTY_RESULT));
+        // then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getProducts());
+        Assert.assertTrue(response.getProducts().isEmpty());
+    }
+
+
+    @Test
     public void getOnBoardingInfo_fullyValued() {
         // given and when
         OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED));
@@ -120,17 +160,17 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response.getPerson().getName());
         Assert.assertNotNull(response.getPerson().getSurname());
         Assert.assertNotNull(response.getPerson().getTaxCode());
-        Assert.assertNotNull(response.getInstitutions().get(0).getDescription());
-        Assert.assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNotNull(response.getInstitutions().get(0).getProductRole());
-        Assert.assertNotNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNotNull(response.getInstitutions().get(0).getState());
-        Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
         Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionId());
-        Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionProducts());
-        Assert.assertFalse(response.getInstitutions().get(0).getInstitutionProducts().isEmpty());
-        Assert.assertNotNull(response.getInstitutions().get(0).getRelationshipProducts());
-        Assert.assertFalse(response.getInstitutions().get(0).getInstitutionProducts().isEmpty());
+        Assert.assertNotNull(response.getInstitutions().get(0).getDescription());
+        Assert.assertNotNull(response.getInstitutions().get(0).getTaxCode());
+        Assert.assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
+        Assert.assertNotNull(response.getInstitutions().get(0).getState());
+        Assert.assertNotNull(response.getInstitutions().get(0).getRole());
+        Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
+        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo());
+        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo().getId());
+        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo().getRole());
+        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo().getCreatedAt());
     }
 
 
@@ -145,12 +185,14 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNull(response.getPerson().getName());
         Assert.assertNull(response.getPerson().getSurname());
         Assert.assertNull(response.getPerson().getTaxCode());
+        Assert.assertNull(response.getInstitutions().get(0).getInstitutionId());
         Assert.assertNull(response.getInstitutions().get(0).getDescription());
+        Assert.assertNull(response.getInstitutions().get(0).getTaxCode());
         Assert.assertNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNull(response.getInstitutions().get(0).getProductRole());
-        Assert.assertNull(response.getInstitutions().get(0).getRole());
         Assert.assertNull(response.getInstitutions().get(0).getState());
+        Assert.assertNull(response.getInstitutions().get(0).getRole());
         Assert.assertNull(response.getInstitutions().get(0).getAttributes());
+        Assert.assertNull(response.getInstitutions().get(0).getProductInfo());
     }
 
 
@@ -163,5 +205,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertTrue(response.getInstitutions().isEmpty());
         Assert.assertNull(response.getPerson());
     }
+
+    //TODO: add relationships tests
 
 }

@@ -13,7 +13,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.*;
+import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN;
+import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
 
 @Slf4j
 @Configuration
@@ -33,9 +34,7 @@ class DashboardSecurityConfig extends SecurityConfig {
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(ADMIN.name() + " > " + LEGAL.name() + "\n" +
-                LEGAL.name() + " > " + ADMIN_REF.name() + "\n" +
-                ADMIN_REF.name() + " > " + TECH_REF.name());
+        roleHierarchy.setHierarchy(ADMIN.name() + " > " + LIMITED.name());
         RoleHierarchyAuthoritiesMapper authoritiesMapper = new RoleHierarchyAuthoritiesMapper(roleHierarchy);
         authenticationProvider.setAuthoritiesMapper(authoritiesMapper);
         authenticationManagerBuilder.authenticationProvider(authenticationProvider);
@@ -46,9 +45,9 @@ class DashboardSecurityConfig extends SecurityConfig {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/products/**").hasAuthority(TECH_REF.name())
-                .antMatchers(HttpMethod.PUT, "/institutions/**/logo").hasAuthority(ADMIN_REF.name())
-                .antMatchers("/institutions/**").hasAuthority(TECH_REF.name())
+                .antMatchers("/products/**").hasAuthority(LIMITED.name())
+                .antMatchers(HttpMethod.PUT, "/institutions/**/logo").hasAuthority(ADMIN.name())
+                .antMatchers("/institutions/**").hasAuthority(LIMITED.name())
                 .anyRequest().permitAll();
         super.configure(http);
     }

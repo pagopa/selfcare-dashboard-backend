@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.TECH_REF;
+import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
 
 @Service
 class ProductsServiceImpl implements ProductsService {
@@ -33,7 +34,7 @@ class ProductsServiceImpl implements ProductsService {
 
 
     @Override
-    public List<Product> getProducts() {
+    public List<Product> getProducts() {//TODO: add InstitutionId param
         List<Product> products = productsConnector.getProducts();
 
         if (!products.isEmpty()) {
@@ -46,21 +47,20 @@ class ProductsServiceImpl implements ProductsService {
             if (selcAuthority.isPresent()) {
                 String institutionId = ((SelfCareAuthenticationDetails) authentication.getDetails())
                         .getInstitutionId();
-                List<String> institutionsProducts = partyConnector.getInstitutionInfo(institutionId)
-                        .getActiveProducts();
-                Collection<String> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getProducts();
+                List<String> institutionsProducts = partyConnector.getInstitutionProducts(institutionId);
+                Collection<ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
 
-                if (TECH_REF.name().equals(selcAuthority.get().getAuthority())) {
+                if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
                     products = products.stream()
                             .filter(product -> institutionsProducts.contains(product.getCode()))
-                            .filter(product -> userAuthProducts.contains(product.getCode()))
+                            .filter(product -> userAuthProducts.stream().anyMatch(productRole -> productRole.getProductCode().equals(product.getCode())))//FIXME:use getId
                             .peek(product -> product.setActive(true))
                             .peek(product -> product.setAuthorized(true))
                             .collect(Collectors.toList());
 
                 } else {
                     products.forEach(product -> {
-                        product.setAuthorized(userAuthProducts == null || userAuthProducts.contains(product.getCode()));
+                        product.setAuthorized(userAuthProducts.stream().anyMatch(productRole -> productRole.getProductCode().equals(product.getCode())));//FIXME:use getId
                         product.setActive(institutionsProducts.contains(product.getCode()));
                     });
                 }

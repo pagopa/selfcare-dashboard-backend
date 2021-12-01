@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
+package it.pagopa.selfcare.dashboard.connector.rest.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +11,11 @@ public class OnboardingData {
 
     private String institutionId;
     private String description;
+    private String taxCode;
     private String digitalAddress;
     private RelationshipState state;
     private PartyRole role;
-    private List<String> relationshipProducts;
-    private String productRole;
-    private List<String> institutionProducts;
-    private List<String> attributes;
+    private ProductInfo productInfo;
+    private List<Attribute> attributes;
 
 }

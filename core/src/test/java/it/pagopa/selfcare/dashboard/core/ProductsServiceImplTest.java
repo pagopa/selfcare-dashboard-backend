@@ -1,11 +1,11 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN_REF;
-import static it.pagopa.selfcare.commons.base.security.Authority.TECH_REF;
+import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN;
+import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
 
 @ExtendWith(MockitoExtension.class)
 class ProductsServiceImplTest {
@@ -59,19 +59,18 @@ class ProductsServiceImplTest {
 
 
     @Test
-    void getProducts_techRefWithEmptyInstProductsAndEmptyAuthProducts() {
+    void getProducts_limitedWithEmptyInstProducts() {
         //given
         String institutionId = "institutionId";
         Product product = TestUtils.mockInstance(new Product());
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(product));
-        InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setActiveProducts(Collections.emptyList());
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.any()))
-                .thenReturn(institutionInfo);
+        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+                .thenReturn(Collections.emptyList());
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(LIMITED, "", "");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(TECH_REF.name())));
+                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(productGrantedAuthority))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -80,25 +79,24 @@ class ProductsServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertTrue(products.isEmpty());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionInfo(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
 
     @Test
-    void getProducts_adminRefWithEmptyInstProductsAndEmptyAuthProducts() {
+    void getProducts_adminWithEmptyInstProducts() {
         //given
         String institutionId = "institutionId";
         Product product = TestUtils.mockInstance(new Product());
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(product));
-        InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setActiveProducts(Collections.emptyList());
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.any()))
-                .thenReturn(institutionInfo);
+        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+                .thenReturn(Collections.emptyList());
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(ADMIN, "", product.getCode());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(ADMIN_REF.name())));
+                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(productGrantedAuthority))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -108,15 +106,14 @@ class ProductsServiceImplTest {
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(1, products.size());
         Assertions.assertFalse(products.get(0).isActive());
-        Assertions.assertFalse(products.get(0).isAuthorized());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionInfo(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
 
     @Test
-    void getProducts_techRefWithNotEmptyInstProductsAndNotEmptyAuthProducts() {
+    void getProducts_operatorWithNotEmptyInstProducts() {
         //given
         String institutionId = "institutionId";
         Product p1 = TestUtils.mockInstance(new Product(), 1);
@@ -124,13 +121,13 @@ class ProductsServiceImplTest {
         Product p3 = TestUtils.mockInstance(new Product(), 3);
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(p1, p2, p3));
-        InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setActiveProducts(List.of(p1.getCode(), p3.getCode()));
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.any()))
-                .thenReturn(institutionInfo);
+        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+                .thenReturn(List.of(p1.getCode(), p3.getCode()));
+        ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(LIMITED, "", p2.getCode());
+        ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(LIMITED, "", p3.getCode());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(TECH_REF.name(), List.of(p2.getCode(), p3.getCode()))));
+                Collections.singletonList(new SelfCareGrantedAuthority(List.of(productGrantedAuthority2, productGrantedAuthority3))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -143,13 +140,13 @@ class ProductsServiceImplTest {
         Assertions.assertTrue(products.get(0).isActive());
         Assertions.assertTrue(products.get(0).isAuthorized());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionInfo(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
 
     @Test
-    void getProducts_adminRefWithNotEmptyInstProductsAndNotEmptyAuthProducts() {
+    void getProducts_adminWithNotEmptyInstProducts() {
         //given
         String institutionId = "institutionId";
         Product p1 = TestUtils.mockInstance(new Product(), 1);
@@ -157,13 +154,13 @@ class ProductsServiceImplTest {
         Product p3 = TestUtils.mockInstance(new Product(), 3);
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(p1, p2, p3));
-        InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setActiveProducts(List.of(p1.getCode(), p3.getCode()));
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.any()))
-                .thenReturn(institutionInfo);
+        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+                .thenReturn(List.of(p1.getCode(), p3.getCode()));
+        ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(ADMIN, "", p2.getCode());
+        ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(ADMIN, "", p3.getCode());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(ADMIN_REF.name(), List.of(p2.getCode(), p3.getCode()))));
+                Collections.singletonList(new SelfCareGrantedAuthority(List.of(productGrantedAuthority2, productGrantedAuthority3))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -179,7 +176,7 @@ class ProductsServiceImplTest {
             Assertions.assertEquals(expectedAuthorizedProducts.contains(product.getId()), product.isAuthorized());
         });
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionInfo(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 

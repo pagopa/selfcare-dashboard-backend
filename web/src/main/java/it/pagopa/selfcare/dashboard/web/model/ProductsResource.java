@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
 @Data
@@ -37,7 +35,6 @@ public class ProductsResource {
     private String description;
 
     @ApiModelProperty("${swagger.dashboard.products.model.urlPublic}")
-    @NotBlank
     private String urlPublic;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.urlBO}", required = true)
@@ -45,9 +42,8 @@ public class ProductsResource {
     @NotBlank
     private String urlBO;
 
-    @ApiModelProperty("${swagger.dashboard.products.model.creationDateTime}")
-    @NotNull
-    private OffsetDateTime creationDateTime;
+    @ApiModelProperty("${swagger.dashboard.products.model.activatedAt}")
+    private OffsetDateTime activatedAt;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.active}", required = true)
     @JsonProperty(required = true)

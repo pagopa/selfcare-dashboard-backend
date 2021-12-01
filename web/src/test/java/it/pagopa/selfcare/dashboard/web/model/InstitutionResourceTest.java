@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InstitutionResourceTest {
 
@@ -35,7 +35,6 @@ class InstitutionResourceTest {
         toCheckMap.put("id", NotBlank.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("category", NotBlank.class);
-        toCheckMap.put("IPACode", NotBlank.class);
         toCheckMap.put("fiscalCode", NotBlank.class);
         toCheckMap.put("mailAddress", NotBlank.class);
         toCheckMap.put("userRole", NotBlank.class);
@@ -44,7 +43,6 @@ class InstitutionResourceTest {
         institutionResource.setId(null);
         institutionResource.setName(null);
         institutionResource.setCategory(null);
-        institutionResource.setIPACode(null);
         institutionResource.setFiscalCode(null);
         institutionResource.setMailAddress(null);
         institutionResource.setUserRole(null);

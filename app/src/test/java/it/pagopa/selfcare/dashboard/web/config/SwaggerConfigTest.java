@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
+import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.ProductsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ class SwaggerConfigTest {
     private FileStorageService storageService;
 
     @MockBean
-    private PartyConnector partyConnector;
+    private InstitutionService institutionService;
 
     @Autowired
     WebApplicationContext context;

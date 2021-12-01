@@ -34,7 +34,7 @@
           {
             "name": "institutionId",
             "in": "path",
-            "description": "Institution's unique identifier",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "simple",
             "schema": {
@@ -44,7 +44,7 @@
           {
             "name": "x-selc-institutionId",
             "in": "header",
-            "description": "Institution's unique identifier",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "allowReserved": false,
             "schema": {
@@ -104,7 +104,7 @@
           {
             "name": "x-selc-institutionId",
             "in": "header",
-            "description": "Institution's unique identifier",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "allowReserved": false,
             "schema": {
@@ -181,7 +181,7 @@
           {
             "name": "x-selc-institutionId",
             "in": "header",
-            "description": "Institution's unique identifier",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "allowReserved": false,
             "schema": {
@@ -228,11 +228,9 @@
       "InstitutionResource": {
         "title": "InstitutionResource",
         "required": [
-          "IPACode",
           "category",
           "fiscalCode",
           "id",
-          "ipacode",
           "mailAddress",
           "name",
           "status",
@@ -240,10 +238,6 @@
         ],
         "type": "object",
         "properties": {
-          "IPACode": {
-            "type": "string",
-            "description": "IPA code"
-          },
           "category": {
             "type": "string",
             "description": "Institution's category"
@@ -254,10 +248,7 @@
           },
           "id": {
             "type": "string",
-            "description": "Institution's unique identifier"
-          },
-          "ipacode": {
-            "type": "string"
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
           "mailAddress": {
             "type": "string",
@@ -291,6 +282,11 @@
         ],
         "type": "object",
         "properties": {
+          "activatedAt": {
+            "type": "string",
+            "description": "Date the products was activated",
+            "format": "date-time"
+          },
           "active": {
             "type": "boolean",
             "description": "flag indicating whether the institution has a valid contract related to the product",
@@ -304,11 +300,6 @@
           "code": {
             "type": "string",
             "description": "Product's code"
-          },
-          "creationDateTime": {
-            "type": "string",
-            "description": "Date the products was activated/created",
-            "format": "date-time"
           },
           "description": {
             "type": "string",
