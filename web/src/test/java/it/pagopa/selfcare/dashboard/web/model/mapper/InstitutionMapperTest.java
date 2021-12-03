@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.commons.base.security.Authority;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -29,10 +29,10 @@ class InstitutionMapperTest {
     void toResourceNotNull() {
         // given
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
-        Authority selcRole = LIMITED;
+        SelfCareAuthority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(new ProductGrantedAuthority(selcRole, "", "")))));
+                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(new ProductGrantedAuthority(selcRole, "productRole", "productId")))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when

@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.commons.base.security.Authority;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
@@ -19,16 +19,16 @@ import java.util.stream.Collectors;
 @Service
 class PartyConnectorImpl implements PartyConnector {
 
-    static final Function<PartyRole, Authority> PARTY_2_SELC_ROLE = partyRole -> {
-        Authority selfCareRole;
+    static final Function<PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> {
+        SelfCareAuthority selfCareRole;
         switch (partyRole) {
             case MANAGER:
             case DELEGATE:
             case SUB_DELEGATE:
-                selfCareRole = Authority.ADMIN;
+                selfCareRole = SelfCareAuthority.ADMIN;
                 break;
             default:
-                selfCareRole = Authority.LIMITED;
+                selfCareRole = SelfCareAuthority.LIMITED;
         }
         return selfCareRole;
     };
@@ -95,7 +95,7 @@ class PartyConnectorImpl implements PartyConnector {
                             .map(onboardingData -> {
                                 ProductRole productRole = new ProductRole() {
                                     @Override
-                                    public Authority getSelfCareRole() {
+                                    public SelfCareAuthority getSelfCareRole() {
                                         return PARTY_2_SELC_ROLE.apply(onboardingData.getRole());
                                     }
 
@@ -105,7 +105,7 @@ class PartyConnectorImpl implements PartyConnector {
                                     }
 
                                     @Override
-                                    public String getProductCode() {
+                                    public String getProductId() {
                                         return onboardingData.getProductInfo().getId();
                                     }
                                 };

@@ -1,11 +1,15 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +27,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class})
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
+    private static final Product PRODUCT = TestUtils.mockInstance(new Product());
 
     @Autowired
     protected MockMvc mvc;
@@ -106,6 +113,49 @@ class InstitutionControllerTest {
                 .andReturn();
         // then
         assertEquals("", result.getResponse().getContentAsString());
+    }
+
+
+    @Test
+    void getProductsNotNull() throws Exception {
+        // given
+        Mockito.when(institutionServiceMock.getInstitutionProducts(Mockito.any()))
+                .thenReturn(Collections.singletonList(PRODUCT));
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/institutionId/products")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        // then
+        List<ProductsResource> products = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+        assertNotNull(products);
+        assertFalse(products.isEmpty());
+    }
+
+    @Test
+    void getProductsNull() throws Exception {
+        // given
+        Mockito.when(institutionServiceMock.getInstitutionProducts(Mockito.any()))
+                .thenReturn(Collections.emptyList());
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/institutionId/products")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        // then
+        List<ProductsResource> products = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+        assertNotNull(products);
+        assertTrue(products.isEmpty());
     }
 
 }

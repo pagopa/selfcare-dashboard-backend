@@ -10,7 +10,6 @@ import java.time.OffsetDateTime;
 public class Product {
 
     private String id;
-    private String code;
     private String logo;
     private String title;
     private String description;
@@ -19,4 +18,5 @@ public class Product {
     private OffsetDateTime activatedAt;
     private boolean active;
     private boolean authorized;
+    private String userRole;
 }

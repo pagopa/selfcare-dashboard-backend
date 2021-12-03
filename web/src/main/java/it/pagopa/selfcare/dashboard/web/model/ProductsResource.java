@@ -14,11 +14,6 @@ public class ProductsResource {
     @NotBlank
     private String id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.code}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
-    private String code;
-
     @ApiModelProperty(value = "${swagger.dashboard.products.model.logo}", required = true)
     @JsonProperty(required = true)
     @NotBlank
@@ -52,4 +47,7 @@ public class ProductsResource {
     @ApiModelProperty(value = "${swagger.dashboard.products.model.authorized}", required = true)
     @JsonProperty(required = true)
     private boolean authorized;
+
+    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
+    private String userRole;
 }

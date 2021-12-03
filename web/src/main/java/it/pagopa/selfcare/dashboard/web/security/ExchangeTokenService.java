@@ -5,12 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
+import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -46,31 +48,35 @@ public class ExchangeTokenService {
         this.duration = Duration.parse(duration);
     }
 
-    public String exchange(String productCode, String realm) {
+    public String exchange(String productId, String realm) {
         if (log.isDebugEnabled()) {
             log.trace("ExchangeTokenService.exchange");
-            log.debug("productCode = " + productCode + ", realm = " + realm);
+            log.debug("productId = " + productId + ", realm = " + realm);
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
-            throw new RuntimeException();
+            throw new IllegalStateException("Authentication is required");
         }
-        //TODO: retrieve product role from authentication object
+        Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
+                .findAny();
+        SelfCareGrantedAuthority grantedAuthority = (SelfCareGrantedAuthority) selcAuthority
+                .orElseThrow(() -> new IllegalArgumentException("A Self Care Granted SelfCareAuthority is required"));
+        if (!SelfCareAuthenticationDetails.class.isAssignableFrom(authentication.getDetails().getClass())) {
+            throw new IllegalArgumentException("A Self Care Authentication Details is required");
+        }
         String institutionId = ((SelfCareAuthenticationDetails) authentication.getDetails()).getInstitutionId();
-        Optional<Claims> selcClaims = jwtService.getClaims(authentication.getCredentials().toString());
-        if (selcClaims.isEmpty()) {
-            throw new RuntimeException();//TODO: define a custom exception
-        }
-        System.out.println("selcClaims.get().setIssuedAt() = " + selcClaims.get().getIssuedAt());//FIXME:remove
-        TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims.get());
+        Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString())
+                .orElseThrow(() -> new RuntimeException("Failed to retrieve session token claims"));
+        TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
         claims.setIssuer(ISSUER);
-        claims.setInstitution(new Institution(institutionId, null));
+        claims.setInstitution(new Institution(institutionId, grantedAuthority.getRoleOnProducts().get(productId).getProductRole()));
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-        System.out.println("claims.getIssuedAt() = " + claims.getIssuedAt());//FIXME:remove
 
         if (log.isDebugEnabled()) {
             log.debug("Exchanged claims: " + claims.toString());

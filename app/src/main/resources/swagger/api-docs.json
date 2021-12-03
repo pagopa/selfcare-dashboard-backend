@@ -17,10 +17,6 @@
       "description": "Institution operations"
     },
     {
-      "name": "products",
-      "description": "Product operations"
-    },
-    {
       "name": "token",
       "description": "Token Controller"
     }
@@ -98,7 +94,7 @@
           {
             "name": "institutionId",
             "in": "path",
-            "description": "${swagger.dashboard.model.id}",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "simple",
             "schema": {
@@ -173,15 +169,25 @@
         ]
       }
     },
-    "/products/": {
+    "/institutions/{institutionId}/products": {
       "get": {
         "tags": [
-          "products"
+          "institutions"
         ],
-        "summary": "getProducts",
-        "description": "Service that returns the list of PagoPA products",
-        "operationId": "getProductsUsingGET",
+        "summary": "getInstitutionProducts",
+        "description": "Service that returns the list of products related to the institution",
+        "operationId": "getInstitutionProductsUsingGET",
         "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "x-selc-institutionId",
             "in": "header",
@@ -226,77 +232,18 @@
         ]
       }
     },
-    "/products/{id}/token": {
-      "get": {
-        "tags": [
-          "products"
-        ],
-        "summary": "exchange",
-        "operationId": "exchangeUsingGET",
-        "parameters": [
-          {
-            "name": "realm",
-            "in": "query",
-            "description": "realm",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier",
-            "required": true,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IdentityTokenResource"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
-      }
-    },
     "/token/exchange": {
       "get": {
         "tags": [
           "token"
         ],
         "summary": "exchange",
-        "operationId": "exchangeUsingGET_1",
+        "operationId": "exchangeUsingGET",
         "parameters": [
           {
-            "name": "productCode",
+            "name": "productId",
             "in": "query",
-            "description": "productCode",
+            "description": "Product's unique identifier",
             "required": true,
             "style": "form",
             "schema": {
@@ -306,7 +253,7 @@
           {
             "name": "x-selc-institutionId",
             "in": "header",
-            "description": "Institution's unique identifier",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "allowReserved": false,
             "schema": {
@@ -316,7 +263,7 @@
           {
             "name": "realm",
             "in": "query",
-            "description": "realm",
+            "description": "The domain for which the requested token is valid",
             "required": true,
             "style": "form",
             "schema": {
@@ -359,10 +306,14 @@
     "schemas": {
       "IdentityTokenResource": {
         "title": "IdentityTokenResource",
+        "required": [
+          "token"
+        ],
         "type": "object",
         "properties": {
           "token": {
-            "type": "string"
+            "type": "string",
+            "description": "The Identity Token"
           }
         }
       },
@@ -414,7 +365,6 @@
         "required": [
           "active",
           "authorized",
-          "code",
           "description",
           "id",
           "logo",
@@ -437,10 +387,6 @@
             "type": "boolean",
             "description": "flag indicating whether the logged user has the authorization to manage the product",
             "example": false
-          },
-          "code": {
-            "type": "string",
-            "description": "Product's code"
           },
           "description": {
             "type": "string",
@@ -465,6 +411,10 @@
           "urlPublic": {
             "type": "string",
             "description": "URL that redirects to the public information webpage of the product"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       }

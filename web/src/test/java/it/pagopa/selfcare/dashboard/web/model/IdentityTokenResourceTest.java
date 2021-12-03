@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ProductsResourceTest {
+class IdentityTokenResourceTest {
 
     private Validator validator;
-    private static final ProductsResource PRODUCTS_RESOURCE = TestUtils.mockInstance(new ProductsResource());
+
 
     @BeforeEach
     void setUp() {
@@ -28,23 +28,16 @@ class ProductsResourceTest {
         validator = validatorFactory.getValidator();
     }
 
+
     @Test
     void validateNullFields() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("id", NotBlank.class);
-        toCheckMap.put("logo", NotBlank.class);
-        toCheckMap.put("title", NotBlank.class);
-        toCheckMap.put("description", NotBlank.class);
-        toCheckMap.put("urlBO", NotBlank.class);
-        ProductsResource productsResource = new ProductsResource();
-        productsResource.setId(null);
-        productsResource.setLogo(null);
-        productsResource.setTitle(null);
-        productsResource.setDescription(null);
-        productsResource.setUrlBO(null);
+        toCheckMap.put("token", NotBlank.class);
+        IdentityTokenResource resource = new IdentityTokenResource();
+        resource.setToken(null);
         // when
-        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
+        Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then
         List<ConstraintViolation<Object>> filteredViolations = violations.stream()
                 .filter(violation -> {
@@ -55,11 +48,13 @@ class ProductsResourceTest {
         assertTrue(filteredViolations.isEmpty());
     }
 
+
     @Test
     void validateNotNullFields() {
         // given
+        IdentityTokenResource resource = TestUtils.mockInstance(new IdentityTokenResource());
         // when
-        Set<ConstraintViolation<Object>> violations = validator.validate(PRODUCTS_RESOURCE);
+        Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then
         assertTrue(violations.isEmpty());
     }

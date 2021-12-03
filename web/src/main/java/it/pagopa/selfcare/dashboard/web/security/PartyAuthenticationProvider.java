@@ -45,7 +45,7 @@ public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticati
 
             if (authInfo != null) {
                 List<ProductGrantedAuthority> authoritiesOnProducts = authInfo.getProductRoles().stream()
-                        .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(), productRole.getProductRole(), productRole.getProductCode()))
+                        .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(), productRole.getProductRole(), productRole.getProductId()))
                         .collect(Collectors.toList());
 
                 SelfCareGrantedAuthority selfCareGrantedAuthority = new SelfCareGrantedAuthority(authoritiesOnProducts);
