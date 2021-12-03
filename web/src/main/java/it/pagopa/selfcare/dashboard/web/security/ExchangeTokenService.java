@@ -93,8 +93,8 @@ public class ExchangeTokenService {
         boolean isRsa = signingKey.contains("RSA");
         String privateKeyEnvelopName = (isRsa ? "RSA " : "") + "PRIVATE KEY";
         String privateKeyPEM = signingKey
-                .replace("\\r", "")
-                .replace("\\n", "")
+                .replaceAll("\\r", "")
+                .replaceAll("\\n", "")
                 .replace(String.format(PRIVATE_KEY_HEADER_TEMPLATE, privateKeyEnvelopName), "")
                 .replace(String.format(PRIVATE_KEY_FOOTER_TEMPLATE, privateKeyEnvelopName), "");
 
