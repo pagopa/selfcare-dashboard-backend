@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.commons.base.security.Authority;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class PartyConnectorImplTest {
 
-    private static final EnumMap<PartyRole, Authority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class) {{
-        put(PartyRole.MANAGER, Authority.ADMIN);
-        put(PartyRole.DELEGATE, Authority.ADMIN);
-        put(PartyRole.SUB_DELEGATE, Authority.ADMIN);
-        put(PartyRole.OPERATOR, Authority.LIMITED);
+    private static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class) {{
+        put(PartyRole.MANAGER, SelfCareAuthority.ADMIN);
+        put(PartyRole.DELEGATE, SelfCareAuthority.ADMIN);
+        put(PartyRole.SUB_DELEGATE, SelfCareAuthority.ADMIN);
+        put(PartyRole.OPERATOR, SelfCareAuthority.LIMITED);
     }};
 
     @InjectMocks
@@ -340,7 +340,7 @@ class PartyConnectorImplTest {
         assertNotNull(authInfo.getProductRoles());
         assertEquals(1, authInfo.getProductRoles().size());
         ProductRole productRole = authInfo.getProductRoles().iterator().next();
-        assertEquals(onboardingData1.getProductInfo().getId(), productRole.getProductCode());
+        assertEquals(onboardingData1.getProductInfo().getId(), productRole.getProductId());
         assertEquals(onboardingData1.getProductInfo().getRole(), productRole.getProductRole());
         assertEquals(PARTY_ROLE_AUTHORITY_MAP.get(onboardingData1.getRole()), productRole.getSelfCareRole());
         Mockito.verify(restClientMock, Mockito.times(1))
@@ -353,7 +353,7 @@ class PartyConnectorImplTest {
     @EnumSource(value = PartyRole.class)
     void getAuthInfo(PartyRole partyRole) {
         // when
-        Authority authority = PartyConnectorImpl.PARTY_2_SELC_ROLE.apply(partyRole);
+        SelfCareAuthority authority = PartyConnectorImpl.PARTY_2_SELC_ROLE.apply(partyRole);
         // then
         assertEquals(PARTY_ROLE_AUTHORITY_MAP.get(partyRole), authority);
     }

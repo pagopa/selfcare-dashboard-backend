@@ -34,7 +34,7 @@ public class InstitutionResource {
     @NotBlank
     private String mailAddress;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.userRole}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}", required = true)
     @JsonProperty(required = true)
     @NotBlank
     private String userRole;

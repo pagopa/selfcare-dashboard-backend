@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
-import it.pagopa.selfcare.commons.base.security.Authority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,7 +88,7 @@ class PartyAuthenticationProviderTest {
     @Test
     void retrieveUser() {
         // given
-        Authority role = ADMIN;
+        SelfCareAuthority role = ADMIN;
         String username = "username";
         String credentials = "credentials";
         String institutionId = "institutionId";
@@ -100,18 +100,18 @@ class PartyAuthenticationProviderTest {
                     public Collection<ProductRole> getProductRoles() {
                         return Collections.singleton(new ProductRole() {
                             @Override
-                            public Authority getSelfCareRole() {
+                            public SelfCareAuthority getSelfCareRole() {
                                 return role;
                             }
 
                             @Override
                             public String getProductRole() {
-                                return "";
+                                return "productRole";
                             }
 
                             @Override
-                            public String getProductCode() {
-                                return "";
+                            public String getProductId() {
+                                return "productId";
                             }
                         });
                     }

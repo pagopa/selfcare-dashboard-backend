@@ -1,13 +1,13 @@
 package it.pagopa.selfcare.dashboard.connector.model.auth;
 
-import it.pagopa.selfcare.commons.base.security.Authority;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 
 public interface ProductRole {
 
-    Authority getSelfCareRole();
+    SelfCareAuthority getSelfCareRole();
 
     String getProductRole();
 
-    String getProductCode();
+    String getProductId();
 
 }

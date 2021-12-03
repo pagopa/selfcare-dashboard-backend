@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.web.security.PartyAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -13,12 +14,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-import static it.pagopa.selfcare.commons.base.security.Authority.ADMIN;
-import static it.pagopa.selfcare.commons.base.security.Authority.LIMITED;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@PropertySource("classpath:config/token-exchange.properties")
 class DashboardSecurityConfig extends SecurityConfig {
 
     private final PartyAuthenticationProvider authenticationProvider;
@@ -48,6 +50,7 @@ class DashboardSecurityConfig extends SecurityConfig {
                 .antMatchers("/products/**").hasAuthority(LIMITED.name())
                 .antMatchers(HttpMethod.PUT, "/institutions/**/logo").hasAuthority(ADMIN.name())
                 .antMatchers("/institutions/**").hasAuthority(LIMITED.name())
+                .antMatchers("/token/**").hasAuthority(LIMITED.name())
                 .anyRequest().permitAll();
         super.configure(http);
     }
