@@ -92,24 +92,21 @@ class PartyConnectorImpl implements PartyConnector {
                     return onBoardingInfo.getInstitutions().stream()
                             .filter(onboardingData -> RelationshipState.ACTIVE.equals(onboardingData.getState()))
                             .filter(onboardingData -> onboardingData.getProductInfo() != null)
-                            .map(onboardingData -> {
-                                ProductRole productRole = new ProductRole() {
-                                    @Override
-                                    public SelfCareAuthority getSelfCareRole() {
-                                        return PARTY_2_SELC_ROLE.apply(onboardingData.getRole());
-                                    }
+                            .map(onboardingData -> new ProductRole() {
+                                @Override
+                                public SelfCareAuthority getSelfCareRole() {
+                                    return PARTY_2_SELC_ROLE.apply(onboardingData.getRole());
+                                }
 
-                                    @Override
-                                    public String getProductRole() {
-                                        return onboardingData.getProductInfo().getRole();
-                                    }
+                                @Override
+                                public String getProductRole() {
+                                    return onboardingData.getProductInfo().getRole();
+                                }
 
-                                    @Override
-                                    public String getProductId() {
-                                        return onboardingData.getProductInfo().getId();
-                                    }
-                                };
-                                return productRole;
+                                @Override
+                                public String getProductId() {
+                                    return onboardingData.getProductInfo().getId();
+                                }
                             }).collect(Collectors.toList());
                 }
             };

@@ -101,7 +101,7 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertTrue(products.isEmpty());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
@@ -129,7 +129,7 @@ class InstitutionServiceImplTest {
         Assertions.assertEquals(1, products.size());
         Assertions.assertFalse(products.get(0).isActive());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
@@ -163,7 +163,7 @@ class InstitutionServiceImplTest {
         Assertions.assertTrue(products.get(0).isAuthorized());
         Assertions.assertEquals(LIMITED.name(), products.get(0).getUserRole());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
@@ -205,7 +205,7 @@ class InstitutionServiceImplTest {
             }
         });
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(Mockito.eq(institutionId));
+        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 

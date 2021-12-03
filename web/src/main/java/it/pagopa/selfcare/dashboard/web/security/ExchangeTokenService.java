@@ -42,7 +42,7 @@ public class ExchangeTokenService {
     public ExchangeTokenService(
             JwtService jwtService,
             @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
-            @Value("${jwt.exchange.duration}") String duration) throws Exception {
+            @Value("${jwt.exchange.duration}") String duration) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.jwtSigningKey = getPrivateKey(jwtSigningKey);
         this.duration = Duration.parse(duration);
@@ -93,8 +93,8 @@ public class ExchangeTokenService {
         boolean isRsa = signingKey.contains("RSA");
         String privateKeyEnvelopName = (isRsa ? "RSA " : "") + "PRIVATE KEY";
         String privateKeyPEM = signingKey
-                .replaceAll("\\r", "")
-                .replaceAll("\\n", "")
+                .replace("\\r", "")
+                .replace("\\n", "")
                 .replace(String.format(PRIVATE_KEY_HEADER_TEMPLATE, privateKeyEnvelopName), "")
                 .replace(String.format(PRIVATE_KEY_FOOTER_TEMPLATE, privateKeyEnvelopName), "");
 
