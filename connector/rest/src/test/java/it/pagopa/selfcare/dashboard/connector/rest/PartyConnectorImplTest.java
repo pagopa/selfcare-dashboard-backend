@@ -166,7 +166,7 @@ class PartyConnectorImplTest {
         OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setState");
         onboardingData3.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData3.setState(RelationshipState.PENDING);
-        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3));
+        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3, onboardingData3));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.isNull()))
                 .thenReturn(onBoardingInfo);
         // when

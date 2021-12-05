@@ -6,7 +6,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,7 +70,10 @@ public class ExchangeTokenService {
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
         claims.setIssuer(ISSUER);
-        claims.setInstitution(new Institution(institutionId, grantedAuthority.getRoleOnProducts().get(productId).getProductRole()));
+        Institution institution = new Institution();
+        institution.setId(institutionId);
+        institution.setRole(grantedAuthority.getRoleOnProducts().get(productId).getProductRole());
+        claims.setInstitution(institution);
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
@@ -117,8 +122,6 @@ public class ExchangeTokenService {
     }
 
 
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Getter
     @Setter
     @ToString

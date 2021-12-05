@@ -224,7 +224,10 @@ class ExchangeTokenServiceTest {
 
         public ExchangeTokenService.Institution getInstitution() {
             LinkedHashMap<String, String> o = (LinkedHashMap) get(INSTITUTION);
-            return new ExchangeTokenService.Institution(o.get("id"), o.get("role"));
+            ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
+            institution.setId(o.get("id"));
+            institution.setRole(o.get("role"));
+            return institution;
         }
     }
 

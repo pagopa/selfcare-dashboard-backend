@@ -117,6 +117,27 @@ class InstitutionControllerTest {
 
 
     @Test
+    void getInstitutions_institutionInfoNotNull() throws Exception {
+        // given
+        Mockito.when(institutionServiceMock.getInstitutions())
+                .thenAnswer(invocationOnMock -> List.of(TestUtils.mockInstance(new InstitutionInfo())));
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        // then
+        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+        assertNotNull(resources);
+        assertFalse(resources.isEmpty());
+    }
+
+
+    @Test
     void getProductsNotNull() throws Exception {
         // given
         Mockito.when(institutionServiceMock.getInstitutionProducts(Mockito.any()))

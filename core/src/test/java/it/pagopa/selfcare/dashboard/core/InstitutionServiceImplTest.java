@@ -19,13 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class InstitutionServiceImplTest {
@@ -59,6 +60,24 @@ class InstitutionServiceImplTest {
         assertSame(expectedInstitutionInfo, institutionInfo);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getInstitution(institutionId);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+
+    @Test
+    void getInstitutions() {
+        // given
+        InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
+        Mockito.when(partyConnectorMock.getInstitutions())
+                .thenReturn(List.of(expectedInstitutionInfo));
+        // when
+        Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
+        // then
+        assertNotNull(institutions);
+        assertEquals(1, institutions.size());
+        assertSame(expectedInstitutionInfo, institutions.iterator().next());
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getInstitutions();
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
