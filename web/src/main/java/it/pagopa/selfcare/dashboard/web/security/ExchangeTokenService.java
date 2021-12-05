@@ -4,10 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,10 +49,10 @@ public class ExchangeTokenService {
         this.duration = Duration.parse(duration);
     }
 
-    public String exchange(String productId, String realm) {
+    public String exchange(String institutionId, String productId, String realm) {
         if (log.isDebugEnabled()) {
             log.trace("ExchangeTokenService.exchange");
-            log.debug("productId = " + productId + ", realm = " + realm);
+            log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
@@ -63,17 +64,16 @@ public class ExchangeTokenService {
                 .findAny();
         SelfCareGrantedAuthority grantedAuthority = (SelfCareGrantedAuthority) selcAuthority
                 .orElseThrow(() -> new IllegalArgumentException("A Self Care Granted SelfCareAuthority is required"));
-        if (!SelfCareAuthenticationDetails.class.isAssignableFrom(authentication.getDetails().getClass())) {
-            throw new IllegalArgumentException("A Self Care Authentication Details is required");
-        }
-        String institutionId = ((SelfCareAuthenticationDetails) authentication.getDetails()).getInstitutionId();
         Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString())
                 .orElseThrow(() -> new RuntimeException("Failed to retrieve session token claims"));
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
         claims.setIssuer(ISSUER);
-        claims.setInstitution(new Institution(institutionId, grantedAuthority.getRoleOnProducts().get(productId).getProductRole()));
+        Institution institution = new Institution();
+        institution.setId(institutionId);
+        institution.setRole(grantedAuthority.getRoleOnProducts().get(productId).getProductRole());
+        claims.setInstitution(institution);
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
@@ -93,8 +93,8 @@ public class ExchangeTokenService {
         boolean isRsa = signingKey.contains("RSA");
         String privateKeyEnvelopName = (isRsa ? "RSA " : "") + "PRIVATE KEY";
         String privateKeyPEM = signingKey
-                .replaceAll("\\r", "")
-                .replaceAll("\\n", "")
+                .replace("\r", "")
+                .replace("\n", "")
                 .replace(String.format(PRIVATE_KEY_HEADER_TEMPLATE, privateKeyEnvelopName), "")
                 .replace(String.format(PRIVATE_KEY_FOOTER_TEMPLATE, privateKeyEnvelopName), "");
 
@@ -122,8 +122,6 @@ public class ExchangeTokenService {
     }
 
 
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Getter
     @Setter
     @ToString

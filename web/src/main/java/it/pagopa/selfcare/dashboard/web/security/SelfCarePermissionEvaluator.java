@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
@@ -23,22 +22,19 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
         boolean result = false;
 
         if (authentication != null && targetType != null) {
+            Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
+                    .stream()
+                    .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
+                    .findAny();
 
-            if (InstitutionResource.class.getSimpleName().equals(targetType)) {
+            if (selcAuthority.isPresent()) {
+                SelfCareGrantedAuthority selfCareGrantedAuthority = (SelfCareGrantedAuthority) selcAuthority.get();
 
-                if (SelfCareAuthenticationDetails.class.isAssignableFrom(authentication.getDetails().getClass())) {
-                    String institutionId = ((SelfCareAuthenticationDetails) authentication.getDetails()).getInstitutionId();
-                    result = targetId.equals(institutionId);
-                }
+                if (InstitutionResource.class.getSimpleName().equals(targetType)) {
+                    result = targetId.equals(selfCareGrantedAuthority.getInstitutionId());
 
-            } else if (ProductsResource.class.getSimpleName().equals(targetType)) {
-                Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
-                        .stream()
-                        .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
-                        .findAny();
-
-                if (selcAuthority.isPresent()) {
-                    result = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts().containsKey(String.valueOf(targetId));
+                } else if (ProductsResource.class.getSimpleName().equals(targetType)) {
+                    result = selfCareGrantedAuthority.getRoleOnProducts().containsKey(String.valueOf(targetId));
                 }
             }
         }

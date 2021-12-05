@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import io.jsonwebtoken.Jwts;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
@@ -88,7 +87,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
+        Executable executable = () -> exchangeTokenService.exchange(null, null, null);
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
@@ -106,31 +105,10 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
+        Executable executable = () -> exchangeTokenService.exchange(null, null, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
-    }
-
-
-    @Test
-    void exchange_noSelfCareAuthDetails() throws Exception {
-        // given
-        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
-        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
-        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(roleOnProducts));
-        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
-        authentication.setDetails("details");
-        TestSecurityContextHolder.setAuthentication(authentication);
-        // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A Self Care Authentication Details is required", e.getMessage());
         Mockito.verifyNoInteractions(jwtServiceMock);
     }
 
@@ -146,12 +124,11 @@ class ExchangeTokenServiceTest {
                 .thenReturn(Optional.empty());
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
-        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(roleOnProducts));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
         // then
         RuntimeException e = assertThrows(RuntimeException.class, executable);
         assertEquals("Failed to retrieve session token claims", e.getMessage());
@@ -174,9 +151,8 @@ class ExchangeTokenServiceTest {
         String productId = "productId";
         String productRole = "productRole";
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, productRole, productId));
-        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(roleOnProducts));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         TestSecurityContextHolder.setAuthentication(authentication);
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
@@ -189,7 +165,7 @@ class ExchangeTokenServiceTest {
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
         // when
-        String token = exchangeTokenService.exchange(productId, realm);
+        String token = exchangeTokenService.exchange(institutionId, productId, realm);
         // then
         assertNotNull(token);
         TestTokenExchangeClaims exchangedClaims =
@@ -248,7 +224,10 @@ class ExchangeTokenServiceTest {
 
         public ExchangeTokenService.Institution getInstitution() {
             LinkedHashMap<String, String> o = (LinkedHashMap) get(INSTITUTION);
-            return new ExchangeTokenService.Institution(o.get("id"), o.get("role"));
+            ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
+            institution.setId(o.get("id"));
+            institution.setRole(o.get("role"));
+            return institution;
         }
     }
 

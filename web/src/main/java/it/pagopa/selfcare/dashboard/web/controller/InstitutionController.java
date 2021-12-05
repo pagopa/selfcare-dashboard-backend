@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,20 @@ public class InstitutionController {
         }
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         return null;
+    }
+
+
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
+    public List<InstitutionResource> getInstitutions() {
+        if (log.isTraceEnabled()) {
+            log.trace("InstitutionController.getInstitutions");
+        }
+        Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
+        return institutions.stream()
+                .map(InstitutionMapper::toResource)
+                .collect(Collectors.toList());
     }
 
 
