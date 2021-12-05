@@ -38,12 +38,13 @@ class TokenControllerTest {
     @Test
     void exchange() throws Exception {
         // given
-        Mockito.when(exchangeTokenServiceMock.exchange(Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(exchangeTokenServiceMock.exchange(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn("token");
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/exchange")
-                .param("productId", "p1")
+                .param("institutionId", "inst1")
+                .param("productId", "prod1")
                 .param("realm", "r")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))

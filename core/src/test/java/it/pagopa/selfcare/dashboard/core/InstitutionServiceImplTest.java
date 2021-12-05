@@ -51,14 +51,14 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        Mockito.when(partyConnectorMock.getInstitutionInfo(Mockito.any()))
+        Mockito.when(partyConnectorMock.getInstitution(Mockito.any()))
                 .thenReturn(expectedInstitutionInfo);
         // when
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         // then
         assertSame(expectedInstitutionInfo, institutionInfo);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getInstitutionInfo(institutionId);
+                .getInstitution(institutionId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -92,7 +92,7 @@ class InstitutionServiceImplTest {
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(LIMITED, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(productGrantedAuthority))));
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(productGrantedAuthority))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -118,7 +118,7 @@ class InstitutionServiceImplTest {
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(ADMIN, "productRole", product.getId());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(productGrantedAuthority))));
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(productGrantedAuthority))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -149,7 +149,7 @@ class InstitutionServiceImplTest {
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(LIMITED, "productRole3", p3.getId());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(List.of(productGrantedAuthority2, productGrantedAuthority3))));
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, List.of(productGrantedAuthority2, productGrantedAuthority3))));
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
@@ -181,7 +181,7 @@ class InstitutionServiceImplTest {
                 .thenReturn(List.of(p1.getId(), p3.getId()));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(ADMIN, "productRole2", p2.getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(ADMIN, "productRole3", p3.getId());
-        SelfCareGrantedAuthority selfCareGrantedAuthority = new SelfCareGrantedAuthority(List.of(productGrantedAuthority2, productGrantedAuthority3));
+        SelfCareGrantedAuthority selfCareGrantedAuthority = new SelfCareGrantedAuthority(institutionId, List.of(productGrantedAuthority2, productGrantedAuthority3));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.singletonList(selfCareGrantedAuthority));

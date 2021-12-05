@@ -29,7 +29,10 @@ public class TokenController {
     @GetMapping(value = "exchange")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasPermission(#productId, 'ProductsResource', null)")
-    public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.products.model.id}")
+    public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                          @RequestParam("institutionId")
+                                                  String institutionId,
+                                          @ApiParam("${swagger.dashboard.products.model.id}")
                                           @RequestParam("productId")
                                                   String productId,
                                           @ApiParam(value = "${swagger.dashboard.token.model.realm}", example = "io.selfcare.pagopa.it", defaultValue = "defVal")
@@ -37,9 +40,9 @@ public class TokenController {
                                                   String realm) {
         if (log.isDebugEnabled()) {
             log.trace("TokenController.exchange");
-            log.debug("productId = {}, realm = {}", productId, realm);
+            log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         }
-        String token = exchangeTokenService.exchange(productId, realm);
+        String token = exchangeTokenService.exchange(institutionId, productId, realm);
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 

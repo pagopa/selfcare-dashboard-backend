@@ -28,11 +28,12 @@ class InstitutionMapperTest {
     @Test
     void toResourceNotNull() {
         // given
+        String institutionId = "institutionId";
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
         SelfCareAuthority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(Collections.singleton(new ProductGrantedAuthority(selcRole, "productRole", "productId")))));
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(new ProductGrantedAuthority(selcRole, "productRole", "productId")))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when

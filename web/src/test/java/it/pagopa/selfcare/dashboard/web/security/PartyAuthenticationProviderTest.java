@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
@@ -54,6 +55,8 @@ class PartyAuthenticationProviderTest {
         String institutionId = "institutionId";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
+        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+                .thenReturn(null);
         // when
         UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
         // then
@@ -65,7 +68,7 @@ class PartyAuthenticationProviderTest {
 
 
     @Test
-    void retrieveUser_notNullAuthInfoAndEmptyProductsRole() {
+    void retrieveUser_emptyAuthInfo() {
         // given
         String username = "username";
         String credentials = "credentials";
@@ -73,8 +76,30 @@ class PartyAuthenticationProviderTest {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
-                .thenReturn(new AuthInfo() {
-                });
+                .thenReturn(Collections.emptyList());
+        // when
+        UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
+        // then
+        assertNotNull(userDetails);
+        assertNotNull(userDetails.getAuthorities());
+        assertTrue(userDetails.getAuthorities().isEmpty());
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getAuthInfo(Mockito.eq(institutionId));
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+
+    @Test
+    void retrieveUser_notEmptyAuthInfoAndEmptyProductsRole() {
+        // given
+        String username = "username";
+        String credentials = "credentials";
+        String institutionId = "institutionId";
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
+        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
+        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+                .thenReturn(Collections.singletonList(new AuthInfo() {
+                }));
         // when
         Executable executable = () -> authenticationProvider.retrieveUser(username, authentication);
         // then
@@ -95,7 +120,12 @@ class PartyAuthenticationProviderTest {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
         authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
-                .thenReturn(new AuthInfo() {
+                .thenReturn(Collections.singletonList(new AuthInfo() {
+                    @Override
+                    public String getInstitutionId() {
+                        return institutionId;
+                    }
+
                     @Override
                     public Collection<ProductRole> getProductRoles() {
                         return Collections.singleton(new ProductRole() {
@@ -115,16 +145,20 @@ class PartyAuthenticationProviderTest {
                             }
                         });
                     }
-                });
+                }));
         // when
         UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
         // then
         assertNotNull(userDetails);
         assertNotNull(userDetails.getAuthorities());
         assertEquals(1, userDetails.getAuthorities().size());
-        Optional<? extends GrantedAuthority> grantedAuthority = userDetails.getAuthorities().stream().findAny();
+        Optional<? extends GrantedAuthority> grantedAuthority = userDetails.getAuthorities().stream()
+                .filter(authority -> SelfCareGrantedAuthority.class.isAssignableFrom(authority.getClass()))
+                .findAny();
         assertTrue(grantedAuthority.isPresent());
-        assertEquals(role.name(), grantedAuthority.get().getAuthority());
+        SelfCareGrantedAuthority selfCareGrantedAuthority = (SelfCareGrantedAuthority) grantedAuthority.get();
+        assertEquals(institutionId, selfCareGrantedAuthority.getInstitutionId());
+        assertEquals(role.name(), selfCareGrantedAuthority.getAuthority());
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.eq(institutionId));
         Mockito.verifyNoMoreInteractions(partyConnectorMock);

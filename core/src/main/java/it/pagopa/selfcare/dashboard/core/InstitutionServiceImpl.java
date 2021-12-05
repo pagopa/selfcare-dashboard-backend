@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,9 +38,14 @@ class InstitutionServiceImpl implements InstitutionService {
 
     @Override
     public InstitutionInfo getInstitution(String institutionId) {
-        return partyConnector.getInstitutionInfo(institutionId);
+        return partyConnector.getInstitution(institutionId);
     }
 
+
+    @Override
+    public Collection<InstitutionInfo> getInstitutions() {
+        return partyConnector.getInstitutions();
+    }
 
     @Override
     public List<Product> getInstitutionProducts(String institutionId) {

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,20 @@ class PartyConnectorImpl implements PartyConnector {
         }
         return selfCareRole;
     };
+    private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
+            (inst1, inst2) -> RelationshipState.ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
+    private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
+        InstitutionInfo institutionInfo = new InstitutionInfo();
+        institutionInfo.setInstitutionId(onboardingData.getInstitutionId());
+        institutionInfo.setDescription(onboardingData.getDescription());
+        institutionInfo.setTaxCode(onboardingData.getTaxCode());
+        institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
+        institutionInfo.setStatus(onboardingData.getState().toString());
+        if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
+            institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
+        }
+        return institutionInfo;
+    };
 
     private final PartyProcessRestClient restClient;
 
@@ -43,26 +59,33 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public InstitutionInfo getInstitutionInfo(String institutionId) {
-        InstitutionInfo institutionInfo = null;
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);
+    public InstitutionInfo getInstitution(String institutionId) {
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);//TODO: request only ACTIVE records
 
-        if (onBoardingInfo != null
-                && onBoardingInfo.getInstitutions() != null
-                && !onBoardingInfo.getInstitutions().isEmpty()) {
-            OnboardingData onboardingData = onBoardingInfo.getInstitutions().get(0);
-            institutionInfo = new InstitutionInfo();
-            institutionInfo.setInstitutionId(onboardingData.getInstitutionId());
-            institutionInfo.setDescription(onboardingData.getDescription());
-            institutionInfo.setTaxCode(onboardingData.getTaxCode());
-            institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
-            institutionInfo.setStatus(onboardingData.getState().toString());
-            if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
-                institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
-            }
+        return parseOnBoardingInfo(onBoardingInfo).stream()
+                .findAny().orElse(null);
+    }
+
+
+    @Override
+    public Collection<InstitutionInfo> getInstitutions() {
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null);//TODO: request only ACTIVE or PENDING records
+
+        return parseOnBoardingInfo(onBoardingInfo);
+    }
+
+
+    private Collection<InstitutionInfo> parseOnBoardingInfo(OnBoardingInfo onBoardingInfo) {
+        Collection<InstitutionInfo> institutions = Collections.emptyList();
+        if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
+            institutions = onBoardingInfo.getInstitutions().stream()
+                    .map(ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION)
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(InstitutionInfo::getInstitutionId, Function.identity(), MERGE_FUNCTION),
+                            Map::values
+                    ));
         }
-
-        return institutionInfo;
+        return institutions;
     }
 
 
@@ -81,38 +104,48 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public AuthInfo getAuthInfo(String institutionId) {
-        AuthInfo authInfo = null;
+    public Collection<AuthInfo> getAuthInfo(String institutionId) {
+        Collection<AuthInfo> authInfos = Collections.emptyList();
 
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);//TODO: request only ACTIVE records
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
-            authInfo = new AuthInfo() {
-                @Override
-                public Collection<ProductRole> getProductRoles() {
-                    return onBoardingInfo.getInstitutions().stream()
-                            .filter(onboardingData -> RelationshipState.ACTIVE.equals(onboardingData.getState()))
-                            .filter(onboardingData -> onboardingData.getProductInfo() != null)
-                            .map(onboardingData -> new ProductRole() {
-                                @Override
-                                public SelfCareAuthority getSelfCareRole() {
-                                    return PARTY_2_SELC_ROLE.apply(onboardingData.getRole());
-                                }
+            authInfos = onBoardingInfo.getInstitutions().stream()
+                    .filter(onboardingData -> RelationshipState.ACTIVE.equals(onboardingData.getState()))
+                    .filter(onboardingData -> onboardingData.getProductInfo() != null)
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.groupingBy(OnboardingData::getInstitutionId,
+                                    Collectors.mapping(onboardingData -> new ProductRole() {
+                                        @Override
+                                        public SelfCareAuthority getSelfCareRole() {
+                                            return PARTY_2_SELC_ROLE.apply(onboardingData.getRole());
+                                        }
 
-                                @Override
-                                public String getProductRole() {
-                                    return onboardingData.getProductInfo().getRole();
-                                }
+                                        @Override
+                                        public String getProductRole() {
+                                            return onboardingData.getProductInfo().getRole();
+                                        }
 
-                                @Override
-                                public String getProductId() {
-                                    return onboardingData.getProductInfo().getId();
-                                }
-                            }).collect(Collectors.toList());
-                }
-            };
+                                        @Override
+                                        public String getProductId() {
+                                            return onboardingData.getProductInfo().getId();
+                                        }
+                                    }, Collectors.toList())),
+                            map -> map.entrySet().stream()
+                                    .map(entry -> new AuthInfo() {
+                                        @Override
+                                        public String getInstitutionId() {
+                                            return entry.getKey();
+                                        }
+
+                                        @Override
+                                        public Collection<ProductRole> getProductRoles() {
+                                            return Collections.unmodifiableCollection(entry.getValue());
+                                        }
+                                    }).collect(Collectors.toList())
+                    ));
         }
 
-        return authInfo;
+        return authInfos;
     }
 
 }

@@ -69,7 +69,7 @@ class SwaggerConfig {
                 .globalRequestParameters(Collections.singletonList(new RequestParameterBuilder()
                         .name("x-selc-institutionId")
                         .in(ParameterType.HEADER)
-                        .required(true)
+                        .required(false)
                         .description(environment.getProperty("swagger.dashboard.institutions.model.id"))
                         .query(psb -> psb.model(msb -> msb.scalarModel(ScalarType.STRING)))
                         .build()));
