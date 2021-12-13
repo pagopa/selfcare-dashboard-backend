@@ -1,14 +1,22 @@
 {
   "request": {
     "method": "GET",
-    "url": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info?institutionId=institutionId2"
+    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info",
+    "queryParameters": {
+      "institutionId": {
+        "equalTo": "institutionId2"
+      },
+      "states": {
+        "matches": "^(ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED){0,1}(,ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED)*$"
+      }
+    }
   },
   "response": {
     "status": "200",
     "jsonBody": {
-      "person": { },
+      "person": {},
       "institutions": [
-        { }
+        {}
       ]
     },
     "headers": {

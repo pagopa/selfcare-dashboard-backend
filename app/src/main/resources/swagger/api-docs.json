@@ -294,9 +294,9 @@
         "operationId": "exchangeUsingGET",
         "parameters": [
           {
-            "name": "productId",
+            "name": "institutionId",
             "in": "query",
-            "description": "Product's unique identifier",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "form",
             "schema": {
@@ -309,6 +309,16 @@
             "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": false,
             "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "form",
             "schema": {
               "type": "string"
             }

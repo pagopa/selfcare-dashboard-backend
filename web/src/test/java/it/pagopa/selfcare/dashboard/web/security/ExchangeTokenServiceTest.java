@@ -1,10 +1,15 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +50,7 @@ class ExchangeTokenServiceTest {
         // given
         String jwtSigningKey = "invalid signature";
         // when
-        Executable executable = () -> new ExchangeTokenService(null, jwtSigningKey, null);
+        Executable executable = () -> new ExchangeTokenService(null, null, jwtSigningKey, null, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("Illegal base64"));
@@ -59,7 +64,7 @@ class ExchangeTokenServiceTest {
                 + Base64.getEncoder().encodeToString("invalid signature".getBytes())
                 + "-----END PRIVATE KEY-----";
         // when
-        Executable executable = () -> new ExchangeTokenService(null, jwtSigningKey, null);
+        Executable executable = () -> new ExchangeTokenService(null, null, jwtSigningKey, null, null);
         // then
         assertThrows(InvalidKeySpecException.class, executable);
     }
@@ -72,7 +77,7 @@ class ExchangeTokenServiceTest {
                 + Base64.getEncoder().encodeToString("invalid signature".getBytes())
                 + "-----END RSA PRIVATE KEY-----";
         // when
-        Executable executable = () -> new ExchangeTokenService(null, jwtSigningKey, null);
+        Executable executable = () -> new ExchangeTokenService(null, null, jwtSigningKey, null, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("failed to construct sequence from byte[]"));
@@ -85,7 +90,7 @@ class ExchangeTokenServiceTest {
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, jwtSigningKey, "PT5S", null);
         // when
         Executable executable = () -> exchangeTokenService.exchange(null, null, null);
         // then
@@ -101,7 +106,7 @@ class ExchangeTokenServiceTest {
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, jwtSigningKey, "PT5S", null);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
@@ -122,7 +127,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
                 .thenReturn(Optional.empty());
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, jwtSigningKey, "PT5S", null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -135,6 +140,42 @@ class ExchangeTokenServiceTest {
         Mockito.verify(jwtServiceMock, Mockito.times(1))
                 .getClaims(Mockito.any());
         Mockito.verifyNoMoreInteractions(jwtServiceMock);
+    }
+
+
+    @Test
+    void exchange_noInstitutionInfo() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String jti = "id";
+        String sub = "subject";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+                .thenReturn(Optional.of(Jwts.claims()
+                        .setId(jti)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp)));
+        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, jwtSigningKey, "PT5S", null);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        // when
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
+        // then
+        RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Institution info is required", e.getMessage());
+        Mockito.verify(jwtServiceMock, Mockito.times(1))
+                .getClaims(Mockito.any());
+        Mockito.verify(institutionServiceMock, Mockito.times(1))
+                .getInstitution(institutionId);
+        Mockito.verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
     }
 
 
@@ -161,18 +202,25 @@ class ExchangeTokenServiceTest {
                         .setSubject(sub)
                         .setIssuedAt(iat)
                         .setExpiration(exp)));
+        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        Mockito.when(institutionServiceMock.getInstitution(Mockito.any()))
+                .thenReturn(institutionInfo);
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, jwtSigningKey, "PT5S");
+        String kid = "kid";
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, jwtSigningKey, "PT5S", kid);
         // when
         String token = exchangeTokenService.exchange(institutionId, productId, realm);
         // then
         assertNotNull(token);
-        TestTokenExchangeClaims exchangedClaims =
-                new TestTokenExchangeClaims(Jwts.parser()
-                        .setSigningKey(loadPublicKey())
-                        .parseClaimsJws(token)
-                        .getBody());
+        Jws<Claims> claimsJws = Jwts.parser()
+                .setSigningKey(loadPublicKey())
+                .parseClaimsJws(token);
+        assertNotNull(claimsJws);
+        assertNotNull(claimsJws.getHeader());
+        assertEquals(kid, claimsJws.getHeader().getKeyId());
+        TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
         assertNotEquals(jti, exchangedClaims.getId());
         assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
         assertEquals(sub, exchangedClaims.getSubject());
@@ -189,9 +237,12 @@ class ExchangeTokenServiceTest {
         assertNotNull(institution);
         assertEquals(institutionId, institution.getId());
         assertEquals(productRole, institution.getRole());
+        assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         Mockito.verify(jwtServiceMock, Mockito.times(1))
                 .getClaims(Mockito.any());
-        Mockito.verifyNoMoreInteractions(jwtServiceMock);
+        Mockito.verify(institutionServiceMock, Mockito.times(1))
+                .getInstitution(institutionId);
+        Mockito.verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
     }
 
 
@@ -227,6 +278,7 @@ class ExchangeTokenServiceTest {
             ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
             institution.setId(o.get("id"));
             institution.setRole(o.get("role"));
+            institution.setTaxCode(o.get("fiscal_code"));
             return institution;
         }
     }
