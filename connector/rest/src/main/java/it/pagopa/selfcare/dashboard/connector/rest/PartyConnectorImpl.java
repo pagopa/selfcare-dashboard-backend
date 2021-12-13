@@ -10,13 +10,13 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
 @Service
 class PartyConnectorImpl implements PartyConnector {
@@ -35,7 +35,7 @@ class PartyConnectorImpl implements PartyConnector {
         return selfCareRole;
     };
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
-            (inst1, inst2) -> RelationshipState.ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
+            (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setInstitutionId(onboardingData.getInstitutionId());
@@ -60,7 +60,7 @@ class PartyConnectorImpl implements PartyConnector {
 
     @Override
     public InstitutionInfo getInstitution(String institutionId) {
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);//TODO: request only ACTIVE records
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
 
         return parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
@@ -69,7 +69,7 @@ class PartyConnectorImpl implements PartyConnector {
 
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null);//TODO: request only ACTIVE or PENDING records
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
 
         return parseOnBoardingInfo(onBoardingInfo);
     }
@@ -107,10 +107,10 @@ class PartyConnectorImpl implements PartyConnector {
     public Collection<AuthInfo> getAuthInfo(String institutionId) {
         Collection<AuthInfo> authInfos = Collections.emptyList();
 
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId);//TODO: request only ACTIVE records
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             authInfos = onBoardingInfo.getInstitutions().stream()
-                    .filter(onboardingData -> RelationshipState.ACTIVE.equals(onboardingData.getState()))
+                    .filter(onboardingData -> ACTIVE.equals(onboardingData.getState()))
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
                     .collect(Collectors.collectingAndThen(
                             Collectors.groupingBy(OnboardingData::getInstitutionId,

@@ -20,13 +20,17 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.Map;
+
+import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
 @TestPropertySource(
         locations = "classpath:config/party-process-rest-client.properties",
         properties = {
                 "logging.level.it.pagopa.selfcare.dashboard.connector.rest=DEBUG",
-                "spring.application.name=selc-dashboard-integration-rest"
+                "spring.application.name=selc-dashboard-connector-rest"
         })
 @ContextConfiguration(
         initializers = PartyProcessRestClientTest.RandomPortInitializer.class,
@@ -152,7 +156,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getOnBoardingInfo_fullyValued() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED), EnumSet.of(ACTIVE, PENDING));
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getPerson());
@@ -177,7 +181,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getOnBoardingInfo_fullyNull() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), EnumSet.of(ACTIVE, PENDING));
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getPerson());
@@ -199,7 +203,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getOnBoardingInfo_emptyResult() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.EMPTY_RESULT));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.EMPTY_RESULT), EnumSet.of(ACTIVE, PENDING));
         // then
         Assert.assertNotNull(response);
         Assert.assertTrue(response.getInstitutions().isEmpty());

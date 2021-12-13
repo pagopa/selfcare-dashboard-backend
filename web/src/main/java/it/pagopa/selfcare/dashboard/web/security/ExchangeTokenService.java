@@ -1,11 +1,15 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.security.KeyFactory;
@@ -39,15 +44,22 @@ public class ExchangeTokenService {
     private final PrivateKey jwtSigningKey;
     private final JwtService jwtService;
     private final Duration duration;
+    private final String kid;
+    private final InstitutionService institutionService;
 
-    public ExchangeTokenService(
-            JwtService jwtService,
-            @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
-            @Value("${jwt.exchange.duration}") String duration) throws InvalidKeySpecException, NoSuchAlgorithmException {
+
+    public ExchangeTokenService(JwtService jwtService,
+                                InstitutionService institutionService,
+                                @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
+                                @Value("${jwt.exchange.duration}") String duration,
+                                @Value("${jwt.exchange.kid}") String kid) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
+        this.institutionService = institutionService;
         this.jwtSigningKey = getPrivateKey(jwtSigningKey);
         this.duration = Duration.parse(duration);
+        this.kid = kid;
     }
+
 
     public String exchange(String institutionId, String productId, String realm) {
         if (log.isDebugEnabled()) {
@@ -66,12 +78,15 @@ public class ExchangeTokenService {
                 .orElseThrow(() -> new IllegalArgumentException("A Self Care Granted SelfCareAuthority is required"));
         Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString())
                 .orElseThrow(() -> new RuntimeException("Failed to retrieve session token claims"));
+        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
+        Assert.notNull(institutionInfo, "Institution info is required");
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
         claims.setIssuer(ISSUER);
         Institution institution = new Institution();
         institution.setId(institutionId);
+        institution.setTaxCode(institutionInfo.getTaxCode());
         institution.setRole(grantedAuthority.getRoleOnProducts().get(productId).getProductRole());
         claims.setInstitution(institution);
         claims.setDesiredExpiration(claims.getExpiration());
@@ -85,6 +100,7 @@ public class ExchangeTokenService {
         return Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS512, jwtSigningKey)
+                .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
     }
 
@@ -127,6 +143,8 @@ public class ExchangeTokenService {
     @ToString
     static class Institution implements Serializable {
         private String id;
+        @JsonProperty("fiscal_code")
+        private String taxCode;
         private String role;
     }
 

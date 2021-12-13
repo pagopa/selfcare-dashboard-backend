@@ -29,6 +29,8 @@ spec:
                 name: b4f-dashboard
             - configMapRef:
                 name: inner-service-url
+            - configMapRef:
+                name: jwt-exchange
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness

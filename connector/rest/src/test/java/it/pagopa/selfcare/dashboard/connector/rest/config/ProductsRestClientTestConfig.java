@@ -5,5 +5,5 @@ import org.springframework.context.annotation.Import;
 
 @TestConfiguration
 @Import(ProductsRestClientConfig.class)
-public class ProductsRestClientConfigTest {
+public class ProductsRestClientTestConfig {
 }

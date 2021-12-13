@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsSource;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientConfigTest;
+import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -25,12 +25,12 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 @TestPropertySource(
         locations = "classpath:config/products-rest-client.properties",
         properties = {
-                "logging.level.it.pagopa.selfcare.products.connector.rest=DEBUG",
-                "spring.application.name=selc-products-integration-rest"
+                "logging.level.it.pagopa.selfcare.dashboard.connector.rest=DEBUG",
+                "spring.application.name=selc-dashboard-connector-rest"
         })
 @ContextConfiguration(
         initializers = ProductsRestClientTest.RandomPortInitializer.class,
-        classes = {ProductsRestClientConfigTest.class})
+        classes = {ProductsRestClientTestConfig.class})
 public class ProductsRestClientTest extends BaseFeignRestClientTest {
 
     @ClassRule
