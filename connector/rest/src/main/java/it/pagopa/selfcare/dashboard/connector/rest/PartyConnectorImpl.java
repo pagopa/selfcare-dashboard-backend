@@ -26,12 +26,6 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipStat
 @Service
 class PartyConnectorImpl implements PartyConnector {
 
-    static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class) {{
-        put(MANAGER, ADMIN);
-        put(DELEGATE, ADMIN);
-        put(SUB_DELEGATE, ADMIN);
-        put(OPERATOR, LIMITED);
-    }};
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -46,6 +40,14 @@ class PartyConnectorImpl implements PartyConnector {
         }
         return institutionInfo;
     };
+    static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class);
+
+    static {
+        PARTY_ROLE_AUTHORITY_MAP.put(MANAGER, ADMIN);
+        PARTY_ROLE_AUTHORITY_MAP.put(DELEGATE, ADMIN);
+        PARTY_ROLE_AUTHORITY_MAP.put(SUB_DELEGATE, ADMIN);
+        PARTY_ROLE_AUTHORITY_MAP.put(OPERATOR, LIMITED);
+    }
 
     private final PartyProcessRestClient restClient;
 

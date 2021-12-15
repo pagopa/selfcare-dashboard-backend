@@ -58,7 +58,7 @@ public class InstitutionController {
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
         if (log.isDebugEnabled()) {
             log.trace("InstitutionController.saveInstitutionLogo");
-            log.debug("institutionId = " + institutionId + ", logo = " + logo);
+            log.debug("institutionId = {}, logo = {}", institutionId, logo);
         }
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         return null;
@@ -88,7 +88,7 @@ public class InstitutionController {
                                                       String institutionId) {
         if (log.isDebugEnabled()) {
             log.trace("InstitutionController.getInstitution");
-            log.debug("institutionId = " + institutionId);
+            log.debug("institutionId = {}", institutionId);
         }
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         return InstitutionMapper.toResource(institutionInfo);
@@ -106,8 +106,8 @@ public class InstitutionController {
                                                              @RequestParam(value = "role", required = false)
                                                                      Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionProducts");
-            log.debug("institutionId = " + institutionId + ", role = " + role);
+            log.trace("InstitutionController.getInstitutionUsers");
+            log.debug("institutionId = {}, role = {}", institutionId, role);
         }
         Collection<UserInfo> userInfos = institutionService.getUsers(institutionId, role);
         return userInfos.stream()
@@ -125,7 +125,7 @@ public class InstitutionController {
                                                                  String institutionId) {
         if (log.isDebugEnabled()) {
             log.trace("InstitutionController.getInstitutionProducts");
-            log.debug("institutionId = " + institutionId);
+            log.debug("institutionId = {}", institutionId);
         }
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
         return products.stream()
@@ -148,8 +148,8 @@ public class InstitutionController {
                                                                 @RequestParam(value = "role", required = false)
                                                                         Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionProducts");
-            log.debug("institutionId = " + institutionId + ", productId = " + productId + ", role = " + role);
+            log.trace("InstitutionController.getInstitutionProductUsers");
+            log.debug("institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         }
         Collection<UserInfo> userInfos = institutionService.getUsers(institutionId, role, Set.of(productId));
         return userInfos.stream()
