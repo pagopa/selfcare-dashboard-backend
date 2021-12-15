@@ -10,26 +10,25 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.connector.rest.model;
+package it.pagopa.selfcare.dashboard.connector.model.user;
 
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.OffsetDateTime;
+import java.util.List;
 
 @Getter
 @Setter
-public class RelationshipInfo {
+public class UserInfo {
 
     private String id;
-    private String from;
+    private String relationshipId;
     private String name;
     private String surname;
     private String email;
-    private PartyRole role;
-    private ProductInfo product;
-    private RelationshipState state;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    private SelfCareAuthority role;
+    private List<ProductInfo> products;
+    private String status;
 
 }

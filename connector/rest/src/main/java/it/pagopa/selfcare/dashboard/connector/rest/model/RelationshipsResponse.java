@@ -14,9 +14,5 @@ package it.pagopa.selfcare.dashboard.connector.rest.model;
 
 import java.util.ArrayList;
 
-/**
- * RelationshipsResponse
- */
 public class RelationshipsResponse extends ArrayList<RelationshipInfo> {
-
 }

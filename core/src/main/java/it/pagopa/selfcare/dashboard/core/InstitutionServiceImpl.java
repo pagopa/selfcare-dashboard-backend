@@ -1,22 +1,23 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
@@ -83,6 +84,28 @@ class InstitutionServiceImpl implements InstitutionService {
         }
 
         return products;
+    }
+
+
+    @Override
+    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role) {
+        Collection<UserInfo> userInfos = getUsers(institutionId, role, null);
+        Map<String, Product> idToProductMap = productsConnector.getProducts().stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
+        userInfos.forEach(userInfo ->
+                userInfo.getProducts().forEach(productInfo ->
+                        productInfo.setTitle(idToProductMap.get(productInfo.getId()).getTitle())));
+
+        return userInfos;
+    }
+
+
+    @Override
+    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Set<String> productIds) {
+        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.notNull(role, "An Optional role object is required");
+
+        return partyConnector.getUsers(institutionId, role, Optional.ofNullable(productIds));
     }
 
 }

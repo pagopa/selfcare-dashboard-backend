@@ -5,9 +5,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -22,7 +20,10 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
+import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.MANAGER;
+import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
@@ -77,15 +78,25 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionRelationships_fullyValued() {
-        // given and when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(testCase2instIdMap.get(TestCase.FULLY_VALUED));
+        // given
+        String institutionId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
+        EnumSet<PartyRole> roles = null;
+        EnumSet<RelationshipState> states = null;
+        Set<String> products = null;
+        // when
+        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products);
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
         Assert.assertNotNull(response.get(0).getId());
         Assert.assertNotNull(response.get(0).getFrom());
+        Assert.assertNotNull(response.get(0).getName());
+        Assert.assertNotNull(response.get(0).getSurname());
+        Assert.assertNotNull(response.get(0).getEmail());
         Assert.assertNotNull(response.get(0).getRole());
         Assert.assertNotNull(response.get(0).getState());
+        Assert.assertNotNull(response.get(0).getCreatedAt());
+        Assert.assertNotNull(response.get(0).getUpdatedAt());
         Assert.assertNotNull(response.get(0).getProduct());
         Assert.assertNotNull(response.get(0).getProduct().getId());
         Assert.assertNotNull(response.get(0).getProduct().getRole());
@@ -95,8 +106,13 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionRelationships_fullyNull() {
-        // given and when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(testCase2instIdMap.get(TestCase.FULLY_NULL));
+        // given
+        String institutionId = testCase2instIdMap.get(TestCase.FULLY_NULL);
+        EnumSet<PartyRole> roles = null;
+        EnumSet<RelationshipState> states = null;
+        Set<String> products = null;
+        // when
+        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products);
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
@@ -110,8 +126,13 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionRelationships_emptyResult() {
-        // given and when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(testCase2instIdMap.get(TestCase.EMPTY_RESULT));
+        // given
+        String institutionId = testCase2instIdMap.get(TestCase.EMPTY_RESULT);
+        EnumSet<PartyRole> roles = EnumSet.of(MANAGER, OPERATOR);
+        EnumSet<RelationshipState> states = EnumSet.of(ACTIVE, PENDING);
+        Set<String> products = Set.of("prod1", "prod2");
+        // when
+        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products);
         // then
         Assert.assertNotNull(response);
         Assert.assertTrue(response.isEmpty());
@@ -156,7 +177,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getOnBoardingInfo_fullyValued() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED), EnumSet.of(ACTIVE, PENDING));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED), null);
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getPerson());
@@ -181,7 +202,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getOnBoardingInfo_fullyNull() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), EnumSet.of(ACTIVE, PENDING));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), EnumSet.of(ACTIVE));
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getPerson());
@@ -209,7 +230,5 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertTrue(response.getInstitutions().isEmpty());
         Assert.assertNull(response.getPerson());
     }
-
-    //TODO: add relationships tests
 
 }

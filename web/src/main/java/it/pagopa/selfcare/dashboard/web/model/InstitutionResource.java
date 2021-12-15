@@ -19,9 +19,7 @@ public class InstitutionResource {
     @NotBlank
     private String name;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.category}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.category}")
     private String category;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.fiscalCode}", required = true)

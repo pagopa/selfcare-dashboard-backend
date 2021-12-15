@@ -7,7 +7,7 @@
         "equalTo": "institutionId2"
       },
       "states": {
-        "matches": "^(ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED){0,1}(,ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED)*$"
+        "matches": "^(?:ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED){0,1}(?:,(?:ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED))*$"
       }
     }
   },
