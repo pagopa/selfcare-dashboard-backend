@@ -5,35 +5,27 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
 @Service
 class PartyConnectorImpl implements PartyConnector {
 
-    static final Function<PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> {
-        SelfCareAuthority selfCareRole;
-        switch (partyRole) {
-            case MANAGER:
-            case DELEGATE:
-            case SUB_DELEGATE:
-                selfCareRole = SelfCareAuthority.ADMIN;
-                break;
-            default:
-                selfCareRole = SelfCareAuthority.LIMITED;
-        }
-        return selfCareRole;
-    };
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -48,6 +40,14 @@ class PartyConnectorImpl implements PartyConnector {
         }
         return institutionInfo;
     };
+    static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class);
+
+    static {
+        PARTY_ROLE_AUTHORITY_MAP.put(MANAGER, ADMIN);
+        PARTY_ROLE_AUTHORITY_MAP.put(DELEGATE, ADMIN);
+        PARTY_ROLE_AUTHORITY_MAP.put(SUB_DELEGATE, ADMIN);
+        PARTY_ROLE_AUTHORITY_MAP.put(OPERATOR, LIMITED);
+    }
 
     private final PartyProcessRestClient restClient;
 
@@ -110,14 +110,13 @@ class PartyConnectorImpl implements PartyConnector {
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             authInfos = onBoardingInfo.getInstitutions().stream()
-                    .filter(onboardingData -> ACTIVE.equals(onboardingData.getState()))
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
                     .collect(Collectors.collectingAndThen(
                             Collectors.groupingBy(OnboardingData::getInstitutionId,
                                     Collectors.mapping(onboardingData -> new ProductRole() {
                                         @Override
                                         public SelfCareAuthority getSelfCareRole() {
-                                            return PARTY_2_SELC_ROLE.apply(onboardingData.getRole());
+                                            return PARTY_ROLE_AUTHORITY_MAP.get(onboardingData.getRole());
                                         }
 
                                         @Override
@@ -146,6 +145,50 @@ class PartyConnectorImpl implements PartyConnector {
         }
 
         return authInfos;
+    }
+
+
+    @Override
+    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<Set<String>> productIds) {
+        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.notNull(role, "An Optional role object is required");
+        Assert.notNull(productIds, "An Optional list of Product id object is required");
+        Collection<UserInfo> userInfos = Collections.emptyList();
+        EnumSet<PartyRole> roles = null;
+        if (role.isPresent()) {
+            roles = PARTY_ROLE_AUTHORITY_MAP.entrySet().stream()
+                    .filter(entry -> role.get().equals(entry.getValue()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
+        }
+        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, null, productIds.orElse(null));
+        if (institutionRelationships != null) {
+            userInfos = institutionRelationships.stream()
+                    .collect(Collectors.toMap(RelationshipInfo::getFrom,
+                            relationshipInfo -> {
+                                UserInfo userInfo = new UserInfo();
+                                userInfo.setRelationshipId(relationshipInfo.getId());
+                                userInfo.setId(relationshipInfo.getFrom());
+                                userInfo.setName(relationshipInfo.getName());
+                                userInfo.setSurname(relationshipInfo.getSurname());
+                                userInfo.setEmail(relationshipInfo.getEmail());
+                                userInfo.setStatus(relationshipInfo.getState().toString());
+                                userInfo.setRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
+                                it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
+                                        = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
+                                productInfo.setId(relationshipInfo.getProduct().getId());
+                                ArrayList<it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new ArrayList<>();
+                                products.add(productInfo);
+                                userInfo.setProducts(products);
+                                return userInfo;
+                            },
+                            (userInfo1, userInfo2) -> {
+                                userInfo1.getProducts().addAll(userInfo2.getProducts());
+                                return userInfo1;
+                            })).values();
+        }
+
+        return userInfos;
     }
 
 }

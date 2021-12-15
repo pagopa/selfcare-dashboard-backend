@@ -38,14 +38,17 @@ class TokenControllerTest {
     @Test
     void exchange() throws Exception {
         // given
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String realm = "r";
         Mockito.when(exchangeTokenServiceMock.exchange(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn("token");
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/exchange")
-                .param("institutionId", "inst1")
-                .param("productId", "prod1")
-                .param("realm", "r")
+                .param("institutionId", institutionId)
+                .param("productId", productId)
+                .param("realm", realm)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -54,6 +57,9 @@ class TokenControllerTest {
         IdentityTokenResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), IdentityTokenResource.class);
         assertNotNull(resource);
         assertNotNull(resource.getToken());
+        Mockito.verify(exchangeTokenServiceMock, Mockito.times(1))
+                .exchange(institutionId, productId, realm);
+        Mockito.verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 
 }

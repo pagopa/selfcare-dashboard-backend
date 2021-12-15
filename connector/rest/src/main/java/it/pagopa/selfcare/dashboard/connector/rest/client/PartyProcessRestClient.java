@@ -1,9 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -13,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Party Process Rest Client
@@ -22,7 +20,11 @@ public interface PartyProcessRestClient {
 
     @GetMapping(value = "${rest-client.party-process.getInstitutionRelationships.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    RelationshipsResponse getInstitutionRelationships(@PathVariable("institutionId") String institutionId);
+    @CollectionFormat(feign.CollectionFormat.CSV)
+    RelationshipsResponse getInstitutionRelationships(@PathVariable("institutionId") String institutionId,
+                                                      @RequestParam(value = "roles", required = false) EnumSet<PartyRole> roles,
+                                                      @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states,
+                                                      @RequestParam(value = "products", required = false) Set<String> products);
 
     @GetMapping(value = "${rest-client.party-process.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

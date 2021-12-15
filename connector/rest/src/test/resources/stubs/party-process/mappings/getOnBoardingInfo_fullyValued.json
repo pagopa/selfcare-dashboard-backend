@@ -5,9 +5,6 @@
     "queryParameters": {
       "institutionId": {
         "equalTo": "institutionId1"
-      },
-      "states": {
-        "matches": "^(ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED){0,1}(,ACTIVE|PENDING|SUSPENDED|DELETED|REJECTED)*$"
       }
     }
   },

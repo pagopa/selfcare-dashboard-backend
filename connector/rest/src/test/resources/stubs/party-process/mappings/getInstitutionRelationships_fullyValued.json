@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/relationships"
+    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/relationships"
   },
   "response": {
     "status": "200",
@@ -9,13 +9,18 @@
       {
         "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "from": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "name": "string",
+        "surname": "string",
+        "email": "string",
         "role": "MANAGER",
         "product": {
           "id": "string",
           "role": "string",
-          "createdAt": "2021-11-29T15:18:04.035Z"
+          "createdAt": "2021-12-14T09:09:56.751Z"
         },
-        "state": "PENDING"
+        "state": "PENDING",
+        "createdAt": "2021-12-14T09:09:56.751Z",
+        "updatedAt": "2021-12-14T09:09:56.751Z"
       }
     ],
     "headers": {
