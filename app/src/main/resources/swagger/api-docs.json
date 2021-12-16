@@ -19,6 +19,10 @@
     {
       "name": "token",
       "description": "Token Controller"
+    },
+    {
+      "name": "users",
+      "description": "User Controller"
     }
   ],
   "paths": {
@@ -517,6 +521,59 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/users/{relationshipId}": {
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "deleteUser",
+        "description": "${swagger.dashboard.institutions.api.createInstitutionProductUser}",
+        "operationId": "deleteUserUsingDELETE",
+        "parameters": [
+          {
+            "name": "relationshipId",
+            "in": "path",
+            "description": "Unique relationship identifier between User and Product",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-selc-institutionId",
+            "in": "header",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": false,
+            "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         },
         "security": [

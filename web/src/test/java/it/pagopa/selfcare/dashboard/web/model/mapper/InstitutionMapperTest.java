@@ -29,7 +29,8 @@ class InstitutionMapperTest {
     void toResourceNotNull() {
         // given
         String institutionId = "institutionId";
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setInstitutionId");
+        institutionInfo.setInstitutionId(institutionId);
         SelfCareAuthority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
@@ -51,13 +52,61 @@ class InstitutionMapperTest {
 
 
     @Test
-    void toResourceNotNullNoAuth() {
+    void toResource_notNullNoAuth() {
         // given
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
         assertNull(resource.getUserRole());
+    }
+
+
+    @Test
+    void toResource_emptyAuthNoPendingStatus() {
+        // given
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // when
+        InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
+        // then
+        assertNull(resource.getUserRole());
+    }
+
+
+    @Test
+    void toResource_emptyAuthPendingStatus() {
+        // given
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setStatus");
+        institutionInfo.setStatus("PENDING");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // when
+        InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
+        // then
+        assertEquals(SelfCareAuthority.ADMIN.toString(), resource.getUserRole());
+    }
+
+
+    @Test
+    void toResource_AuthOnDifferentInstitutionPendingStatus() {
+        // given
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setStatus");
+        institutionInfo.setStatus("PENDING");
+        String institutionId = "institutionId";
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(new ProductGrantedAuthority(LIMITED, "productRole", "productId")))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // when
+        InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
+        // then
+        assertEquals(SelfCareAuthority.ADMIN.toString(), resource.getUserRole());
     }
 
 
