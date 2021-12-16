@@ -49,6 +49,7 @@ class DashboardSecurityConfig extends SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/products/**").hasAuthority(LIMITED.name())
                 .antMatchers(HttpMethod.PUT, "/institutions/**/logo").hasAuthority(ADMIN.name())
+                .antMatchers(HttpMethod.GET, "/institutions").fullyAuthenticated()
                 .antMatchers("/institutions/**").hasAuthority(LIMITED.name())
                 .antMatchers("/token/**").hasAuthority(LIMITED.name())
                 .anyRequest().permitAll();
