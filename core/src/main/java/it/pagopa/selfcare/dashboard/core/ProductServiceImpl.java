@@ -2,12 +2,14 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
 class ProductServiceImpl implements ProductService {
 
     private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATORS");
