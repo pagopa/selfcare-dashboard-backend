@@ -18,10 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,6 +29,7 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 class InstitutionServiceImpl implements InstitutionService {
 
     private static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
+    private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATOR");
 
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
@@ -129,6 +127,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
         Map<String, List<String>> productRoleMappings = productsConnector.getProductRoleMappings(productId);
         Optional<String> partyRole = productRoleMappings.entrySet().stream()
+                .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
                 .filter(entry -> entry.getValue().contains(user.getProductRole()))
                 .map(Map.Entry::getKey)
                 .findAny();

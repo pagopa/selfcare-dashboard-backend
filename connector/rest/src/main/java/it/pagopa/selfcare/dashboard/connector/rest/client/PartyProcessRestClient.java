@@ -46,4 +46,12 @@ public interface PartyProcessRestClient {
     @ResponseBody
     void onboardingOperators(@RequestBody OnboardingRequest request);
 
+    @PostMapping(value = "${rest-client.party-process.suspendRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    void suspendRelationship(@PathVariable("relationshipId") String relationshipId);
+
+    @PostMapping(value = "${rest-client.party-process.activateRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    void activateRelationship(@PathVariable("relationshipId") String relationshipId);
+
 }

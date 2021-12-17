@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
+import it.pagopa.selfcare.dashboard.core.RelationshipService;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,16 +38,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class SwaggerConfigTest {
 
     @MockBean
-    private FileStorageService storageService;
+    private FileStorageService storageServiceMock;
 
     @MockBean
-    private InstitutionService institutionService;
+    private InstitutionService institutionServiceMock;
 
     @MockBean
-    private ExchangeTokenService exchangeTokenService;
+    private ExchangeTokenService exchangeTokenServiceMock;
 
     @MockBean
-    private ProductService productService;
+    private ProductService productServiceMock;
+
+    @MockBean
+    private RelationshipService relationshipServiceMock;
 
     @Autowired
     WebApplicationContext context;
