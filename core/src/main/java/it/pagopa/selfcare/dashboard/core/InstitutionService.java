@@ -9,7 +9,6 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface InstitutionService {
 
@@ -19,9 +18,9 @@ public interface InstitutionService {
 
     List<Product> getInstitutionProducts(String institutionId);
 
-    Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role);
+    Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role);
 
-    Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Set<String> productIds);
+    Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role);
 
     void createUsers(String institutionId, String productId, CreateUserDto user);
 

@@ -418,11 +418,9 @@ class PartyConnectorImplTest {
         // given
         String institutionId = null;
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productIds = Optional.empty();
+        Optional<String> productId = Optional.empty();
         // when
-        Executable executable = () -> {
-            partyConnector.getUsers(institutionId, role, productIds);
-        };
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
@@ -435,11 +433,9 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = null;
-        Optional<Set<String>> productIds = Optional.empty();
+        Optional<String> productId = Optional.empty();
         // when
-        Executable executable = () -> {
-            partyConnector.getUsers(institutionId, role, productIds);
-        };
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional role object is required", e.getMessage());
@@ -448,18 +444,16 @@ class PartyConnectorImplTest {
 
 
     @Test
-    void getUsers_nullProductIds() {
+    void getUsers_nullProductId() {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productIds = null;
+        Optional<String> productId = null;
         // when
-        Executable executable = () -> {
-            partyConnector.getUsers(institutionId, role, productIds);
-        };
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("An Optional list of Product id object is required", e.getMessage());
+        Assertions.assertEquals("An Optional Product id object is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
 
@@ -469,9 +463,9 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productIds = Optional.empty();
+        Optional<String> productId = Optional.empty();
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productIds);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
@@ -486,9 +480,9 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productIds = Optional.empty();
+        Optional<String> productId = Optional.empty();
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productIds);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
@@ -503,14 +497,14 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productIds = Optional.of(Set.of("productId"));
+        Optional<String> productId = Optional.of("productId");
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productIds);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.eq(productIds.get()));
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.eq(productId.map(Set::of).get()));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -521,9 +515,9 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.of(selfCareAuthority);
-        Optional<Set<String>> productIds = Optional.empty();
+        Optional<String> productId = Optional.empty();
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productIds);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
@@ -544,7 +538,7 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productIds = Optional.empty();
+        Optional<String> productId = Optional.empty();
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
@@ -556,7 +550,7 @@ class PartyConnectorImplTest {
         Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productIds);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
         // then
         Assertions.assertNotNull(userInfos);
         Assertions.assertEquals(1, userInfos.size());

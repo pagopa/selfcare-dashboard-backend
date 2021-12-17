@@ -456,7 +456,7 @@
           "institutions"
         ],
         "summary": "getInstitutionUsers",
-        "description": "Service to get all the users related to a specific institution",
+        "description": "Service to get all the users related to a specific pair of institution-product",
         "operationId": "getInstitutionUsersUsingGET",
         "parameters": [
           {
@@ -475,6 +475,16 @@
             "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": false,
             "allowReserved": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": false,
+            "style": "form",
             "schema": {
               "type": "string"
             }
