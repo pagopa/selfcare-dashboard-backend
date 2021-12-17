@@ -236,15 +236,13 @@ class InstitutionServiceImplTest {
 
 
     @Test
-    void getUsers_nullInstitutionId() {
+    void getInstitutionProductUsers_nullInstitutionId() {
         // given
         String institutionId = null;
+        String productId = "productId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Set<String> productIds = null;
         // when
-        Executable executable = () -> {
-            institutionService.getUsers(institutionId, role, productIds);
-        };
+        Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
@@ -253,13 +251,28 @@ class InstitutionServiceImplTest {
 
 
     @Test
-    void getUsers_nullRole() {
+    void getInstitutionProductUsers_nullProductId() {
         // given
         String institutionId = "institutionId";
-        Optional<SelfCareAuthority> role = null;
-        Set<String> productIds = null;
+        String productId = null;
+        Optional<SelfCareAuthority> role = Optional.empty();
         // when
-        Executable executable = () -> institutionService.getUsers(institutionId, role, productIds);
+        Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Product id is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+    }
+
+
+    @Test
+    void getInstitutionProductUsers_nullRole() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        Optional<SelfCareAuthority> role = null;
+        // when
+        Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional role object is required", e.getMessage());
@@ -268,41 +281,72 @@ class InstitutionServiceImplTest {
 
 
     @Test
-    void getUsers_nullProductIds() {
+    void getInstitutionProductUsers() {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Set<String> productIds = null;
         // when
-        institutionService.getUsers(institutionId, role, productIds);
+        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role);
         // then
+        Assertions.assertNotNull(userInfos);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getUsers(institutionId, role, Optional.empty());
+                .getUsers(institutionId, role, Optional.of(productId));
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
         Mockito.verifyNoInteractions(productsConnectorMock);
     }
 
 
     @Test
-    void getUsers_notNullProductIds() {
+    void getInstitutionUsers_nullInstitutionId() {
         // given
-        String institutionId = "institutionId";
+        String institutionId = null;
+        Optional<String> productId = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
-        Set<String> productIds = Set.of("prod-1");
         // when
-        institutionService.getUsers(institutionId, role, productIds);
+        Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role);
         // then
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getUsers(institutionId, role, Optional.of(productIds));
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
-        Mockito.verifyNoInteractions(productsConnectorMock);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An Institution id is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
 
     @Test
-    void getUsers_fillProductTitle() {
+    void getInstitutionUsers_nullProductIds() {
         // given
         String institutionId = "institutionId";
+        Optional<String> productId = null;
+        Optional<SelfCareAuthority> role = Optional.empty();
+        // when
+        Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An Optional Product id object is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+    }
+
+
+    @Test
+    void getInstitutionUsers_nullRole() {
+        // given
+        String institutionId = "institutionId";
+        Optional<String> productId = Optional.empty();
+        Optional<SelfCareAuthority> role = null;
+        // when
+        Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An Optional role object is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+    }
+
+
+    @Test
+    void getInstitutionUsers() {
+        // given
+        String institutionId = "institutionId";
+        Optional<String> productId = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
         UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo(), "setId");
         ProductInfo productInfo1 = new ProductInfo();
@@ -322,7 +366,7 @@ class InstitutionServiceImplTest {
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(new ArrayList<>(idToProductMap.values()));
         // when
-        Collection<UserInfo> userInfos = institutionService.getUsers(institutionId, role);
+        Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
         // then
         Assertions.assertNotNull(userInfos);
         Assertions.assertEquals(1, userInfos.size());

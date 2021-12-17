@@ -154,10 +154,10 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<Set<String>> productIds) {
+    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId) {
         Assert.hasText(institutionId, "An Institution id is required");
         Assert.notNull(role, "An Optional role object is required");
-        Assert.notNull(productIds, "An Optional list of Product id object is required");
+        Assert.notNull(productId, "An Optional Product id object is required");
         Collection<UserInfo> userInfos = Collections.emptyList();
         EnumSet<PartyRole> roles = null;
         if (role.isPresent()) {
@@ -166,7 +166,7 @@ class PartyConnectorImpl implements PartyConnector {
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
-        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, null, productIds.orElse(null));
+        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, null, productId.map(Set::of).orElse(null));
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
