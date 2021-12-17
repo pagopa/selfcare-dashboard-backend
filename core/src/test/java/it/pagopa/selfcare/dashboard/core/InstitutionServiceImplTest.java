@@ -18,6 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -428,48 +430,36 @@ class InstitutionServiceImplTest {
     }
 
 
-    @Test
-    void createUsers_invalidRole() {
+    @ParameterizedTest
+    @ValueSource(strings = {"MANAGER", "DELEGATE", "SUB_DELEGATE", "OPERATOR", "invalid"})
+    void createUsers(String partyRole) {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        CreateUserDto createUserDto = new CreateUserDto();
-        createUserDto.setProductRole("invalid-productRole");
-        Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
-                .thenReturn(Map.of("partyRole", List.of("productRole")));
-        // when
-        Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
-        // then
-        InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
-        Assertions.assertEquals(String.format("Product role '%s' is not valid", createUserDto.getProductRole()), e.getMessage());
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
-                .getProductRoleMappings(productId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock);
-        Mockito.verifyNoInteractions(partyConnectorMock);
-    }
-
-
-    @Test
-    void createUsers() {
-        // given
-        String institutionId = "institutionId";
-        String productId = "productId";
-        String partyRole = "partyRole";
         String productRole = "productRole";
         CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setProductRole", "setPartyRole");
         createUserDto.setProductRole(productRole);
         Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
                 .thenReturn(Map.of(partyRole, List.of(productRole)));
         // when
-        institutionService.createUsers(institutionId, productId, createUserDto);
+        Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
         // then
+        if ("SUB_DELEGATE".equals(partyRole) || "OPERATOR".equals(partyRole)) {
+            assertDoesNotThrow(executable);
+            Mockito.verify(partyConnectorMock, Mockito.times(1))
+                    .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());
+            Assertions.assertEquals(partyRole, createUserDtoCaptor.getValue().getPartyRole());
+            TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
+            Mockito.verifyNoMoreInteractions(partyConnectorMock);
+
+        } else {
+            InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
+            Assertions.assertEquals(String.format("Product role '%s' is not valid", createUserDto.getProductRole()), e.getMessage());
+            Mockito.verifyNoInteractions(partyConnectorMock);
+        }
         Mockito.verify(productsConnectorMock, Mockito.times(1))
                 .getProductRoleMappings(productId);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());
-        Assertions.assertEquals(partyRole, createUserDtoCaptor.getValue().getPartyRole());
-        TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(productsConnectorMock);
     }
 
 }

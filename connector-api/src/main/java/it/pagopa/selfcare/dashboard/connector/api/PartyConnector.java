@@ -24,4 +24,8 @@ public interface PartyConnector {
 
     void createUsers(String institutionId, String productId, CreateUserDto createUserDto);
 
+    void suspend(String relationshipId);
+
+    void activate(String relationshipId);
+
 }

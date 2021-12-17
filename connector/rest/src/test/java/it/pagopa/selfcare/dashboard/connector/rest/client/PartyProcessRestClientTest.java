@@ -263,4 +263,26 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assertions.assertDoesNotThrow(executable);
     }
 
+
+    @Test
+    public void suspendRelationship() {
+        // given
+        String relationshipId = "relationshipId";
+        // when
+        Executable executable = () -> restClient.suspendRelationship(relationshipId);
+        // then
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+
+    @Test
+    public void activateRelationship() {
+        // given
+        String relationshipId = "relationshipId";
+        // when
+        Executable executable = () -> restClient.activateRelationship(relationshipId);
+        // then
+        Assertions.assertDoesNotThrow(executable);
+    }
+
 }

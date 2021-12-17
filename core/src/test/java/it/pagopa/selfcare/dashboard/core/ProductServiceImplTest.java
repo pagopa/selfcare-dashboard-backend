@@ -10,14 +10,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
-
-    private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATORS");
 
     @Mock
     private ProductsConnector productsConnectorMock;
@@ -47,7 +48,7 @@ class ProductServiceImplTest {
                 "MANAGER", List.of("role-1"),
                 "DELEGATE", List.of("role-2"),
                 "SUB_DELEGATE", List.of("role-3"),
-                "OPERATORS", List.of("role-4", "role-5")
+                "OPERATOR", List.of("role-4", "role-5")
         );
         Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.any()))
                 .thenReturn(productRoleMappings);
@@ -58,7 +59,7 @@ class ProductServiceImplTest {
         Assertions.assertFalse(productRoles.isEmpty());
         TreeSet<String> expectedRoles = new TreeSet<>();
         expectedRoles.addAll(productRoleMappings.get("SUB_DELEGATE"));
-        expectedRoles.addAll(productRoleMappings.get("OPERATORS"));
+        expectedRoles.addAll(productRoleMappings.get("OPERATOR"));
         Assertions.assertIterableEquals(expectedRoles, new TreeSet<>(productRoles));
         Mockito.verify(productsConnectorMock, Mockito.times(1))
                 .getProductRoleMappings(productId);

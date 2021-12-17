@@ -227,4 +227,20 @@ class PartyConnectorImpl implements PartyConnector {
         }
     }
 
+
+    @Override
+    public void suspend(String relationshipId) {
+        Assert.hasText(relationshipId, "A Relationship id is required");
+
+        restClient.suspendRelationship(relationshipId);
+    }
+
+
+    @Override
+    public void activate(String relationshipId) {
+        Assert.hasText(relationshipId, "A Relationship id is required");
+
+        restClient.activateRelationship(relationshipId);
+    }
+
 }

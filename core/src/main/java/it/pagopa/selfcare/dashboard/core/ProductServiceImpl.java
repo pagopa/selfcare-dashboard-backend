@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 class ProductServiceImpl implements ProductService {
 
-    private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATORS");
+    private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATOR");
 
     private final ProductsConnector productsConnector;
 

@@ -671,4 +671,56 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(createUserDto.getPartyRole(), request.getUsers().get(0).getRole().toString());
     }
 
+
+    @Test
+    void suspend_nullRelationshipId() {
+        // given
+        String relationshipId = null;
+        // when
+        Executable executable = () -> partyConnector.suspend(relationshipId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Relationship id is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+
+    @Test
+    void suspend() {
+        // given
+        String relationshipId = "relationshipId";
+        // when
+        partyConnector.suspend(relationshipId);
+        // then
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .suspendRelationship(relationshipId);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    @Test
+    void activate_nullRelationshipId() {
+        // given
+        String relationshipId = null;
+        // when
+        Executable executable = () -> partyConnector.activate(relationshipId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Relationship id is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+
+    @Test
+    void activate() {
+        // given
+        String relationshipId = "relationshipId";
+        // when
+        partyConnector.activate(relationshipId);
+        // then
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .activateRelationship(relationshipId);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
 }
