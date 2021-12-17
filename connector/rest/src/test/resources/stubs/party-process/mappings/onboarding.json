@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/(?:subdelegates|operators)",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.institutionId"
+      },
+      {
+        "matchesJsonPath": "$[?(@.users.size() == 1)]"
+      }
+    ]
+  },
+  "response": {
+    "status": "201",
+    "jsonBody": {},
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

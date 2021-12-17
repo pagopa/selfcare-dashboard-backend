@@ -9,16 +9,16 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +40,9 @@ class InstitutionServiceImplTest {
 
     @InjectMocks
     private InstitutionServiceImpl institutionService;
+
+    @Captor
+    private ArgumentCaptor<CreateUserDto> createUserDtoCaptor;
 
 
     @BeforeEach
@@ -315,8 +318,9 @@ class InstitutionServiceImplTest {
         product1.setId(productId1);
         Product product2 = TestUtils.mockInstance(new Product(), 2, "setId");
         product2.setId(productId2);
+        Map<String, Product> idToProductMap = Map.of(productId1, product1, productId2, product2);
         Mockito.when(productsConnectorMock.getProducts())
-                .thenReturn(List.of(product1, product2));
+                .thenReturn(new ArrayList<>(idToProductMap.values()));
         // when
         Collection<UserInfo> userInfos = institutionService.getUsers(institutionId, role);
         // then
@@ -325,14 +329,103 @@ class InstitutionServiceImplTest {
         UserInfo userInfo = userInfos.iterator().next();
         Assertions.assertNotNull(userInfo.getProducts());
         Assertions.assertEquals(2, userInfo.getProducts().size());
-        userInfo.getProducts().forEach(productInfo -> {
-
-        });
+        userInfo.getProducts().forEach(productInfo ->
+                Assertions.assertEquals(idToProductMap.get(productInfo.getId()).getTitle(), productInfo.getTitle()));
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(institutionId, role, Optional.empty());
         Mockito.verify(productsConnectorMock, Mockito.times(1))
                 .getProducts();
         Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
+    }
+
+
+    @Test
+    void createUsers_nullInstitutionId() {
+        // given
+        String institutionId = null;
+        String productId = "productId";
+        CreateUserDto createUserDto = new CreateUserDto();
+        // when
+        Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An Institution id is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+    }
+
+
+    @Test
+    void createUsers_nullProductId() {
+        // given
+        String institutionId = "institutionId";
+        String productId = null;
+        CreateUserDto createUserDto = new CreateUserDto();
+        // when
+        Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Product id is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+    }
+
+
+    @Test
+    void createUsers_nullUser() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        CreateUserDto createUserDto = null;
+        // when
+        Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An User is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+    }
+
+
+    @Test
+    void createUsers_invalidRole() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        CreateUserDto createUserDto = new CreateUserDto();
+        createUserDto.setProductRole("invalid-productRole");
+        Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
+                .thenReturn(Map.of("partyRole", List.of("productRole")));
+        // when
+        Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
+        // then
+        InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
+        Assertions.assertEquals(String.format("Product role '%s' is not valid", createUserDto.getProductRole()), e.getMessage());
+        Mockito.verify(productsConnectorMock, Mockito.times(1))
+                .getProductRoleMappings(productId);
+        Mockito.verifyNoMoreInteractions(productsConnectorMock);
+        Mockito.verifyNoInteractions(partyConnectorMock);
+    }
+
+
+    @Test
+    void createUsers() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String partyRole = "partyRole";
+        String productRole = "productRole";
+        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setProductRole", "setPartyRole");
+        createUserDto.setProductRole(productRole);
+        Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
+                .thenReturn(Map.of(partyRole, List.of(productRole)));
+        // when
+        institutionService.createUsers(institutionId, productId, createUserDto);
+        // then
+        Mockito.verify(productsConnectorMock, Mockito.times(1))
+                .getProductRoleMappings(productId);
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());
+        Assertions.assertEquals(partyRole, createUserDtoCaptor.getValue().getPartyRole());
+        TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
+        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
 }

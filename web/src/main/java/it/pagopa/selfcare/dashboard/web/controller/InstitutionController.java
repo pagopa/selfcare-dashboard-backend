@@ -9,10 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.*;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
@@ -24,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -97,7 +95,7 @@ public class InstitutionController {
 
     @GetMapping(value = "/{institutionId}/users")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null)")
     public List<InstitutionUserResource> getInstitutionUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
@@ -136,7 +134,7 @@ public class InstitutionController {
 
     @GetMapping(value = "/{institutionId}/products/{productId}/users")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null) and hasPermission(#productId, 'ProductsResource', null)")
     public List<ProductUserResource> getInstitutionProductUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                                 @PathVariable("institutionId")
@@ -155,6 +153,29 @@ public class InstitutionController {
         return userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .collect(Collectors.toList());
+    }
+
+
+    @PostMapping(value = "/{institutionId}/products/{productId}/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null) and hasPermission(#productId, 'ProductsResource', null)")
+    public void createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                             @PathVariable("institutionId")
+                                                     String institutionId,
+                                             @ApiParam("${swagger.dashboard.products.model.id}")
+                                             @PathVariable("productId")
+                                                     String productId,
+                                             @ApiParam("${swagger.dashboard.user.model.role}")
+                                             @RequestBody
+                                             @Valid
+                                                     CreateUserDto user) {
+        if (log.isDebugEnabled()) {
+            log.trace("InstitutionController.createInstitutionProductUser");
+            log.debug("institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+        }
+
+        institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
     }
 
 }

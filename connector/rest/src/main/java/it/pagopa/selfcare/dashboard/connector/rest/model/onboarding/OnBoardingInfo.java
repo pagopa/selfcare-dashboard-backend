@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.connector.rest.model;
+package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
 import lombok.Data;
 

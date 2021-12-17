@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
 
@@ -55,6 +56,21 @@ public class UserMapper {
         }
 
         return resource;
+    }
+
+
+    public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto) {
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = null;
+        if (dto != null) {
+            model = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto();
+            model.setName(dto.getName());
+            model.setSurname(dto.getSurname());
+            model.setTaxCode(dto.getTaxCode());
+            model.setEmail(dto.getEmail());
+            model.setProductRole(dto.getProductRole());
+        }
+
+        return model;
     }
 
 }

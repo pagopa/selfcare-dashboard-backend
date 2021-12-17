@@ -3,14 +3,14 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
 
@@ -73,6 +73,30 @@ class UserMapperTest {
         assertEquals(model.getRole(), resource.getRole());
         assertEquals(model.getStatus(), resource.getStatus());
         TestUtils.reflectionEqualsByName(resource, model);
+    }
+
+
+    @Test
+    void fromCreateUserDto_null() {
+        // given
+        CreateUserDto dto = null;
+        // when
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto);
+        // then
+        assertNull(model);
+    }
+
+
+    @Test
+    void fromCreateUserDto_notNull() {
+        // given
+        CreateUserDto dto = TestUtils.mockInstance(new CreateUserDto());
+        // when
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto);
+        // then
+        assertNotNull(model);
+        TestUtils.reflectionEqualsByName(model, dto, "partyRole");
+        assertNull(model.getPartyRole());
     }
 
 }

@@ -1,13 +1,15 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.*;
+import it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -35,5 +37,13 @@ public interface PartyProcessRestClient {
     @CollectionFormat(feign.CollectionFormat.CSV)
     OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
                                      @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
+
+    @PostMapping(value = "${rest-client.party-process.onboardingSubdelegates.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    void onboardingSubdelegates(@RequestBody OnboardingRequest request);
+
+    @PostMapping(value = "${rest-client.party-process.onboardingOperators.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    void onboardingOperators(@RequestBody OnboardingRequest request);
 
 }

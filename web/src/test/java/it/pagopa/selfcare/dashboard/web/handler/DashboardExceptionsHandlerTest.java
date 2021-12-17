@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.handler;
 
 import it.pagopa.selfcare.commons.web.model.ErrorResource;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -28,6 +29,20 @@ class DashboardExceptionsHandlerTest {
                 .thenReturn(DETAIL_MESSAGE);
         // when
         ErrorResource resource = handler.handleFileValidationException(exceptionMock);
+        // then
+        assertNotNull(resource);
+        assertEquals(DETAIL_MESSAGE, resource.getMessage());
+    }
+
+
+    @Test
+    void handleInvalidProductRoleException() {
+        // given
+        InvalidProductRoleException exceptionMock = Mockito.mock(InvalidProductRoleException.class);
+        Mockito.when(exceptionMock.getMessage())
+                .thenReturn(DETAIL_MESSAGE);
+        // when
+        ErrorResource resource = handler.handleInvalidProductRoleException(exceptionMock);
         // then
         assertNotNull(resource);
         assertEquals(DETAIL_MESSAGE, resource.getMessage());

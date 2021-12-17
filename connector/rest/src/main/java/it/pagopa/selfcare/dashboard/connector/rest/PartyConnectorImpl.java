@@ -5,9 +5,14 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -189,6 +194,37 @@ class PartyConnectorImpl implements PartyConnector {
         }
 
         return userInfos;
+    }
+
+
+    @Override
+    public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
+        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(productId, "A Product id is required");
+        Assert.notNull(createUserDto, "An User is required");
+
+        OnboardingRequest onboardingRequest = new OnboardingRequest();
+        onboardingRequest.setInstitutionId(institutionId);
+        User user = new User();
+        user.setProduct(productId);
+        user.setName(createUserDto.getName());
+        user.setSurname(createUserDto.getSurname());
+        user.setTaxCode(createUserDto.getTaxCode());
+        user.setEmail(createUserDto.getEmail());
+        user.setProductRole(createUserDto.getProductRole());
+        user.setRole(valueOf(createUserDto.getPartyRole()));
+        onboardingRequest.setUsers(List.of(user));
+
+        switch (user.getRole()) {
+            case SUB_DELEGATE:
+                restClient.onboardingSubdelegates(onboardingRequest);
+                break;
+            case OPERATOR:
+                restClient.onboardingOperators(onboardingRequest);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid Party role");
+        }
     }
 
 }

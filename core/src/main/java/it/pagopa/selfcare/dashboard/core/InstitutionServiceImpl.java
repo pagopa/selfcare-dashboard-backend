@@ -7,7 +7,9 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -108,4 +110,21 @@ class InstitutionServiceImpl implements InstitutionService {
         return partyConnector.getUsers(institutionId, role, Optional.ofNullable(productIds));
     }
 
+
+    @Override
+    public void createUsers(String institutionId, String productId, CreateUserDto user) {
+        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(productId, "A Product id is required");
+        Assert.notNull(user, "An User is required");
+
+        Map<String, List<String>> productRoleMappings = productsConnector.getProductRoleMappings(productId);
+        Optional<String> partyRole = productRoleMappings.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(user.getProductRole()))
+                .map(Map.Entry::getKey)
+                .findAny();
+        user.setPartyRole(partyRole.orElseThrow(() ->
+                new InvalidProductRoleException(String.format("Product role '%s' is not valid", user.getProductRole()))));
+
+        partyConnector.createUsers(institutionId, productId, user);
+    }
 }

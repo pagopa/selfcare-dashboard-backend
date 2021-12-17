@@ -1,10 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsSource;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
+import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
@@ -19,8 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.util.List;
-
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import java.util.Map;
 
 @TestPropertySource(
         locations = "classpath:config/products-rest-client.properties",
@@ -40,13 +38,7 @@ public class ProductsRestClientTest extends BaseFeignRestClientTest {
     private ProductsRestClient restClient;
 
     static {
-        String port = System.getenv("WIREMOCKPORT");
-        WireMockConfiguration config = wireMockConfig()
-                .port(port != null ? Integer.parseInt(port) : 0)
-                .bindAddress("localhost")
-                .withRootDirectory("src/test/resources")
-                .extensions(new ResponseTemplateTransformer(false));
-        config.mappingSource(new JsonFileMappingsSource(config.filesRoot().child("stubs")));
+        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs");
         wireMockRule = new WireMockClassRule(config);
     }
 
@@ -62,11 +54,26 @@ public class ProductsRestClientTest extends BaseFeignRestClientTest {
         }
     }
 
+
     @Test
     public void getProducts() {
         // given and when
         List<Product> response = restClient.getProducts();
         // then
-         Assert.assertFalse(response.isEmpty());
+        Assert.assertFalse(response.isEmpty());
     }
+
+
+    @Test
+    public void getProductRoleMappings() {
+        // given
+        String productId = "productId";
+        // when
+        Map<String, List<String>> response = restClient.getProductRoleMappings(productId);
+        System.out.println("response = " + response);
+        // then
+        Assert.assertNotNull(response);
+        Assert.assertFalse(response.isEmpty());
+    }
+
 }
