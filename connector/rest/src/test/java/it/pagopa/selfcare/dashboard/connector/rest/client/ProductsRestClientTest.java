@@ -70,7 +70,6 @@ public class ProductsRestClientTest extends BaseFeignRestClientTest {
         String productId = "productId";
         // when
         Map<String, List<String>> response = restClient.getProductRoleMappings(productId);
-        System.out.println("response = " + response);
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
