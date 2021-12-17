@@ -47,11 +47,12 @@ class DashboardSecurityConfig extends SecurityConfig {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/products/**").hasAuthority(LIMITED.name())
                 .antMatchers(HttpMethod.PUT, "/institutions/**/logo").hasAuthority(ADMIN.name())
                 .antMatchers(HttpMethod.GET, "/institutions").fullyAuthenticated()
                 .antMatchers("/institutions/**").hasAuthority(LIMITED.name())
                 .antMatchers("/token/**").hasAuthority(LIMITED.name())
+                .antMatchers("/relationships/**").hasAuthority(ADMIN.name())
+                .antMatchers("/products/**").hasAuthority(LIMITED.name())
                 .anyRequest().permitAll();
         super.configure(http);
     }

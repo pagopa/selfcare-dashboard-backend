@@ -4,18 +4,21 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.Attribute;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
@@ -50,6 +53,9 @@ class PartyConnectorImplTest {
 
     @Mock
     private PartyProcessRestClient restClientMock;
+
+    @Captor
+    private ArgumentCaptor<OnboardingRequest> onboardingRequestCaptor;
 
 
     @Test
@@ -569,6 +575,106 @@ class PartyConnectorImplTest {
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    @Test
+    void createUsers_nullInstitutionId() {
+        // given
+        String institutionId = null;
+        String productId = "productId";
+        CreateUserDto createUserDto = new CreateUserDto();
+        // when
+        Executable executable = () -> {
+            partyConnector.createUsers(institutionId, productId, createUserDto);
+        };
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An Institution id is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+
+    @Test
+    void createUsers_nullProductId() {
+        // given
+        String institutionId = "institutionId";
+        String productId = null;
+        CreateUserDto createUserDto = new CreateUserDto();
+        // when
+        Executable executable = () -> {
+            partyConnector.createUsers(institutionId, productId, createUserDto);
+        };
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Product id is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+
+    @Test
+    void createUsers_nullUser() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        CreateUserDto createUserDto = null;
+        // when
+        Executable executable = () -> {
+            partyConnector.createUsers(institutionId, productId, createUserDto);
+        };
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An User is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(value = PartyRole.class)
+    void createUsers(PartyRole partyRole) {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setPartyRole");
+        createUserDto.setPartyRole(partyRole.toString());
+        // when
+        Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
+        // then
+        switch (partyRole) {
+            case SUB_DELEGATE:
+                Assertions.assertDoesNotThrow(executable);
+                Mockito.verify(restClientMock, Mockito.times(1))
+                        .onboardingSubdelegates(onboardingRequestCaptor.capture());
+                verifyRequest(institutionId, productId, createUserDto, onboardingRequestCaptor);
+                break;
+            case OPERATOR:
+                Assertions.assertDoesNotThrow(executable);
+                Mockito.verify(restClientMock, Mockito.times(1))
+                        .onboardingOperators(onboardingRequestCaptor.capture());
+                verifyRequest(institutionId, productId, createUserDto, onboardingRequestCaptor);
+                break;
+            default:
+                IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+                Assertions.assertEquals("Invalid Party role", e.getMessage());
+        }
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingRequest> onboardingRequestCaptor) {
+        OnboardingRequest request = onboardingRequestCaptor.getValue();
+        Assertions.assertNotNull(request);
+        Assertions.assertEquals(institutionId, request.getInstitutionId());
+        Assertions.assertNull(request.getContract());
+        Assertions.assertNotNull(request.getUsers());
+        Assertions.assertEquals(1, request.getUsers().size());
+        Assertions.assertEquals(createUserDto.getName(), request.getUsers().get(0).getName());
+        Assertions.assertEquals(createUserDto.getSurname(), request.getUsers().get(0).getSurname());
+        Assertions.assertEquals(createUserDto.getTaxCode(), request.getUsers().get(0).getTaxCode());
+        Assertions.assertEquals(createUserDto.getEmail(), request.getUsers().get(0).getEmail());
+        Assertions.assertEquals(productId, request.getUsers().get(0).getProduct());
+        Assertions.assertEquals(createUserDto.getProductRole(), request.getUsers().get(0).getProductRole());
+        Assertions.assertEquals(createUserDto.getPartyRole(), request.getUsers().get(0).getRole().toString());
     }
 
 }

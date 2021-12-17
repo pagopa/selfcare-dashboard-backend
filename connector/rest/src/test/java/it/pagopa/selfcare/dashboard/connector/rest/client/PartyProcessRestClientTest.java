@@ -4,12 +4,21 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
+import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.*;
+import it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -17,10 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.MANAGER;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.OPERATOR;
@@ -229,6 +235,32 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response);
         Assert.assertTrue(response.getInstitutions().isEmpty());
         Assert.assertNull(response.getPerson());
+    }
+
+
+    @Test
+    public void onboardingSubdelegates() {
+        // given
+        OnboardingRequest onboardingRequest = new OnboardingRequest();
+        onboardingRequest.setInstitutionId("institutionId");
+        onboardingRequest.setUsers(List.of(TestUtils.mockInstance(new User())));
+        // when
+        Executable executable = () -> restClient.onboardingSubdelegates(onboardingRequest);
+        // then
+        Assertions.assertDoesNotThrow(executable);
+    }
+
+
+    @Test
+    public void onboardingOperators() {
+        // given
+        OnboardingRequest onboardingRequest = new OnboardingRequest();
+        onboardingRequest.setInstitutionId("institutionId");
+        onboardingRequest.setUsers(List.of(TestUtils.mockInstance(new User())));
+        // when
+        Executable executable = () -> restClient.onboardingOperators(onboardingRequest);
+        // then
+        Assertions.assertDoesNotThrow(executable);
     }
 
 }

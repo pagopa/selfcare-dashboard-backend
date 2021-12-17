@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
@@ -29,6 +30,7 @@ public class TokenController {
     @GetMapping(value = "exchange")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasPermission(#productId, 'ProductsResource', null)")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.exchange}")
     public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                           @RequestParam("institutionId")
                                                   String institutionId,

@@ -65,4 +65,5 @@ class SwaggerConfigTest {
                     Files.write(basePath.resolve("api-docs.json"), formatted.getBytes());
                 });
     }
+
 }

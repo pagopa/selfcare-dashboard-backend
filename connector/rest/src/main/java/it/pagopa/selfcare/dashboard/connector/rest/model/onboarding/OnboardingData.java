@@ -1,5 +1,8 @@
-package it.pagopa.selfcare.dashboard.connector.rest.model;
+package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
+import it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.rest.model.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
 import lombok.Getter;
 import lombok.Setter;
 

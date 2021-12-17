@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
@@ -309,6 +310,29 @@ class InstitutionControllerTest {
         assertFalse(products.isEmpty());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
                 .getUsers(institutionId, Optional.of(role), Set.of(productId));
+        Mockito.verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+    @Test
+    void createInstitutionProductUser() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        CreateUserDto user = TestUtils.mockInstance(new CreateUserDto());
+        Mockito.when(institutionServiceMock.getUsers(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(Collections.singletonList(TestUtils.mockInstance(new UserInfo())));
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
+                .content(objectMapper.writeValueAsString(user))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andReturn();
+        // then
+        assertEquals(0, result.getResponse().getContentLength());
+        Mockito.verify(institutionServiceMock, Mockito.times(1))
+                .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.notNull());
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
