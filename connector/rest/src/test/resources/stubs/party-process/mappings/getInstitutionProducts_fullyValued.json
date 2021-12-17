@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/products"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "products": [
+        {
+          "id": "string",
+          "role": "string",
+          "createdAt": "2021-11-29T19:14:40.712Z"
+        }
+      ]
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
