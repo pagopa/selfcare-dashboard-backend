@@ -99,7 +99,7 @@ public class ExchangeTokenService {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS512, jwtSigningKey)
+                .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
     }
