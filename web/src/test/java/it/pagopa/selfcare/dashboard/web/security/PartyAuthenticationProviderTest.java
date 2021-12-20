@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
@@ -35,26 +34,11 @@ class PartyAuthenticationProviderTest {
 
 
     @Test
-    void retrieveUser_nullAuthDetails() {
-        // given
-        String username = "username";
-        String credentials = "credentials";
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
-        // when
-        UserDetails userDetails = authenticationProvider.retrieveUser(username, authentication);
-        // then
-        assertNull(userDetails);
-    }
-
-
-    @Test
     void retrieveUser_nullAuthInfo() {
         // given
         String username = "username";
         String credentials = "credentials";
-        String institutionId = "institutionId";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(null);
         // when
@@ -62,7 +46,7 @@ class PartyAuthenticationProviderTest {
         // then
         assertNull(userDetails);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getAuthInfo(Mockito.eq(institutionId));
+                .getAuthInfo(Mockito.isNull());
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -72,9 +56,7 @@ class PartyAuthenticationProviderTest {
         // given
         String username = "username";
         String credentials = "credentials";
-        String institutionId = "institutionId";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(Collections.emptyList());
         // when
@@ -84,7 +66,7 @@ class PartyAuthenticationProviderTest {
         assertNotNull(userDetails.getAuthorities());
         assertTrue(userDetails.getAuthorities().isEmpty());
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getAuthInfo(Mockito.eq(institutionId));
+                .getAuthInfo(Mockito.isNull());
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -94,9 +76,7 @@ class PartyAuthenticationProviderTest {
         // given
         String username = "username";
         String credentials = "credentials";
-        String institutionId = "institutionId";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(Collections.singletonList(new AuthInfo() {
                 }));
@@ -105,7 +85,7 @@ class PartyAuthenticationProviderTest {
         // then
         assertThrows(IllegalArgumentException.class, executable);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getAuthInfo(Mockito.eq(institutionId));
+                .getAuthInfo(Mockito.isNull());
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -118,7 +98,6 @@ class PartyAuthenticationProviderTest {
         String credentials = "credentials";
         String institutionId = "institutionId";
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, credentials);
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(Collections.singletonList(new AuthInfo() {
                     @Override
@@ -160,7 +139,7 @@ class PartyAuthenticationProviderTest {
         assertEquals(institutionId, selfCareGrantedAuthority.getInstitutionId());
         assertEquals(role.name(), selfCareGrantedAuthority.getAuthority());
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getAuthInfo(Mockito.eq(institutionId));
+                .getAuthInfo(Mockito.isNull());
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
 
 

@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
@@ -37,22 +36,17 @@ public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticati
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         User user = null;
-        Object authenticationDetails = authentication.getDetails();
+        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
 
-        if (authenticationDetails != null
-                && SelfCareAuthenticationDetails.class.isAssignableFrom(authenticationDetails.getClass())) {
-            Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(((SelfCareAuthenticationDetails) authenticationDetails).getInstitutionId());
-
-            if (authInfos != null) {
-                List<SelfCareGrantedAuthority> authorities = authInfos.stream()
-                        .map(authInfo -> new SelfCareGrantedAuthority(authInfo.getInstitutionId(), authInfo.getProductRoles().stream()
-                                .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(),
-                                        productRole.getProductRole(),
-                                        productRole.getProductId()))
-                                .collect(Collectors.toList())))
-                        .collect(Collectors.toList());
-                user = new User(username, authentication.getCredentials().toString(), authorities);
-            }
+        if (authInfos != null) {
+            List<SelfCareGrantedAuthority> authorities = authInfos.stream()
+                    .map(authInfo -> new SelfCareGrantedAuthority(authInfo.getInstitutionId(), authInfo.getProductRoles().stream()
+                            .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(),
+                                    productRole.getProductRole(),
+                                    productRole.getProductId()))
+                            .collect(Collectors.toList())))
+                    .collect(Collectors.toList());
+            user = new User(username, authentication.getCredentials().toString(), authorities);
         }
 
         return user;
