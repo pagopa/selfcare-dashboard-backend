@@ -151,7 +151,7 @@ public class ExchangeTokenService {
 
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
-        public static final String INSTITUTION = "company";
+        public static final String INSTITUTION = "organization";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
