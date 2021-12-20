@@ -38,19 +38,19 @@ public interface PartyProcessRestClient {
     OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
                                      @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
 
-    @PostMapping(value = "${rest-client.party-process.onboardingSubdelegates.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "${rest-client.party-process.onboardingSubdelegates.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     void onboardingSubdelegates(@RequestBody OnboardingRequest request);
 
-    @PostMapping(value = "${rest-client.party-process.onboardingOperators.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "${rest-client.party-process.onboardingOperators.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     void onboardingOperators(@RequestBody OnboardingRequest request);
 
-    @PostMapping(value = "${rest-client.party-process.suspendRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "${rest-client.party-process.suspendRelationship.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     void suspendRelationship(@PathVariable("relationshipId") String relationshipId);
 
-    @PostMapping(value = "${rest-client.party-process.activateRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "${rest-client.party-process.activateRelationship.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     void activateRelationship(@PathVariable("relationshipId") String relationshipId);
 
