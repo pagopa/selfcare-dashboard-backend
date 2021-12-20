@@ -99,7 +99,7 @@ public class ExchangeTokenService {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS512, jwtSigningKey)
+                .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
     }
@@ -151,7 +151,7 @@ public class ExchangeTokenService {
 
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
-        public static final String INSTITUTION = "company";
+        public static final String INSTITUTION = "organization";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);

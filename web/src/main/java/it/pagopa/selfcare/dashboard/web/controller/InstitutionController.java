@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -95,19 +94,22 @@ public class InstitutionController {
 
     @GetMapping(value = "/{institutionId}/users")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null)")
     public List<InstitutionUserResource> getInstitutionUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
                                                                      String institutionId,
+                                                             @ApiParam("${swagger.dashboard.products.model.id}")
+                                                             @RequestParam(value = "productId", required = false)
+                                                                     Optional<String> productId,
                                                              @ApiParam("${swagger.dashboard.user.model.role}")
                                                              @RequestParam(value = "role", required = false)
                                                                      Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionUsers");
-            log.debug("institutionId = {}, role = {}", institutionId, role);
+            log.trace("InstitutionController.getInstitutionProductUsers");
+            log.debug("institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
         }
-        Collection<UserInfo> userInfos = institutionService.getUsers(institutionId, role);
+        Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
         return userInfos.stream()
                 .map(UserMapper::toInstitutionUser)
                 .collect(Collectors.toList());
@@ -149,7 +151,7 @@ public class InstitutionController {
             log.trace("InstitutionController.getInstitutionProductUsers");
             log.debug("institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         }
-        Collection<UserInfo> userInfos = institutionService.getUsers(institutionId, role, Set.of(productId));
+        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role);
         return userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .collect(Collectors.toList());

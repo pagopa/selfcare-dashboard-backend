@@ -28,6 +28,9 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 @Service
 class InstitutionServiceImpl implements InstitutionService {
 
+    private static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
+    private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATOR");
+
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
 
@@ -90,8 +93,12 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
     @Override
-    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role) {
-        Collection<UserInfo> userInfos = getUsers(institutionId, role, null);
+    public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role) {
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.notNull(productId, "An Optional Product id object is required");
+        Assert.notNull(role, "An Optional role object is required");
+
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
         Map<String, Product> idToProductMap = productsConnector.getProducts().stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         userInfos.forEach(userInfo ->
@@ -103,22 +110,24 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
     @Override
-    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Set<String> productIds) {
-        Assert.hasText(institutionId, "An Institution id is required");
+    public Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role) {
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.hasText(productId, "A Product id is required");
         Assert.notNull(role, "An Optional role object is required");
 
-        return partyConnector.getUsers(institutionId, role, Optional.ofNullable(productIds));
+        return partyConnector.getUsers(institutionId, role, Optional.of(productId));
     }
 
 
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto user) {
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
 
         Map<String, List<String>> productRoleMappings = productsConnector.getProductRoleMappings(productId);
         Optional<String> partyRole = productRoleMappings.entrySet().stream()
+                .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
                 .filter(entry -> entry.getValue().contains(user.getProductRole()))
                 .map(Map.Entry::getKey)
                 .findAny();
