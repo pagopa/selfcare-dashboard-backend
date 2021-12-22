@@ -48,7 +48,7 @@ public class InstitutionController {
     @PutMapping(value = "/{institutionId}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.saveInstitutionLogo}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null)")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public Object saveInstitutionLogo(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                       @PathVariable("institutionId") String institutionId,
                                       @ApiParam("${swagger.dashboard.institutions.model.logo}")
@@ -79,7 +79,7 @@ public class InstitutionController {
     @GetMapping("/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null)")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                                       String institutionId) {
@@ -95,7 +95,7 @@ public class InstitutionController {
     @GetMapping(value = "/{institutionId}/users")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null)")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public List<InstitutionUserResource> getInstitutionUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
                                                                      String institutionId,
@@ -119,7 +119,7 @@ public class InstitutionController {
     @GetMapping(value = "/{institutionId}/products")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null)")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public List<ProductsResource> getInstitutionProducts(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                          @PathVariable("institutionId")
                                                                  String institutionId) {
@@ -137,7 +137,7 @@ public class InstitutionController {
     @GetMapping(value = "/{institutionId}/products/{productId}/users")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null) and hasPermission(#productId, 'ProductsResource', null)")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
     public List<ProductUserResource> getInstitutionProductUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                                 @PathVariable("institutionId")
                                                                         String institutionId,
@@ -161,7 +161,7 @@ public class InstitutionController {
     @PostMapping(value = "/{institutionId}/products/{productId}/users")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', null) and hasPermission(#productId, 'ProductsResource', null)")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                              @PathVariable("institutionId")
                                                      String institutionId,

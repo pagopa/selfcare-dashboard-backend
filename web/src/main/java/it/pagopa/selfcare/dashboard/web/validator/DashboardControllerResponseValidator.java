@@ -20,7 +20,7 @@ public class DashboardControllerResponseValidator extends ControllerResponseVali
     @Override
     @Pointcut("execution(* it.pagopa.selfcare.dashboard.web.controller.*.*(..))")
     public void controllersPointcut() {
-
+        // Do nothing because is a pointcut
     }
 
 }

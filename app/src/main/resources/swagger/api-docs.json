@@ -38,18 +38,6 @@
         "summary": "getInstitutions",
         "description": "Service to get all the institutions related to logged user",
         "operationId": "getInstitutionsUsingGET",
-        "parameters": [
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -101,16 +89,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -158,16 +136,6 @@
             "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
             "schema": {
               "type": "string"
             }
@@ -248,16 +216,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -308,16 +266,6 @@
             "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
             "schema": {
               "type": "string"
             }
@@ -398,16 +346,6 @@
             }
           },
           {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "productId",
             "in": "path",
             "description": "Product's unique identifier",
@@ -465,16 +403,6 @@
             "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
             "schema": {
               "type": "string"
             }
@@ -555,16 +483,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -618,16 +536,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -674,16 +582,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -727,16 +625,6 @@
             "description": "Institution's unique identifier (i.e.: IPA code)",
             "required": true,
             "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "x-selc-institutionId",
-            "in": "header",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": false,
-            "allowReserved": false,
             "schema": {
               "type": "string"
             }
