@@ -8,9 +8,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.builders.RequestParameterBuilder;
-import springfox.documentation.schema.ScalarType;
-import springfox.documentation.service.*;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.HttpAuthenticationScheme;
+import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.Tag;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -68,13 +69,6 @@ class SwaggerConfig {
                 .securitySchemes(Collections.singletonList(HttpAuthenticationScheme.JWT_BEARER_BUILDER
                         .name(AUTH_SCHEMA_NAME)
                         .description(environment.getProperty("swagger.security.schema.bearer.description"))
-                        .build()))
-                .globalRequestParameters(Collections.singletonList(new RequestParameterBuilder()
-                        .name("x-selc-institutionId")
-                        .in(ParameterType.HEADER)
-                        .required(false)
-                        .description(environment.getProperty("swagger.dashboard.institutions.model.id"))
-                        .query(psb -> psb.model(msb -> msb.scalarModel(ScalarType.STRING)))
                         .build()));
     }
 

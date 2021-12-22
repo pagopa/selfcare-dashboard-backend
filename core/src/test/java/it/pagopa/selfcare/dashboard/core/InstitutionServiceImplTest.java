@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthenticationDetails;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
@@ -118,7 +117,6 @@ class InstitutionServiceImplTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(productGrantedAuthority))));
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
@@ -144,7 +142,6 @@ class InstitutionServiceImplTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(productGrantedAuthority))));
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
@@ -175,7 +172,6 @@ class InstitutionServiceImplTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.singletonList(new SelfCareGrantedAuthority(institutionId, List.of(productGrantedAuthority2, productGrantedAuthority3))));
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
@@ -210,7 +206,6 @@ class InstitutionServiceImplTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.singletonList(selfCareGrantedAuthority));
-        authentication.setDetails(new SelfCareAuthenticationDetails(institutionId));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
