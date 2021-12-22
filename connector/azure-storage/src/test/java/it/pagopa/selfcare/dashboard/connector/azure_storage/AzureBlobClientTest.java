@@ -23,6 +23,7 @@ class AzureBlobClientTest {
 
     @Test
     void uploadInstitutionLogo_ok() throws URISyntaxException, InvalidKeyException, FileUploadException, IOException, NoSuchFieldException, IllegalAccessException, StorageException {
+        // given
         AzureBlobClient blobClient = new AzureBlobClient("UseDevelopmentStorage=true;", "$web");
         CloudBlockBlob blockBlobMock = Mockito.mock(CloudBlockBlob.class);
         Mockito.when(blockBlobMock.getProperties())
@@ -30,17 +31,18 @@ class AzureBlobClientTest {
         Mockito.doNothing().
                 when(blockBlobMock).upload(Mockito.any(), Mockito.anyByte());
         CloudBlobContainer blobContainerMock = Mockito.mock(CloudBlobContainer.class);
-        Mockito.when(blobContainerMock.getBlockBlobReference(Mockito.eq("filename.png")))
+        Mockito.when(blobContainerMock.getBlockBlobReference("filename.png"))
                 .thenReturn(blockBlobMock);
         CloudBlobClient blobClientMock = Mockito.mock(CloudBlobClient.class);
-        Mockito.when(blobClientMock.getContainerReference(Mockito.eq("$web")))
+        Mockito.when(blobClientMock.getContainerReference("$web"))
                 .thenReturn(blobContainerMock);
-
         mockCloudBlobClient(blobClient, blobClientMock);
-
         InputStream resource = new ClassPathResource("logo-pagopa-spa.png")
                 .getInputStream();
-        blobClient.uploadInstitutionLogo(resource, "filename.png", "image/png");
+        // when
+        Executable executable = () -> blobClient.uploadInstitutionLogo(resource, "filename.png", "image/png");
+        // then
+        Assertions.assertDoesNotThrow(executable);
     }
 
 
@@ -51,7 +53,7 @@ class AzureBlobClientTest {
         CloudBlobClient blobClientMock = Mockito.mock(CloudBlobClient.class);
         Mockito.doThrow(StorageException.class)
                 .when(blobClientMock)
-                .getContainerReference(Mockito.eq("$web"));
+                .getContainerReference("$web");
         mockCloudBlobClient(blobClient, blobClientMock);
         InputStream resource = new ClassPathResource("logo-pagopa-spa.png")
                 .getInputStream();

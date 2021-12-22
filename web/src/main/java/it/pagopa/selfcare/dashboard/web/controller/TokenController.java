@@ -29,8 +29,8 @@ public class TokenController {
 
     @GetMapping(value = "exchange")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasPermission(#productId, 'ProductsResource', null)")
     @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.exchange}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
     public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                           @RequestParam("institutionId")
                                                   String institutionId,

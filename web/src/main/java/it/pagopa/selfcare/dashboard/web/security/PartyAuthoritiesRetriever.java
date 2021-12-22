@@ -2,54 +2,47 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.commons.web.security.AuthoritiesRetriever;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
-public class PartyAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
 
     private final PartyConnector partyConnector;
 
 
     @Autowired
-    public PartyAuthenticationProvider(PartyConnector partyConnector) {
+    public PartyAuthoritiesRetriever(PartyConnector partyConnector) {
         this.partyConnector = partyConnector;
     }
 
 
     @Override
-    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-    }
+    public Collection<GrantedAuthority> retrieveAuthorities() {
+        log.trace("PartyAuthoritiesRetriever.retrieveAuthorities");
+        Collection<GrantedAuthority> authorities = null;
 
-
-    @Override
-    protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        User user = null;
         Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
-
         if (authInfos != null) {
-            List<SelfCareGrantedAuthority> authorities = authInfos.stream()
+            authorities = authInfos.stream()
                     .map(authInfo -> new SelfCareGrantedAuthority(authInfo.getInstitutionId(), authInfo.getProductRoles().stream()
                             .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(),
                                     productRole.getProductRole(),
                                     productRole.getProductId()))
                             .collect(Collectors.toList())))
                     .collect(Collectors.toList());
-            user = new User(username, authentication.getCredentials().toString(), authorities);
         }
 
-        return user;
+        return authorities;
     }
 
 }

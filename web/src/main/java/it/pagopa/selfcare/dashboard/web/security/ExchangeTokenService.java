@@ -76,8 +76,8 @@ public class ExchangeTokenService {
                 .findAny();
         SelfCareGrantedAuthority grantedAuthority = (SelfCareGrantedAuthority) selcAuthority
                 .orElseThrow(() -> new IllegalArgumentException("A Self Care Granted SelfCareAuthority is required"));
-        Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString())
-                .orElseThrow(() -> new RuntimeException("Failed to retrieve session token claims"));
+        Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString());
+        Assert.notNull(selcClaims, "Session token claims is required");
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         Assert.notNull(institutionInfo, "Institution info is required");
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);

@@ -126,7 +126,7 @@ class ExchangeTokenServiceTest {
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
-                .thenReturn(Optional.empty());
+                .thenReturn(null);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, jwtSigningKey, "PT5S", null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
@@ -135,8 +135,8 @@ class ExchangeTokenServiceTest {
         // when
         Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
         // then
-        RuntimeException e = assertThrows(RuntimeException.class, executable);
-        assertEquals("Failed to retrieve session token claims", e.getMessage());
+        RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Session token claims is required", e.getMessage());
         Mockito.verify(jwtServiceMock, Mockito.times(1))
                 .getClaims(Mockito.any());
         Mockito.verifyNoMoreInteractions(jwtServiceMock);
@@ -155,11 +155,11 @@ class ExchangeTokenServiceTest {
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
-                .thenReturn(Optional.of(Jwts.claims()
+                .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
                         .setIssuedAt(iat)
-                        .setExpiration(exp)));
+                        .setExpiration(exp));
         InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, jwtSigningKey, "PT5S", null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
@@ -197,11 +197,11 @@ class ExchangeTokenServiceTest {
         TestSecurityContextHolder.setAuthentication(authentication);
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
-                .thenReturn(Optional.of(Jwts.claims()
+                .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
                         .setIssuedAt(iat)
-                        .setExpiration(exp)));
+                        .setExpiration(exp));
         InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
         Mockito.when(institutionServiceMock.getInstitution(Mockito.any()))
