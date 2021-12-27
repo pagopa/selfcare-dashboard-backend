@@ -5,7 +5,7 @@
 trigger:
   branches:
     include:
-      - master
+      - main
       - release-*
   paths:
     include:
@@ -32,7 +32,7 @@ variables:
   deployNamespace: '$(DEPLOY_NAMESPACE)'
   settingsXmlROsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
 
-  isToDeploy: $[and(ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')))]
+  isToDeploy: $[and(ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')))]
 
   ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release-dev') }}:
     environment: 'DEV'
@@ -52,7 +52,7 @@ variables:
     selfHostedAgentPool: $(UAT_AGENT_POOL)
     mavenGoals: 'package'
     settingsXmlsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
-  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'),eq(variables['Build.SourceBranch'], 'refs/heads/release-prod')) }}:
+  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),eq(variables['Build.SourceBranch'], 'refs/heads/release-prod')) }}:
     environment: 'PROD'
     dockerRegistryServiceConnection: '$(PROD_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
