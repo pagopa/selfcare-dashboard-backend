@@ -1,0 +1,46 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/onboarding/info",
+    "queryParameters": {
+      "institutionId": {
+        "equalTo": "institutionId1"
+      }
+    }
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "person": {
+        "name": "string",
+        "surname": "string",
+        "taxCode": "string"
+      },
+      "institutions": [
+        {
+          "institutionId": "string",
+          "description": "string",
+          "taxCode": "string",
+          "digitalAddress": "string",
+          "state": "PENDING",
+          "role": "MANAGER",
+          "productInfo": {
+            "id": "string",
+            "role": "string",
+            "createdAt": "2021-11-29T15:18:04.026Z"
+          },
+          "attributes": [
+            {
+              "id": "string",
+              "name": "string",
+              "description": "string"
+            }
+          ]
+        }
+      ]
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
