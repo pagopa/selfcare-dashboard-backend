@@ -14,11 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
-            <artifactId>selc-commons-integration-rest</artifactId>
+            <artifactId>selc-commons-connector-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
-            <artifactId>selc-commons-integration-rest</artifactId>
+            <artifactId>selc-commons-connector-rest</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

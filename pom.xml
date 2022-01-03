@@ -65,12 +65,12 @@
             </dependency>
             <dependency>
                 <groupId>it.pagopa.selfcare</groupId>
-                <artifactId>selc-commons-integration-rest</artifactId>
+                <artifactId>selc-commons-connector-rest</artifactId>
                 <version>${selc-commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>it.pagopa.selfcare</groupId>
-                <artifactId>selc-commons-integration-rest</artifactId>
+                <artifactId>selc-commons-connector-rest</artifactId>
                 <version>${selc-commons.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
