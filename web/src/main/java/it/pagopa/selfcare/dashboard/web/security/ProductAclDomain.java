@@ -1,10 +1,12 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
+@ToString
 public class ProductAclDomain {
 
     private final String institutionId;

@@ -219,7 +219,7 @@ class InstitutionServiceImplTest {
             Assertions.assertEquals(expectedActiveProducts.contains(product.getId()), product.isActive());
             Assertions.assertEquals(expectedAuthorizedProducts.contains(product.getId()), product.isAuthorized());
             if (selfCareGrantedAuthority.getRoleOnProducts().containsKey(product.getId())) {
-                Assertions.assertEquals(selfCareGrantedAuthority.getRoleOnProducts().get(product.getId()).getSelfCareAuthority().name(), product.getUserRole());
+                Assertions.assertEquals(selfCareGrantedAuthority.getRoleOnProducts().get(product.getId()).getAuthority(), product.getUserRole());
             } else {
                 Assertions.assertNull(product.getUserRole());
             }
