@@ -13,6 +13,10 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingIn
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -28,9 +32,11 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
+@Slf4j
 @Service
 class PartyConnectorImpl implements PartyConnector {
 
+    static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class);
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -45,7 +51,23 @@ class PartyConnectorImpl implements PartyConnector {
         }
         return institutionInfo;
     };
-    static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class);
+    private static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setRelationshipId(relationshipInfo.getId());
+        userInfo.setId(relationshipInfo.getFrom());
+        userInfo.setName(relationshipInfo.getName());
+        userInfo.setSurname(relationshipInfo.getSurname());
+        userInfo.setEmail(relationshipInfo.getEmail());
+        userInfo.setStatus(relationshipInfo.getState().toString());
+        userInfo.setRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
+        it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
+                = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
+        productInfo.setId(relationshipInfo.getProduct().getId());
+        ArrayList<it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new ArrayList<>();
+        products.add(productInfo);
+        userInfo.setProducts(products);
+        return userInfo;
+    };
 
     static {
         PARTY_ROLE_AUTHORITY_MAP.put(MANAGER, ADMIN);
@@ -65,22 +87,31 @@ class PartyConnectorImpl implements PartyConnector {
 
     @Override
     public InstitutionInfo getInstitution(String institutionId) {
+        log.trace("PartyConnectorImpl.getInstitution start");
+        log.debug("institutionId = {}", institutionId);
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
-
-        return parseOnBoardingInfo(onBoardingInfo).stream()
+        InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
+        log.debug("result = {}", result);
+        log.trace("PartyConnectorImpl.getInstitution end");
+        return result;
     }
 
 
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
+        log.trace("PartyConnectorImpl.getInstitutions start");
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
-
-        return parseOnBoardingInfo(onBoardingInfo);
+        Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
+        log.debug("result = {}", result);
+        log.trace("PartyConnectorImpl.getInstitutions end");
+        return result;
     }
 
 
     private Collection<InstitutionInfo> parseOnBoardingInfo(OnBoardingInfo onBoardingInfo) {
+        log.trace("PartyConnectorImpl.parseOnBoardingInfo start");
+        log.debug("onBoardingInfo = {}", onBoardingInfo);
         Collection<InstitutionInfo> institutions = Collections.emptyList();
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             institutions = onBoardingInfo.getInstitutions().stream()
@@ -90,12 +121,16 @@ class PartyConnectorImpl implements PartyConnector {
                             Map::values
                     ));
         }
+        log.debug("result = {}", institutions);
+        log.trace("PartyConnectorImpl.parseOnBoardingInfo end");
         return institutions;
     }
 
 
     @Override
     public List<String> getInstitutionProducts(String institutionId) {//TODO: return also activationDate
+        log.trace("PartyConnectorImpl.getInstitutionProducts start");
+        log.debug("institutionId = {}", institutionId);
         List<String> products = Collections.emptyList();
         Products institutionProducts = restClient.getInstitutionProducts(institutionId);
         if (institutionProducts != null && institutionProducts.getProducts() != null) {
@@ -103,58 +138,49 @@ class PartyConnectorImpl implements PartyConnector {
                     .map(ProductInfo::getId)
                     .collect(Collectors.toList());
         }
-
+        log.debug("result = {}", products);
+        log.trace("PartyConnectorImpl.getInstitutionProducts end");
         return products;
     }
 
 
     @Override
     public Collection<AuthInfo> getAuthInfo(String institutionId) {
+        log.trace("PartyConnectorImpl.getAuthInfo start");
+        log.debug("institutionId = {}", institutionId);
         Collection<AuthInfo> authInfos = Collections.emptyList();
-
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             authInfos = onBoardingInfo.getInstitutions().stream()
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
                     .collect(Collectors.collectingAndThen(
                             Collectors.groupingBy(OnboardingData::getInstitutionId,
-                                    Collectors.mapping(onboardingData -> new ProductRole() {
-                                        @Override
-                                        public SelfCareAuthority getSelfCareRole() {
-                                            return PARTY_ROLE_AUTHORITY_MAP.get(onboardingData.getRole());
-                                        }
-
-                                        @Override
-                                        public String getProductRole() {
-                                            return onboardingData.getProductInfo().getRole();
-                                        }
-
-                                        @Override
-                                        public String getProductId() {
-                                            return onboardingData.getProductInfo().getId();
-                                        }
+                                    Collectors.mapping(onboardingData -> {
+                                        PartyProductRole productRole = new PartyProductRole();
+                                        productRole.setProductId(onboardingData.getProductInfo().getId());
+                                        productRole.setProductRole(onboardingData.getProductInfo().getRole());
+                                        productRole.setSelfCareRole(PARTY_ROLE_AUTHORITY_MAP.get(onboardingData.getRole()));
+                                        return productRole;
                                     }, Collectors.toList())),
                             map -> map.entrySet().stream()
-                                    .map(entry -> new AuthInfo() {
-                                        @Override
-                                        public String getInstitutionId() {
-                                            return entry.getKey();
-                                        }
-
-                                        @Override
-                                        public Collection<ProductRole> getProductRoles() {
-                                            return Collections.unmodifiableCollection(entry.getValue());
-                                        }
+                                    .map(entry -> {
+                                        PartyAuthInfo authInfo = new PartyAuthInfo();
+                                        authInfo.setInstitutionId(entry.getKey());
+                                        authInfo.setProductRoles(Collections.unmodifiableCollection(entry.getValue()));
+                                        return authInfo;
                                     }).collect(Collectors.toList())
                     ));
         }
-
+        log.debug("result = {}", authInfos);
+        log.trace("PartyConnectorImpl.getAuthInfo end");
         return authInfos;
     }
 
 
     @Override
     public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId) {
+        log.trace("PartyConnectorImpl.getUsers start");
+        log.debug("institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
         Assert.hasText(institutionId, "An Institution id is required");
         Assert.notNull(role, "An Optional role object is required");
         Assert.notNull(productId, "An Optional Product id object is required");
@@ -170,35 +196,22 @@ class PartyConnectorImpl implements PartyConnector {
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
-                            relationshipInfo -> {
-                                UserInfo userInfo = new UserInfo();
-                                userInfo.setRelationshipId(relationshipInfo.getId());
-                                userInfo.setId(relationshipInfo.getFrom());
-                                userInfo.setName(relationshipInfo.getName());
-                                userInfo.setSurname(relationshipInfo.getSurname());
-                                userInfo.setEmail(relationshipInfo.getEmail());
-                                userInfo.setStatus(relationshipInfo.getState().toString());
-                                userInfo.setRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
-                                it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
-                                        = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
-                                productInfo.setId(relationshipInfo.getProduct().getId());
-                                ArrayList<it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new ArrayList<>();
-                                products.add(productInfo);
-                                userInfo.setProducts(products);
-                                return userInfo;
-                            },
+                            RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION,
                             (userInfo1, userInfo2) -> {
                                 userInfo1.getProducts().addAll(userInfo2.getProducts());
                                 return userInfo1;
                             })).values();
         }
-
+        log.debug("result = {}", userInfos);
+        log.trace("PartyConnectorImpl.getUsers end");
         return userInfos;
     }
 
 
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
+        log.trace("PartyConnectorImpl.createUsers start");
+        log.debug("institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
         Assert.hasText(institutionId, "An Institution id is required");
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");
@@ -225,22 +238,45 @@ class PartyConnectorImpl implements PartyConnector {
             default:
                 throw new IllegalArgumentException("Invalid Party role");
         }
+
+        log.trace("PartyConnectorImpl.createUsers end");
     }
 
 
     @Override
     public void suspend(String relationshipId) {
+        log.trace("PartyConnectorImpl.suspend start");
+        log.debug("relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, "A Relationship id is required");
-
         restClient.suspendRelationship(relationshipId);
+        log.trace("PartyConnectorImpl.suspend end");
     }
 
 
     @Override
     public void activate(String relationshipId) {
+        log.trace("PartyConnectorImpl.activate start");
+        log.debug("relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, "A Relationship id is required");
-
         restClient.activateRelationship(relationshipId);
+        log.trace("PartyConnectorImpl.activate end");
+    }
+
+
+    @Getter
+    @Setter(AccessLevel.PRIVATE)
+    private static class PartyProductRole implements ProductRole {
+        private SelfCareAuthority selfCareRole;
+        private String productRole;
+        private String productId;
+    }
+
+
+    @Getter
+    @Setter(AccessLevel.PRIVATE)
+    private static class PartyAuthInfo implements AuthInfo {
+        private String institutionId;
+        private Collection<ProductRole> productRoles;
     }
 
 }

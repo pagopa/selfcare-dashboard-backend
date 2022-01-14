@@ -119,6 +119,27 @@ class ExchangeTokenServiceTest {
 
 
     @Test
+    void exchange_SelfCareAuthOnDifferentInstId() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, jwtSigningKey, "PT5S", null);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("institutionId2", roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        // when
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
+        Mockito.verifyNoInteractions(jwtServiceMock);
+    }
+
+
+    @Test
     void exchange_noSessionTokenClaims() throws Exception {
         // given
         String institutionId = "institutionId";
