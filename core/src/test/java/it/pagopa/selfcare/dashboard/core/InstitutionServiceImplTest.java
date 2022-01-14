@@ -105,6 +105,30 @@ class InstitutionServiceImplTest {
 
 
     @Test
+    void getInstitutionProducts_GrantedAuthorityOnDifferentInstId() {
+        //given
+        String institutionId = "institutionId";
+        Product product = TestUtils.mockInstance(new Product());
+        List<Product> productList = List.of(product);
+        Mockito.when(productsConnectorMock.getProducts())
+                .thenReturn(productList);
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(LIMITED, "productRole", "productId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId2", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        //when
+        List<Product> products = institutionService.getInstitutionProducts(institutionId);
+        //then
+        Assertions.assertNotNull(products);
+        Assertions.assertIterableEquals(productList, products);
+        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
+        Mockito.verifyNoMoreInteractions(productsConnectorMock);
+        Mockito.verifyNoInteractions(partyConnectorMock);
+    }
+
+
+    @Test
     void getInstitutionProducts_limitedWithEmptyInstProducts() {
         //given
         String institutionId = "institutionId";
