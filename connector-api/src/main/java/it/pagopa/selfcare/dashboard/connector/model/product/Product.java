@@ -19,4 +19,5 @@ public class Product {
     private boolean active;
     private boolean authorized;
     private String userRole;
+    private String state;
 }

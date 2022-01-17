@@ -50,4 +50,8 @@ public class ProductsResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
     private String userRole;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.state}", required = true)
+    @JsonProperty(required = true)
+    private String producState;
 }

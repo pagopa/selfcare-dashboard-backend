@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.api;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 
@@ -16,7 +17,7 @@ public interface PartyConnector {
 
     Collection<InstitutionInfo> getInstitutions();
 
-    List<String> getInstitutionProducts(String institutionId);
+    List<PartyProduct> getInstitutionProducts(String institutionId);
 
     Collection<AuthInfo> getAuthInfo(String institutionId);
 

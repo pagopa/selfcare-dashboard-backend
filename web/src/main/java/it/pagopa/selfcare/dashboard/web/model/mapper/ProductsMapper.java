@@ -19,6 +19,7 @@ public class ProductsMapper {
             resource.setActive(model.isActive());
             resource.setAuthorized(model.isAuthorized());
             resource.setUserRole(model.getUserRole());
+            resource.setProducState(model.getState());
         }
 
         return resource;
