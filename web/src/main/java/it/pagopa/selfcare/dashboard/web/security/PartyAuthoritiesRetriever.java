@@ -28,7 +28,7 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
 
     @Override
     public Collection<GrantedAuthority> retrieveAuthorities() {
-        log.trace("PartyAuthoritiesRetriever.retrieveAuthorities");
+        log.trace("PartyAuthoritiesRetriever.retrieveAuthorities start");
         Collection<GrantedAuthority> authorities = null;
 
         Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
@@ -42,6 +42,8 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
                     .collect(Collectors.toList());
         }
 
+        log.debug("retrieved authorities = {}", authorities);
+        log.trace("PartyAuthoritiesRetriever.retrieveAuthorities end");
         return authorities;
     }
 

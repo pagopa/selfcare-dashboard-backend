@@ -62,10 +62,8 @@ public class ExchangeTokenService {
 
 
     public String exchange(String institutionId, String productId, String realm) {
-        if (log.isDebugEnabled()) {
-            log.trace("ExchangeTokenService.exchange");
-            log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
-        }
+        log.trace("ExchangeTokenService.exchange start");
+        log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -73,6 +71,8 @@ public class ExchangeTokenService {
         Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
                 .stream()
                 .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
+                .map(grantedAuthority -> (SelfCareGrantedAuthority) grantedAuthority)
+                .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
                 .findAny();
         SelfCareGrantedAuthority grantedAuthority = (SelfCareGrantedAuthority) selcAuthority
                 .orElseThrow(() -> new IllegalArgumentException("A Self Care Granted SelfCareAuthority is required"));
@@ -93,15 +93,15 @@ public class ExchangeTokenService {
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
 
-        if (log.isDebugEnabled()) {
-            log.debug("Exchanged claims: " + claims.toString());
-        }
-
-        return Jwts.builder()
+        String result = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
+        log.debug("Exchanged claims = {}", claims);
+        log.debug("Exchanged token = {}", result);
+        log.trace("ExchangeTokenService.exchange end");
+        return result;
     }
 
 

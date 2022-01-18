@@ -17,10 +17,8 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if (log.isDebugEnabled()) {
-            log.trace("SelfCarePermissionEvaluator.hasPermission");
-            log.debug("authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
-        }
+        log.trace("SelfCarePermissionEvaluator.hasPermission start");
+        log.debug("authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
         Assert.notNull(authentication, "An authentication is required");
         Assert.notNull(permission, "A permission is required");
 
@@ -38,16 +36,16 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
                     .anyMatch(grantedAuthority -> ANY_PERMISSION.equals(permission) || permission.equals(grantedAuthority.getAuthority()));
         }
 
+        log.debug("hasPermission = {}", result);
+        log.trace("SelfCarePermissionEvaluator.hasPermission end");
         return result;
     }
 
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        if (log.isDebugEnabled()) {
-            log.trace("SelfCarePermissionEvaluator.hasPermission");
-            log.debug("authentication = {}, targetId = {}, targetType = {}, permission = {}", authentication, targetId, targetType, permission);
-        }
+        log.trace("SelfCarePermissionEvaluator.hasPermission start");
+        log.debug("authentication = {}, targetId = {}, targetType = {}, permission = {}", authentication, targetId, targetType, permission);
         Assert.notNull(authentication, "An authentication is required");
         Assert.notNull(targetType, "A targetType is required");
         Assert.notNull(permission, "A permission is required");
@@ -63,6 +61,8 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
                     .anyMatch(grantedAuthority -> ANY_PERMISSION.equals(permission) || permission.equals(grantedAuthority.getAuthority()));
         }
 
+        log.debug("hasPermission = {}", result);
+        log.trace("SelfCarePermissionEvaluator.hasPermission end");
         return result;
     }
 
