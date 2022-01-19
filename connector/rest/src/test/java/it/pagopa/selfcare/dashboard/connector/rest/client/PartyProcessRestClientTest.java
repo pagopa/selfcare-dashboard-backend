@@ -167,8 +167,10 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionProducts_emptyResult() {
+        //given
+        EnumSet<ProductState> states = EnumSet.of(ProductState.ACTIVE, ProductState.PENDING);
         // given and when
-        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.EMPTY_RESULT), null);
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.EMPTY_RESULT), states);
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getProducts());

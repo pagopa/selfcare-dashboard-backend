@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
@@ -28,6 +27,7 @@ public interface PartyProcessRestClient {
 
     @GetMapping(value = "${rest-client.party-process.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @CollectionFormat(feign.CollectionFormat.CSV)
     Products getInstitutionProducts(@PathVariable("institutionId") String institutionId,
                                     @RequestParam(value= "states",required = false)EnumSet<ProductState> states);
 
