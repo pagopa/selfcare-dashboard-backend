@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
@@ -87,17 +88,17 @@ class InstitutionServiceImpl implements InstitutionService {
                     products = products.stream()
                             .filter(product -> institutionsProductsMap.containsKey(product.getId()))
                             .filter(product -> userAuthProducts.containsKey(product.getId()))
-                            .peek(product -> product.setActive(true))
                             .peek(product -> product.setAuthorized(true))
                             .peek(product -> product.setUserRole(LIMITED.name()))
-                            .peek(product -> product.setState(institutionsProductsMap.get(product.getId()).getState()))
+                            .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
                             .collect(Collectors.toList());
 
                 } else {
                     products.forEach(product -> {
                         product.setAuthorized(userAuthProducts.containsKey(product.getId()));
-                        product.setActive(institutionsProductsMap.containsKey(product.getId()));
-                        product.setState(institutionsProductsMap.get(product.getId()).getState());
+                        product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
+                                .map(PartyProduct::getStatus)
+                                .orElse(ProductStatus.INACTIVE));
                         Optional.ofNullable(userAuthProducts.get(product.getId()))
                                 .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null));
                     });

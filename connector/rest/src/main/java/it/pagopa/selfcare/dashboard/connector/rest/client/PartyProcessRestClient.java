@@ -28,8 +28,8 @@ public interface PartyProcessRestClient {
 
     @GetMapping(value = "${rest-client.party-process.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    Products getInstitutionProducts(@RequestParam("institutionId") String institutionId,
-                                    @RequestParam(value= "state",required = false)EnumSet<ProductState> states);
+    Products getInstitutionProducts(@PathVariable("institutionId") String institutionId,
+                                    @RequestParam(value= "states",required = false)EnumSet<ProductState> states);
 
     @GetMapping(value = "${rest-client.party-process.getOnBoardingInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

@@ -3,12 +3,11 @@ package it.pagopa.selfcare.dashboard.connector.rest.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
-@Getter
 @Setter
-public class Products {
+@Getter
+public class Product {
 
-    private List<Product> products;
+    private String id;
+    private ProductState state;
 
 }

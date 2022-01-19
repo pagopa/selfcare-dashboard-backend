@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PartyProduct {
-    private String state;
+    private ProductStatus status;
     private String productId;
 }
