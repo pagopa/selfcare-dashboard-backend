@@ -193,13 +193,13 @@ class InstitutionServiceImplTest {
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(p1, p2, p3, p4));
         PartyProduct pp1 = new PartyProduct();
-        pp1.setProductId(p1.getId());
+        pp1.setId(p1.getId());
         pp1.setStatus(ProductStatus.ACTIVE);
         PartyProduct pp3 = new PartyProduct();
-        pp3.setProductId(p3.getId());
+        pp3.setId(p3.getId());
         pp3.setStatus(ProductStatus.ACTIVE);
         PartyProduct pp4 = new PartyProduct();
-        pp4.setProductId(p4.getId());
+        pp4.setId(p4.getId());
         pp4.setStatus(ProductStatus.PENDING);
         Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
@@ -217,8 +217,8 @@ class InstitutionServiceImplTest {
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(2, products.size());
         HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
-        expectedStatusMap.put(pp3.getProductId(), pp3.getStatus());
-        expectedStatusMap.put(pp4.getProductId(), pp4.getStatus());
+        expectedStatusMap.put(pp3.getId(), pp3.getStatus());
+        expectedStatusMap.put(pp4.getId(), pp4.getStatus());
         products.forEach(product -> {
             Assertions.assertTrue(expectedStatusMap.containsKey(product.getId()));
             Assertions.assertEquals(expectedStatusMap.get(product.getId()), product.getStatus());
@@ -242,13 +242,13 @@ class InstitutionServiceImplTest {
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(p1, p2, p3));
         PartyProduct pp1 = new PartyProduct();
-        pp1.setProductId(p1.getId());
+        pp1.setId(p1.getId());
         pp1.setStatus(ProductStatus.ACTIVE);
         PartyProduct pp3 = new PartyProduct();
-        pp3.setProductId(p3.getId());
+        pp3.setId(p3.getId());
         pp3.setStatus(ProductStatus.ACTIVE);
         PartyProduct pp4 = new PartyProduct();
-        pp4.setProductId(p4.getId());
+        pp4.setId(p4.getId());
         pp4.setStatus(ProductStatus.PENDING);
         Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
@@ -266,10 +266,10 @@ class InstitutionServiceImplTest {
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(3, products.size());
         HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
-        expectedStatusMap.put(pp1.getProductId(), pp1.getStatus());
+        expectedStatusMap.put(pp1.getId(), pp1.getStatus());
         expectedStatusMap.put(p2.getId(), ProductStatus.INACTIVE);
-        expectedStatusMap.put(pp3.getProductId(), pp3.getStatus());
-        expectedStatusMap.put(pp4.getProductId(), pp4.getStatus());
+        expectedStatusMap.put(pp3.getId(), pp3.getStatus());
+        expectedStatusMap.put(pp4.getId(), pp4.getStatus());
         Set<String> expectedAuthorizedProducts = Set.of(p3.getId(), p2.getId());
         products.forEach(product -> {
             Assertions.assertTrue(expectedStatusMap.containsKey(product.getId()));

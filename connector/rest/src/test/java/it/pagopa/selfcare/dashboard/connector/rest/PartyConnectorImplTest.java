@@ -283,7 +283,7 @@ class PartyConnectorImplTest {
         // then
         assertNotNull(institutionProducts);
         assertFalse(institutionProducts.isEmpty());
-        assertEquals(products.getProducts().get(0).getId(), institutionProducts.get(0).getProductId());
+        assertEquals(products.getProducts().get(0).getId(), institutionProducts.get(0).getId());
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getInstitutionProducts(institutionId, EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);

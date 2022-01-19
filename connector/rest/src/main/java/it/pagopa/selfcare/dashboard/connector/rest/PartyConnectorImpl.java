@@ -7,7 +7,6 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
-import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
@@ -73,7 +72,7 @@ class PartyConnectorImpl implements PartyConnector {
     };
     private static final Function<Product, PartyProduct> PRODUCT_INFO_TO_PRODUCT_FUNCTION = productInfo -> {
         PartyProduct product = new PartyProduct();
-        product.setProductId(productInfo.getId());
+        product.setId(productInfo.getId());
         product.setStatus(ProductStatus.valueOf(productInfo.getState().toString()));
         return product;
     };

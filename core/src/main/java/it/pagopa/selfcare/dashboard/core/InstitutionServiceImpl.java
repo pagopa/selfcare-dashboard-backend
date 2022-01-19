@@ -82,7 +82,7 @@ class InstitutionServiceImpl implements InstitutionService {
             if (selcAuthority.isPresent()) {
                 Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
                 Map<String, PartyProduct> institutionsProductsMap = partyConnector.getInstitutionProducts(institutionId).stream()
-                        .collect(Collectors.toMap(PartyProduct::getProductId, Function.identity()));
+                        .collect(Collectors.toMap(PartyProduct::getId, Function.identity()));
 
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
                     products = products.stream()

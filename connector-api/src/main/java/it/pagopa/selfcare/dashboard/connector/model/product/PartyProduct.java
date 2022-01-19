@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class PartyProduct {
     private ProductStatus status;
-    private String productId;
+    private String id;
 }
