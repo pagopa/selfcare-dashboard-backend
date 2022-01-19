@@ -29,7 +29,7 @@ public interface PartyProcessRestClient {
     @ResponseBody
     @CollectionFormat(feign.CollectionFormat.CSV)
     Products getInstitutionProducts(@PathVariable("institutionId") String institutionId,
-                                    @RequestParam(value= "states",required = false)EnumSet<ProductState> states);
+                                    @RequestParam(value = "states", required = false) EnumSet<ProductState> states);
 
     @GetMapping(value = "${rest-client.party-process.getOnBoardingInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
