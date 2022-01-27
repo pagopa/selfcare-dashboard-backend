@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
@@ -223,12 +224,12 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         // when
-        List<String> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId);
+                .getInstitutionProducts(institutionId,EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -237,15 +238,15 @@ class PartyConnectorImplTest {
     void getInstitutionProducts_nullProductsInfo() {
         // given
         String institutionId = "institutionId";
-        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(),Mockito.any()))
                 .thenReturn(new Products());
         // when
-        List<String> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId);
+                .getInstitutionProducts(institutionId,EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -256,15 +257,15 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Products products = new Products();
         products.setProducts(Collections.emptyList());
-        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(), Mockito.any()))
                 .thenReturn(products);
         // when
-        List<String> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId);
+                .getInstitutionProducts(institutionId,EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -274,17 +275,17 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Products products = new Products();
-        products.setProducts(List.of(TestUtils.mockInstance(new ProductInfo())));
-        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any()))
+        products.setProducts(List.of(TestUtils.mockInstance(new Product())));
+        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(),Mockito.any()))
                 .thenReturn(products);
         // when
-        List<String> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertFalse(institutionProducts.isEmpty());
-        assertEquals(products.getProducts().get(0).getId(), institutionProducts.get(0));
+        assertEquals(products.getProducts().get(0).getId(), institutionProducts.get(0).getId());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId);
+                .getInstitutionProducts(institutionId, EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 

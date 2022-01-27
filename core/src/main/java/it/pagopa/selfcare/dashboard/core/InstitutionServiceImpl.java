@@ -6,7 +6,9 @@ import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
@@ -79,21 +81,24 @@ class InstitutionServiceImpl implements InstitutionService {
 
             if (selcAuthority.isPresent()) {
                 Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
-                List<String> institutionsProducts = partyConnector.getInstitutionProducts(institutionId);
+                Map<String, PartyProduct> institutionsProductsMap = partyConnector.getInstitutionProducts(institutionId).stream()
+                        .collect(Collectors.toMap(PartyProduct::getId, Function.identity()));
 
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
                     products = products.stream()
-                            .filter(product -> institutionsProducts.contains(product.getId()))
+                            .filter(product -> institutionsProductsMap.containsKey(product.getId()))
                             .filter(product -> userAuthProducts.containsKey(product.getId()))
-                            .peek(product -> product.setActive(true))
                             .peek(product -> product.setAuthorized(true))
                             .peek(product -> product.setUserRole(LIMITED.name()))
+                            .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
                             .collect(Collectors.toList());
 
                 } else {
                     products.forEach(product -> {
                         product.setAuthorized(userAuthProducts.containsKey(product.getId()));
-                        product.setActive(institutionsProducts.contains(product.getId()));
+                        product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
+                                .map(PartyProduct::getStatus)
+                                .orElse(ProductStatus.INACTIVE));
                         Optional.ofNullable(userAuthProducts.get(product.getId()))
                                 .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null));
                     });

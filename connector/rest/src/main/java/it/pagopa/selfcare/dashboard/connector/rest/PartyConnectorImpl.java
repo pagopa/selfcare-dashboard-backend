@@ -5,6 +5,8 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
@@ -68,6 +70,12 @@ class PartyConnectorImpl implements PartyConnector {
         userInfo.setProducts(products);
         return userInfo;
     };
+    private static final Function<Product, PartyProduct> PRODUCT_INFO_TO_PRODUCT_FUNCTION = productInfo -> {
+        PartyProduct product = new PartyProduct();
+        product.setId(productInfo.getId());
+        product.setStatus(ProductStatus.valueOf(productInfo.getState().toString()));
+        return product;
+    };
 
     static {
         PARTY_ROLE_AUTHORITY_MAP.put(MANAGER, ADMIN);
@@ -128,14 +136,14 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public List<String> getInstitutionProducts(String institutionId) {//TODO: return also activationDate
+    public List<PartyProduct> getInstitutionProducts(String institutionId) {
         log.trace("PartyConnectorImpl.getInstitutionProducts start");
         log.debug("institutionId = {}", institutionId);
-        List<String> products = Collections.emptyList();
-        Products institutionProducts = restClient.getInstitutionProducts(institutionId);
+        List<PartyProduct> products = Collections.emptyList();
+        Products institutionProducts = restClient.getInstitutionProducts(institutionId, EnumSet.of(ProductState.ACTIVE, ProductState.PENDING));
         if (institutionProducts != null && institutionProducts.getProducts() != null) {
             products = institutionProducts.getProducts().stream()
-                    .map(ProductInfo::getId)
+                    .map(PRODUCT_INFO_TO_PRODUCT_FUNCTION)
                     .collect(Collectors.toList());
         }
         log.debug("result = {}", products);

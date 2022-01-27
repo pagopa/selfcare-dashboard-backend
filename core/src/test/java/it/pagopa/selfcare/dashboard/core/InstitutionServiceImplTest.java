@@ -7,7 +7,9 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -173,7 +175,7 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(1, products.size());
-        Assertions.assertFalse(products.get(0).isActive());
+        Assertions.assertEquals(ProductStatus.INACTIVE, products.get(0).getStatus());
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
         Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
@@ -181,32 +183,48 @@ class InstitutionServiceImplTest {
 
 
     @Test
-    void getInstitutionProducts_operatorWithNotEmptyInstProducts() {
+    void getInstitutionProducts_limitedWithNotEmptyInstProducts() {
         //given
         String institutionId = "institutionId";
         Product p1 = TestUtils.mockInstance(new Product(), 1);
         Product p2 = TestUtils.mockInstance(new Product(), 2);
         Product p3 = TestUtils.mockInstance(new Product(), 3);
+        Product p4 = TestUtils.mockInstance(new Product(), 4);
         Mockito.when(productsConnectorMock.getProducts())
-                .thenReturn(List.of(p1, p2, p3));
+                .thenReturn(List.of(p1, p2, p3, p4));
+        PartyProduct pp1 = new PartyProduct();
+        pp1.setId(p1.getId());
+        pp1.setStatus(ProductStatus.ACTIVE);
+        PartyProduct pp3 = new PartyProduct();
+        pp3.setId(p3.getId());
+        pp3.setStatus(ProductStatus.ACTIVE);
+        PartyProduct pp4 = new PartyProduct();
+        pp4.setId(p4.getId());
+        pp4.setStatus(ProductStatus.PENDING);
         Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
-                .thenReturn(List.of(p1.getId(), p3.getId()));
+                .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(LIMITED, "productRole2", p2.getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(LIMITED, "productRole3", p3.getId());
+        ProductGrantedAuthority productGrantedAuthority4 = new ProductGrantedAuthority(LIMITED, "productRole4", p4.getId());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, List.of(productGrantedAuthority2, productGrantedAuthority3))));
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, List.of(productGrantedAuthority2, productGrantedAuthority3, productGrantedAuthority4))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //when
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
         //then
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
-        Assertions.assertEquals(1, products.size());
-        Assertions.assertEquals(p3.getId(), products.get(0).getId());
-        Assertions.assertTrue(products.get(0).isActive());
-        Assertions.assertTrue(products.get(0).isAuthorized());
-        Assertions.assertEquals(LIMITED.name(), products.get(0).getUserRole());
+        Assertions.assertEquals(2, products.size());
+        HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
+        expectedStatusMap.put(pp3.getId(), pp3.getStatus());
+        expectedStatusMap.put(pp4.getId(), pp4.getStatus());
+        products.forEach(product -> {
+            Assertions.assertTrue(expectedStatusMap.containsKey(product.getId()));
+            Assertions.assertEquals(expectedStatusMap.get(product.getId()), product.getStatus());
+            Assertions.assertTrue(product.isAuthorized());
+            Assertions.assertEquals(LIMITED.name(), product.getUserRole());
+        });
         Mockito.verify(productsConnectorMock, Mockito.times(1)).getProducts();
         Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
@@ -220,10 +238,20 @@ class InstitutionServiceImplTest {
         Product p1 = TestUtils.mockInstance(new Product(), 1);
         Product p2 = TestUtils.mockInstance(new Product(), 2);
         Product p3 = TestUtils.mockInstance(new Product(), 3);
+        Product p4 = TestUtils.mockInstance(new Product(), 4);
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(List.of(p1, p2, p3));
+        PartyProduct pp1 = new PartyProduct();
+        pp1.setId(p1.getId());
+        pp1.setStatus(ProductStatus.ACTIVE);
+        PartyProduct pp3 = new PartyProduct();
+        pp3.setId(p3.getId());
+        pp3.setStatus(ProductStatus.ACTIVE);
+        PartyProduct pp4 = new PartyProduct();
+        pp4.setId(p4.getId());
+        pp4.setStatus(ProductStatus.PENDING);
         Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
-                .thenReturn(List.of(p1.getId(), p3.getId()));
+                .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(ADMIN, "productRole2", p2.getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(ADMIN, "productRole3", p3.getId());
         SelfCareGrantedAuthority selfCareGrantedAuthority = new SelfCareGrantedAuthority(institutionId, List.of(productGrantedAuthority2, productGrantedAuthority3));
@@ -237,10 +265,15 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(3, products.size());
-        Set<String> expectedActiveProducts = Set.of(p3.getId(), p1.getId());
+        HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
+        expectedStatusMap.put(pp1.getId(), pp1.getStatus());
+        expectedStatusMap.put(p2.getId(), ProductStatus.INACTIVE);
+        expectedStatusMap.put(pp3.getId(), pp3.getStatus());
+        expectedStatusMap.put(pp4.getId(), pp4.getStatus());
         Set<String> expectedAuthorizedProducts = Set.of(p3.getId(), p2.getId());
         products.forEach(product -> {
-            Assertions.assertEquals(expectedActiveProducts.contains(product.getId()), product.isActive());
+            Assertions.assertTrue(expectedStatusMap.containsKey(product.getId()));
+            Assertions.assertEquals(expectedStatusMap.get(product.getId()), product.getStatus());
             Assertions.assertEquals(expectedAuthorizedProducts.contains(product.getId()), product.isAuthorized());
             if (selfCareGrantedAuthority.getRoleOnProducts().containsKey(product.getId())) {
                 Assertions.assertEquals(selfCareGrantedAuthority.getRoleOnProducts().get(product.getId()).getAuthority(), product.getUserRole());
