@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.Attribute;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
@@ -15,12 +16,15 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingDa
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.*;
 import java.util.function.Function;
@@ -32,7 +36,14 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipStat
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = {
+                PartyConnectorImpl.class,
+                PartyConnectorConfig.class
+        },
+        properties = "USER_STATES_FILTER=ACTIVE,SUSPENDED"
+)
 class PartyConnectorImplTest {
 
     private static final Function<PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> {
@@ -49,10 +60,10 @@ class PartyConnectorImplTest {
         return selfCareRole;
     };
 
-    @InjectMocks
+    @Autowired
     private PartyConnectorImpl partyConnector;
 
-    @Mock
+    @MockBean
     private PartyProcessRestClient restClientMock;
 
     @Captor
@@ -229,7 +240,7 @@ class PartyConnectorImplTest {
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId,EnumSet.allOf(ProductState.class));
+                .getInstitutionProducts(institutionId, EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -238,7 +249,7 @@ class PartyConnectorImplTest {
     void getInstitutionProducts_nullProductsInfo() {
         // given
         String institutionId = "institutionId";
-        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(),Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(), Mockito.any()))
                 .thenReturn(new Products());
         // when
         List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
@@ -246,7 +257,7 @@ class PartyConnectorImplTest {
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId,EnumSet.allOf(ProductState.class));
+                .getInstitutionProducts(institutionId, EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -265,7 +276,7 @@ class PartyConnectorImplTest {
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionProducts(institutionId,EnumSet.allOf(ProductState.class));
+                .getInstitutionProducts(institutionId, EnumSet.allOf(ProductState.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -276,7 +287,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Products products = new Products();
         products.setProducts(List.of(TestUtils.mockInstance(new Product())));
-        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(),Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionProducts(Mockito.any(), Mockito.any()))
                 .thenReturn(products);
         // when
         List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
@@ -471,7 +482,7 @@ class PartyConnectorImplTest {
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -479,6 +490,8 @@ class PartyConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
+        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock, null);
+
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
@@ -505,7 +518,7 @@ class PartyConnectorImplTest {
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.eq(productId.map(Set::of).get()));
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.eq(productId.map(Set::of).get()));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -529,7 +542,7 @@ class PartyConnectorImplTest {
             }
         }
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.notNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -537,6 +550,87 @@ class PartyConnectorImplTest {
     @Test
     void getUsers() {
         // given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        String id = "id";
+        relationshipInfo1.setFrom(id);
+        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        relationshipInfo2.setFrom(id);
+        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
+        relationshipsResponse.add(relationshipInfo1);
+        relationshipsResponse.add(relationshipInfo2);
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(relationshipsResponse);
+        // when
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        // then
+        Assertions.assertNotNull(userInfos);
+        Assertions.assertEquals(1, userInfos.size());
+        UserInfo userInfo = userInfos.iterator().next();
+        Assertions.assertEquals(id, userInfo.getId());
+        Assertions.assertNotNull(userInfo.getRelationshipId());
+        Assertions.assertNotNull(userInfo.getName());
+        Assertions.assertNotNull(userInfo.getSurname());
+        Assertions.assertNotNull(userInfo.getEmail());
+        Assertions.assertNotNull(userInfo.getStatus());
+        Assertions.assertNotNull(userInfo.getRole());
+        Assertions.assertEquals(2, userInfo.getProducts().size());
+        it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo = userInfo.getProducts().iterator().next();
+        Assertions.assertNotNull(productInfo.getId());
+        Assertions.assertNull(productInfo.getTitle());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    @Test
+    void getUsers_nullAllowedState() {
+        // given
+        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock, null);
+
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        String id = "id";
+        relationshipInfo1.setFrom(id);
+        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        relationshipInfo2.setFrom(id);
+        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
+        relationshipsResponse.add(relationshipInfo1);
+        relationshipsResponse.add(relationshipInfo2);
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(relationshipsResponse);
+        // when
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        // then
+        Assertions.assertNotNull(userInfos);
+        Assertions.assertEquals(1, userInfos.size());
+        UserInfo userInfo = userInfos.iterator().next();
+        Assertions.assertEquals(id, userInfo.getId());
+        Assertions.assertNotNull(userInfo.getRelationshipId());
+        Assertions.assertNotNull(userInfo.getName());
+        Assertions.assertNotNull(userInfo.getSurname());
+        Assertions.assertNotNull(userInfo.getEmail());
+        Assertions.assertNotNull(userInfo.getStatus());
+        Assertions.assertNotNull(userInfo.getRole());
+        Assertions.assertEquals(2, userInfo.getProducts().size());
+        it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo = userInfo.getProducts().iterator().next();
+        Assertions.assertNotNull(productInfo.getId());
+        Assertions.assertNull(productInfo.getTitle());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUsers_emptyAllowedStates() {
+        // given
+        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock, new String[0]);
+
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
