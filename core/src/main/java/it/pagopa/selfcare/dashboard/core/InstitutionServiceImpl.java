@@ -47,9 +47,9 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public InstitutionInfo getInstitution(String institutionId) {
         log.trace("InstitutionServiceImpl.getInstitution start");
-        log.debug("institutionId = {}", institutionId);
+        log.debug("InstitutionServiceImpl.getInstitution institutionId = {}", institutionId);
         InstitutionInfo result = partyConnector.getInstitution(institutionId);
-        log.debug("result = {}", result);
+        log.debug("InstitutionServiceImpl.getInstitution result = {}", result);
         log.trace("InstitutionServiceImpl.getInstitution end");
         return result;
     }
@@ -59,7 +59,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("InstitutionServiceImpl.getInstitutions start");
         Collection<InstitutionInfo> result = partyConnector.getInstitutions();
-        log.debug("result = {}", result);
+        log.debug("InstitutionServiceImpl.getInstitutions result = {}", result);
         log.trace("InstitutionServiceImpl.getInstitutions end");
         return result;
     }
@@ -67,7 +67,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public List<Product> getInstitutionProducts(String institutionId) {
         log.trace("InstitutionServiceImpl.getInstitutionProducts start");
-        log.debug("institutionId = {}", institutionId);
+        log.debug("InstitutionServiceImpl.getInstitutionProducts institutionId = {}", institutionId);
         List<Product> products = productsConnector.getProducts();
 
         if (!products.isEmpty()) {
@@ -75,7 +75,7 @@ class InstitutionServiceImpl implements InstitutionService {
             Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
                     .stream()
                     .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
-                    .map(grantedAuthority -> (SelfCareGrantedAuthority) grantedAuthority)
+                    .map(SelfCareGrantedAuthority.class::cast)
                     .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
                     .findAny();
 
@@ -106,7 +106,7 @@ class InstitutionServiceImpl implements InstitutionService {
             }
         }
 
-        log.debug("result = {}", products);
+        log.debug("InstitutionServiceImpl.getInstitutionProducts result = {}", products);
         log.trace("InstitutionServiceImpl.getInstitutionProducts end");
         return products;
     }
@@ -115,7 +115,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role) {
         log.trace("InstitutionServiceImpl.getInstitutionUsers start");
-        log.debug("institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+        log.debug("InstitutionServiceImpl.getInstitutionUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(productId, "An Optional Product id object is required");
         Assert.notNull(role, "An Optional role object is required");
@@ -127,7 +127,7 @@ class InstitutionServiceImpl implements InstitutionService {
                 userInfo.getProducts().forEach(productInfo ->
                         productInfo.setTitle(idToProductMap.get(productInfo.getId()).getTitle())));
 
-        log.debug("result = {}", userInfos);
+        log.debug("InstitutionServiceImpl.getInstitutionUsers result = {}", userInfos);
         log.trace("InstitutionServiceImpl.getInstitutionUsers end");
         return userInfos;
     }
@@ -136,14 +136,14 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role) {
         log.trace("InstitutionServiceImpl.getInstitutionProductUsers start");
-        log.debug("institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+        log.debug("InstitutionServiceImpl.getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(role, "An Optional role object is required");
 
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, role, Optional.of(productId));
 
-        log.debug("result = {}", result);
+        log.debug("InstitutionServiceImpl.getInstitutionProductUsers result = {}", result);
         log.trace("InstitutionServiceImpl.getInstitutionProductUsers end");
         return result;
     }
@@ -152,7 +152,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto user) {
         log.trace("InstitutionServiceImpl.createUsers start");
-        log.debug("institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+        log.debug("InstitutionServiceImpl.createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
