@@ -215,6 +215,15 @@ class PartyConnectorImpl implements PartyConnector {
                             RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION,
                             (userInfo1, userInfo2) -> {
                                 userInfo1.getProducts().addAll(userInfo2.getProducts());
+                                if (userInfo1.getStatus().equals(userInfo2.getStatus())) {
+                                    if (userInfo1.getRole().compareTo(userInfo2.getRole()) > 0) {
+                                        userInfo1 = userInfo2;
+                                    }
+                                } else {
+                                    if (userInfo2.getStatus().equals("ACTIVE")) {
+                                        userInfo1 = userInfo2;
+                                    }
+                                }
                                 return userInfo1;
                             })).values();
         }
