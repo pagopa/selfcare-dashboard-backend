@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -85,11 +86,18 @@ class PartyConnectorImpl implements PartyConnector {
     }
 
     private final PartyProcessRestClient restClient;
+    private final EnumSet<RelationshipState> allowedStates;
 
 
     @Autowired
-    public PartyConnectorImpl(PartyProcessRestClient restClient) {
+    public PartyConnectorImpl(PartyProcessRestClient restClient,
+                              @Value("${dashboard.partyConnector.getUsers.filter.states}") String[] allowedStates) {
         this.restClient = restClient;
+        this.allowedStates = allowedStates == null || allowedStates.length == 0
+                ? null
+                : EnumSet.copyOf(Arrays.stream(allowedStates)
+                .map(RelationshipState::valueOf)
+                .collect(Collectors.toList()));
     }
 
 
@@ -200,7 +208,7 @@ class PartyConnectorImpl implements PartyConnector {
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
-        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, null, productId.map(Set::of).orElse(null));
+        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, allowedStates, productId.map(Set::of).orElse(null));
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
@@ -233,7 +241,7 @@ class PartyConnectorImpl implements PartyConnector {
         user.setTaxCode(createUserDto.getTaxCode());
         user.setEmail(createUserDto.getEmail());
         user.setProductRole(createUserDto.getProductRole());
-        user.setRole(valueOf(createUserDto.getPartyRole()));
+        user.setRole(PartyRole.valueOf(createUserDto.getPartyRole()));
         onboardingRequest.setUsers(List.of(user));
 
         switch (user.getRole()) {
