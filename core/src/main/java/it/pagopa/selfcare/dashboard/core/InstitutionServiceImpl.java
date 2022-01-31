@@ -50,7 +50,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug("institutionId = {}", institutionId);
         InstitutionInfo result = partyConnector.getInstitution(institutionId);
         log.debug("result = {}", result);
-        log.trace("InstitutionServiceImpl.getInstitution start");
+        log.trace("InstitutionServiceImpl.getInstitution end");
         return result;
     }
 

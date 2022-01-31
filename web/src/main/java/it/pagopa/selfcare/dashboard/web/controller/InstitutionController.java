@@ -106,7 +106,7 @@ public class InstitutionController {
                                                              @RequestParam(value = "role", required = false)
                                                                      Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionProductUsers");
+            log.trace("InstitutionController.getInstitutionUsers");
             log.debug("institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
         }
         Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
