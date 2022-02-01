@@ -41,7 +41,7 @@ public class TokenController {
                                           @RequestParam("realm")
                                                   String realm) {
         if (log.isDebugEnabled()) {
-            log.trace("TokenController.exchange");
+            log.trace("exchange");
             log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         }
         String token = exchangeTokenService.exchange(institutionId, productId, realm);

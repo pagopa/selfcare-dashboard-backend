@@ -54,7 +54,7 @@ public class InstitutionController {
                                       @ApiParam("${swagger.dashboard.institutions.model.logo}")
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.saveInstitutionLogo");
+            log.trace("saveInstitutionLogo");
             log.debug("institutionId = {}, logo = {}", institutionId, logo);
         }
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
@@ -67,7 +67,7 @@ public class InstitutionController {
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
     public List<InstitutionResource> getInstitutions() {
         if (log.isTraceEnabled()) {
-            log.trace("InstitutionController.getInstitutions");
+            log.trace("getInstitutions");
         }
         Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
         return institutions.stream()
@@ -84,7 +84,7 @@ public class InstitutionController {
                                               @PathVariable("institutionId")
                                                       String institutionId) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitution");
+            log.trace("getInstitution");
             log.debug("institutionId = {}", institutionId);
         }
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
@@ -106,7 +106,7 @@ public class InstitutionController {
                                                              @RequestParam(value = "role", required = false)
                                                                      Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionUsers");
+            log.trace("getInstitutionUsers");
             log.debug("institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
         }
         Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
@@ -124,7 +124,7 @@ public class InstitutionController {
                                                          @PathVariable("institutionId")
                                                                  String institutionId) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionProducts");
+            log.trace("getInstitutionProducts");
             log.debug("institutionId = {}", institutionId);
         }
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
@@ -148,7 +148,7 @@ public class InstitutionController {
                                                                 @RequestParam(value = "role", required = false)
                                                                         Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.getInstitutionProductUsers");
+            log.trace("getInstitutionProductUsers");
             log.debug("institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         }
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role);
@@ -173,7 +173,7 @@ public class InstitutionController {
                                              @Valid
                                                      CreateUserDto user) {
         if (log.isDebugEnabled()) {
-            log.trace("InstitutionController.createInstitutionProductUser");
+            log.trace("createInstitutionProductUser");
             log.debug("institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         }
 

@@ -32,7 +32,7 @@ public class RelationshipController {
                                     @PathVariable("relationshipId")
                                             String relationshipId) {
         if (log.isDebugEnabled()) {
-            log.trace("RelationshipController.suspendUser");
+            log.trace("suspendUser");
             log.debug("relationshipId = {}", relationshipId);
         }
 
@@ -47,7 +47,7 @@ public class RelationshipController {
                                      @PathVariable("relationshipId")
                                              String relationshipId) {
         if (log.isDebugEnabled()) {
-            log.trace("RelationshipController.activateUser");
+            log.trace("activateUser");
             log.debug("relationshipId = {}", relationshipId);
         }
 

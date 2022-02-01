@@ -34,7 +34,7 @@ public class ProductController {
                                               @PathVariable("productId")
                                                       String productId) {
         if (log.isDebugEnabled()) {
-            log.trace("ProductController.getProductRoles");
+            log.trace("getProductRoles");
             log.debug("productId = {}", productId);
         }
 
