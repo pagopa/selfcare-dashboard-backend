@@ -46,28 +46,28 @@ class InstitutionServiceImpl implements InstitutionService {
 
     @Override
     public InstitutionInfo getInstitution(String institutionId) {
-        log.trace("InstitutionServiceImpl.getInstitution start");
-        log.debug("InstitutionServiceImpl.getInstitution institutionId = {}", institutionId);
+        log.trace("getInstitution start");
+        log.debug("getInstitution institutionId = {}", institutionId);
         InstitutionInfo result = partyConnector.getInstitution(institutionId);
-        log.debug("InstitutionServiceImpl.getInstitution result = {}", result);
-        log.trace("InstitutionServiceImpl.getInstitution end");
+        log.debug("getInstitution result = {}", result);
+        log.trace("getInstitution end");
         return result;
     }
 
 
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
-        log.trace("InstitutionServiceImpl.getInstitutions start");
+        log.trace("getInstitutions start");
         Collection<InstitutionInfo> result = partyConnector.getInstitutions();
-        log.debug("InstitutionServiceImpl.getInstitutions result = {}", result);
-        log.trace("InstitutionServiceImpl.getInstitutions end");
+        log.debug("getInstitutions result = {}", result);
+        log.trace("getInstitutions end");
         return result;
     }
 
     @Override
     public List<Product> getInstitutionProducts(String institutionId) {
-        log.trace("InstitutionServiceImpl.getInstitutionProducts start");
-        log.debug("InstitutionServiceImpl.getInstitutionProducts institutionId = {}", institutionId);
+        log.trace("getInstitutionProducts start");
+        log.debug("getInstitutionProducts institutionId = {}", institutionId);
         List<Product> products = productsConnector.getProducts();
 
         if (!products.isEmpty()) {
@@ -106,16 +106,16 @@ class InstitutionServiceImpl implements InstitutionService {
             }
         }
 
-        log.debug("InstitutionServiceImpl.getInstitutionProducts result = {}", products);
-        log.trace("InstitutionServiceImpl.getInstitutionProducts end");
+        log.debug("getInstitutionProducts result = {}", products);
+        log.trace("getInstitutionProducts end");
         return products;
     }
 
 
     @Override
     public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role) {
-        log.trace("InstitutionServiceImpl.getInstitutionUsers start");
-        log.debug("InstitutionServiceImpl.getInstitutionUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+        log.trace("getInstitutionUsers start");
+        log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(productId, "An Optional Product id object is required");
         Assert.notNull(role, "An Optional role object is required");
@@ -127,32 +127,32 @@ class InstitutionServiceImpl implements InstitutionService {
                 userInfo.getProducts().forEach(productInfo ->
                         productInfo.setTitle(idToProductMap.get(productInfo.getId()).getTitle())));
 
-        log.debug("InstitutionServiceImpl.getInstitutionUsers result = {}", userInfos);
-        log.trace("InstitutionServiceImpl.getInstitutionUsers end");
+        log.debug("getInstitutionUsers result = {}", userInfos);
+        log.trace("getInstitutionUsers end");
         return userInfos;
     }
 
 
     @Override
     public Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role) {
-        log.trace("InstitutionServiceImpl.getInstitutionProductUsers start");
-        log.debug("InstitutionServiceImpl.getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+        log.trace("getInstitutionProductUsers start");
+        log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(role, "An Optional role object is required");
 
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, role, Optional.of(productId));
 
-        log.debug("InstitutionServiceImpl.getInstitutionProductUsers result = {}", result);
-        log.trace("InstitutionServiceImpl.getInstitutionProductUsers end");
+        log.debug("getInstitutionProductUsers result = {}", result);
+        log.trace("getInstitutionProductUsers end");
         return result;
     }
 
 
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto user) {
-        log.trace("InstitutionServiceImpl.createUsers start");
-        log.debug("InstitutionServiceImpl.createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+        log.trace("createUsers start");
+        log.debug("createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
@@ -168,6 +168,6 @@ class InstitutionServiceImpl implements InstitutionService {
 
         partyConnector.createUsers(institutionId, productId, user);
 
-        log.trace("InstitutionServiceImpl.createUsers end");
+        log.trace("createUsers end");
     }
 }
