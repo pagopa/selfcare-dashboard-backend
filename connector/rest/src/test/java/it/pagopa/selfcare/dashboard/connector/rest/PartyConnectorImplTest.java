@@ -665,9 +665,8 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SelfCareAuthority.class)
-    void getUsers_higherRoleForActiveUsers(SelfCareAuthority selfCareAuthority) {
+    @Test
+    void getUsers_higherRoleForActiveUsers() {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
@@ -759,6 +758,38 @@ class PartyConnectorImplTest {
         //Then
         Assertions.assertEquals("user1", userInfo.getName());
         Assertions.assertEquals(LIMITED, userInfo.getRole());
+        Assertions.assertEquals("ACTIVE", userInfo.getStatus());
+        Assertions.assertEquals(1, userInfos.size());
+    }
+
+    @Test
+    void getUsers_activeRoleUserDifferentStatus2() {
+        //given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        String id = "id";
+        relationshipInfo1.setFrom(id);
+        relationshipInfo1.setName("user1");
+        relationshipInfo1.setRole(PartyRole.OPERATOR);
+        relationshipInfo1.setState(PENDING);
+        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        relationshipInfo2.setFrom(id);
+        relationshipInfo2.setName("user2");
+        relationshipInfo2.setRole(PartyRole.DELEGATE);
+        relationshipInfo2.setState(ACTIVE);
+        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
+        relationshipsResponse.add(relationshipInfo1);
+        relationshipsResponse.add(relationshipInfo2);
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(relationshipsResponse);
+        //when
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        UserInfo userInfo = userInfos.iterator().next();
+        //Then
+        Assertions.assertEquals("user2", userInfo.getName());
+        Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());
     }
