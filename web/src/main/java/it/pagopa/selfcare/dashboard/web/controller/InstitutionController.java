@@ -55,7 +55,7 @@ public class InstitutionController {
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
         if (log.isDebugEnabled()) {
             log.trace("saveInstitutionLogo");
-            log.debug("institutionId = {}, logo = {}", institutionId, logo);
+            log.debug("saveInstitutionLogo institutionId = {}, logo = {}", institutionId, logo);
         }
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         return null;
@@ -85,7 +85,7 @@ public class InstitutionController {
                                                       String institutionId) {
         if (log.isDebugEnabled()) {
             log.trace("getInstitution");
-            log.debug("institutionId = {}", institutionId);
+            log.debug("getInstitution institutionId = {}", institutionId);
         }
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         return InstitutionMapper.toResource(institutionInfo);
@@ -107,7 +107,7 @@ public class InstitutionController {
                                                                      Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
             log.trace("getInstitutionUsers");
-            log.debug("institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
+            log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
         }
         Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
         return userInfos.stream()
@@ -125,7 +125,7 @@ public class InstitutionController {
                                                                  String institutionId) {
         if (log.isDebugEnabled()) {
             log.trace("getInstitutionProducts");
-            log.debug("institutionId = {}", institutionId);
+            log.debug("getInstitutionProducts institutionId = {}", institutionId);
         }
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
         return products.stream()
@@ -149,7 +149,7 @@ public class InstitutionController {
                                                                         Optional<SelfCareAuthority> role) {
         if (log.isDebugEnabled()) {
             log.trace("getInstitutionProductUsers");
-            log.debug("institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+            log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
         }
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role);
         return userInfos.stream()
@@ -174,7 +174,7 @@ public class InstitutionController {
                                                      CreateUserDto user) {
         if (log.isDebugEnabled()) {
             log.trace("createInstitutionProductUser");
-            log.debug("institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+            log.debug("createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         }
 
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));

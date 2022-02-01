@@ -42,7 +42,7 @@ public class TokenController {
                                                   String realm) {
         if (log.isDebugEnabled()) {
             log.trace("exchange");
-            log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+            log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         }
         String token = exchangeTokenService.exchange(institutionId, productId, realm);
         IdentityTokenResource identityToken = new IdentityTokenResource();

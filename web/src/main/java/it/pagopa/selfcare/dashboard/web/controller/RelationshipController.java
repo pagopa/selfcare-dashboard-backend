@@ -33,7 +33,7 @@ public class RelationshipController {
                                             String relationshipId) {
         if (log.isDebugEnabled()) {
             log.trace("suspendUser");
-            log.debug("relationshipId = {}", relationshipId);
+            log.debug("suspendUser relationshipId = {}", relationshipId);
         }
 
         relationshipService.suspend(relationshipId);
@@ -48,7 +48,7 @@ public class RelationshipController {
                                              String relationshipId) {
         if (log.isDebugEnabled()) {
             log.trace("activateUser");
-            log.debug("relationshipId = {}", relationshipId);
+            log.debug("activateUser relationshipId = {}", relationshipId);
         }
 
         relationshipService.activate(relationshipId);
