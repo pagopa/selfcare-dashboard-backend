@@ -696,9 +696,8 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(1, userInfos.size());
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SelfCareAuthority.class)
-    void getUsers_higherRoleForPendingUsers(SelfCareAuthority selfCareAuthority) {
+    @Test
+    void getUsers_higherRoleForPendingUsers() {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
@@ -729,9 +728,8 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(1, userInfos.size());
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SelfCareAuthority.class)
-    void getUsers_activeRoleUserDifferentStatus(SelfCareAuthority selfCareAuthority) {
+    @Test
+    void getUsers_activeRoleUserDifferentStatus() {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
