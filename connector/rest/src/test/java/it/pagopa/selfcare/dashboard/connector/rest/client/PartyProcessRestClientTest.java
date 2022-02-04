@@ -6,10 +6,7 @@ import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
@@ -148,21 +145,20 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     public void getInstitutionProducts_fullyValued() {
         // given and when
-        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_VALUED));
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_VALUED), null);
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getProducts());
         Assert.assertFalse(response.getProducts().isEmpty());
         Assert.assertNotNull(response.getProducts().get(0).getId());
-        Assert.assertNotNull(response.getProducts().get(0).getRole());
-        Assert.assertNotNull(response.getProducts().get(0).getCreatedAt());
+        Assert.assertNotNull(response.getProducts().get(0).getState());
     }
 
 
     @Test
     public void getInstitutionProducts_fullyNull() {
         // given and when
-        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_NULL));
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_NULL),null);
         // then
         Assert.assertNotNull(response);
         Assert.assertNull(response.getProducts());
@@ -171,8 +167,10 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Test
     public void getInstitutionProducts_emptyResult() {
+        //given
+        EnumSet<ProductState> states = EnumSet.of(ProductState.ACTIVE, ProductState.PENDING);
         // given and when
-        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.EMPTY_RESULT));
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.EMPTY_RESULT), states);
         // then
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getProducts());

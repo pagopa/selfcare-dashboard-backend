@@ -24,7 +24,7 @@ class ProductMapperTest {
         assertEquals(product.getUrlPublic(), resource.getUrlPublic());
         assertEquals(product.getUrlBO(), resource.getUrlBO());
         assertEquals(product.getActivatedAt(), resource.getActivatedAt());
-        assertEquals(product.isActive(), resource.isActive());
+        assertEquals(product.getStatus(), resource.getStatus());
         assertEquals(product.isAuthorized(), resource.isAuthorized());
         assertEquals(product.getUserRole(), resource.getUserRole());
         TestUtils.reflectionEqualsByName(product, resource);

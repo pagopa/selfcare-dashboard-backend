@@ -62,8 +62,8 @@ public class ExchangeTokenService {
 
 
     public String exchange(String institutionId, String productId, String realm) {
-        log.trace("ExchangeTokenService.exchange start");
-        log.debug("institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.trace("exchange start");
+        log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -71,7 +71,7 @@ public class ExchangeTokenService {
         Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
                 .stream()
                 .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
-                .map(grantedAuthority -> (SelfCareGrantedAuthority) grantedAuthority)
+                .map(SelfCareGrantedAuthority.class::cast)
                 .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
                 .findAny();
         SelfCareGrantedAuthority grantedAuthority = (SelfCareGrantedAuthority) selcAuthority
@@ -100,7 +100,7 @@ public class ExchangeTokenService {
                 .compact();
         log.debug("Exchanged claims = {}", claims);
         log.debug("Exchanged token = {}", result);
-        log.trace("ExchangeTokenService.exchange end");
+        log.trace("exchange end");
         return result;
     }
 

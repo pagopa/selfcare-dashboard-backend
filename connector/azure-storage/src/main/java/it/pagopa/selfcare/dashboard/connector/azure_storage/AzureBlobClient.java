@@ -30,8 +30,8 @@ class AzureBlobClient implements FileStorageConnector {
                     @Value("${blobStorage.institutions.logo.containerReference}") String institutionsLogoContainerReference)
             throws URISyntaxException, InvalidKeyException {
         if (log.isDebugEnabled()) {
-            log.trace("AzureBlobClient.AzureBlobClient");
-            log.debug("storageConnectionString = {}, containerReference = {}",
+            log.trace("AzureBlobClient");
+            log.debug("AzureBlobClient storageConnectionString = {}, containerReference = {}",
                     storageConnectionString, institutionsLogoContainerReference);
         }
         final CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
@@ -43,8 +43,8 @@ class AzureBlobClient implements FileStorageConnector {
     @Override
     public void uploadInstitutionLogo(InputStream file, String fileName, String contentType) throws FileUploadException {
         if (log.isDebugEnabled()) {
-            log.trace("AzureBlobClient.uploadInstitutionLogo");
-            log.debug("fileName = {}, contentType = {}", fileName, contentType);
+            log.trace("uploadInstitutionLogo");
+            log.debug("uploadInstitutionLogo fileName = {}, contentType = {}", fileName, contentType);
         }
 
         try {

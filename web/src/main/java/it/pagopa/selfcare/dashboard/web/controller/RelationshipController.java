@@ -32,8 +32,8 @@ public class RelationshipController {
                                     @PathVariable("relationshipId")
                                             String relationshipId) {
         if (log.isDebugEnabled()) {
-            log.trace("RelationshipController.suspendUser");
-            log.debug("relationshipId = {}", relationshipId);
+            log.trace("suspendUser");
+            log.debug("suspendUser relationshipId = {}", relationshipId);
         }
 
         relationshipService.suspend(relationshipId);
@@ -47,8 +47,8 @@ public class RelationshipController {
                                      @PathVariable("relationshipId")
                                              String relationshipId) {
         if (log.isDebugEnabled()) {
-            log.trace("RelationshipController.activateUser");
-            log.debug("relationshipId = {}", relationshipId);
+            log.trace("activateUser");
+            log.debug("activateUser relationshipId = {}", relationshipId);
         }
 
         relationshipService.activate(relationshipId);

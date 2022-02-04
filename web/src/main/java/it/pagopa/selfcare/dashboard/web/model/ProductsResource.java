@@ -2,9 +2,11 @@ package it.pagopa.selfcare.dashboard.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 
 @Data
@@ -40,14 +42,15 @@ public class ProductsResource {
     @ApiModelProperty("${swagger.dashboard.products.model.activatedAt}")
     private OffsetDateTime activatedAt;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.active}", required = true)
-    @JsonProperty(required = true)
-    private boolean active;
-
     @ApiModelProperty(value = "${swagger.dashboard.products.model.authorized}", required = true)
     @JsonProperty(required = true)
     private boolean authorized;
 
     @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
     private String userRole;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}", required = true)
+    @JsonProperty(required = true)
+    @NotNull
+    private ProductStatus status;
 }

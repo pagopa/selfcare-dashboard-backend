@@ -16,7 +16,7 @@ public class Product {
     private String urlPublic;
     private String urlBO;
     private OffsetDateTime activatedAt;
-    private boolean active;
     private boolean authorized;
     private String userRole;
+    private ProductStatus status;
 }
