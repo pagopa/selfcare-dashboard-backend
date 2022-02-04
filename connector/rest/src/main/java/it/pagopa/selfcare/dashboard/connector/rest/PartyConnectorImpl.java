@@ -217,11 +217,12 @@ class PartyConnectorImpl implements PartyConnector {
                                 userInfo1.getProducts().addAll(userInfo2.getProducts());
                                 if (userInfo1.getStatus().equals(userInfo2.getStatus())) {
                                     if (userInfo1.getRole().compareTo(userInfo2.getRole()) > 0) {
-                                        userInfo1 = userInfo2;
+                                        userInfo1.setRole(userInfo2.getRole());
                                     }
                                 } else {
                                     if (userInfo2.getStatus().equals("ACTIVE")) {
-                                        userInfo1 = userInfo2;
+                                        userInfo1.setRole(userInfo2.getRole());
+                                        userInfo1.setStatus(userInfo2.getStatus());
                                     }
                                 }
                                 return userInfo1;
