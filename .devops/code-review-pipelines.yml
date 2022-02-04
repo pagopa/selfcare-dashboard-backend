@@ -58,7 +58,7 @@ steps:
     inputs:
       mavenPomFile: 'pom.xml'
       goals: 'sonar:sonar'
-      options: '-B -Dsonar.coverage.jacoco.xmlReportPaths=$(xmlReportPaths)'
+      options: '-B -s $(settingsxml.secureFilePath) -Dsonar.coverage.jacoco.xmlReportPaths=$(xmlReportPaths)'
       publishJUnitResults: false
       javaHomeOption: 'JDKVersion'
       mavenVersionOption: 'Default'
