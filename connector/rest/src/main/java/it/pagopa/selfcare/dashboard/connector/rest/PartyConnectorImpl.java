@@ -220,7 +220,7 @@ class PartyConnectorImpl implements PartyConnector {
                                         userInfo1.setRole(userInfo2.getRole());
                                     }
                                 } else {
-                                    if (userInfo2.getStatus().equals("ACTIVE")) {
+                                    if ("ACTIVE".equals(userInfo2.getStatus())) {
                                         userInfo1.setRole(userInfo2.getRole());
                                         userInfo1.setStatus(userInfo2.getStatus());
                                     }
