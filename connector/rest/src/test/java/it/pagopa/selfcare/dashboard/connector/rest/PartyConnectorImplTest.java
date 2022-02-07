@@ -1,5 +1,13 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
@@ -25,7 +33,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,6 +56,21 @@ import static org.junit.jupiter.api.Assertions.*;
         properties = "USER_STATES_FILTER=ACTIVE,SUSPENDED"
 )
 class PartyConnectorImplTest {
+
+    private final ObjectMapper mapper;
+
+    public PartyConnectorImplTest() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new Jdk8Module());
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setTimeZone(TimeZone.getDefault());
+    }
 
     private static final Function<PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> {
         SelfCareAuthority selfCareRole;
@@ -666,99 +692,62 @@ class PartyConnectorImplTest {
     }
 
     @Test
-    void getUsers_higherRoleForActiveUsers() {
+    void getUsers_higherRoleForActiveUsers() throws IOException {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
-        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        String id = "id";
-        relationshipInfo1.setFrom(id);
-        relationshipInfo1.setName("user1");
-        relationshipInfo1.setRole(PartyRole.OPERATOR);
-        relationshipInfo1.setState(ACTIVE);
-        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user1");
-        relationshipInfo2.setRole(PartyRole.DELEGATE);
-        relationshipInfo2.setState(ACTIVE);
-        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
-        relationshipsResponse.add(relationshipInfo1);
-        relationshipsResponse.add(relationshipInfo2);
+
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/higher-role-active.json");
+        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
+
         Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
-        UserInfo userInfo = userInfos.iterator().next();
         //Then
+        Assertions.assertEquals(1, userInfos.size());
+        UserInfo userInfo = userInfos.iterator().next();
         Assertions.assertEquals("user1", userInfo.getName());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
-        Assertions.assertEquals(1, userInfos.size());
+        Assertions.assertEquals(2, userInfo.getProducts().size());
     }
 
     @Test
-    void getUser_getProductFromMerge() {
+    void getUser_getProductFromMerge() throws IOException {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
-        String productId1 = "prod-io";
-        ProductInfo productMock1 = TestUtils.mockInstance(new ProductInfo());
-        productMock1.setId(productId1);
-        String productId2 = "prod-pn";
-        ProductInfo productMock2 = TestUtils.mockInstance(new ProductInfo());
-        productMock2.setId(productId2);
-        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        String id = "id";
-        relationshipInfo1.setFrom(id);
-        relationshipInfo1.setName("user1");
-        relationshipInfo1.setRole(PartyRole.DELEGATE);
-        relationshipInfo1.setState(PENDING);
-        relationshipInfo1.setProduct(productMock1);
-        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user1");
-        relationshipInfo2.setRole(PartyRole.OPERATOR);
-        relationshipInfo2.setState(PENDING);
-        relationshipInfo2.setProduct(productMock2);
-        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
-        relationshipsResponse.add(relationshipInfo1);
-        relationshipsResponse.add(relationshipInfo2);
+
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/merge.json");
+        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
+
         Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
-        UserInfo userInfo = userInfos.iterator().next();
         //then
-        Assertions.assertEquals(2, userInfo.getProducts().size());
+        Assertions.assertEquals(1, userInfos.size());
+        UserInfo userInfo = userInfos.iterator().next();
+        Assertions.assertEquals(relationshipsResponse.size(), userInfo.getProducts().size());
         Assertions.assertEquals("user1", userInfo.getName());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("PENDING", userInfo.getStatus());
-        Assertions.assertEquals(1, userInfos.size());
 
     }
 
     @Test
-    void getUsers_higherRoleForPendingUsers() {
+    void getUsers_higherRoleForPendingUsers() throws IOException {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
-        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        String id = "id";
-        relationshipInfo1.setFrom(id);
-        relationshipInfo1.setName("user1");
-        relationshipInfo1.setRole(PartyRole.DELEGATE);
-        relationshipInfo1.setState(PENDING);
-        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user1");
-        relationshipInfo2.setRole(PartyRole.OPERATOR);
-        relationshipInfo2.setState(PENDING);
-        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
-        relationshipsResponse.add(relationshipInfo1);
-        relationshipsResponse.add(relationshipInfo2);
+
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/higher-role-pending.json");
+        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
+
         Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
@@ -772,25 +761,14 @@ class PartyConnectorImplTest {
     }
 
     @Test
-    void getUsers_activeRoleUserDifferentStatus() {
+    void getUsers_activeRoleUserDifferentStatus() throws IOException {
         //given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
-        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        String id = "id";
-        relationshipInfo1.setFrom(id);
-        relationshipInfo1.setName("user1");
-        relationshipInfo1.setRole(PartyRole.OPERATOR);
-        relationshipInfo1.setState(ACTIVE);
-        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user1");
-        relationshipInfo2.setRole(PartyRole.DELEGATE);
-        relationshipInfo2.setState(PENDING);
-        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
-        relationshipsResponse.add(relationshipInfo1);
-        relationshipsResponse.add(relationshipInfo2);
+
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/active-role-different-status.json");
+        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
         Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
@@ -986,4 +964,23 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+    @Test
+    void relationship_info_to_user_info_function() throws IOException {
+        // given
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/relationInfo-to-userInfo.json");
+        RelationshipInfo relationshipInfo = mapper.readValue(stub, RelationshipInfo.class);
+        // when
+        UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
+        // then
+        Assertions.assertEquals(relationshipInfo.getName(), userInfo.getName());
+        Assertions.assertEquals(relationshipInfo.getSurname(), userInfo.getSurname());
+        Assertions.assertEquals(relationshipInfo.getId(), userInfo.getRelationshipId());
+        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
+        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getProducts().get(0).getStatus());
+        Assertions.assertEquals(relationshipInfo.getEmail(), userInfo.getEmail());
+        Assertions.assertEquals(relationshipInfo.getFrom(), userInfo.getId());
+        Assertions.assertEquals(relationshipInfo.getProduct().getId(), userInfo.getProducts().get(0).getId());
+        Assertions.assertEquals(relationshipInfo.getProduct().getRole(), userInfo.getProducts().get(0).getRole());
+
+    }
 }

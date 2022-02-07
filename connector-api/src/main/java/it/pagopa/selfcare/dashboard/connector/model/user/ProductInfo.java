@@ -9,5 +9,7 @@ public class ProductInfo {
 
     private String id;
     private String title;
+    private String status;
+    private String role;
 
 }

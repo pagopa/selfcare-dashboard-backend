@@ -54,7 +54,7 @@ class PartyConnectorImpl implements PartyConnector {
         }
         return institutionInfo;
     };
-    private static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
+    static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
         UserInfo userInfo = new UserInfo();
         userInfo.setRelationshipId(relationshipInfo.getId());
         userInfo.setId(relationshipInfo.getFrom());
@@ -66,6 +66,8 @@ class PartyConnectorImpl implements PartyConnector {
         it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
                 = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
         productInfo.setId(relationshipInfo.getProduct().getId());
+        productInfo.setRole(relationshipInfo.getProduct().getRole());
+        productInfo.setStatus(relationshipInfo.getState().toString());
         ArrayList<it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new ArrayList<>();
         products.add(productInfo);
         userInfo.setProducts(products);
