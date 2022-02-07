@@ -679,7 +679,7 @@ class PartyConnectorImplTest {
         relationshipInfo1.setState(ACTIVE);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user2");
+        relationshipInfo2.setName("user1");
         relationshipInfo2.setRole(PartyRole.DELEGATE);
         relationshipInfo2.setState(ACTIVE);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
@@ -691,9 +691,52 @@ class PartyConnectorImplTest {
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
-        Assertions.assertEquals("user2", userInfo.getName());
+        Assertions.assertEquals("user1", userInfo.getName());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
+        Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());
+    }
+
+    @Test
+    void getUser_getProductFromMerge() {
+        //given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        String productId1 = "prod-io";
+        ProductInfo productMock1 = TestUtils.mockInstance(new ProductInfo());
+        productMock1.setId(productId1);
+        String productId2 = "prod-pn";
+        ProductInfo productMock2 = TestUtils.mockInstance(new ProductInfo());
+        productMock2.setId(productId2);
+        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        String id = "id";
+        relationshipInfo1.setFrom(id);
+        relationshipInfo1.setName("user1");
+        relationshipInfo1.setRole(PartyRole.DELEGATE);
+        relationshipInfo1.setState(PENDING);
+        relationshipInfo1.setProduct(productMock1);
+        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
+        relationshipInfo2.setFrom(id);
+        relationshipInfo2.setName("user1");
+        relationshipInfo2.setRole(PartyRole.OPERATOR);
+        relationshipInfo2.setState(PENDING);
+        relationshipInfo2.setProduct(productMock2);
+        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
+        relationshipsResponse.add(relationshipInfo1);
+        relationshipsResponse.add(relationshipInfo2);
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(relationshipsResponse);
+        //when
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        UserInfo userInfo = userInfos.iterator().next();
+        //then
+        Assertions.assertEquals(2, userInfo.getProducts().size());
+        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertEquals(ADMIN, userInfo.getRole());
+        Assertions.assertEquals("PENDING", userInfo.getStatus());
+        Assertions.assertEquals(1, userInfos.size());
+
     }
 
     @Test
@@ -710,7 +753,7 @@ class PartyConnectorImplTest {
         relationshipInfo1.setState(PENDING);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user2");
+        relationshipInfo2.setName("user1");
         relationshipInfo2.setRole(PartyRole.OPERATOR);
         relationshipInfo2.setState(PENDING);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
@@ -742,7 +785,7 @@ class PartyConnectorImplTest {
         relationshipInfo1.setState(ACTIVE);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user2");
+        relationshipInfo2.setName("user1");
         relationshipInfo2.setRole(PartyRole.DELEGATE);
         relationshipInfo2.setState(PENDING);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
@@ -774,7 +817,7 @@ class PartyConnectorImplTest {
         relationshipInfo1.setState(PENDING);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user2");
+        relationshipInfo2.setName("user1");
         relationshipInfo2.setRole(PartyRole.DELEGATE);
         relationshipInfo2.setState(ACTIVE);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
@@ -786,7 +829,7 @@ class PartyConnectorImplTest {
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
-        Assertions.assertEquals("user2", userInfo.getName());
+        Assertions.assertEquals("user1", userInfo.getName());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());
