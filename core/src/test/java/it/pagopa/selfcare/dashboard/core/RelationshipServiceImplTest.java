@@ -73,4 +73,27 @@ class RelationshipServiceImplTest {
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
+    @Test
+    void delete() {
+        // given
+        String relationshipId = "relationshipId";
+        // when
+        relationshipService.delete(relationshipId);
+        // then
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .delete(relationshipId);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void delete_nullRelationshipId() {
+        // given
+        String relationshipId = null;
+        // when
+        Executable executable = () -> relationshipService.delete(relationshipId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Relationship id is required", e.getMessage());
+        Mockito.verifyNoInteractions(partyConnectorMock);
+    }
 }

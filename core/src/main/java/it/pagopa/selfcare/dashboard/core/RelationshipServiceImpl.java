@@ -32,4 +32,12 @@ class RelationshipServiceImpl implements RelationshipService {
         partyConnector.activate(relationshipId);
     }
 
+    @Override
+    public void delete(String relationshipId) {
+        Assert.hasText(relationshipId, "A Relationship id is required");
+
+        partyConnector.delete(relationshipId);
+    }
+
+
 }

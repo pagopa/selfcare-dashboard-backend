@@ -290,6 +290,15 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("activate end");
     }
 
+    @Override
+    public void delete(String relationshipId) {
+        log.trace("delete start");
+        log.debug("delete relationshipId = {}", relationshipId);
+        Assert.hasText(relationshipId, "A Relationship id is required");
+        restClient.deleteRelationshipById(relationshipId);
+        log.trace("delete end");
+    }
+
 
     @Getter
     @Setter(AccessLevel.PRIVATE)
