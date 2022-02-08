@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 class RelationshipServiceImpl implements RelationshipService {
 
     private final PartyConnector partyConnector;
-
+    private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
 
     @Autowired
     RelationshipServiceImpl(PartyConnector partyConnector) {
@@ -19,7 +19,7 @@ class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void suspend(String relationshipId) {
-        Assert.hasText(relationshipId, "A Relationship id is required");
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
 
         partyConnector.suspend(relationshipId);
     }
@@ -27,14 +27,14 @@ class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void activate(String relationshipId) {
-        Assert.hasText(relationshipId, "A Relationship id is required");
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
 
         partyConnector.activate(relationshipId);
     }
 
     @Override
     public void delete(String relationshipId) {
-        Assert.hasText(relationshipId, "A Relationship id is required");
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
 
         partyConnector.delete(relationshipId);
     }
