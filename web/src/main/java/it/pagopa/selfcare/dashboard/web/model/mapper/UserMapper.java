@@ -1,10 +1,12 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.UserResource;
 
 import java.util.stream.Collectors;
 
@@ -18,6 +20,19 @@ public class UserMapper {
             resource.setTitle(model.getTitle());
         }
 
+        return resource;
+    }
+
+    public static UserResource toUserResource(User model) {
+        UserResource resource = null;
+        if (model != null) {
+            resource = new UserResource();
+            resource.setCertification(model.isCertification());
+            resource.setName(model.getName());
+            resource.setEmail(model.getEmail());
+            resource.setSurname(model.getSurname());
+            resource.setFiscalCode(model.getFiscalCode());
+        }
         return resource;
     }
 

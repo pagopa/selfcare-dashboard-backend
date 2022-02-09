@@ -147,14 +147,18 @@ public class InstitutionController {
                                                                 @ApiParam("${swagger.dashboard.user.model.role}")
                                                                 @RequestParam(value = "role", required = false)
                                                                         Optional<SelfCareAuthority> role) {
-        if (log.isDebugEnabled()) {
-            log.trace("getInstitutionProductUsers");
-            log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
-        }
+
+        log.trace("getInstitutionProductUsers start");
+        log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role);
-        return userInfos.stream()
+        List<ProductUserResource> result = userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .collect(Collectors.toList());
+        log.debug("getInstitutionProductUsers result = {}", result);
+        log.trace("getInstitutionProductUsers end");
+
+        return result;
     }
 
 
@@ -172,12 +176,14 @@ public class InstitutionController {
                                              @RequestBody
                                              @Valid
                                                      CreateUserDto user) {
-        if (log.isDebugEnabled()) {
-            log.trace("createInstitutionProductUser");
-            log.debug("createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
-        }
+
+        log.trace("createInstitutionProductUser start");
+        log.debug("createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+
 
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
+        log.trace("createInstitutionProductUser end");
+
     }
 
 }

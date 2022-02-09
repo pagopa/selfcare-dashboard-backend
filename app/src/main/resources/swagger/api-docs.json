@@ -11,17 +11,25 @@
   } ],
   "tags" : [ {
     "name" : "institutions",
-    "description" : "Institution operations"
-  }, {
-    "name" : "products",
-    "description" : "Products operations"
-  }, {
-    "name" : "relationships",
-    "description" : "Relationships operations"
-  }, {
-    "name" : "token",
-    "description" : "Token operations"
-  } ],
+    "description": "Institution operations"
+  },
+    {
+      "name": "products",
+      "description": "Products operations"
+    },
+    {
+      "name": "relationships",
+      "description": "Relationships operations"
+    },
+    {
+      "name": "token",
+      "description": "Token operations"
+    },
+    {
+      "name": "user",
+      "description": "User Controller"
+    }
+  ],
   "paths" : {
     "/institutions" : {
       "get" : {
@@ -607,15 +615,69 @@
             "description" : "Unauthorized"
           },
           "403" : {
-            "description" : "Forbidden"
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/users/external-id": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "getUserByExternalId",
+        "description": "Retrieve the user for a given internal id ",
+        "operationId": "getUserByExternalIdUsingPOST",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbeddedExternalIdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     }
   },
@@ -638,24 +700,35 @@
             "type" : "string",
             "description" : "Institution's unique identifier (i.e.: IPA code)"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "surname": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "taxCode" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "taxCode": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           }
         }
       },
-      "IdentityTokenResource" : {
-        "title" : "IdentityTokenResource",
-        "required" : [ "token" ],
-        "type" : "object",
-        "properties" : {
-          "token" : {
-            "type" : "string",
-            "description" : "The Identity Token"
+      "EmbeddedExternalIdDto": {
+        "title": "EmbeddedExternalIdDto",
+        "type": "object",
+        "properties": {
+          "externalId": {
+            "type": "string"
+          }
+        }
+      },
+      "IdentityTokenResource": {
+        "title": "IdentityTokenResource",
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The Identity Token"
           }
         }
       },
@@ -824,13 +897,47 @@
             "type" : "string",
             "description" : "URL that redirects to the back-office section, where is possible to manage the product"
           },
-          "urlPublic" : {
-            "type" : "string",
-            "description" : "URL that redirects to the public information webpage of the product"
+          "urlPublic": {
+            "type": "string",
+            "description": "URL that redirects to the public information webpage of the product"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
+          }
+        }
+      },
+      "UserResource": {
+        "title": "UserResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User's certification source",
+            "example": false
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "${swagger.dashboard.user.model.fiscalCode}"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       }

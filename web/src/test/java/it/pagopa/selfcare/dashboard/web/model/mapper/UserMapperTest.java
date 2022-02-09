@@ -2,10 +2,12 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.UserResource;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -75,6 +77,29 @@ class UserMapperTest {
         TestUtils.reflectionEqualsByName(resource, model);
     }
 
+    @Test
+    void toUserResource_null() {
+        // given
+        User model = null;
+        // when
+        UserResource resource = UserMapper.toUserResource(model);
+        // then
+        assertNull(resource);
+    }
+
+    @Test
+    void toUserResource_notNull() {
+        //given
+        User model = TestUtils.mockInstance(new User());
+        //when
+        UserResource resource = UserMapper.toUserResource(model);
+        //then
+        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getSurname(), resource.getSurname());
+        assertEquals(model.isCertification(), resource.isCertification());
+        TestUtils.reflectionEqualsByName(resource, model);
+    }
 
     @Test
     void fromCreateUserDto_null() {
