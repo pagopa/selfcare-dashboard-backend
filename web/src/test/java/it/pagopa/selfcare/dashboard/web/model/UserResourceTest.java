@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class UserResourceTest {
+class UserResourceTest {
     private Validator validator;
     private static final UserResource USER_RESOURCE = TestUtils.mockInstance(new UserResource());
 

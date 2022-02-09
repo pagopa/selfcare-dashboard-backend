@@ -61,6 +61,29 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
+    void getUser_nullInfo_nullUserResponse() {
+        //given
+        String externalId = "externalId";
+        UserResponse userMock = null;
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
+                .thenReturn(userMock);
+        //when
+        User user = userConnector.getUser(externalId);
+        ///then
+        assertNull(user.getEmail());
+        assertNull(user.getName());
+        assertFalse(user.isCertification());
+        assertNull(user.getSurname());
+        assertNull(user.getFiscalCode());
+
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByExternalId(embeddedCaptor.capture());
+        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
+        assertEquals(externalId, externalIdCaptured.getExternalId());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
     void getUser_nullInfo_certificationNone() {
         //given
         String externalId = "externalId";
