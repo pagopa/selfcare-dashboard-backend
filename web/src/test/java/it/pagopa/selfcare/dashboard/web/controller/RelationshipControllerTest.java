@@ -73,7 +73,7 @@ class RelationshipControllerTest {
         String relationshipId = "rel1";
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .delete(BASE_URL + "/{relationshipId}/delete", relationshipId)
+                .delete(BASE_URL + "/{relationshipId}", relationshipId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())

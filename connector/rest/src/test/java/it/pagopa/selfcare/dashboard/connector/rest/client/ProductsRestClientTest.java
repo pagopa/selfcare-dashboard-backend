@@ -38,7 +38,7 @@ public class ProductsRestClientTest extends BaseFeignRestClientTest {
     private ProductsRestClient restClient;
 
     static {
-        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs");
+        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/products");
         wireMockRule = new WireMockClassRule(config);
     }
 
