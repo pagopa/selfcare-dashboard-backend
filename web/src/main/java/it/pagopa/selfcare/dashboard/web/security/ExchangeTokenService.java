@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+import it.pagopa.selfcare.commons.base.TargetEnvironment;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -98,8 +99,10 @@ public class ExchangeTokenService {
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
-        log.debug("Exchanged claims = {}", claims);
-        log.debug("Exchanged token = {}", result);
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("Exchanged claims = {}", claims);
+            log.debug("Exchanged token = {}", result);
+        }
         log.trace("exchange end");
         return result;
     }
