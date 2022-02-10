@@ -21,9 +21,9 @@ class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void suspend(String relationshipId) {
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         log.trace("suspend start");
         log.debug("suspend relationshipId = {}", relationshipId);
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.suspend(relationshipId);
         log.trace("suspend end");
 
@@ -32,9 +32,9 @@ class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void activate(String relationshipId) {
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         log.trace("activate start");
         log.debug("activate relationshipId = {}", relationshipId);
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.activate(relationshipId);
         log.trace("activate end");
 
@@ -42,9 +42,9 @@ class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     public void delete(String relationshipId) {
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         log.trace("delete start");
         log.debug("relationshipId = {}", relationshipId);
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.delete(relationshipId);
         log.trace("delete end");
 
