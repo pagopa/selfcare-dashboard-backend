@@ -29,4 +29,6 @@ public interface PartyConnector {
 
     void activate(String relationshipId);
 
+    void delete(String relationshipId);
+
 }

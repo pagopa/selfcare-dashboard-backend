@@ -40,6 +40,8 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipStat
 class PartyConnectorImpl implements PartyConnector {
 
     static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class);
+    private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
+
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -275,7 +277,7 @@ class PartyConnectorImpl implements PartyConnector {
     public void suspend(String relationshipId) {
         log.trace("suspend start");
         log.debug("suspend relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, "A Relationship id is required");
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         restClient.suspendRelationship(relationshipId);
         log.trace("suspend end");
     }
@@ -285,9 +287,18 @@ class PartyConnectorImpl implements PartyConnector {
     public void activate(String relationshipId) {
         log.trace("activate start");
         log.debug("activate relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, "A Relationship id is required");
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         restClient.activateRelationship(relationshipId);
         log.trace("activate end");
+    }
+
+    @Override
+    public void delete(String relationshipId) {
+        log.trace("delete start");
+        log.debug("delete relationshipId = {}", relationshipId);
+        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
+        restClient.deleteRelationshipById(relationshipId);
+        log.trace("delete end");
     }
 
 

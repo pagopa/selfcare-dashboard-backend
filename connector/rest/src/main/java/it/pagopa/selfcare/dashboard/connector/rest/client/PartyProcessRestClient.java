@@ -53,4 +53,7 @@ public interface PartyProcessRestClient {
     @ResponseBody
     void activateRelationship(@PathVariable("relationshipId") String relationshipId);
 
+    @DeleteMapping(value = "${rest-client.party-process.deleteRelationshipById.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    void deleteRelationshipById(@PathVariable("relationshipId") String relationshipId);
 }

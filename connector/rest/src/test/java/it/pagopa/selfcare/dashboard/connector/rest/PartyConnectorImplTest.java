@@ -378,7 +378,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-
     @Test
     void getAuthInfo_nullProductInfo() {
         // given
@@ -398,7 +397,6 @@ class PartyConnectorImplTest {
                 .getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
-
 
     @Test
     void getAuthInfo() {
@@ -440,7 +438,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-
     @ParameterizedTest
     @EnumSource(value = PartyRole.class)
     void party2SelcRoleMapping(PartyRole partyRole) {
@@ -449,7 +446,6 @@ class PartyConnectorImplTest {
         // then
         assertEquals(PARTY_2_SELC_ROLE.apply(partyRole), authority);
     }
-
 
     @Test
     void getUsers_nullInstitutionId() {
@@ -465,7 +461,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-
     @Test
     void getUsers_nullRole() {
         // given
@@ -480,7 +475,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-
     @Test
     void getUsers_nullProductId() {
         // given
@@ -494,7 +488,6 @@ class PartyConnectorImplTest {
         Assertions.assertEquals("An Optional Product id object is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
-
 
     @Test
     void getUsers_nullResponse_emptyRole_emptyProductIds() {
@@ -511,7 +504,6 @@ class PartyConnectorImplTest {
                 .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
-
 
     @Test
     void getUsers_nullResponse() {
@@ -531,7 +523,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-
     @Test
     void getUsers_notEmptyProductIds() {
         // given
@@ -547,7 +538,6 @@ class PartyConnectorImplTest {
                 .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.eq(productId.map(Set::of).get()));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
-
 
     @ParameterizedTest
     @EnumSource(value = SelfCareAuthority.class)
@@ -571,7 +561,6 @@ class PartyConnectorImplTest {
                 .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.notNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
-
 
     @Test
     void getUsers() {
@@ -829,7 +818,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-
     @Test
     void createUsers_nullProductId() {
         // given
@@ -846,7 +834,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-
     @Test
     void createUsers_nullUser() {
         // given
@@ -862,7 +849,6 @@ class PartyConnectorImplTest {
         Assertions.assertEquals("An User is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
-
 
     @ParameterizedTest
     @EnumSource(value = PartyRole.class)
@@ -895,7 +881,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-
     private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingRequest> onboardingRequestCaptor) {
         OnboardingRequest request = onboardingRequestCaptor.getValue();
         Assertions.assertNotNull(request);
@@ -912,7 +897,6 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(createUserDto.getPartyRole(), request.getUsers().get(0).getRole().toString());
     }
 
-
     @Test
     void suspend_nullRelationshipId() {
         // given
@@ -924,7 +908,6 @@ class PartyConnectorImplTest {
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
-
 
     @Test
     void suspend() {
@@ -938,7 +921,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-
     @Test
     void activate_nullRelationshipId() {
         // given
@@ -951,7 +933,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-
     @Test
     void activate() {
         // given
@@ -961,6 +942,30 @@ class PartyConnectorImplTest {
         // then
         Mockito.verify(restClientMock, Mockito.times(1))
                 .activateRelationship(relationshipId);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void delete_nullRelationshipId() {
+        // given
+        String relationshipId = null;
+        // when
+        Executable executable = () -> partyConnector.delete(relationshipId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Relationship id is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void delete() {
+        // given
+        String relationshipId = "relationshipId";
+        // when
+        partyConnector.delete(relationshipId);
+        // then
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .deleteRelationshipById(relationshipId);
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
