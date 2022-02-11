@@ -100,7 +100,7 @@ class TokenControllerTest {
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
         // then
-        Assertions.assertEquals(1, listAppender.list.stream()
+        Assertions.assertEquals(2, listAppender.list.stream()
                 .filter(iLoggingEvent -> Level.DEBUG.equals(iLoggingEvent.getLevel())
                         && TokenController.class.getName().equals(iLoggingEvent.getLoggerName()))
                 .count());
