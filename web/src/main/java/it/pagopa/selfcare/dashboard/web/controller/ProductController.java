@@ -33,12 +33,14 @@ public class ProductController {
     public Collection<String> getProductRoles(@ApiParam("${swagger.dashboard.products.model.id}")
                                               @PathVariable("productId")
                                                       String productId) {
-        if (log.isDebugEnabled()) {
-            log.trace("getProductRoles");
-            log.debug("productId = {}", productId);
-        }
 
-        return productService.getProductRoles(productId);
+        log.trace("getProductRoles start");
+        log.debug("productId = {}", productId);
+        Collection<String> result = productService.getProductRoles(productId);
+        log.debug("getProductRoles result = {}", result);
+        log.trace("getProductRoles start");
+
+        return result;
     }
 
 }

@@ -1,11 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model.user_registry;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class UserResponse {
 
     private String id;

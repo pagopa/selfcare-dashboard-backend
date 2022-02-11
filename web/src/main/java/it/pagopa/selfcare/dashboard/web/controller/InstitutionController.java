@@ -53,11 +53,13 @@ public class InstitutionController {
                                       @PathVariable("institutionId") String institutionId,
                                       @ApiParam("${swagger.dashboard.institutions.model.logo}")
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.trace("saveInstitutionLogo");
-            log.debug("saveInstitutionLogo institutionId = {}, logo = {}", institutionId, logo);
-        }
+
+        log.trace("saveInstitutionLogo start");
+        log.debug("saveInstitutionLogo institutionId = {}, logo = {}", institutionId, logo);
+
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
+        log.trace("saveInstitutionLogo end");
+
         return null;
     }
 
@@ -66,13 +68,17 @@ public class InstitutionController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
     public List<InstitutionResource> getInstitutions() {
-        if (log.isTraceEnabled()) {
-            log.trace("getInstitutions");
-        }
+
+        log.trace("getInstitutions start");
+
         Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
-        return institutions.stream()
+        List<InstitutionResource> result = institutions.stream()
                 .map(InstitutionMapper::toResource)
                 .collect(Collectors.toList());
+        log.debug("getInstitutions result = {}", result);
+        log.trace("getInstitutions end");
+
+        return result;
     }
 
 
@@ -83,12 +89,16 @@ public class InstitutionController {
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                                       String institutionId) {
-        if (log.isDebugEnabled()) {
-            log.trace("getInstitution");
-            log.debug("getInstitution institutionId = {}", institutionId);
-        }
+
+        log.trace("getInstitution start");
+        log.debug("getInstitution institutionId = {}", institutionId);
+
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
-        return InstitutionMapper.toResource(institutionInfo);
+        InstitutionResource result = InstitutionMapper.toResource(institutionInfo);
+        log.debug("getInstitution result = {}", result);
+        log.trace("getInstitution end");
+
+        return result;
     }
 
 
@@ -105,14 +115,17 @@ public class InstitutionController {
                                                              @ApiParam("${swagger.dashboard.user.model.role}")
                                                              @RequestParam(value = "role", required = false)
                                                                      Optional<SelfCareAuthority> role) {
-        if (log.isDebugEnabled()) {
-            log.trace("getInstitutionUsers");
-            log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
-        }
+
+        log.trace("getInstitutionUsers start");
+        log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
         Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
-        return userInfos.stream()
+        List<InstitutionUserResource> result = userInfos.stream()
                 .map(UserMapper::toInstitutionUser)
                 .collect(Collectors.toList());
+        log.debug("getInstitutionUsers result = {}", result);
+        log.trace("getInstitutionUsers end");
+
+        return result;
     }
 
 
@@ -123,14 +136,17 @@ public class InstitutionController {
     public List<ProductsResource> getInstitutionProducts(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                          @PathVariable("institutionId")
                                                                  String institutionId) {
-        if (log.isDebugEnabled()) {
-            log.trace("getInstitutionProducts");
-            log.debug("getInstitutionProducts institutionId = {}", institutionId);
-        }
+        log.trace("getInstitutionProducts start");
+        log.debug("getInstitutionProducts institutionId = {}", institutionId);
+
         List<Product> products = institutionService.getInstitutionProducts(institutionId);
-        return products.stream()
+        List<ProductsResource> result = products.stream()
                 .map(ProductsMapper::toResource)
                 .collect(Collectors.toList());
+        log.debug("getInstitutionProducts result = {}", result);
+        log.trace("getInstitutionProducts end");
+
+        return result;
     }
 
 

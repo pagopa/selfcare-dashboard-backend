@@ -1,8 +1,13 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import it.pagopa.selfcare.commons.base.TargetEnvironment;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
@@ -11,6 +16,7 @@ import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import lombok.Getter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,15 +25,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.util.ResourceUtils;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -36,7 +48,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, SystemStubsExtension.class})
 class ExchangeTokenServiceTest {
 
     @BeforeEach
@@ -44,6 +56,8 @@ class ExchangeTokenServiceTest {
         TestSecurityContextHolder.clearContext();
     }
 
+    @SystemStub
+    private EnvironmentVariables environmentVariables;
 
     @Test
     void exchange_illegalBase64Signature() {
@@ -138,6 +152,95 @@ class ExchangeTokenServiceTest {
         Mockito.verifyNoInteractions(jwtServiceMock);
     }
 
+    @Test
+    void exchange_doNotLog() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        environmentVariables.set("ENV_TARGET", TargetEnvironment.PROD);
+        String realm = "realm";
+        String jti = "id";
+        String sub = "subject";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRole = "productRole";
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, productRole, productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+                .thenReturn(Jwts.claims()
+                        .setId(jti)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp));
+        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        Mockito.when(institutionServiceMock.getInstitution(Mockito.any()))
+                .thenReturn(institutionInfo);
+        File file = ResourceUtils.getFile(PrivateKey.PKCS8.getResourceLocation());
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        String kid = "kid";
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, jwtSigningKey, "PT5S", kid);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.addAppender(listAppender);
+        logger.setLevel(Level.DEBUG);
+        // when
+        String token = exchangeTokenService.exchange(institutionId, productId, realm);
+        //then
+        Assertions.assertEquals(0, listAppender.list.stream()
+                .filter(iLoggingEvent -> Level.DEBUG.equals(iLoggingEvent.getLevel())
+                        && ExchangeTokenService.class.getName().equals(iLoggingEvent.getLoggerName()))
+                .count());
+    }
+
+    @Test
+    void exchange_doLog() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        String realm = "realm";
+        String jti = "id";
+        String sub = "subject";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRole = "productRole";
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, productRole, productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+                .thenReturn(Jwts.claims()
+                        .setId(jti)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp));
+        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        Mockito.when(institutionServiceMock.getInstitution(Mockito.any()))
+                .thenReturn(institutionInfo);
+        File file = ResourceUtils.getFile(PrivateKey.PKCS8.getResourceLocation());
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        String kid = "kid";
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, jwtSigningKey, "PT5S", kid);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        logger.addAppender(listAppender);
+        logger.setLevel(Level.DEBUG);
+
+        // when
+        String token = exchangeTokenService.exchange(institutionId, productId, realm);
+
+        //then
+        Assertions.assertEquals(3, listAppender.list.stream()
+                .filter(iLoggingEvent -> Level.DEBUG.equals(iLoggingEvent.getLevel())
+                        && ExchangeTokenService.class.getName().equals(iLoggingEvent.getLoggerName()))
+                .count());
+
+    }
 
     @Test
     void exchange_noSessionTokenClaims() throws Exception {

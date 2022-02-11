@@ -1,5 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import it.pagopa.selfcare.commons.base.TargetEnvironment;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -7,14 +12,21 @@ import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserRegistryConnectorConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,8 +36,11 @@ import static org.junit.jupiter.api.Assertions.*;
                 UserRegistryConnectorConfig.class
         }
 )
+@ExtendWith({SystemStubsExtension.class, MockitoExtension.class})
 class UserRegistryConnectorImplTest {
 
+    @SystemStub
+    private EnvironmentVariables environmentVariables;
 
     @Autowired
     private UserRegistryConnectorImpl userConnector;
@@ -118,6 +133,53 @@ class UserRegistryConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void getUser_doNotLog() {
+        //given
+        environmentVariables.set("ENV_TARGET", TargetEnvironment.PROD);
+        String externalId = "externalId";
+        UserResponse userResponseMock = TestUtils.mockInstance(new UserResponse());
+        userResponseMock.setCertification(Certification.SPID);
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
+                .thenReturn(userResponseMock);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.addAppender(listAppender);
+        rootLogger.setLevel(Level.DEBUG);
+        //when
+        User user = userConnector.getUser(externalId);
+        //then
+        Assertions.assertEquals(0, listAppender.list.stream()
+                .filter(iLoggingEvent -> Level.DEBUG.equals(iLoggingEvent.getLevel())
+                        && UserRegistryConnectorImpl.class.getName().equals(iLoggingEvent.getLoggerName()))
+                .count());
+    }
+
+    @Test
+    void getUser_doLog() {
+        //given
+        environmentVariables.set("ENV_TARGET", TargetEnvironment.DEV);
+
+        String externalId = "externalId";
+        UserResponse userResponseMock = TestUtils.mockInstance(new UserResponse());
+        userResponseMock.setCertification(Certification.SPID);
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
+                .thenReturn(userResponseMock);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.setLevel(Level.DEBUG);
+        rootLogger.addAppender(listAppender);
+        //when
+        User user = userConnector.getUser(externalId);
+        //then
+        Assertions.assertEquals(2, listAppender.list.stream()
+                .filter(iLoggingEvent -> Level.DEBUG.equals(iLoggingEvent.getLevel())
+                        && UserRegistryConnectorImpl.class.getName().equals(iLoggingEvent.getLoggerName()))
+                .count());
     }
 
     @Test

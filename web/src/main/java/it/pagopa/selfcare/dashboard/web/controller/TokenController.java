@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import it.pagopa.selfcare.commons.base.TargetEnvironment;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +41,21 @@ public class TokenController {
                                           @ApiParam(value = "${swagger.dashboard.token.model.realm}", example = "io.selfcare.pagopa.it", defaultValue = "defVal")
                                           @RequestParam("realm")
                                                   String realm) {
-        if (log.isDebugEnabled()) {
-            log.trace("exchange");
-            log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
-        }
+
+        log.trace("exchange start");
+        log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+
         String token = exchangeTokenService.exchange(institutionId, productId, realm);
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
-        return identityToken;
+        IdentityTokenResource result = identityToken;
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            System.out.printf("exchange result = {}", result);
+        }
+        log.trace("exchange end");
+
+        return result;
     }
 
 }

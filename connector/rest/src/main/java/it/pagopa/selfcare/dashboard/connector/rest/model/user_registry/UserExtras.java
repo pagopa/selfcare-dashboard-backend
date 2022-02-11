@@ -1,12 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model.user_registry;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 public class UserExtras {
     private String email;
     private LocalDate birthDate;

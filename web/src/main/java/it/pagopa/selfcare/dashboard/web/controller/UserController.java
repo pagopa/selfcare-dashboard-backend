@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import it.pagopa.selfcare.commons.base.TargetEnvironment;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.core.UserRegistryService;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
@@ -33,7 +34,16 @@ public class UserController {
     public UserResource getUserByExternalId(@ApiParam()
                                             @RequestBody
                                                     EmbeddedExternalIdDto externalId) {
+        log.trace("getUserByExternalId start");
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("getUserByExternalId externalId = {}", externalId);
+        }
         User user = userRegistryService.getUser(externalId.getExternalId());
-        return UserMapper.toUserResource(user);
+        UserResource result = UserMapper.toUserResource(user);
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("getUserByExternalId result = {}", result);
+        }
+        log.trace("getUserByExternalId end");
+        return result;
     }
 }

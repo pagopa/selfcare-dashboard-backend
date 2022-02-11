@@ -2,11 +2,9 @@ package it.pagopa.selfcare.dashboard.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class UserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)

@@ -50,8 +50,10 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
 
         UserResponse userResponse = restClient.getUserByExternalId(new EmbeddedExternalId(externalId));
         User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
-        log.debug("getUser result = {}", result);
-        log.trace("getUser start");
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("getUser result = {}", result);
+        }
+        log.trace("getUser end");
 
         return result;
     }

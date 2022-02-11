@@ -64,7 +64,9 @@ public class ExchangeTokenService {
 
     public String exchange(String institutionId, String productId, String realm) {
         log.trace("exchange start");
-        log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
