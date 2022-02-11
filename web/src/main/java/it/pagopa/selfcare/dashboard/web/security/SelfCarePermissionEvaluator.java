@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import it.pagopa.selfcare.commons.base.TargetEnvironment;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,9 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         log.trace("hasPermission start");
-        log.debug("hasPermission authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("hasPermission authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
+        }
         Assert.notNull(authentication, "An authentication is required");
         Assert.notNull(permission, "A permission is required");
 
@@ -45,7 +48,9 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         log.trace("hasPermission start");
-        log.debug("hasPermission authentication = {}, targetId = {}, targetType = {}, permission = {}", authentication, targetId, targetType, permission);
+        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
+            log.debug("hasPermission authentication = {}, targetId = {}, targetType = {}, permission = {}", authentication, targetId, targetType, permission);
+        }
         Assert.notNull(authentication, "An authentication is required");
         Assert.notNull(targetType, "A targetType is required");
         Assert.notNull(permission, "A permission is required");
