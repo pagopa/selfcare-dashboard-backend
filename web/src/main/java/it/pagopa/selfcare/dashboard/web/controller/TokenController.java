@@ -51,7 +51,7 @@ public class TokenController {
 
         IdentityTokenResource result = identityToken;
         if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
-            System.out.printf("exchange result = {}", result);
+            log.debug("exchange result = {}", result);
         }
         log.trace("exchange end");
 
