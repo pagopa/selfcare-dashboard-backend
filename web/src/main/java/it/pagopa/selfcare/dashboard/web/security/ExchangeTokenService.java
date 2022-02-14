@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -63,7 +64,7 @@ public class ExchangeTokenService {
 
     public String exchange(String institutionId, String productId, String realm) {
         log.trace("exchange start");
-        log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}" , institutionId, productId, realm);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -98,8 +99,8 @@ public class ExchangeTokenService {
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
-        log.debug("Exchanged claims = {}", claims);
-        log.debug("Exchanged token = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}" , claims);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}" , result);
         log.trace("exchange end");
         return result;
     }
@@ -109,8 +110,8 @@ public class ExchangeTokenService {
         boolean isRsa = signingKey.contains("RSA");
         String privateKeyEnvelopName = (isRsa ? "RSA " : "") + "PRIVATE KEY";
         String privateKeyPEM = signingKey
-                .replace("\r", "")
-                .replace("\n", "")
+                .replace("\r" , "")
+                .replace("\n" , "")
                 .replace(String.format(PRIVATE_KEY_HEADER_TEMPLATE, privateKeyEnvelopName), "")
                 .replace(String.format(PRIVATE_KEY_FOOTER_TEMPLATE, privateKeyEnvelopName), "");
 

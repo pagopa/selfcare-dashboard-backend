@@ -23,6 +23,9 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.util.ResourceUtils;
+import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
+import uk.org.webcompere.systemstubs.jupiter.SystemStub;
+import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -36,7 +39,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, SystemStubsExtension.class})
 class ExchangeTokenServiceTest {
 
     @BeforeEach
@@ -44,6 +47,8 @@ class ExchangeTokenServiceTest {
         TestSecurityContextHolder.clearContext();
     }
 
+    @SystemStub
+    private EnvironmentVariables environmentVariables;
 
     @Test
     void exchange_illegalBase64Signature() {

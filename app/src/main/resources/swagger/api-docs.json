@@ -1,43 +1,56 @@
 {
-  "openapi" : "3.0.3",
-  "info" : {
-    "title" : "selc-dashboard",
-    "description" : "Self Care Dashboard API documentation",
-    "version" : "0.0.1-SNAPSHOT"
+  "openapi": "3.0.3",
+  "info": {
+    "title": "selc-dashboard",
+    "description": "Self Care Dashboard API documentation",
+    "version": "0.0.1-SNAPSHOT"
   },
-  "servers" : [ {
-    "url" : "http://localhost:80",
-    "description" : "Inferred Url"
-  } ],
-  "tags" : [ {
-    "name" : "institutions",
-    "description" : "Institution operations"
-  }, {
-    "name" : "products",
-    "description" : "Products operations"
-  }, {
-    "name" : "relationships",
-    "description" : "Relationships operations"
-  }, {
-    "name" : "token",
-    "description" : "Token operations"
-  } ],
-  "paths" : {
-    "/institutions" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutions",
-        "description" : "Service to get all the institutions related to logged user",
-        "operationId" : "getInstitutionsUsingGET",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionResource"
+  "servers": [
+    {
+      "url": "http://localhost:80",
+      "description": "Inferred Url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "institutions",
+      "description": "Institution operations"
+    },
+    {
+      "name": "products",
+      "description": "Products operations"
+    },
+    {
+      "name": "relationships",
+      "description": "Relationships operations"
+    },
+    {
+      "name": "token",
+      "description": "Token operations"
+    },
+    {
+      "name": "user",
+      "description": "User Controller"
+    }
+  ],
+  "paths": {
+    "/institutions": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutions",
+        "description": "Service to get all the institutions related to logged user",
+        "operationId": "getInstitutionsUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionResource"
                   }
                 }
               }
@@ -411,11 +424,11 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "type" : "string"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
                 }
               }
@@ -487,32 +500,34 @@
         ],
         "summary": "activateRelationship",
         "description": "Activate the relationship",
-        "operationId" : "activateRelationshipUsingPOST",
-        "parameters" : [ {
-          "name" : "relationshipId",
-          "in" : "path",
-          "description" : "Unique relationship identifier between User and Product",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+        "operationId": "activateRelationshipUsingPOST",
+        "parameters": [
+          {
+            "name": "relationshipId",
+            "in": "path",
+            "description": "Unique relationship identifier between User and Product",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "201" : {
-            "description" : "Created"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           },
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
         "security" : [ {
@@ -593,29 +608,83 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/IdentityTokenResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityTokenResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/users/external-id": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "getUserByExternalId",
+        "description": "Retrieve the user for a given internal id ",
+        "operationId": "getUserByExternalIdUsingPOST",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbeddedExternalIdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     }
   },
@@ -626,71 +695,89 @@
         "required" : [ "email", "name", "productRole", "surname", "taxCode" ],
         "type" : "object",
         "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "email": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "name": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "productRole" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "productRole": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "surname": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "taxCode" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "taxCode": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           }
         }
       },
-      "IdentityTokenResource" : {
-        "title" : "IdentityTokenResource",
-        "required" : [ "token" ],
-        "type" : "object",
-        "properties" : {
-          "token" : {
-            "type" : "string",
-            "description" : "The Identity Token"
+      "EmbeddedExternalIdDto": {
+        "title": "EmbeddedExternalIdDto",
+        "type": "object",
+        "properties": {
+          "externalId": {
+            "type": "string"
           }
         }
       },
-      "InstitutionResource" : {
-        "title" : "InstitutionResource",
-        "required" : [ "fiscalCode", "id", "mailAddress", "name", "status", "userRole" ],
-        "type" : "object",
-        "properties" : {
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
+      "IdentityTokenResource": {
+        "title": "IdentityTokenResource",
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The Identity Token"
+          }
+        }
+      },
+      "InstitutionResource": {
+        "title": "InstitutionResource",
+        "required": [
+          "fiscalCode",
+          "id",
+          "mailAddress",
+          "name",
+          "status",
+          "userRole"
+        ],
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "id": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
@@ -789,48 +876,86 @@
         "required" : [ "authorized", "description", "id", "logo", "status", "title", "urlBO" ],
         "type" : "object",
         "properties" : {
-          "activatedAt" : {
-            "type" : "string",
-            "description" : "Date the products was activated",
-            "format" : "date-time"
+          "activatedAt": {
+            "type": "string",
+            "description": "Date the products was activated",
+            "format": "date-time"
           },
-          "authorized" : {
-            "type" : "boolean",
-            "description" : "flag indicating whether the logged user has the authorization to manage the product",
-            "example" : false
+          "authorized": {
+            "type": "boolean",
+            "description": "flag indicating whether the logged user has the authorization to manage the product",
+            "example": false
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Product's description"
+          "description": {
+            "type": "string",
+            "description": "Product's description"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "logo" : {
-            "type" : "string",
-            "description" : "Product's logo"
+          "logo": {
+            "type": "string",
+            "description": "Product's logo"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "status": {
+            "type": "string",
+            "description": "Product's status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "title": {
+            "type": "string",
+            "description": "Product's title"
           },
-          "urlBO" : {
-            "type" : "string",
-            "description" : "URL that redirects to the back-office section, where is possible to manage the product"
+          "urlBO": {
+            "type": "string",
+            "description": "URL that redirects to the back-office section, where is possible to manage the product"
           },
-          "urlPublic" : {
-            "type" : "string",
-            "description" : "URL that redirects to the public information webpage of the product"
+          "urlPublic": {
+            "type": "string",
+            "description": "URL that redirects to the public information webpage of the product"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
+          }
+        }
+      },
+      "UserResource": {
+        "title": "UserResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User's certification source",
+            "example": false
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       }
