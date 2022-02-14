@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.TargetEnvironment;
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +22,10 @@ public class UserRegistryServiceImpl implements UserRegistryService {
     @Override
     public User getUser(String externalId) {
         log.trace("getUser start");
-        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
-            log.debug("getUser externalId = {}", externalId);
-        }
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}" , externalId);
         Assert.hasText(externalId, "A TaxCode is required");
         User result = userConnector.getUser(externalId);
-        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
-            log.debug("getUser result = {}", result);
-        }
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}" , result);
         log.trace("getUser end");
         return result;
     }

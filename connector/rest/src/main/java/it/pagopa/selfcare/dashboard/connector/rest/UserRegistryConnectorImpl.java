@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.commons.base.TargetEnvironment;
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -43,16 +43,13 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     @Override
     public User getUser(String externalId) {
         log.trace("getUser start");
-        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
-            log.debug("getUser externalId = {}", externalId);
-        }
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}" , externalId);
+
         Assert.hasText(externalId, "A TaxCode is required");
 
         UserResponse userResponse = restClient.getUserByExternalId(new EmbeddedExternalId(externalId));
         User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
-        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
-            log.debug("getUser result = {}", result);
-        }
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}" , result);
         log.trace("getUser end");
 
         return result;

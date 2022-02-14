@@ -3,7 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import it.pagopa.selfcare.commons.base.TargetEnvironment;
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,19 +43,17 @@ public class TokenController {
                                                   String realm) {
 
         log.trace("exchange start");
-        log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.debug("exchange institutionId = {}, productId = {}, realm = {}" , institutionId, productId, realm);
 
         String token = exchangeTokenService.exchange(institutionId, productId, realm);
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
-        IdentityTokenResource result = identityToken;
-        if (!TargetEnvironment.PROD.equals(TargetEnvironment.getCurrent())) {
-            log.debug("exchange result = {}", result);
-        }
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange result = {}" , identityToken);
         log.trace("exchange end");
 
-        return result;
+        return identityToken;
     }
 
 }

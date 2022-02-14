@@ -1,6 +1,6 @@
 {
-  "openapi" : "3.0.3",
-  "info" : {
+  "openapi": "3.0.3",
+  "info": {
     "title": "selc-dashboard",
     "description": "Self Care Dashboard API documentation",
     "version": "0.0.1-SNAPSHOT"
@@ -45,12 +45,12 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionResource"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionResource"
                   }
                 }
               }
@@ -511,22 +511,23 @@
             "schema": {
               "type": "string"
             }
-        } ],
-        "responses" : {
-          "201" : {
-            "description" : "Created"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           },
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
         "security" : [ {
@@ -607,12 +608,12 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/IdentityTokenResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityTokenResource"
                 }
               }
             }
@@ -694,8 +695,8 @@
         "required" : [ "email", "name", "productRole", "surname", "taxCode" ],
         "type" : "object",
         "properties" : {
-          "email" : {
-            "type" : "string",
+          "email": {
+            "type": "string",
             "description": "Institution's unique identifier (i.e.: IPA code)"
           },
           "name": {
@@ -752,31 +753,31 @@
         "properties": {
           "category": {
             "type": "string",
-            "description" : "Institution's category"
+            "description": "Institution's category"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+          "id": {
+            "type": "string",
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
@@ -875,31 +876,31 @@
         "required" : [ "authorized", "description", "id", "logo", "status", "title", "urlBO" ],
         "type" : "object",
         "properties" : {
-          "activatedAt" : {
-            "type" : "string",
-            "description" : "Date the products was activated",
-            "format" : "date-time"
+          "activatedAt": {
+            "type": "string",
+            "description": "Date the products was activated",
+            "format": "date-time"
           },
-          "authorized" : {
-            "type" : "boolean",
-            "description" : "flag indicating whether the logged user has the authorization to manage the product",
-            "example" : false
+          "authorized": {
+            "type": "boolean",
+            "description": "flag indicating whether the logged user has the authorization to manage the product",
+            "example": false
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Product's description"
+          "description": {
+            "type": "string",
+            "description": "Product's description"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "logo" : {
-            "type" : "string",
-            "description" : "Product's logo"
+          "logo": {
+            "type": "string",
+            "description": "Product's logo"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
+          "status": {
+            "type": "string",
+            "description": "Product's status",
             "enum": [
               "ACTIVE",
               "INACTIVE",

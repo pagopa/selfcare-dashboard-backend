@@ -195,8 +195,6 @@ public class InstitutionController {
 
         log.trace("createInstitutionProductUser start");
         log.debug("createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
-
-
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
         log.trace("createInstitutionProductUser end");
 
