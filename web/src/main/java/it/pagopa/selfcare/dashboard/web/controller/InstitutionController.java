@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
@@ -194,7 +195,7 @@ public class InstitutionController {
                                                      CreateUserDto user) {
 
         log.trace("createInstitutionProductUser start");
-        log.debug("createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}" , institutionId, productId, user);
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
         log.trace("createInstitutionProductUser end");
 
