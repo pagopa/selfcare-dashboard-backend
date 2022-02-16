@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import lombok.extern.slf4j.Slf4j;
@@ -113,19 +114,24 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
     @Override
-    public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role) {
+    public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles) {
         log.trace("getInstitutionUsers start");
-        log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+        log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}, productRoles = {}", institutionId, productId, role, productRoles);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(productId, "An Optional Product id object is required");
         Assert.notNull(role, "An Optional role object is required");
+        Assert.notNull(productRoles, "An Optional product role object is required");
 
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRoles);
         Map<String, Product> idToProductMap = productsConnector.getProducts().stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
-        userInfos.forEach(userInfo ->
-                userInfo.getProducts().forEach(productInfo ->
-                        productInfo.setTitle(idToProductMap.get(productInfo.getId()).getTitle())));
+
+        userInfos.forEach(userInfo -> {
+            for (String key : userInfo.getProducts().keySet()) {
+                ProductInfo prod = userInfo.getProducts().get(key);
+                userInfo.getProducts().get(key).setTitle(idToProductMap.get(prod.getId()).getTitle());
+            }
+        });
 
         log.debug("getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
@@ -134,14 +140,15 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
     @Override
-    public Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role) {
+    public Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles) {
         log.trace("getInstitutionProductUsers start");
-        log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
+        log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}, productRoles = {}", institutionId, productId, role, productRoles);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(role, "An Optional role object is required");
+        Assert.notNull(productRoles, "An Optional product role object is required");
 
-        Collection<UserInfo> result = partyConnector.getUsers(institutionId, role, Optional.of(productId));
+        Collection<UserInfo> result = partyConnector.getUsers(institutionId, role, Optional.of(productId), productRoles);
 
         log.debug("getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");

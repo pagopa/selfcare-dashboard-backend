@@ -56,14 +56,14 @@
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
         "security" : [ {
@@ -230,55 +230,73 @@
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionProductUsers",
         "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionProductUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+        "operationId": "getInstitutionProductUsersUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "description": "User's roles in product",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }, {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductUserResource"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductUserResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
           "404" : {
             "description" : "Not Found"
@@ -345,55 +363,73 @@
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionUsers",
         "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+        "operationId": "getInstitutionUsersUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "description": "User's roles in product",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionUserResource"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionUserResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
           "404" : {
             "description" : "Not Found"
@@ -459,7 +495,7 @@
           "relationships"
         ],
         "summary": "deleteRelationshipById",
-        "description": "{swagger.dashboard.institutions.api.deleteUser}",
+        "description": "Delete the relationship",
         "operationId": "deleteRelationshipByIdUsingDELETE",
         "parameters": [
           {
@@ -697,23 +733,23 @@
         "properties" : {
           "email": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's email"
           },
           "name": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's name"
           },
           "productRole": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's role in product"
           },
           "surname": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's surname"
           },
           "taxCode": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's fiscal code"
           }
         }
       },
@@ -782,92 +818,179 @@
         }
       },
       "InstitutionUserResource" : {
-        "title" : "InstitutionUserResource",
-        "required" : [ "email", "id", "name", "products", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
+        "title": "InstitutionUserResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User provided with certification",
+            "example": false
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+          "email": {
+            "type": "string",
+            "description": "User's email"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "products" : {
-            "type" : "array",
-            "description" : "Authorized user products",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductInfo"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "products": {
+            "type": "array",
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
             }
           },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
+          "status": {
+            "type": "string",
+            "description": "User's status"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
-      "ProductInfo" : {
-        "title" : "ProductInfo",
-        "required" : [ "id", "title" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+      "ProductInfoResource": {
+        "title": "ProductInfoResource",
+        "required": [
+          "id",
+          "roleInfos",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "roleInfos": {
+            "type": "array",
+            "description": "User's role infos in product",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleInfoResource"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "Product's title"
           }
         }
       },
-      "ProductUserResource" : {
-        "title" : "ProductUserResource",
-        "required" : [ "email", "id", "name", "relationshipId", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
+      "ProductRoleInfoResource": {
+        "title": "ProductRoleInfoResource",
+        "required": [
+          "relationshipId",
+          "role",
+          "selcRole",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "relationshipId": {
+            "type": "string",
+            "description": "Unique relationship identifier between User and Product"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+          "role": {
+            "type": "string",
+            "description": "User's role in product"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "selcRole": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
-          "relationshipId" : {
-            "type" : "string",
-            "description" : "Unique relationship identifier between User and Product"
+          "status": {
+            "type": "string",
+            "description": "User's status"
+          }
+        }
+      },
+      "ProductUserResource": {
+        "title": "ProductUserResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "id",
+          "name",
+          "product",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User provided with certification",
+            "example": false
           },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+          "email": {
+            "type": "string",
+            "description": "User's email"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "product": {
+            "description": "Authorized user product",
+            "$ref": "#/components/schemas/ProductInfoResource"
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "User's status"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },

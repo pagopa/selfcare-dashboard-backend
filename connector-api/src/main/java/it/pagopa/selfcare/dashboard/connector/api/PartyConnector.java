@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface PartyConnector {
 
@@ -21,7 +22,7 @@ public interface PartyConnector {
 
     Collection<AuthInfo> getAuthInfo(String institutionId);
 
-    Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId);
+    Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId, Optional<Set<String>> productRoles);
 
     void createUsers(String institutionId, String productId, CreateUserDto createUserDto);
 

@@ -14,6 +14,8 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorConfig;
@@ -453,8 +455,10 @@ class PartyConnectorImplTest {
         String institutionId = null;
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         // when
-        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId);
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
@@ -467,8 +471,10 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = null;
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         // when
-        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId);
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional role object is required", e.getMessage());
@@ -481,8 +487,10 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = null;
+        Optional<Set<String>> productRole = Optional.empty();
+
         // when
-        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId);
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional Product id object is required", e.getMessage());
@@ -490,18 +498,36 @@ class PartyConnectorImplTest {
     }
 
     @Test
-    void getUsers_nullResponse_emptyRole_emptyProductIds() {
+    void getUsers_nullProductRole() {
         // given
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = null;
+
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
+        Executable executable = () -> partyConnector.getUsers(institutionId, role, productId, productRole);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An optional Product role is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void getUsers_nullResponse_emptyRole_emptyProductIds_emptyProductRole() {
+        // given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
+        // when
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -513,13 +539,15 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -529,13 +557,33 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.of("productId");
+        Optional<Set<String>> productRole = Optional.empty();
+
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.eq(productId.map(Set::of).get()));
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.eq(productId.map(Set::of).get()), Mockito.isNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUsers_notEmptyProductRoles() {
+        // given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.of(Set.of("api", "security"));
+
+        // when
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId, productRole);
+        // then
+        Assertions.assertNotNull(users);
+        Assertions.assertTrue(users.isEmpty());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNotNull(), Mockito.isNull(), Mockito.eq(productRole.get()));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -546,8 +594,10 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.of(selfCareAuthority);
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> users = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(users);
         Assertions.assertTrue(users.isEmpty());
@@ -558,7 +608,7 @@ class PartyConnectorImplTest {
             }
         }
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.notNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.notNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -568,6 +618,8 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
@@ -576,27 +628,35 @@ class PartyConnectorImplTest {
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
         relationshipsResponse.add(relationshipInfo1);
         relationshipsResponse.add(relationshipInfo2);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(userInfos);
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
+        String prodId = null;
+        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
+        for (String key :
+                productInfoMap.keySet()) {
+            prodId = key;
+        }
+        ProductInfo product = productInfoMap.get(prodId);
         Assertions.assertEquals(id, userInfo.getId());
-        Assertions.assertNotNull(userInfo.getRelationshipId());
+        Assertions.assertNotNull(product.getRoleInfos());
+        Assertions.assertNotNull(product.getId());
+        Assertions.assertNull(product.getTitle());
         Assertions.assertNotNull(userInfo.getName());
         Assertions.assertNotNull(userInfo.getSurname());
         Assertions.assertNotNull(userInfo.getEmail());
         Assertions.assertNotNull(userInfo.getStatus());
         Assertions.assertNotNull(userInfo.getRole());
-        Assertions.assertEquals(2, userInfo.getProducts().size());
-        it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo = userInfo.getProducts().iterator().next();
-        Assertions.assertNotNull(productInfo.getId());
-        Assertions.assertNull(productInfo.getTitle());
+        Assertions.assertEquals(1, userInfo.getProducts().size());
+
+        Assertions.assertNotNull(productInfoMap.keySet());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.notNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -608,6 +668,8 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
@@ -616,27 +678,33 @@ class PartyConnectorImplTest {
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
         relationshipsResponse.add(relationshipInfo1);
         relationshipsResponse.add(relationshipInfo2);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(userInfos);
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
         Assertions.assertEquals(id, userInfo.getId());
-        Assertions.assertNotNull(userInfo.getRelationshipId());
         Assertions.assertNotNull(userInfo.getName());
         Assertions.assertNotNull(userInfo.getSurname());
         Assertions.assertNotNull(userInfo.getEmail());
         Assertions.assertNotNull(userInfo.getStatus());
         Assertions.assertNotNull(userInfo.getRole());
-        Assertions.assertEquals(2, userInfo.getProducts().size());
-        it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo = userInfo.getProducts().iterator().next();
-        Assertions.assertNotNull(productInfo.getId());
-        Assertions.assertNull(productInfo.getTitle());
+        String prodId = null;
+        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
+        for (String key :
+                productInfoMap.keySet()) {
+            prodId = key;
+        }
+        Assertions.assertEquals(1, userInfo.getProducts().size());
+        ProductInfo product = productInfoMap.get(prodId);
+        Assertions.assertNotNull(product.getRoleInfos());
+        Assertions.assertNotNull(product.getId());
+        Assertions.assertNull(product.getTitle());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -648,6 +716,8 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
@@ -656,28 +726,87 @@ class PartyConnectorImplTest {
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
         relationshipsResponse.add(relationshipInfo1);
         relationshipsResponse.add(relationshipInfo2);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         // then
         Assertions.assertNotNull(userInfos);
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
         Assertions.assertEquals(id, userInfo.getId());
-        Assertions.assertNotNull(userInfo.getRelationshipId());
         Assertions.assertNotNull(userInfo.getName());
         Assertions.assertNotNull(userInfo.getSurname());
         Assertions.assertNotNull(userInfo.getEmail());
         Assertions.assertNotNull(userInfo.getStatus());
         Assertions.assertNotNull(userInfo.getRole());
-        Assertions.assertEquals(2, userInfo.getProducts().size());
-        it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo = userInfo.getProducts().iterator().next();
-        Assertions.assertNotNull(productInfo.getId());
-        Assertions.assertNull(productInfo.getTitle());
+        String prodId = null;
+        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
+        for (String key :
+                productInfoMap.keySet()) {
+            prodId = key;
+        }
+        Assertions.assertEquals(1, userInfo.getProducts().size());
+        ProductInfo product = productInfoMap.get(prodId);
+        Assertions.assertNotNull(product.getRoleInfos());
+        Assertions.assertNotNull(product.getId());
+        Assertions.assertNull(product.getTitle());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void relationship_info_to_user_info_function() throws IOException {
+        // given
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/relationInfo-to-userInfo.json");
+        RelationshipInfo relationshipInfo = mapper.readValue(stub, RelationshipInfo.class);
+        // when
+        UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
+        // then
+        Assertions.assertEquals(relationshipInfo.getName(), userInfo.getName());
+        Assertions.assertEquals(relationshipInfo.getSurname(), userInfo.getSurname());
+        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
+        Assertions.assertEquals(relationshipInfo.getEmail(), userInfo.getEmail());
+        Assertions.assertEquals(relationshipInfo.getFrom(), userInfo.getId());
+        String prodId = null;
+        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
+        for (String key :
+                productInfoMap.keySet()) {
+            prodId = key;
+        }
+        ProductInfo product = productInfoMap.get(prodId);
+        Assertions.assertEquals(relationshipInfo.getProduct().getId(), product.getId());
+        Assertions.assertEquals(1, product.getRoleInfos().size());
+        RoleInfo roleInfo = product.getRoleInfos().get(0);
+        Assertions.assertEquals(relationshipInfo.getProduct().getRole(), product.getRoleInfos().get(0).getRole());
+        Assertions.assertEquals(relationshipInfo.getId(), roleInfo.getRelationshipId());
+        Assertions.assertEquals(ADMIN, roleInfo.getSelcRole());
+
+    }
+
+    @Test
+    void getUser_mergeRoleInfos() throws IOException {
+        //given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/multi-role.json");
+        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(relationshipsResponse);
+        //when
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
+        //then
+        Assertions.assertEquals(1, userInfos.size());
+        UserInfo userInfo = userInfos.iterator().next();
+        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
+        Assertions.assertEquals(2, productInfoMap.values().size());
+        Assertions.assertEquals(2, productInfoMap.get("prod-io").getRoleInfos().size());
+        Assertions.assertEquals(1, productInfoMap.get("prod-pn").getRoleInfos().size());
+        //Check all variables
+
     }
 
     @Test
@@ -686,14 +815,16 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/higher-role-active.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
 
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         //Then
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
@@ -709,14 +840,15 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/merge.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
 
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         //then
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
@@ -733,14 +865,15 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/higher-role-pending.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
 
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         Assertions.assertEquals("user1", userInfo.getName());
@@ -755,13 +888,14 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/active-role-different-status.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         Assertions.assertEquals("user1", userInfo.getName());
@@ -776,6 +910,8 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
@@ -790,10 +926,10 @@ class PartyConnectorImplTest {
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
         relationshipsResponse.add(relationshipInfo1);
         relationshipsResponse.add(relationshipInfo2);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId);
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         Assertions.assertEquals("user1", userInfo.getName());
@@ -921,6 +1057,7 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+
     @Test
     void activate_nullRelationshipId() {
         // given
@@ -967,25 +1104,5 @@ class PartyConnectorImplTest {
         Mockito.verify(restClientMock, Mockito.times(1))
                 .deleteRelationshipById(relationshipId);
         Mockito.verifyNoMoreInteractions(restClientMock);
-    }
-
-    @Test
-    void relationship_info_to_user_info_function() throws IOException {
-        // given
-        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/relationInfo-to-userInfo.json");
-        RelationshipInfo relationshipInfo = mapper.readValue(stub, RelationshipInfo.class);
-        // when
-        UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
-        // then
-        Assertions.assertEquals(relationshipInfo.getName(), userInfo.getName());
-        Assertions.assertEquals(relationshipInfo.getSurname(), userInfo.getSurname());
-        Assertions.assertEquals(relationshipInfo.getId(), userInfo.getRelationshipId());
-        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
-        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getProducts().get(0).getStatus());
-        Assertions.assertEquals(relationshipInfo.getEmail(), userInfo.getEmail());
-        Assertions.assertEquals(relationshipInfo.getFrom(), userInfo.getId());
-        Assertions.assertEquals(relationshipInfo.getProduct().getId(), userInfo.getProducts().get(0).getId());
-        Assertions.assertEquals(relationshipInfo.getProduct().getRole(), userInfo.getProducts().get(0).getRole());
-
     }
 }

@@ -56,7 +56,7 @@ public class RelationshipController {
 
     @DeleteMapping(value = "/{relationshipId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "{swagger.dashboard.institutions.api.deleteUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
                                        @PathVariable("relationshipId")
                                                String relationshipId) {

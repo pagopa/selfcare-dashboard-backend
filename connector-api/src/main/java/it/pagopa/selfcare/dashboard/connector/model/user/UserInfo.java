@@ -16,19 +16,20 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 public class UserInfo {
 
     private String id;
-    private String relationshipId;
     private String name;
     private String surname;
     private String email;
+    private String taxCode;
     private SelfCareAuthority role;
-    private List<ProductInfo> products;
+    private boolean certified;
+    private Map<String, ProductInfo> products;
     private String status;
 
 }

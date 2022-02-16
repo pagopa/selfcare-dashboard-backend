@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -115,11 +116,14 @@ public class InstitutionController {
                                                                      Optional<String> productId,
                                                              @ApiParam("${swagger.dashboard.user.model.role}")
                                                              @RequestParam(value = "role", required = false)
-                                                                     Optional<SelfCareAuthority> role) {
+                                                                     Optional<SelfCareAuthority> role,
+                                                             @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                                             @RequestParam(value = "productRoles", required = false)
+                                                                     Optional<Set<String>> productRoles) {
 
         log.trace("getInstitutionUsers start");
         log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
-        Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role);
+        Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role, productRoles);
         List<InstitutionUserResource> result = userInfos.stream()
                 .map(UserMapper::toInstitutionUser)
                 .collect(Collectors.toList());
@@ -163,12 +167,15 @@ public class InstitutionController {
                                                                         String productId,
                                                                 @ApiParam("${swagger.dashboard.user.model.role}")
                                                                 @RequestParam(value = "role", required = false)
-                                                                        Optional<SelfCareAuthority> role) {
+                                                                        Optional<SelfCareAuthority> role,
+                                                                @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                                                @RequestParam(value = "productRoles", required = false)
+                                                                        Optional<Set<String>> productRoles) {
 
         log.trace("getInstitutionProductUsers start");
         log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
 
-        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role);
+        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRoles);
         List<ProductUserResource> result = userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .collect(Collectors.toList());
@@ -195,7 +202,7 @@ public class InstitutionController {
                                                      CreateUserDto user) {
 
         log.trace("createInstitutionProductUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}" , institutionId, productId, user);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
         log.trace("createInstitutionProductUser end");
 
