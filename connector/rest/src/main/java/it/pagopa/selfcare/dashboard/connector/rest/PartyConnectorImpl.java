@@ -93,6 +93,26 @@ class PartyConnectorImpl implements PartyConnector {
         return product;
     };
 
+    private static final BinaryOperator<UserInfo> USER_INFO_MERGE_FUNCTION = (userInfo1, userInfo2) -> {
+        String id = userInfo2.getProducts().keySet().toArray()[0].toString();
+        if (userInfo1.getProducts().containsKey(id)) {
+            userInfo1.getProducts().get(id).getRoleInfos().addAll(userInfo2.getProducts().get(id).getRoleInfos());
+        } else {
+            userInfo1.getProducts().put(id, userInfo2.getProducts().get(id));
+        }
+        if (userInfo1.getStatus().equals(userInfo2.getStatus())) {
+            if (userInfo1.getRole().compareTo(userInfo2.getRole()) > 0) {
+                userInfo1.setRole(userInfo2.getRole());
+            }
+        } else {
+            if ("ACTIVE".equals(userInfo2.getStatus())) {
+                userInfo1.setRole(userInfo2.getRole());
+                userInfo1.setStatus(userInfo2.getStatus());
+            }
+        }
+        return userInfo1;
+    };
+
     static {
         PARTY_ROLE_AUTHORITY_MAP.put(MANAGER, ADMIN);
         PARTY_ROLE_AUTHORITY_MAP.put(DELEGATE, ADMIN);
@@ -229,25 +249,7 @@ class PartyConnectorImpl implements PartyConnector {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
                             RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION,
-                            (userInfo1, userInfo2) -> {
-                                String id = userInfo2.getProducts().keySet().toArray()[0].toString();
-                                if (userInfo1.getProducts().containsKey(id)) {
-                                    userInfo1.getProducts().get(id).getRoleInfos().addAll(userInfo2.getProducts().get(id).getRoleInfos());
-                                } else {
-                                    userInfo1.getProducts().put(id, userInfo2.getProducts().get(id));
-                                }
-                                if (userInfo1.getStatus().equals(userInfo2.getStatus())) {
-                                    if (userInfo1.getRole().compareTo(userInfo2.getRole()) > 0) {
-                                        userInfo1.setRole(userInfo2.getRole());
-                                    }
-                                } else {
-                                    if ("ACTIVE".equals(userInfo2.getStatus())) {
-                                        userInfo1.setRole(userInfo2.getRole());
-                                        userInfo1.setStatus(userInfo2.getStatus());
-                                    }
-                                }
-                                return userInfo1;
-                            })).values();
+                            USER_INFO_MERGE_FUNCTION)).values();
         }
         log.debug("getUsers result = {}", userInfos);
         log.trace("getUsers end");
