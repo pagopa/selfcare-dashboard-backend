@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
@@ -50,7 +51,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
         InstitutionInfo result = partyConnector.getInstitution(institutionId);
-        log.debug("getInstitution result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
     }
@@ -60,7 +61,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
         Collection<InstitutionInfo> result = partyConnector.getInstitutions();
-        log.debug("getInstitutions result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
     }
@@ -133,7 +134,7 @@ class InstitutionServiceImpl implements InstitutionService {
             }
         });
 
-        log.debug("getInstitutionUsers result = {}", userInfos);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
         return userInfos;
     }
@@ -150,7 +151,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, role, Optional.of(productId), productRoles);
 
-        log.debug("getInstitutionProductUsers result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
         return result;
     }
@@ -159,7 +160,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto user) {
         log.trace("createUsers start");
-        log.debug("createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");

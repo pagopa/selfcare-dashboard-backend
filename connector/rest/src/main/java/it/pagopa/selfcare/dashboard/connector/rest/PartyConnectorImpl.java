@@ -143,7 +143,7 @@ class PartyConnectorImpl implements PartyConnector {
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
-        log.debug("getInstitution result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
     }
@@ -154,7 +154,7 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("getInstitutions start");
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
-        log.debug("getInstitutions result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
     }
@@ -172,7 +172,7 @@ class PartyConnectorImpl implements PartyConnector {
                             Map::values
                     ));
         }
-        log.debug("parseOnBoardingInfo result = {}", institutions);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "parseOnBoardingInfo result = {}", institutions);
         log.trace("parseOnBoardingInfo end");
         return institutions;
     }
@@ -251,7 +251,7 @@ class PartyConnectorImpl implements PartyConnector {
                             RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION,
                             USER_INFO_MERGE_FUNCTION)).values();
         }
-        log.debug("getUsers result = {}", userInfos);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUsers result = {}", userInfos);
         log.trace("getUsers end");
         return userInfos;
     }
@@ -260,7 +260,7 @@ class PartyConnectorImpl implements PartyConnector {
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
         log.trace("createUsers start");
-        log.debug("createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
         Assert.hasText(institutionId, "An Institution id is required");
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");
