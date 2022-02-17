@@ -5,7 +5,7 @@
     "name": "user1",
     "surname": "string",
     "email": "string",
-    "role": "OPERATOR",
+    "role": "DELEGATE",
     "product": {
       "id": "prod-io",
       "role": "api",
@@ -21,13 +21,13 @@
     "name": "user1",
     "surname": "string",
     "email": "string",
-    "role": "DELEGATE",
+    "role": "OPERATOR",
     "product": {
       "id": "prod-pn",
       "role": "security",
       "createdAt": "2022-02-07T14:20:31.373Z"
     },
-    "state": "ACTIVE",
+    "state": "PENDING",
     "createdAt": "2022-02-07T14:20:31.373Z",
     "updatedAt": "2022-02-07T14:20:31.373Z"
   }

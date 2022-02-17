@@ -756,6 +756,7 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+
     @Test
     void relationship_info_to_user_info_function() throws IOException {
         // given
@@ -769,6 +770,7 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
         Assertions.assertEquals(relationshipInfo.getEmail(), userInfo.getEmail());
         Assertions.assertEquals(relationshipInfo.getFrom(), userInfo.getId());
+        Assertions.assertEquals(relationshipInfo.getTaxCode(), userInfo.getTaxCode());
         String prodId = null;
         Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
         for (String key :
@@ -805,7 +807,6 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(2, productInfoMap.values().size());
         Assertions.assertEquals(2, productInfoMap.get("prod-io").getRoleInfos().size());
         Assertions.assertEquals(1, productInfoMap.get("prod-pn").getRoleInfos().size());
-        //Check all variables
 
     }
 
@@ -816,8 +817,6 @@ class PartyConnectorImplTest {
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<String> productId = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
-
-
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/higher-role-active.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
 
@@ -904,6 +903,27 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(1, userInfos.size());
     }
 
+    @Test
+    void getUsers_activeRoleUserDifferentStatus_2() throws IOException {
+        //given
+        String institutionId = "institutionId";
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/active-role-different-status-2.json");
+        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
+        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(relationshipsResponse);
+        //when
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRole);
+        UserInfo userInfo = userInfos.iterator().next();
+        //Then
+        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertEquals(ADMIN, userInfo.getRole());
+        Assertions.assertEquals("ACTIVE", userInfo.getStatus());
+        Assertions.assertEquals(1, userInfos.size());
+    }
     @Test
     void getUsers_activeRoleUserDifferentStatus2() {
         //given
@@ -1056,7 +1076,6 @@ class PartyConnectorImplTest {
                 .suspendRelationship(relationshipId);
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
-
 
     @Test
     void activate_nullRelationshipId() {

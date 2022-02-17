@@ -95,6 +95,7 @@ class PartyConnectorImpl implements PartyConnector {
 
     private static final BinaryOperator<UserInfo> USER_INFO_MERGE_FUNCTION = (userInfo1, userInfo2) -> {
         String id = userInfo2.getProducts().keySet().toArray()[0].toString();
+
         if (userInfo1.getProducts().containsKey(id)) {
             userInfo1.getProducts().get(id).getRoleInfos().addAll(userInfo2.getProducts().get(id).getRoleInfos());
         } else {
@@ -110,7 +111,8 @@ class PartyConnectorImpl implements PartyConnector {
                 userInfo1.setStatus(userInfo2.getStatus());
             }
         }
-        return userInfo1;
+        UserInfo result = userInfo1;
+        return result;
     };
 
     static {
