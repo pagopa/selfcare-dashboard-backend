@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,6 @@ class InstitutionServiceImplTest {
         SecurityContextHolder.clearContext();
     }
 
-
     @Test
     void getInstitution() {
         // given
@@ -69,7 +69,6 @@ class InstitutionServiceImplTest {
                 .getInstitution(institutionId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
-
 
     @Test
     void getInstitutions() {
@@ -88,7 +87,6 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
-
     @Test
     void getInstitutionProducts_emptyProducts() {
         //given
@@ -104,7 +102,6 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoMoreInteractions(productsConnectorMock);
         Mockito.verifyNoInteractions(partyConnectorMock);
     }
-
 
     @Test
     void getInstitutionProducts_GrantedAuthorityOnDifferentInstId() {
@@ -129,7 +126,6 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoInteractions(partyConnectorMock);
     }
 
-
     @Test
     void getInstitutionProducts_limitedWithEmptyInstProducts() {
         //given
@@ -153,7 +149,6 @@ class InstitutionServiceImplTest {
         Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
-
 
     @Test
     void getInstitutionProducts_adminWithEmptyInstProducts() {
@@ -180,7 +175,6 @@ class InstitutionServiceImplTest {
         Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
-
 
     @Test
     void getInstitutionProducts_limitedWithNotEmptyInstProducts() {
@@ -229,7 +223,6 @@ class InstitutionServiceImplTest {
         Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
-
 
     @Test
     void getInstitutionProducts_adminWithNotEmptyInstProducts() {
@@ -288,7 +281,6 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
-
     @Test
     void getInstitutionProductUsers_nullInstitutionId() {
         // given
@@ -303,7 +295,6 @@ class InstitutionServiceImplTest {
         Assertions.assertEquals("An Institution id is required", e.getMessage());
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
-
 
     @Test
     void getInstitutionProductUsers_nullProductId() {
@@ -350,24 +341,25 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
-
     @Test
     void getInstitutionProductUsers() {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(productId));
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
+        Optional<String> userId = Optional.empty();
         // when
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
         // then
         Assertions.assertNotNull(userInfos);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getUsers(institutionId, role, Optional.of(productId), productRole);
+                .getUsers(institutionId, userInfoFilter);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
         Mockito.verifyNoInteractions(productsConnectorMock);
     }
-
 
     @Test
     void getInstitutionUsers_nullInstitutionId() {
@@ -383,7 +375,6 @@ class InstitutionServiceImplTest {
         Assertions.assertEquals("An Institution id is required", e.getMessage());
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
-
 
     @Test
     void getInstitutionUsers_nullProductIds() {
@@ -432,6 +423,93 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
+    @Test
+    void getInstitutionUser() {
+        // given
+        String institutionId = "institutionId";
+        Optional<String> productId = Optional.empty();
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+        Optional<String> userId = Optional.of("userId1");
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setUserId(userId);
+
+        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
+
+        userInfoMock1.setId("userId1");
+
+        ProductInfo productInfo1 = new ProductInfo();
+
+        String productId1 = "prod-1";
+        productInfo1.setId(productId1);
+
+        Map<String, ProductInfo> products1 = new HashMap<>();
+        products1.put(productId1, productInfo1);
+        userInfoMock1.setProducts(products1);
+
+        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(userInfoMock1));
+        Product product1 = TestUtils.mockInstance(new Product(), "setId");
+        product1.setId(productId1);
+
+        Map<String, Product> idToProductMap = Map.of(productId1, product1);
+        Mockito.when(productsConnectorMock.getProducts())
+                .thenReturn(new ArrayList<>(idToProductMap.values()));
+        // when
+        UserInfo userInfo = institutionService.getInstitutionUser(institutionId, userId.orElse(null));
+        // then
+        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
+        Assertions.assertNotNull(userInfo.getProducts());
+        Assertions.assertEquals(1, userInfo.getProducts().size());
+        for (String key : productInfoMap.keySet()) {
+            ProductInfo productInfo = productInfoMap.get(key);
+            Assertions.assertEquals(idToProductMap.get(productInfo.getId()).getTitle(), productInfo.getTitle());
+        }
+
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getUsers(institutionId, userInfoFilter);
+        Mockito.verify(productsConnectorMock, Mockito.times(1))
+                .getProducts();
+        Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
+    }
+
+    @Test
+    void getInstitutionUser_nullUserId() {
+        // given
+        String institutionId = "institutionId";
+        String userId = null;
+        // when
+        Executable executable = () -> institutionService.getInstitutionUser(institutionId, userId);
+        // then
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A user id is required", e.getMessage());
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+
+    }
+
+    @Test
+    void getInstitutionUser_userNotFound() {
+        // given
+        String institutionId = "institutionId";
+        Optional<String> productId = Optional.empty();
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+        Optional<String> userId = Optional.of("userId1");
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setUserId(userId);
+        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+                .thenReturn(Collections.emptyList());
+        // when
+        Executable executable = () -> institutionService.getInstitutionUser(institutionId, userId.get());
+        // then
+        ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
+        Assertions.assertEquals("No User found for the given userId", e.getMessage());
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getUsers(institutionId, userInfoFilter);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+
+    }
 
     @Test
     void getInstitutionUsers() {
@@ -440,32 +518,45 @@ class InstitutionServiceImplTest {
         Optional<String> productId = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
+        Optional<String> userId = Optional.empty();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
-        UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo(), "setId");
+        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
+
         ProductInfo productInfo1 = new ProductInfo();
+        ProductInfo productInfo2 = new ProductInfo();
+        ProductInfo productInfo3 = new ProductInfo();
+
         String productId1 = "prod-1";
         String productId2 = "prod-2";
+        String productId3 = "prod-3";
         productInfo1.setId(productId1);
-        ProductInfo productInfo2 = new ProductInfo();
         productInfo2.setId(productId2);
-        Map<String, ProductInfo> products = new HashMap<>();
-        products.put(productId1, productInfo1);
-        products.put(productId2, productInfo2);
-        userInfoMock.setProducts(products);
-        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(List.of(userInfoMock));
+        productInfo3.setId(productId3);
+        Map<String, ProductInfo> products1 = new HashMap<>();
+        products1.put(productId1, productInfo1);
+        products1.put(productId2, productInfo2);
+        userInfoMock1.setProducts(products1);
+        HashMap<String, ProductInfo> products2 = new HashMap<>();
+        products2.put(productId3, productInfo3);
+        userInfoMock2.setProducts(products2);
+        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(userInfoMock1, userInfoMock2));
         Product product1 = TestUtils.mockInstance(new Product(), 1, "setId");
         product1.setId(productId1);
         Product product2 = TestUtils.mockInstance(new Product(), 2, "setId");
         product2.setId(productId2);
-        Map<String, Product> idToProductMap = Map.of(productId1, product1, productId2, product2);
+        Product product3 = TestUtils.mockInstance(new Product(), 3, "setId");
+        product3.setId(productId3);
+        Map<String, Product> idToProductMap = Map.of(productId1, product1, productId2, product2, productId3, product3);
         Mockito.when(productsConnectorMock.getProducts())
                 .thenReturn(new ArrayList<>(idToProductMap.values()));
         // when
         Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
         // then
         Assertions.assertNotNull(userInfos);
-        Assertions.assertEquals(1, userInfos.size());
+        Assertions.assertEquals(2, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
         Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
         Assertions.assertNotNull(userInfo.getProducts());
@@ -476,12 +567,11 @@ class InstitutionServiceImplTest {
         }
 
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getUsers(institutionId, role, Optional.empty(), productRole);
+                .getUsers(institutionId, userInfoFilter);
         Mockito.verify(productsConnectorMock, Mockito.times(1))
                 .getProducts();
         Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
     }
-
 
     @Test
     void createUsers_nullInstitutionId() {
@@ -497,7 +587,6 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
-
     @Test
     void createUsers_nullProductId() {
         // given
@@ -512,7 +601,6 @@ class InstitutionServiceImplTest {
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
-
     @Test
     void createUsers_nullUser() {
         // given
@@ -526,7 +614,6 @@ class InstitutionServiceImplTest {
         Assertions.assertEquals("An User is required", e.getMessage());
         Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
-
 
     @ParameterizedTest
     @ValueSource(strings = {"MANAGER", "DELEGATE", "SUB_DELEGATE", "OPERATOR", "invalid"})

@@ -119,7 +119,7 @@ public class InstitutionController {
                                                                      Optional<SelfCareAuthority> role,
                                                              @ApiParam("${swagger.dashboard.user.model.productRoles}")
                                                              @RequestParam(value = "productRoles", required = false)
-                                                                     Optional<Set<String>> productRoles) {
+                                                                         Optional<Set<String>> productRoles) {
 
         log.trace("getInstitutionUsers start");
         log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
@@ -129,6 +129,28 @@ public class InstitutionController {
                 .collect(Collectors.toList());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", result);
         log.trace("getInstitutionUsers end");
+
+        return result;
+    }
+
+
+    @GetMapping(value = "/{institutionId}/users/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    public InstitutionUserResource getInstitutionUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                      @PathVariable("institutionId")
+                                                              String institutionId,
+                                                      @ApiParam("${swagger.dashboard.user.model.id}")
+                                                      @PathVariable("userId")
+                                                              String userId) {
+
+        log.trace("getInstitutionUser start");
+        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
+        UserInfo userInfo = institutionService.getInstitutionUser(institutionId, userId);
+        InstitutionUserResource result = UserMapper.toInstitutionUser(userInfo);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
+        log.trace("getInstitutionUser end");
 
         return result;
     }

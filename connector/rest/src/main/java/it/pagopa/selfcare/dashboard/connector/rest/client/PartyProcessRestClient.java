@@ -24,7 +24,8 @@ public interface PartyProcessRestClient {
                                                       @RequestParam(value = "roles", required = false) EnumSet<PartyRole> roles,
                                                       @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states,
                                                       @RequestParam(value = "products", required = false) Set<String> products,
-                                                      @RequestParam(value = "productRoles", required = false) Set<String> productRoles);
+                                                      @RequestParam(value = "productRoles", required = false) Set<String> productRoles,
+                                                      @RequestParam(value = "personId", required = false) String personId);
 
     @GetMapping(value = "${rest-client.party-process.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

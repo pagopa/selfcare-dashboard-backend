@@ -227,9 +227,11 @@
     },
     "/institutions/{institutionId}/products/{productId}/users" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionProductUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionProductUsers",
+        "description": "Service to get all the users related to a specific pair of institution-product",
         "operationId": "getInstitutionProductUsersUsingGET",
         "parameters": [
           {
@@ -298,8 +300,8 @@
           "403": {
             "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
         "security" : [ {
@@ -360,9 +362,11 @@
     },
     "/institutions/{institutionId}/users" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUsers",
+        "description": "Service to get all the users related to a specific pair of institution-product",
         "operationId": "getInstitutionUsersUsingGET",
         "parameters": [
           {
@@ -431,25 +435,92 @@
           "403": {
             "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/products/{productId}/roles" : {
-      "get" : {
-        "tags" : [ "products" ],
-        "summary" : "getProductRoles",
-        "description" : "Service to get the Product roles",
-        "operationId" : "getProductRolesUsingGET",
-        "parameters" : [ {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
+    "/institutions/{institutionId}/users/{userId}": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUser",
+        "description": "${swagger.dashboard.institutions.api.getInstitutionUser}",
+        "operationId": "getInstitutionUserUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionUserResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/products/{productId}/roles": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "getProductRoles",
+        "description": "Service to get the Product roles",
+        "operationId": "getProductRolesUsingGET",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
