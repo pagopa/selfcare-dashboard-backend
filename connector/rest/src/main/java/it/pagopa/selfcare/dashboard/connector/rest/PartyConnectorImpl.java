@@ -111,8 +111,7 @@ class PartyConnectorImpl implements PartyConnector {
                 userInfo1.setStatus(userInfo2.getStatus());
             }
         }
-        UserInfo result = userInfo1;
-        return result;
+        return userInfo1;
     };
 
     static {
