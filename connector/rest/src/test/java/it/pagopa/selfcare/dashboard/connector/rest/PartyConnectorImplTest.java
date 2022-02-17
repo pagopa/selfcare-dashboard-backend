@@ -1073,10 +1073,4 @@ class PartyConnectorImplTest {
 
     }
 
-
-    @Test
-    void getUser_noResource() {
-
-    }
-
 }
