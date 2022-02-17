@@ -1,25 +1,40 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
-import it.pagopa.selfcare.dashboard.web.model.UserResource;
+import it.pagopa.selfcare.dashboard.web.model.*;
 
 import java.util.stream.Collectors;
 
 public class UserMapper {
 
-    private static InstitutionUserResource.ProductInfo toUserProductInfo(ProductInfo model) {
-        InstitutionUserResource.ProductInfo resource = null;
+    private static ProductInfoResource toUserProductInfoResource(ProductInfo model) {
+        ProductInfoResource resource = null;
         if (model != null) {
-            resource = new InstitutionUserResource.ProductInfo();
+            resource = new ProductInfoResource();
             resource.setId(model.getId());
             resource.setTitle(model.getTitle());
+            resource.setRoleInfos(model.getRoleInfos()
+                    .stream()
+                    .map(UserMapper::toRoleInfoResource)
+                    .collect(Collectors.toList())
+            );
         }
 
+        return resource;
+    }
+
+    private static ProductRoleInfoResource toRoleInfoResource(RoleInfo model) {
+        ProductRoleInfoResource resource = null;
+        if (model != null) {
+            resource = new ProductRoleInfoResource();
+            resource.setRelationshipId(model.getRelationshipId());
+            resource.setRole(model.getRole());
+            resource.setSelcRole(model.getSelcRole());
+            resource.setStatus(model.getStatus());
+        }
         return resource;
     }
 
@@ -46,9 +61,12 @@ public class UserMapper {
             resource.setEmail(model.getEmail());
             resource.setRole(model.getRole());
             resource.setStatus(model.getStatus());
+            resource.setFiscalCode(model.getTaxCode());
+            resource.setCertification(model.isCertified());
             if (model.getProducts() != null) {
-                resource.setProducts(model.getProducts().stream()
-                        .map(UserMapper::toUserProductInfo)
+                resource.setProducts(model.getProducts().values()
+                        .stream()
+                        .map(UserMapper::toUserProductInfoResource)
                         .collect(Collectors.toList()));
             }
         }
@@ -62,12 +80,19 @@ public class UserMapper {
         if (model != null) {
             resource = new ProductUserResource();
             resource.setId(model.getId());
-            resource.setRelationshipId(model.getRelationshipId());
             resource.setName(model.getName());
             resource.setSurname(model.getSurname());
             resource.setEmail(model.getEmail());
             resource.setRole(model.getRole());
             resource.setStatus(model.getStatus());
+            resource.setFiscalCode(model.getTaxCode());
+            resource.setCertification(model.isCertified());
+            if (model.getProducts() != null) {
+                resource.setProduct(model.getProducts().values()
+                        .stream()
+                        .map(UserMapper::toUserProductInfoResource)
+                        .collect(Collectors.toList()).get(0));
+            }
         }
 
         return resource;

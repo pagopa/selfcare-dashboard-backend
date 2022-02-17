@@ -42,6 +42,9 @@ class InstitutionUserResourceTest {
         toCheckMap.put("role", NotNull.class);
         toCheckMap.put("status", NotBlank.class);
         toCheckMap.put("products", NotNull.class);
+        toCheckMap.put("fiscalCode", NotBlank.class);
+        toCheckMap.put("certification", NotNull.class);
+
         InstitutionUserResource institutionResource = new InstitutionUserResource();
         institutionResource.setId(null);
         institutionResource.setName(null);
@@ -50,6 +53,8 @@ class InstitutionUserResourceTest {
         institutionResource.setRole(null);
         institutionResource.setStatus(null);
         institutionResource.setProducts(null);
+        institutionResource.setFiscalCode(null);
+        institutionResource.setCertification(false);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionResource);
@@ -82,9 +87,11 @@ class InstitutionUserResourceTest {
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("id", NotBlank.class);
         toCheckMap.put("title", NotBlank.class);
-        InstitutionUserResource.ProductInfo productInfo = new InstitutionUserResource.ProductInfo();
+        toCheckMap.put("roleInfos", NotNull.class);
+        ProductInfoResource productInfo = new ProductInfoResource();
         productInfo.setId(null);
         productInfo.setTitle(null);
+        productInfo.setRoleInfos(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(productInfo);
@@ -102,7 +109,8 @@ class InstitutionUserResourceTest {
     @Test
     void validateNotNullFields_ProductInfo() {
         // given
-        InstitutionUserResource.ProductInfo productInfo = TestUtils.mockInstance(new InstitutionUserResource.ProductInfo());
+        ProductInfoResource productInfo = TestUtils.mockInstance(new ProductInfoResource());
+        productInfo.setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(productInfo);
         // then

@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
@@ -7,7 +8,9 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
+import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
@@ -58,28 +61,57 @@ class PartyConnectorImpl implements PartyConnector {
     };
     static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
         UserInfo userInfo = new UserInfo();
-        userInfo.setRelationshipId(relationshipInfo.getId());
         userInfo.setId(relationshipInfo.getFrom());
         userInfo.setName(relationshipInfo.getName());
         userInfo.setSurname(relationshipInfo.getSurname());
         userInfo.setEmail(relationshipInfo.getEmail());
         userInfo.setStatus(relationshipInfo.getState().toString());
+        userInfo.setCertified(Certification.isCertified(relationshipInfo.getCertification()));
+        userInfo.setTaxCode(relationshipInfo.getTaxCode());
         userInfo.setRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
         it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
                 = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
         productInfo.setId(relationshipInfo.getProduct().getId());
-        productInfo.setRole(relationshipInfo.getProduct().getRole());
-        productInfo.setStatus(relationshipInfo.getState().toString());
-        ArrayList<it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new ArrayList<>();
-        products.add(productInfo);
+        RoleInfo roleInfo = new RoleInfo();
+        roleInfo.setRelationshipId(relationshipInfo.getId());
+        roleInfo.setSelcRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
+        roleInfo.setRole(relationshipInfo.getProduct().getRole());
+        roleInfo.setStatus(relationshipInfo.getState().toString());
+        ArrayList<RoleInfo> roleInfos = new ArrayList<>();
+        roleInfos.add(roleInfo);
+        productInfo.setRoleInfos(roleInfos);
+        Map<String, it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new HashMap<>();
+        products.put(productInfo.getId(), productInfo);
         userInfo.setProducts(products);
         return userInfo;
     };
+
     private static final Function<Product, PartyProduct> PRODUCT_INFO_TO_PRODUCT_FUNCTION = productInfo -> {
         PartyProduct product = new PartyProduct();
         product.setId(productInfo.getId());
         product.setStatus(ProductStatus.valueOf(productInfo.getState().toString()));
         return product;
+    };
+
+    private static final BinaryOperator<UserInfo> USER_INFO_MERGE_FUNCTION = (userInfo1, userInfo2) -> {
+        String id = userInfo2.getProducts().keySet().toArray()[0].toString();
+
+        if (userInfo1.getProducts().containsKey(id)) {
+            userInfo1.getProducts().get(id).getRoleInfos().addAll(userInfo2.getProducts().get(id).getRoleInfos());
+        } else {
+            userInfo1.getProducts().put(id, userInfo2.getProducts().get(id));
+        }
+        if (userInfo1.getStatus().equals(userInfo2.getStatus())) {
+            if (userInfo1.getRole().compareTo(userInfo2.getRole()) > 0) {
+                userInfo1.setRole(userInfo2.getRole());
+            }
+        } else {
+            if ("ACTIVE".equals(userInfo2.getStatus())) {
+                userInfo1.setRole(userInfo2.getRole());
+                userInfo1.setStatus(userInfo2.getStatus());
+            }
+        }
+        return userInfo1;
     };
 
     static {
@@ -112,7 +144,7 @@ class PartyConnectorImpl implements PartyConnector {
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
-        log.debug("getInstitution result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
     }
@@ -123,7 +155,7 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("getInstitutions start");
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
-        log.debug("getInstitutions result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
     }
@@ -131,7 +163,7 @@ class PartyConnectorImpl implements PartyConnector {
 
     private Collection<InstitutionInfo> parseOnBoardingInfo(OnBoardingInfo onBoardingInfo) {
         log.trace("parseOnBoardingInfo start");
-        log.debug("parseOnBoardingInfo onBoardingInfo = {}", onBoardingInfo);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "parseOnBoardingInfo onBoardingInfo = {}", onBoardingInfo);
         Collection<InstitutionInfo> institutions = Collections.emptyList();
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             institutions = onBoardingInfo.getInstitutions().stream()
@@ -141,7 +173,7 @@ class PartyConnectorImpl implements PartyConnector {
                             Map::values
                     ));
         }
-        log.debug("parseOnBoardingInfo result = {}", institutions);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "parseOnBoardingInfo result = {}", institutions);
         log.trace("parseOnBoardingInfo end");
         return institutions;
     }
@@ -198,12 +230,13 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId) {
+    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId, Optional<Set<String>> productRoles) {
         log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
+        log.debug("getUsers institutionId = {}, role = {}, productId = {}, productRoles = {}", institutionId, role, productId, productRoles);
         Assert.hasText(institutionId, "An Institution id is required");
         Assert.notNull(role, "An Optional role object is required");
         Assert.notNull(productId, "An Optional Product id object is required");
+        Assert.notNull(productRoles, "An optional Product role is required");
         Collection<UserInfo> userInfos = Collections.emptyList();
         EnumSet<PartyRole> roles = null;
         if (role.isPresent()) {
@@ -212,27 +245,14 @@ class PartyConnectorImpl implements PartyConnector {
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
-        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, allowedStates, productId.map(Set::of).orElse(null));
+        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, allowedStates, productId.map(Set::of).orElse(null), productRoles.orElse(null));
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
                             RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION,
-                            (userInfo1, userInfo2) -> {
-                                userInfo1.getProducts().addAll(userInfo2.getProducts());
-                                if (userInfo1.getStatus().equals(userInfo2.getStatus())) {
-                                    if (userInfo1.getRole().compareTo(userInfo2.getRole()) > 0) {
-                                        userInfo1.setRole(userInfo2.getRole());
-                                    }
-                                } else {
-                                    if ("ACTIVE".equals(userInfo2.getStatus())) {
-                                        userInfo1.setRole(userInfo2.getRole());
-                                        userInfo1.setStatus(userInfo2.getStatus());
-                                    }
-                                }
-                                return userInfo1;
-                            })).values();
+                            USER_INFO_MERGE_FUNCTION)).values();
         }
-        log.debug("getUsers result = {}", userInfos);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUsers result = {}", userInfos);
         log.trace("getUsers end");
         return userInfos;
     }
@@ -241,7 +261,7 @@ class PartyConnectorImpl implements PartyConnector {
     @Override
     public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
         log.trace("createUsers start");
-        log.debug("createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
         Assert.hasText(institutionId, "An Institution id is required");
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");

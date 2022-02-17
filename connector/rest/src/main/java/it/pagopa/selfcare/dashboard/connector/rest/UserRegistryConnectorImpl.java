@@ -24,9 +24,7 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
             user.setName(userResponse.getName());
             user.setSurname(userResponse.getSurname());
             user.setFiscalCode(userResponse.getExternalId());
-            if (userResponse.getCertification() != null && !Certification.NONE.equals(userResponse.getCertification())) {
-                user.setCertification(true);
-            }
+            user.setCertification(Certification.isCertified(userResponse.getCertification()));
             if (userResponse.getExtras() != null) {
                 user.setEmail(userResponse.getExtras().getEmail());
             }
@@ -43,13 +41,13 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     @Override
     public User getUser(String externalId) {
         log.trace("getUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}" , externalId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", externalId);
 
         Assert.hasText(externalId, "A TaxCode is required");
 
         UserResponse userResponse = restClient.getUserByExternalId(new EmbeddedExternalId(externalId));
         User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}" , result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}", result);
         log.trace("getUser end");
 
         return result;

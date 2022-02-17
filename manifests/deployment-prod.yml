@@ -31,6 +31,8 @@ spec:
                 name: inner-service-url
             - configMapRef:
                 name: jwt-exchange
+            - configMapRef:
+                name: common
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
