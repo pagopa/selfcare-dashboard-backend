@@ -14,6 +14,9 @@
       },
       "roles": {
         "matches": "^(?:MANAGER|DELEGATE|SUB_DELEGATE|OPERATOR){0,1}(?:,(?:MANAGER|DELEGATE|SUB_DELEGATE|OPERATOR))*$"
+      },
+      "personId": {
+        "matches": "^\\w*(,\\w+)*$"
       }
     }
   },

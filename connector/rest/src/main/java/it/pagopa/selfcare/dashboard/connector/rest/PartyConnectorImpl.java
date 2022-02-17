@@ -228,24 +228,21 @@ class PartyConnectorImpl implements PartyConnector {
         return authInfos;
     }
 
-
     @Override
-    public Collection<UserInfo> getUsers(String institutionId, Optional<SelfCareAuthority> role, Optional<String> productId, Optional<Set<String>> productRoles) {
+    public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, role = {}, productId = {}, productRoles = {}", institutionId, role, productId, productRoles);
+        log.debug("getUsers institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
         Assert.hasText(institutionId, "An Institution id is required");
-        Assert.notNull(role, "An Optional role object is required");
-        Assert.notNull(productId, "An Optional Product id object is required");
-        Assert.notNull(productRoles, "An optional Product role is required");
+
         Collection<UserInfo> userInfos = Collections.emptyList();
         EnumSet<PartyRole> roles = null;
-        if (role.isPresent()) {
+        if (userInfoFilter.getRole().isPresent()) {
             roles = PARTY_ROLE_AUTHORITY_MAP.entrySet().stream()
-                    .filter(entry -> role.get().equals(entry.getValue()))
+                    .filter(entry -> userInfoFilter.getRole().get().equals(entry.getValue()))
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
-        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, allowedStates, productId.map(Set::of).orElse(null), productRoles.orElse(null));
+        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, allowedStates, userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,

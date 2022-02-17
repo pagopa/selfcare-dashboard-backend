@@ -9,11 +9,14 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
+import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,7 +43,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class})
+@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class, DashboardExceptionsHandler.class})
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
@@ -81,7 +85,6 @@ class InstitutionControllerTest {
                 .storeInstitutionLogo(Mockito.eq(institutionId), Mockito.any(), Mockito.eq(contentType), Mockito.eq(filename));
         Mockito.verifyNoMoreInteractions(storageServiceMock);
     }
-
 
     @Test
     void getInstitution_institutionInfoNotNull() throws Exception {
@@ -129,7 +132,6 @@ class InstitutionControllerTest {
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
-
     @Test
     void getInstitutions_institutionInfoNotNull() throws Exception {
         // given
@@ -152,7 +154,6 @@ class InstitutionControllerTest {
                 .getInstitutions();
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
-
 
     @Test
     void getInstitutionProducts_notNull() throws Exception {
@@ -229,7 +230,6 @@ class InstitutionControllerTest {
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
-
     @Test
     void getInstitutionUsers_notEmpty() throws Exception {
         // given
@@ -261,6 +261,49 @@ class InstitutionControllerTest {
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
+    @Test
+    void getInstitutionUser_nullUser() throws Exception {
+        //given
+        String institutionId = "institutionId";
+        String userId = "notFound";
+        Mockito.when(institutionServiceMock.getInstitutionUser(Mockito.any(), Mockito.any()))
+                .thenThrow(ResourceNotFoundException.class);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()))
+                .andReturn();
+        //then
+        Assertions.assertEquals(0, result.getResponse().getContentLength());
+
+    }
+
+    @Test
+    void getInstitutionUser_notNullUser() throws Exception {
+        //given
+        String institutionId = "institutionId";
+        String userId = "notFound";
+        UserInfo userInfo = TestUtils.mockInstance(new UserInfo());
+
+        Mockito.when(institutionServiceMock.getInstitutionUser(Mockito.any(), Mockito.any()))
+                .thenReturn(userInfo);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        //then
+        InstitutionUserResource userResource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionUserResource.class);
+        assertNotNull(userResource);
+        Mockito.verify(institutionServiceMock, Mockito.times(1))
+                .getInstitutionUser(institutionId, userId);
+        Mockito.verifyNoMoreInteractions(institutionServiceMock);
+
+    }
 
     @Test
     void getInstitutionProductUsers_empty() throws Exception {
@@ -287,7 +330,6 @@ class InstitutionControllerTest {
                 .getInstitutionProductUsers(institutionId, productId, Optional.empty(), Optional.empty());
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
-
 
     @Test
     void getInstitutionProductUsers_notEmpty() throws Exception {

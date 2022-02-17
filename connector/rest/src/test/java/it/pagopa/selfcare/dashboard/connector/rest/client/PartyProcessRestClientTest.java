@@ -87,8 +87,9 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         EnumSet<RelationshipState> states = null;
         Set<String> products = null;
         Set<String> productRole = null;
+        String userId = null;
         // when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole);
+        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
@@ -116,8 +117,9 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         EnumSet<RelationshipState> states = null;
         Set<String> products = null;
         Set<String> productRole = null;
+        String userId = null;
         // when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole);
+        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());
@@ -137,8 +139,9 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         EnumSet<RelationshipState> states = EnumSet.of(ACTIVE, PENDING);
         Set<String> products = Set.of("prod1", "prod2");
         Set<String> productRole = Set.of("api", "security");
+        String userId = "userId";
         // when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole);
+        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
 
         // then
         Assert.assertNotNull(response);

@@ -21,6 +21,8 @@ public interface InstitutionService {
 
     Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
+    UserInfo getInstitutionUser(String institutionId, String userId);
+
     Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
     void createUsers(String institutionId, String productId, CreateUserDto user);

@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -33,6 +34,8 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 class InstitutionServiceImpl implements InstitutionService {
 
     private static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
+    private static final String REQUIRED_USER_ID = "A user id is required";
+
     private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATOR");
 
     private final PartyConnector partyConnector;
@@ -123,7 +126,27 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(role, "An Optional role object is required");
         Assert.notNull(productRoles, "An Optional product role object is required");
 
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, role, productId, productRoles);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setUserId(null);
+        userInfoFilter.setRole(role);
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
+        Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
+        log.trace("getInstitutionUsers end");
+        return userInfos;
+    }
+
+
+    private Collection<UserInfo> getInstitutionUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
+        log.trace("getInstitutionUsers start");
+        log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}, productRoles = {}",
+                institutionId, userInfoFilter.getProductId(), userInfoFilter.getRole(), userInfoFilter.getProductRoles());
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.notNull(userInfoFilter, "A UserInfoFilter object is required");
+
+
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
         Map<String, Product> idToProductMap = productsConnector.getProducts().stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
 
@@ -141,6 +164,26 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
     @Override
+    public UserInfo getInstitutionUser(String institutionId, String userId) {
+        log.trace("getInstitutionUser start");
+        log.debug("institutionId = {}, userId = {}", institutionId, userId);
+
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.hasText(userId, REQUIRED_USER_ID);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setUserId(Optional.of(userId));
+
+        Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
+        if (!userInfos.iterator().hasNext()) {
+            throw new ResourceNotFoundException("No User found for the given userId");
+        }
+        UserInfo result = userInfos.iterator().next();
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
+        log.trace("getInstitutionUser end");
+        return result;
+    }
+
+    @Override
     public Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles) {
         log.trace("getInstitutionProductUsers start");
         log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}, productRoles = {}", institutionId, productId, role, productRoles);
@@ -148,8 +191,12 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(role, "An Optional role object is required");
         Assert.notNull(productRoles, "An Optional product role object is required");
-
-        Collection<UserInfo> result = partyConnector.getUsers(institutionId, role, Optional.of(productId), productRoles);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setUserId(null);
+        userInfoFilter.setRole(role);
+        userInfoFilter.setProductId(Optional.of(productId));
+        userInfoFilter.setProductRoles(productRoles);
+        Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
