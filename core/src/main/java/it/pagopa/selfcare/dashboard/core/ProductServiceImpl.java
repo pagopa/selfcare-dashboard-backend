@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
 import java.util.Map;
 
 @Slf4j
@@ -31,7 +30,6 @@ class ProductServiceImpl implements ProductService {
         Assert.hasText(productId, "A Product id is required");
 
         Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
-        Collection<String> result = null;
         log.debug("getProductRoles result = {}", productRoleMappings);
         log.trace("getProductRoles end");
         return productRoleMappings;
