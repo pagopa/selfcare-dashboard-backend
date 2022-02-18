@@ -6,9 +6,11 @@ import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -616,7 +618,7 @@ class InstitutionServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"MANAGER", "DELEGATE", "SUB_DELEGATE", "OPERATOR", "invalid"})
+    @ValueSource(strings = {"MANAGER", "DELEGATE", "SUB_DELEGATE", "OPERATOR"})
     void createUsers(String partyRole) {
         // given
         String institutionId = "institutionId";
@@ -624,8 +626,12 @@ class InstitutionServiceImplTest {
         String productRole = "productRole";
         CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setProductRole", "setPartyRole");
         createUserDto.setProductRole(productRole);
+        ProductRoleInfo.ProductRole role = new ProductRoleInfo.ProductRole();
+        role.setCode(productRole);
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        productRoleInfo.setRoles(List.of(role));
         Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
-                .thenReturn(Map.of(partyRole, List.of(productRole)));
+                .thenReturn(Map.of(PartyRole.valueOf(partyRole), productRoleInfo));
         // when
         Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
         // then

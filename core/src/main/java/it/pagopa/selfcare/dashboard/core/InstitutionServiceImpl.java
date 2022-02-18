@@ -6,9 +6,11 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -212,11 +214,11 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
 
-        Map<String, List<String>> productRoleMappings = productsConnector.getProductRoleMappings(productId);
+        Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
         Optional<String> partyRole = productRoleMappings.entrySet().stream()
-                .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
-                .filter(entry -> entry.getValue().contains(user.getProductRole()))
-                .map(Map.Entry::getKey)
+                .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey().toString()))
+                .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(user.getProductRole())))
+                .map(partyRoleProductRoleInfoEntry -> partyRoleProductRoleInfoEntry.getKey().toString())
                 .findAny();
         user.setPartyRole(partyRole.orElseThrow(() ->
                 new InvalidProductRoleException(String.format("Product role '%s' is not valid", user.getProductRole()))));

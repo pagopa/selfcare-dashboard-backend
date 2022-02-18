@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -444,7 +445,7 @@ class PartyConnectorImplTest {
     @EnumSource(value = PartyRole.class)
     void party2SelcRoleMapping(PartyRole partyRole) {
         // when
-        SelfCareAuthority authority = PartyConnectorImpl.PARTY_ROLE_AUTHORITY_MAP.get(partyRole);
+        SelfCareAuthority authority = partyRole.getSelfCareAuthority();
         // then
         assertEquals(PARTY_2_SELC_ROLE.apply(partyRole), authority);
     }
