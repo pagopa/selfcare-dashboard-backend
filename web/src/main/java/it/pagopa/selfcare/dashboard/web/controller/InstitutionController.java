@@ -227,7 +227,6 @@ public class InstitutionController {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
         log.trace("createInstitutionProductUser end");
-
     }
 
 }

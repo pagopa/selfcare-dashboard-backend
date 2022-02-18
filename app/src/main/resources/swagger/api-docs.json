@@ -799,10 +799,16 @@
   "components" : {
     "schemas" : {
       "CreateUserDto" : {
-        "title" : "CreateUserDto",
-        "required" : [ "email", "name", "productRole", "surname", "taxCode" ],
-        "type" : "object",
-        "properties" : {
+        "title": "CreateUserDto",
+        "required": [
+          "email",
+          "name",
+          "productRoles",
+          "surname",
+          "taxCode"
+        ],
+        "type": "object",
+        "properties": {
           "email": {
             "type": "string",
             "description": "User's email"
@@ -811,9 +817,13 @@
             "type": "string",
             "description": "User's name"
           },
-          "productRole": {
-            "type": "string",
-            "description": "User's role in product"
+          "productRoles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "User's roles in product",
+            "items": {
+              "type": "string"
+            }
           },
           "surname": {
             "type": "string",

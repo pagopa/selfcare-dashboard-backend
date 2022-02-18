@@ -38,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.util.ResourceUtils;
 
+import javax.validation.ValidationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -940,8 +941,12 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setPartyRole");
-        createUserDto.setPartyRole(partyRole.toString());
+        String productRoles = "Operator Api";
+        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(partyRole);
+        createUserDto.setRoles(Set.of(roleMock));
         // when
         Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
         // then
@@ -965,6 +970,32 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+    @Test
+    void createUser_multiplePartyRole() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoles1 = "Operator Api";
+        String productRoles2 = "Operator Security";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
+        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        roleMock2.setProductRole(productRoles2);
+        roleMock2.setPartyRole(partyRole2);
+        createUserDto.setRoles(Set.of(roleMock1, roleMock2));
+        // when
+        Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        Assertions.assertEquals("Is not allowed to create both SUB_DELEGATE and OPERATOR users", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
     private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingRequest> onboardingRequestCaptor) {
         OnboardingRequest request = onboardingRequestCaptor.getValue();
         Assertions.assertNotNull(request);
@@ -977,8 +1008,13 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(createUserDto.getTaxCode(), request.getUsers().get(0).getTaxCode());
         Assertions.assertEquals(createUserDto.getEmail(), request.getUsers().get(0).getEmail());
         Assertions.assertEquals(productId, request.getUsers().get(0).getProduct());
-        Assertions.assertEquals(createUserDto.getProductRole(), request.getUsers().get(0).getProductRole());
-        Assertions.assertEquals(createUserDto.getPartyRole(), request.getUsers().get(0).getRole().toString());
+
+        createUserDto.getRoles().forEach(role -> {
+            request.getUsers().get(0).getProductRoles().forEach(roles -> {
+                Assertions.assertEquals(role.getProductRole(), roles);
+            });
+            Assertions.assertEquals(role.getPartyRole(), request.getUsers().get(0).getRole());
+        });
     }
 
     @Test

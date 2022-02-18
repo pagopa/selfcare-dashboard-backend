@@ -107,7 +107,14 @@ public class UserMapper {
             model.setSurname(dto.getSurname());
             model.setTaxCode(dto.getTaxCode());
             model.setEmail(dto.getEmail());
-            model.setProductRole(dto.getProductRole());
+            if (dto.getProductRoles() != null) {
+                model.setRoles(dto.getProductRoles().stream()
+                        .map(productRole -> {
+                            it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role();
+                            role.setProductRole(productRole);
+                            return role;
+                        }).collect(Collectors.toSet()));
+            }
         }
 
         return model;

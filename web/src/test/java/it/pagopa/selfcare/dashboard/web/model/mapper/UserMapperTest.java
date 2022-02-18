@@ -141,7 +141,6 @@ class UserMapperTest {
         // then
         assertNotNull(model);
         TestUtils.reflectionEqualsByName(model, dto, "partyRole");
-        assertNull(model.getPartyRole());
     }
 
 }

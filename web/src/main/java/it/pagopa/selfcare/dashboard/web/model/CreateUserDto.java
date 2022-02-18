@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Data
 public class CreateUserDto {
@@ -29,9 +31,9 @@ public class CreateUserDto {
     @NotBlank
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.productRole}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.productRoles}", required = true)
     @JsonProperty(required = true)
-    @NotBlank
-    private String productRole;
+    @NotNull
+    private Set<String> productRoles;
 
 }

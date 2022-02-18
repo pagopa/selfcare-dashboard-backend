@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import javax.validation.ValidationException;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -253,26 +254,36 @@ class PartyConnectorImpl implements PartyConnector {
 
         OnboardingRequest onboardingRequest = new OnboardingRequest();
         onboardingRequest.setInstitutionId(institutionId);
-        User user = new User();
-        user.setProduct(productId);
-        user.setName(createUserDto.getName());
-        user.setSurname(createUserDto.getSurname());
-        user.setTaxCode(createUserDto.getTaxCode());
-        user.setEmail(createUserDto.getEmail());
-        user.setProductRole(createUserDto.getProductRole());
-        user.setRole(PartyRole.valueOf(createUserDto.getPartyRole()));
-        onboardingRequest.setUsers(List.of(user));
+        Map<PartyRole, List<User>> partyRoleToUsersMap = createUserDto.getRoles().stream()
+                .map(role -> {
+                    User user = new User();
+                    user.setProduct(productId);
+                    user.setName(createUserDto.getName());
+                    user.setSurname(createUserDto.getSurname());
+                    user.setTaxCode(createUserDto.getTaxCode());
+                    user.setEmail(createUserDto.getEmail());
+                    user.setProductRoles(Set.of(role.getProductRole()));
+                    user.setRole(role.getPartyRole());
+                    return user;
+                }).collect(Collectors.groupingBy(User::getRole));
 
-        switch (user.getRole()) {
-            case SUB_DELEGATE:
-                restClient.onboardingSubdelegates(onboardingRequest);
-                break;
-            case OPERATOR:
-                restClient.onboardingOperators(onboardingRequest);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid Party role");
+        if (partyRoleToUsersMap.size() > 1) {
+            throw new ValidationException(String.format("Is not allowed to create both %s and %s users", PartyRole.SUB_DELEGATE, PartyRole.OPERATOR));
         }
+
+        partyRoleToUsersMap.forEach((key, value) -> {
+            onboardingRequest.setUsers(value);
+            switch (key) {
+                case SUB_DELEGATE:
+                    restClient.onboardingSubdelegates(onboardingRequest);
+                    break;
+                case OPERATOR:
+                    restClient.onboardingOperators(onboardingRequest);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid Party role");
+            }
+        });
 
         log.trace("createUsers end");
     }
