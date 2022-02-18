@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -32,9 +33,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
-import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
@@ -42,9 +40,7 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipStat
 @Service
 class PartyConnectorImpl implements PartyConnector {
 
-    static final EnumMap<PartyRole, SelfCareAuthority> PARTY_ROLE_AUTHORITY_MAP = new EnumMap<>(PartyRole.class);
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
-
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -68,13 +64,13 @@ class PartyConnectorImpl implements PartyConnector {
         userInfo.setStatus(relationshipInfo.getState().toString());
         userInfo.setCertified(Certification.isCertified(relationshipInfo.getCertification()));
         userInfo.setTaxCode(relationshipInfo.getTaxCode());
-        userInfo.setRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
+        userInfo.setRole(relationshipInfo.getRole().getSelfCareAuthority());
         it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
                 = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
         productInfo.setId(relationshipInfo.getProduct().getId());
         RoleInfo roleInfo = new RoleInfo();
         roleInfo.setRelationshipId(relationshipInfo.getId());
-        roleInfo.setSelcRole(PARTY_ROLE_AUTHORITY_MAP.get(relationshipInfo.getRole()));
+        roleInfo.setSelcRole(relationshipInfo.getRole().getSelfCareAuthority());
         roleInfo.setRole(relationshipInfo.getProduct().getRole());
         roleInfo.setStatus(relationshipInfo.getState().toString());
         ArrayList<RoleInfo> roleInfos = new ArrayList<>();
@@ -113,13 +109,6 @@ class PartyConnectorImpl implements PartyConnector {
         }
         return userInfo1;
     };
-
-    static {
-        PARTY_ROLE_AUTHORITY_MAP.put(MANAGER, ADMIN);
-        PARTY_ROLE_AUTHORITY_MAP.put(DELEGATE, ADMIN);
-        PARTY_ROLE_AUTHORITY_MAP.put(SUB_DELEGATE, ADMIN);
-        PARTY_ROLE_AUTHORITY_MAP.put(OPERATOR, LIMITED);
-    }
 
     private final PartyProcessRestClient restClient;
     private final EnumSet<RelationshipState> allowedStates;
@@ -211,7 +200,7 @@ class PartyConnectorImpl implements PartyConnector {
                                         PartyProductRole productRole = new PartyProductRole();
                                         productRole.setProductId(onboardingData.getProductInfo().getId());
                                         productRole.setProductRole(onboardingData.getProductInfo().getRole());
-                                        productRole.setSelfCareRole(PARTY_ROLE_AUTHORITY_MAP.get(onboardingData.getRole()));
+                                        productRole.setSelfCareRole(onboardingData.getRole().getSelfCareAuthority());
                                         return productRole;
                                     }, Collectors.toList())),
                             map -> map.entrySet().stream()
@@ -237,9 +226,8 @@ class PartyConnectorImpl implements PartyConnector {
         Collection<UserInfo> userInfos = Collections.emptyList();
         EnumSet<PartyRole> roles = null;
         if (userInfoFilter.getRole().isPresent()) {
-            roles = PARTY_ROLE_AUTHORITY_MAP.entrySet().stream()
-                    .filter(entry -> userInfoFilter.getRole().get().equals(entry.getValue()))
-                    .map(Map.Entry::getKey)
+            roles = Arrays.stream(PartyRole.values())
+                    .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole().get()))
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
         RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, allowedStates, userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));

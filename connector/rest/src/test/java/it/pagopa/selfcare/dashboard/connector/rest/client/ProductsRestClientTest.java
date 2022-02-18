@@ -4,7 +4,9 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.Assert;
@@ -69,7 +71,7 @@ public class ProductsRestClientTest extends BaseFeignRestClientTest {
         // given
         String productId = "productId";
         // when
-        Map<String, List<String>> response = restClient.getProductRoleMappings(productId);
+        Map<PartyRole, ProductRoleInfo> response = restClient.getProductRoleMappings(productId);
         // then
         Assert.assertNotNull(response);
         Assert.assertFalse(response.isEmpty());

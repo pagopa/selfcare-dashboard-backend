@@ -12,6 +12,7 @@
 
 package it.pagopa.selfcare.dashboard.connector.rest.model;
 
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.InstitutionContact;
 import lombok.Data;

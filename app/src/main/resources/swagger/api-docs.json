@@ -521,21 +521,22 @@
             "name": "productId",
             "in": "path",
             "description": "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/ProductRoleMappingsResource"
                   }
                 }
               }
@@ -1004,6 +1005,71 @@
           "status": {
             "type": "string",
             "description": "User's status"
+          }
+        }
+      },
+      "ProductRoleMappingsResource": {
+        "title": "ProductRoleMappingsResource",
+        "required": [
+          "multiroleAllowed",
+          "partyRole",
+          "productRoles",
+          "selcRole"
+        ],
+        "type": "object",
+        "properties": {
+          "multiroleAllowed": {
+            "type": "boolean",
+            "description": "Indicates if an User can have more than one product role",
+            "example": false
+          },
+          "partyRole": {
+            "type": "string",
+            "description": "Party role",
+            "enum": [
+              "DELEGATE",
+              "MANAGER",
+              "OPERATOR",
+              "SUB_DELEGATE"
+            ]
+          },
+          "productRoles": {
+            "type": "array",
+            "description": "Available product roles",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleResource"
+            }
+          },
+          "selcRole": {
+            "type": "string",
+            "description": "Self Care role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
+          }
+        }
+      },
+      "ProductRoleResource": {
+        "title": "ProductRoleResource",
+        "required": [
+          "code",
+          "description",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Product role internal code"
+          },
+          "description": {
+            "type": "string",
+            "description": "Product role description"
+          },
+          "label": {
+            "type": "string",
+            "description": "Product role label"
           }
         }
       },

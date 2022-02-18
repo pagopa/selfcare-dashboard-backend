@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,10 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.EnumMap;
 import java.util.Map;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -44,23 +44,18 @@ class ProductServiceImplTest {
     void getProductRoles() {
         // given
         String productId = "productId";
-        Map<String, List<String>> productRoleMappings = Map.of(
-                "MANAGER", List.of("role-1"),
-                "DELEGATE", List.of("role-2"),
-                "SUB_DELEGATE", List.of("role-3"),
-                "OPERATOR", List.of("role-4", "role-5")
-        );
+        EnumMap<PartyRole, ProductRoleInfo> roleMappingsMocked = new EnumMap<>(PartyRole.class) {{
+            put(PartyRole.MANAGER, new ProductRoleInfo());
+            put(PartyRole.DELEGATE, new ProductRoleInfo());
+            put(PartyRole.SUB_DELEGATE, new ProductRoleInfo());
+            put(PartyRole.OPERATOR, new ProductRoleInfo());
+        }};
         Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.any()))
-                .thenReturn(productRoleMappings);
+                .thenReturn(roleMappingsMocked);
         // when
-        Collection<String> productRoles = productService.getProductRoles(productId);
+        Map<PartyRole, ProductRoleInfo> roleMappings = productService.getProductRoles(productId);
         // then
-        Assertions.assertNotNull(productRoles);
-        Assertions.assertFalse(productRoles.isEmpty());
-        TreeSet<String> expectedRoles = new TreeSet<>();
-        expectedRoles.addAll(productRoleMappings.get("SUB_DELEGATE"));
-        expectedRoles.addAll(productRoleMappings.get("OPERATOR"));
-        Assertions.assertIterableEquals(expectedRoles, new TreeSet<>(productRoles));
+        Assertions.assertSame(roleMappingsMocked, roleMappings);
         Mockito.verify(productsConnectorMock, Mockito.times(1))
                 .getProductRoleMappings(productId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock);
