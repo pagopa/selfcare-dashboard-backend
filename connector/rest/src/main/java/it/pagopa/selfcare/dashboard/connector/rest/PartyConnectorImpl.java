@@ -263,12 +263,12 @@ class PartyConnectorImpl implements PartyConnector {
                     user.setTaxCode(createUserDto.getTaxCode());
                     user.setEmail(createUserDto.getEmail());
                     user.setProductRoles(Set.of(role.getProductRole()));
-                    user.setRole(valueOf(role.getPartyRole()));
+                    user.setRole(role.getPartyRole());
                     return user;
                 }).collect(Collectors.groupingBy(User::getRole));
 
         if (partyRoleToUsersMap.size() > 1) {
-            throw new ValidationException(String.format("Is not allowed to create both %s and %s users", SUB_DELEGATE, OPERATOR));
+            throw new ValidationException(String.format("Is not allowed to create both %s and %s users", PartyRole.SUB_DELEGATE, PartyRole.OPERATOR));
         }
 
         partyRoleToUsersMap.forEach((key, value) -> {

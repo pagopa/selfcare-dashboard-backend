@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.model.user;
 
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import lombok.Data;
 
 import java.util.Set;
@@ -16,6 +17,6 @@ public class CreateUserDto {
     @Data
     public static class Role {
         private String productRole;
-        private String partyRole;
+        private PartyRole partyRole;
     }
 }

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -618,27 +618,27 @@ class InstitutionServiceImplTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"MANAGER", "DELEGATE", "SUB_DELEGATE", "OPERATOR"})
-    void createUsers(String partyRole) {
+    @EnumSource(value = PartyRole.class)
+    void createUsers(PartyRole partyRole) {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        String productRole = "productRole";
+        String productRoleCode = "productRoleCode";
         CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRole");
         CreateUserDto.Role roleMock = TestUtils.mockInstance(new CreateUserDto.Role(), "setProductRole");
         roleMock.setPartyRole(partyRole);
-        roleMock.setProductRole(productRole);
+        roleMock.setProductRole(productRoleCode);
         createUserDto.setRoles(Set.of(roleMock));
-        ProductRoleInfo.ProductRole role = new ProductRoleInfo.ProductRole();
-        role.setCode(productRole);
+        ProductRoleInfo.ProductRole productRole = new ProductRoleInfo.ProductRole();
+        productRole.setCode(productRoleCode);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
-        productRoleInfo.setRoles(List.of(role));
+        productRoleInfo.setRoles(List.of(productRole));
         Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
-                .thenReturn(Map.of(PartyRole.valueOf(partyRole), productRoleInfo));
+                .thenReturn(Map.of(partyRole, productRoleInfo));
         // when
         Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
         // then
-        if ("SUB_DELEGATE".equals(partyRole) || "OPERATOR".equals(partyRole)) {
+        if (PartyRole.SUB_DELEGATE.equals(partyRole) || PartyRole.OPERATOR.equals(partyRole)) {
             assertDoesNotThrow(executable);
             Mockito.verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());

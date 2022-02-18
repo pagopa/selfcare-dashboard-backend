@@ -37,8 +37,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
     private static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
     private static final String REQUIRED_USER_ID = "A user id is required";
-
-    private static final Set<String> PARTY_ROLE_WHITE_LIST = Set.of("SUB_DELEGATE", "OPERATOR");
+    private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
 
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
@@ -129,7 +128,6 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(productRoles, "An Optional product role object is required");
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setUserId(null);
         userInfoFilter.setRole(role);
         userInfoFilter.setProductId(productId);
         userInfoFilter.setProductRoles(productRoles);
@@ -194,7 +192,6 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(role, "An Optional role object is required");
         Assert.notNull(productRoles, "An Optional product role object is required");
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setUserId(null);
         userInfoFilter.setRole(role);
         userInfoFilter.setProductId(Optional.of(productId));
         userInfoFilter.setProductRoles(productRoles);
@@ -215,10 +212,10 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(user, "An User is required");
         Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
         user.getRoles().forEach(role -> {
-            Optional<String> partyRole = productRoleMappings.entrySet().stream()
-                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey().toString()))
-                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(user.getProductRole())))
-                    .map(partyRoleProductRoleInfoEntry -> partyRoleProductRoleInfoEntry.getKey().toString())
+            Optional<PartyRole> partyRole = productRoleMappings.entrySet().stream()
+                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
+                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
+                    .map(Map.Entry::getKey)
                     .findAny();
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));

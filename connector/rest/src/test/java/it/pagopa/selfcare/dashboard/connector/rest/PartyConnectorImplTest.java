@@ -944,7 +944,7 @@ class PartyConnectorImplTest {
         CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRoles");
         CreateUserDto.Role roleMock = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
         roleMock.setProductRole(productRoles);
-        roleMock.setPartyRole(partyRole.toString());
+        roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
         // when
         Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
@@ -984,9 +984,9 @@ class PartyConnectorImplTest {
 
         createUserDto.getRoles().forEach(role -> {
             request.getUsers().get(0).getProductRoles().forEach(roles -> {
-                Assertions.assertEquals(role.getProductRole(), roles.toString());
+                Assertions.assertEquals(role.getProductRole(), roles);
             });
-            Assertions.assertEquals(role.getPartyRole(), request.getUsers().get(0).getRole().toString());
+            Assertions.assertEquals(role.getPartyRole(), request.getUsers().get(0).getRole());
         });
     }
 
