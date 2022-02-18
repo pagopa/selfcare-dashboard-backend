@@ -16,6 +16,8 @@ import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 public class User {
@@ -26,6 +28,6 @@ public class User {
     private PartyRole role;
     private String email;
     private String product;
-    private String productRole;
+    private Set<String> productRoles;
 
 }

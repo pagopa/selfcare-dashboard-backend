@@ -213,15 +213,16 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
-
         Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
-        Optional<String> partyRole = productRoleMappings.entrySet().stream()
-                .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey().toString()))
-                .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(user.getProductRole())))
-                .map(partyRoleProductRoleInfoEntry -> partyRoleProductRoleInfoEntry.getKey().toString())
-                .findAny();
-        user.setPartyRole(partyRole.orElseThrow(() ->
-                new InvalidProductRoleException(String.format("Product role '%s' is not valid", user.getProductRole()))));
+        user.getRoles().forEach(role -> {
+            Optional<String> partyRole = productRoleMappings.entrySet().stream()
+                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey().toString()))
+                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(user.getProductRole())))
+                    .map(partyRoleProductRoleInfoEntry -> partyRoleProductRoleInfoEntry.getKey().toString())
+                    .findAny();
+            role.setPartyRole(partyRole.orElseThrow(() ->
+                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
+        });
 
         partyConnector.createUsers(institutionId, productId, user);
 

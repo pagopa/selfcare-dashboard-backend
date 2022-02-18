@@ -624,8 +624,11 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRole = "productRole";
-        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setProductRole", "setPartyRole");
-        createUserDto.setProductRole(productRole);
+        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRole");
+        CreateUserDto.Role roleMock = TestUtils.mockInstance(new CreateUserDto.Role(), "setProductRole");
+        roleMock.setPartyRole(partyRole);
+        roleMock.setProductRole(productRole);
+        createUserDto.setRoles(Set.of(roleMock));
         ProductRoleInfo.ProductRole role = new ProductRoleInfo.ProductRole();
         role.setCode(productRole);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
@@ -639,13 +642,16 @@ class InstitutionServiceImplTest {
             assertDoesNotThrow(executable);
             Mockito.verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());
-            Assertions.assertEquals(partyRole, createUserDtoCaptor.getValue().getPartyRole());
+            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
+                Assertions.assertEquals(partyRole, role1.getPartyRole());
+            });
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
             Mockito.verifyNoMoreInteractions(partyConnectorMock);
-
         } else {
             InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
-            Assertions.assertEquals(String.format("Product role '%s' is not valid", createUserDto.getProductRole()), e.getMessage());
+            createUserDto.getRoles().forEach(role -> {
+                Assertions.assertEquals(String.format("Product role '%s' is not valid", role.getProductRole()), e.getMessage());
+            });
             Mockito.verifyNoInteractions(partyConnectorMock);
         }
         Mockito.verify(productsConnectorMock, Mockito.times(1))

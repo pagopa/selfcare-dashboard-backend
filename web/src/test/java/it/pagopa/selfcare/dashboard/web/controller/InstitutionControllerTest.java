@@ -365,7 +365,9 @@ class InstitutionControllerTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        CreateUserDto user = TestUtils.mockInstance(new CreateUserDto());
+        CreateUserDto user = TestUtils.mockInstance(new CreateUserDto(), "setProductRoles");
+        Set<String> productRoles = Set.of("productRole");
+        user.setProductRoles(productRoles);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)

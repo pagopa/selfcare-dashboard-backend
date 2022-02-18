@@ -9,6 +9,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ class CreateUserDtoTest {
         toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("taxCode", NotBlank.class);
         toCheckMap.put("email", NotBlank.class);
-        toCheckMap.put("productRole", NotBlank.class);
+        toCheckMap.put("productRoles", NotNull.class);
         CreateUserDto resource = new CreateUserDto();
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
@@ -56,6 +57,8 @@ class CreateUserDtoTest {
     void validateNotNullFields() {
         // given
         CreateUserDto resource = TestUtils.mockInstance(new CreateUserDto());
+        Set<String> mockProductRoles = Set.of("String");
+        resource.setProductRoles(mockProductRoles);
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then

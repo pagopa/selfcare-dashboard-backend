@@ -940,8 +940,12 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setPartyRole");
-        createUserDto.setPartyRole(partyRole.toString());
+        String productRoles = "Operator Api";
+        CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(partyRole.toString());
+        createUserDto.setRoles(Set.of(roleMock));
         // when
         Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
         // then
@@ -977,8 +981,13 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(createUserDto.getTaxCode(), request.getUsers().get(0).getTaxCode());
         Assertions.assertEquals(createUserDto.getEmail(), request.getUsers().get(0).getEmail());
         Assertions.assertEquals(productId, request.getUsers().get(0).getProduct());
-        Assertions.assertEquals(createUserDto.getProductRole(), request.getUsers().get(0).getProductRole());
-        Assertions.assertEquals(createUserDto.getPartyRole(), request.getUsers().get(0).getRole().toString());
+
+        createUserDto.getRoles().forEach(role -> {
+            request.getUsers().get(0).getProductRoles().forEach(roles -> {
+                Assertions.assertEquals(role.getProductRole(), roles.toString());
+            });
+            Assertions.assertEquals(role.getPartyRole(), request.getUsers().get(0).getRole().toString());
+        });
     }
 
     @Test
