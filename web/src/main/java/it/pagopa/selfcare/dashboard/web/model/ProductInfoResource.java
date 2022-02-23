@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -15,13 +16,12 @@ public class ProductInfoResource {
     @NotBlank
     private String id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.title}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.title}")
     private String title;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.roleInfos}", required = true)
     @JsonProperty(required = true)
     @NotNull
+    @Valid
     private List<ProductRoleInfoResource> roleInfos;
 }

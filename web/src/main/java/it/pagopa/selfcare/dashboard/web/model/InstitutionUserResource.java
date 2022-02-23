@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -57,6 +58,7 @@ public class InstitutionUserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.products}", required = true)
     @JsonProperty(required = true)
     @NotNull
+    @Valid
     private List<ProductInfoResource> products;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)

@@ -70,7 +70,8 @@ class ProductUserResourceTest {
     @Test
     void validateNotNullFields() {
         // given
-        ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource());
+        ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource(), "setRoleInfos");
+        resource.getProduct().setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then

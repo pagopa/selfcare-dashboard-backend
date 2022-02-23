@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -56,6 +57,7 @@ public class ProductUserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.product}", required = true)
     @JsonProperty(required = true)
     @NotNull
+    @Valid
     private ProductInfoResource product;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.status}", required = true)

@@ -964,8 +964,7 @@
         "title": "ProductInfoResource",
         "required": [
           "id",
-          "roleInfos",
-          "title"
+          "roleInfos"
         ],
         "type": "object",
         "properties": {
