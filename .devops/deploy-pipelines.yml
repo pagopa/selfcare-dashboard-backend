@@ -32,8 +32,6 @@ variables:
   deployNamespace: '$(DEPLOY_NAMESPACE)'
   settingsXmlROsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
 
-  isToDeploy: $[and(ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')))]
-
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
     environment: 'UAT'
     dockerRegistryServiceConnection: '$(UAT_CONTAINER_REGISTRY_SERVICE_CONN)'
@@ -67,7 +65,6 @@ variables:
 stages:
   - stage: Release
     displayName: Release
-    condition: eq(variables.isToDeploy, true)
     jobs:
       - job: POM
         displayName: POM
@@ -77,7 +74,7 @@ stages:
           - task: Bash@3
             displayName: Get POM version
             name: getpomversion
-            condition: and(succeeded(), eq(variables.isToDeploy, true))
+            condition: succeeded()
             inputs:
               targetType: 'inline'
               script: |
@@ -88,7 +85,7 @@ stages:
   - stage: 'Build'
     displayName: 'Build_and_Pusblih_to_${{ variables.environment }}'
     dependsOn: Release
-    condition: and(succeeded(), eq(variables.isToDeploy, true))
+    condition: succeeded()
     variables:
       pomversion: $[ stageDependencies.Release.POM.outputs['getpomversion.outputpomversion'] ]
     jobs:
@@ -130,7 +127,7 @@ stages:
                 $(pomversion)
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Atrifact manifests'
-            condition: and(succeeded(), eq(variables.isToDeploy, true))
+            condition: succeeded()
             inputs:
               targetPath: '$(Build.Repository.LocalPath)/manifests'
               artifact: 'manifests'
@@ -139,7 +136,7 @@ stages:
   - stage: 'Deploy'
     displayName: 'Deploy_to_${{ variables.environment }}'
     dependsOn: ['Release', 'Build']
-    condition: and(succeeded(), eq(variables.isToDeploy, true))
+    condition: succeeded()
     variables:
       pomversion: $[ stageDependencies.Release.POM.outputs['getpomversion.outputpomversion'] ]
     jobs:
