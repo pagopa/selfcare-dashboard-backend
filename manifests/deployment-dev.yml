@@ -25,6 +25,8 @@ spec:
                 name: application-insights
             - secretRef:
                 name: b4f-dashboard
+            - secretRef:
+                name: common-secrets
             - configMapRef:
                 name: b4f-dashboard
             - configMapRef:
