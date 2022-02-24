@@ -262,7 +262,7 @@ class PartyConnectorImpl implements PartyConnector {
                     user.setSurname(createUserDto.getSurname());
                     user.setTaxCode(createUserDto.getTaxCode());
                     user.setEmail(createUserDto.getEmail());
-                    user.setProductRoles(Set.of(role.getProductRole()));
+                    user.setProductRole(role.getProductRole());
                     user.setRole(role.getPartyRole());
                     return user;
                 }).collect(Collectors.groupingBy(User::getRole));

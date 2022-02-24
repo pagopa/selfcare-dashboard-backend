@@ -1009,12 +1009,10 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(createUserDto.getEmail(), request.getUsers().get(0).getEmail());
         Assertions.assertEquals(productId, request.getUsers().get(0).getProduct());
 
-        createUserDto.getRoles().forEach(role -> {
-            request.getUsers().get(0).getProductRoles().forEach(roles -> {
-                Assertions.assertEquals(role.getProductRole(), roles);
-            });
-            Assertions.assertEquals(role.getPartyRole(), request.getUsers().get(0).getRole());
-        });
+        createUserDto.getRoles().forEach(role -> request.getUsers().forEach(user -> {
+            Assertions.assertEquals(role.getProductRole(), user.getProductRole());
+            Assertions.assertEquals(role.getPartyRole(), user.getRole());
+        }));
     }
 
     @Test
