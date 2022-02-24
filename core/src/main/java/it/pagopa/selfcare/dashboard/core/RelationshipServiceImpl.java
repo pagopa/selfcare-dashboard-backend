@@ -45,6 +45,7 @@ class RelationshipServiceImpl implements RelationshipService {
         log.trace("delete start");
         log.debug("relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
+        //TODO get relationship info
         partyConnector.delete(relationshipId);
         log.trace("delete end");
 

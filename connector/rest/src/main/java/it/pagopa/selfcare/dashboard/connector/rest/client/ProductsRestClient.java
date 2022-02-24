@@ -24,4 +24,8 @@ public interface ProductsRestClient extends ProductsConnector {
     @ResponseBody
     Map<PartyRole, ProductRoleInfo> getProductRoleMappings(@PathVariable("productId") String productId);
 
+    @GetMapping(value = "${rest-client.products.getProduct.path}")
+    @ResponseBody
+    Product getProduct(@PathVariable("productId") String productId);
+
 }

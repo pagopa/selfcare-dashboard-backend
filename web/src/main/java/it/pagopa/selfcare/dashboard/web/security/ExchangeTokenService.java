@@ -56,7 +56,8 @@ public class ExchangeTokenService {
                                 @Value("${jwt.exchange.kid}") String kid) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.institutionService = institutionService;
-        this.jwtSigningKey = getPrivateKey(jwtSigningKey);
+        this.jwtSigningKey = getPrivateKey(jwtSigningKey);//TODO remove token from eviroment variables in configuration before pushing
+
         this.duration = Duration.parse(duration);
         this.kid = kid;
     }

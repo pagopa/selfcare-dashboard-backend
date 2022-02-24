@@ -10,12 +10,10 @@ import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +39,16 @@ class InstitutionServiceImpl implements InstitutionService {
 
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
+    private final NotificationService notificationService;
 
 
     @Autowired
-    public InstitutionServiceImpl(PartyConnector partyConnector, ProductsConnector productsConnector) {
+    public InstitutionServiceImpl(PartyConnector partyConnector,
+                                  ProductsConnector productsConnector,
+                                  NotificationService notificationService) {
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
+        this.notificationService = notificationService;
     }
 
 
@@ -210,18 +212,21 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
-        Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
-        user.getRoles().forEach(role -> {
-            Optional<PartyRole> partyRole = productRoleMappings.entrySet().stream()
-                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
-                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
-                    .map(Map.Entry::getKey)
-                    .findAny();
-            role.setPartyRole(partyRole.orElseThrow(() ->
-                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
-        });
 
-        partyConnector.createUsers(institutionId, productId, user);
+        Product product = productsConnector.getProduct(productId);
+//        user.getRoles().forEach(role -> { //TODO
+//            Optional<PartyRole> partyRole = product.getRoleMappings().entrySet().stream()
+//                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
+//                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
+//                    .map(Map.Entry::getKey)
+//                    .findAny();
+//            role.setPartyRole(partyRole.orElseThrow(() ->
+//                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
+//        });
+
+//        partyConnector.createUsers(institutionId, productId, user);
+        notificationService.sendNotificationCreateUserRelationship(product.getTitle(), user.getEmail());
+
 
         log.trace("createUsers end");
     }
