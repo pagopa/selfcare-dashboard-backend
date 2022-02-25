@@ -147,6 +147,7 @@ class PartyConnectorImpl implements PartyConnector {
         log.debug("relationshipId = {}", relationshipId);
         RelationshipInfo relationshipInfo = restClient.getRelationshipInfo(relationshipId);
         RelationshipInfoResult relationship = new RelationshipInfoResult();
+        relationship.setProductRole(relationshipInfo.getProduct().getRole());
         relationship.setProductId(relationshipInfo.getProduct().getId());
         relationship.setEmail(relationshipInfo.getEmail());
         relationship.setId(relationshipInfo.getId());

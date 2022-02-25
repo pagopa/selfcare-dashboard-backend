@@ -27,7 +27,7 @@ class RelationshipServiceImpl implements RelationshipService {
         log.debug("suspend relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.suspend(relationshipId);
-        notificationService.sendNotificationSuspendUserRelationship(relationshipId);
+        notificationService.sendNotificationRelationshipEvent(relationshipId, "suspend_template.ftl");
         log.trace("suspend end");
 
     }
@@ -39,6 +39,7 @@ class RelationshipServiceImpl implements RelationshipService {
         log.debug("activate relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.activate(relationshipId);
+        notificationService.sendNotificationRelationshipEvent(relationshipId, "activate_template.ftl");
         log.trace("activate end");
 
     }
@@ -49,7 +50,7 @@ class RelationshipServiceImpl implements RelationshipService {
         log.debug("relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.delete(relationshipId);
-        notificationService.sendNotificationDeleteUserRelationship(relationshipId);
+        notificationService.sendNotificationRelationshipEvent(relationshipId, "delete_template.ftl");
 
         log.trace("delete end");
 

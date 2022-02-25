@@ -6,5 +6,6 @@ import lombok.Data;
 public class RelationshipInfoResult {
     private String id;
     private String email;
+    private String productRole;
     private String productId;
 }

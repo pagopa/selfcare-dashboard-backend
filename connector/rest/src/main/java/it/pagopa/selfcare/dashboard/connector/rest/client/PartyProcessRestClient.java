@@ -42,7 +42,6 @@ public interface PartyProcessRestClient {
 
     @GetMapping(value = "${rest-client.party-process.getRelationshipInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @CollectionFormat(feign.CollectionFormat.CSV)
     RelationshipInfo getRelationshipInfo(@PathVariable(value = "relationshipId") String relationshipId);
 
     @PostMapping(value = "${rest-client.party-process.onboardingSubdelegates.path}", consumes = MediaType.APPLICATION_JSON_VALUE)

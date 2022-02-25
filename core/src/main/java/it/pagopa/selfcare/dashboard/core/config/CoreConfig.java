@@ -11,6 +11,7 @@ import java.net.URL;
 
 @Configuration
 @PropertySource("classpath:config/core-config.properties")
+//@EnableAsync TODO
 class CoreConfig {
 
     private URL property;
