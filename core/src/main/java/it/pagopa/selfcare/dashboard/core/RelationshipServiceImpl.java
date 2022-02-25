@@ -11,11 +11,13 @@ import org.springframework.util.Assert;
 class RelationshipServiceImpl implements RelationshipService {
 
     private final PartyConnector partyConnector;
+    private final NotificationService notificationService;
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
 
     @Autowired
-    RelationshipServiceImpl(PartyConnector partyConnector) {
+    RelationshipServiceImpl(PartyConnector partyConnector, NotificationService notificationService) {
         this.partyConnector = partyConnector;
+        this.notificationService = notificationService;
     }
 
 
@@ -45,8 +47,9 @@ class RelationshipServiceImpl implements RelationshipService {
         log.trace("delete start");
         log.debug("relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        //TODO get relationship info
         partyConnector.delete(relationshipId);
+        notificationService.sendNotificationDeleteUserRelationship(relationshipId);
+
         log.trace("delete end");
 
     }

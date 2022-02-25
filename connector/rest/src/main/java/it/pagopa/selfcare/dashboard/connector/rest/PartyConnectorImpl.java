@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.RelationshipInfoResult;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
@@ -137,6 +138,21 @@ class PartyConnectorImpl implements PartyConnector {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
+    }
+
+
+    @Override
+    public RelationshipInfoResult getRelationshipInfo(String relationshipId) {
+        log.trace("getRelationshipInfo start");
+        log.debug("relationshipId = {}", relationshipId);
+        RelationshipInfo relationshipInfo = restClient.getRelationshipInfo(relationshipId);
+        RelationshipInfoResult relationship = new RelationshipInfoResult();
+        relationship.setProductId(relationshipInfo.getProduct().getId());
+        relationship.setEmail(relationshipInfo.getEmail());
+        relationship.setId(relationshipInfo.getId());
+        log.debug("relationship = {}", relationship);
+        log.trace("getRelationshipInfo end");
+        return relationship;
     }
 
 

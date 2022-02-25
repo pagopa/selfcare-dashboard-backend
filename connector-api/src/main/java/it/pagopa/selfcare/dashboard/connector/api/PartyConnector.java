@@ -15,6 +15,8 @@ public interface PartyConnector {
 
     Collection<InstitutionInfo> getInstitutions();
 
+    RelationshipInfoResult getRelationshipInfo(String relationshipId);
+
     List<PartyProduct> getInstitutionProducts(String institutionId);
 
     Collection<AuthInfo> getAuthInfo(String institutionId);

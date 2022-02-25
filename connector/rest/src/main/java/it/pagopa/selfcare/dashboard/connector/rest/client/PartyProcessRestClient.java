@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import org.springframework.cloud.openfeign.CollectionFormat;
@@ -42,6 +39,11 @@ public interface PartyProcessRestClient {
     @CollectionFormat(feign.CollectionFormat.CSV)
     OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
                                      @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
+
+    @GetMapping(value = "${rest-client.party-process.getRelationshipInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @CollectionFormat(feign.CollectionFormat.CSV)
+    RelationshipInfo getRelationshipInfo(@PathVariable(value = "relationshipId") String relationshipId);
 
     @PostMapping(value = "${rest-client.party-process.onboardingSubdelegates.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
