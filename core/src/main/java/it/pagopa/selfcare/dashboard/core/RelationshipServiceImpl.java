@@ -27,6 +27,7 @@ class RelationshipServiceImpl implements RelationshipService {
         log.debug("suspend relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         partyConnector.suspend(relationshipId);
+        notificationService.sendNotificationSuspendUserRelationship(relationshipId);
         log.trace("suspend end");
 
     }

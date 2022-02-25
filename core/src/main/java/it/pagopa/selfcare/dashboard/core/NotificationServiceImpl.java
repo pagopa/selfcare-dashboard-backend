@@ -48,9 +48,9 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotificationDeleteUserRelationship(String relationshipId) {
         log.trace("sendNotificationDeleteUserRelationship start");
         log.debug("sendNotificationDeleteUserRelationship relationshipId = {}", relationshipId);
+        Assert.notNull(relationshipId, "A relationship Id is required");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Assert.state(authentication != null, "Authentication is required");
-        Assert.notNull(relationshipId, "A relationship Id is required");
         Assert.state(authentication.getPrincipal() instanceof SelfCareUser, "Not SelfCareUser principal");
         SelfCareUser principal = ((SelfCareUser) authentication.getPrincipal());
         RelationshipInfoResult relationshipInfoResult = partyConnector.getRelationshipInfo(relationshipId);
@@ -76,8 +76,34 @@ public class NotificationServiceImpl implements NotificationService {
         log.trace("sendNotificationDeleteUserRelationship end");
     }
 
-    //TODO integration of getrelationshipinfo api in the party process, for email and product ID
-    //TODO for the delete and the others i need product title(productConnector) and email(from relationshipinfo)
+    @Override
+    public void sendNotificationSuspendUserRelationship(String relationshipId) {
+        Assert.notNull(relationshipId, "A relationship Id is required");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Assert.state(authentication != null, "Authentication is required");
+        Assert.state(authentication.getPrincipal() instanceof SelfCareUser, "Not SelfCareUser principal");
+        SelfCareUser principal = ((SelfCareUser) authentication.getPrincipal());
+        RelationshipInfoResult relationshipInfoResult = partyConnector.getRelationshipInfo(relationshipId);
+        String email = relationshipInfoResult.getEmail();
+        Product product = productsConnector.getProduct(relationshipInfoResult.getProductId());
+        Map<String, String> dataModel = new HashMap<>();
+        dataModel.put("productName", product.getTitle());
+        dataModel.put("productRole", product.getUserRole());
+        dataModel.put("requesterName", principal.getUserName());
+        dataModel.put("requesterSurname", principal.getSurname());
+        try {
+            Template template = freemarkerConfig.getTemplate("suspend_referent.ftl");
+            String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataModel);
+            MessageRequest messageRequest = new MessageRequest();
+            messageRequest.setContent(html);
+            messageRequest.setReceiverEmail(email);
+            messageRequest.setSubject("User had been suspended");
+            notificationConnector.sendNotificationToUser(messageRequest);
+        } catch (TemplateException | IOException e) {
+            throw new TemplateProcessingException("Error in processing the template to string");
+        }
+    }
+
     @Override
     public void sendNotificationCreateUserRelationship(String productTitle, String email) {
         log.trace("sendNotificationCreateUserRelationship start");
