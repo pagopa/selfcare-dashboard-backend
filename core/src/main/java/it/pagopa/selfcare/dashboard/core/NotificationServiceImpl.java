@@ -11,7 +11,6 @@ import it.pagopa.selfcare.dashboard.connector.api.RelationshipInfoResult;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
-import it.pagopa.selfcare.dashboard.core.exception.TemplateProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailPreparationException;
@@ -31,10 +30,14 @@ import java.util.Optional;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
-    private Configuration freemarkerConfig;
+    private final Configuration freemarkerConfig;
     private final NotificationServiceConnector notificationConnector;
     private final ProductsConnector productsConnector;
     private final PartyConnector partyConnector;
+    private static final String ACTIVATE_TEMPLATE = "";
+    private static final String DELETE_TEMPLATE = "";
+    private static final String SUSPEND_TEMPLATE = "";
+    private static final String CREATE_TEMPLATE = "";
 
 
     @Autowired
@@ -48,8 +51,8 @@ public class NotificationServiceImpl implements NotificationService {
         this.partyConnector = partyConnector;
     }
 
-    @Override
-    public void sendNotificationRelationshipEvent(String relationshipId, String templateId) {
+
+    private void sendNotificationRelationshipEvent(String relationshipId, String templateId) {
         log.trace("sendNotificationRelationshipEvent start");
         log.debug("sendNotificationRelationshipEvent relationshipId = {}", relationshipId);
         Assert.notNull(relationshipId, "A relationship Id is required");
@@ -81,7 +84,7 @@ public class NotificationServiceImpl implements NotificationService {
             messageRequest.setSubject("User had been deleted");
             notificationConnector.sendNotificationToUser(messageRequest);
         } catch (TemplateException | IOException e) {
-            throw new TemplateProcessingException("Error in processing the template to string");
+            throw new MailPreparationException(e);
         }
 
         log.trace("sendNotificationDeleteUserRelationship end");
@@ -93,7 +96,6 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendNotificationCreateUserRelationship(String productTitle, String email) {
         log.trace("sendNotificationCreateUserRelationship start");
         log.debug("productTitle = {}, email = {}", productTitle, email);
-        log.trace("sendNotificationCreateUserRelationship thread = {}", Thread.currentThread().getName());
         Map<String, String> dataModel = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Assert.state(authentication != null, "Authentication is required");
@@ -106,7 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
         dataModel.put("requesterSurname", principal.getSurname());
         dataModel.put("productName", productTitle);
         try {
-            Template template = freemarkerConfig.getTemplate("add_referent.ftl");
+            Template template = freemarkerConfig.getTemplate("add_referent.ftlh");
             String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataModel);
             MessageRequest messageRequest = new MessageRequest();
             messageRequest.setContent(html);
@@ -115,11 +117,26 @@ public class NotificationServiceImpl implements NotificationService {
             notificationConnector.sendNotificationToUser(messageRequest);
 
         } catch (TemplateException | IOException e) {
-            //TODO MailPreparationException
             throw new MailPreparationException(e);
         }
 
         log.trace("sendNotificationCreateUserRelationship end");
+    }
+
+    @Override
+    public void sendNotificationActivatedRelationship(String relationshipId) {
+        sendNotificationRelationshipEvent(relationshipId, ACTIVATE_TEMPLATE);
+    }
+
+    @Override
+    public void sendNotificationDeletedRelationship(String relationshipId) {
+        sendNotificationRelationshipEvent(relationshipId, DELETE_TEMPLATE);
+    }
+
+    @Override
+    public void sendNotificationSuspendedRelationship(String relationshipId) {
+        sendNotificationRelationshipEvent(relationshipId, SUSPEND_TEMPLATE);
+
     }
 
 }
