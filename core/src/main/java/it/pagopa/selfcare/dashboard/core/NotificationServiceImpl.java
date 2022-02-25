@@ -33,15 +33,17 @@ public class NotificationServiceImpl implements NotificationService {
         this.notificationConnector = notificationConnector;
     }
 
-
+    //TODO integration of getrelationshipinfo api in the party process, for email and product ID
+    //TODO for the delete and the others i need product title(productConnector) and email(from relationshipinfo)
     @Override
     public void sendNotificationCreateUserRelationship(String productTitle, String email) {
         log.trace("sendNotificationCreateUserRelationship start");
-        System.out.println("notification core entered");
+        System.out.printf("productTitle = {}, email = {}", productTitle, email);
         Map<String, String> dataModel = new HashMap<>();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Assert.state(authentication != null, "Authentication is required");
         Assert.notNull(email, "User email is required");
+        Assert.notNull(productTitle, "A product Title is required");
         Assert.state(authentication.getPrincipal() instanceof SelfCareUser, "Not SelfCareUSer principal");
         SelfCareUser principal = ((SelfCareUser) authentication.getPrincipal());
 

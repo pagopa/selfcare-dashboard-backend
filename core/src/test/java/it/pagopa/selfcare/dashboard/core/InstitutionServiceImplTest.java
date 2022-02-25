@@ -42,6 +42,9 @@ class InstitutionServiceImplTest {
     private PartyConnector partyConnectorMock;
 
     @Mock
+    private NotificationService notificationServiceMock;
+
+    @Mock
     private ProductsConnector productsConnectorMock;
 
     @InjectMocks
@@ -586,7 +589,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock);
     }
 
     @Test
@@ -600,7 +603,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Product id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock);
     }
 
     @Test
@@ -614,7 +617,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An User is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock);
     }
 
     @ParameterizedTest
@@ -629,12 +632,17 @@ class InstitutionServiceImplTest {
         roleMock.setPartyRole(partyRole);
         roleMock.setProductRole(productRoleCode);
         createUserDto.setRoles(Set.of(roleMock));
+        Product product = TestUtils.mockInstance(new Product());
         ProductRoleInfo.ProductRole productRole = new ProductRoleInfo.ProductRole();
+        product.setId(productId);
         productRole.setCode(productRoleCode);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
         productRoleInfo.setRoles(List.of(productRole));
-        Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.anyString()))
-                .thenReturn(Map.of(partyRole, productRoleInfo));
+        EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+        map.put(partyRole, productRoleInfo);
+        product.setRoleMappings(map);
+        Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
+                .thenReturn(product);
         // when
         Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
         // then
@@ -642,6 +650,8 @@ class InstitutionServiceImplTest {
             assertDoesNotThrow(executable);
             Mockito.verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());
+            Mockito.verify(notificationServiceMock, Mockito.times(1)).
+                    sendNotificationCreateUserRelationship(Mockito.any(), Mockito.any());
             createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
                 Assertions.assertEquals(partyRole, role1.getPartyRole());
             });
@@ -655,7 +665,7 @@ class InstitutionServiceImplTest {
             Mockito.verifyNoInteractions(partyConnectorMock);
         }
         Mockito.verify(productsConnectorMock, Mockito.times(1))
-                .getProductRoleMappings(productId);
+                .getProduct(productId);
         Mockito.verifyNoMoreInteractions(productsConnectorMock);
     }
 

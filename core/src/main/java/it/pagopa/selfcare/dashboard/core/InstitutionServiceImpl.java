@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,17 +215,17 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(user, "An User is required");
 
         Product product = productsConnector.getProduct(productId);
-//        user.getRoles().forEach(role -> { //TODO
-//            Optional<PartyRole> partyRole = product.getRoleMappings().entrySet().stream()
-//                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
-//                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
-//                    .map(Map.Entry::getKey)
-//                    .findAny();
-//            role.setPartyRole(partyRole.orElseThrow(() ->
-//                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
-//        });
+        user.getRoles().forEach(role -> { //TODO
+            Optional<PartyRole> partyRole = product.getRoleMappings().entrySet().stream()
+                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
+                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
+                    .map(Map.Entry::getKey)
+                    .findAny();
+            role.setPartyRole(partyRole.orElseThrow(() ->
+                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
+        });
 
-//        partyConnector.createUsers(institutionId, productId, user);
+        partyConnector.createUsers(institutionId, productId, user);
         notificationService.sendNotificationCreateUserRelationship(product.getTitle(), user.getEmail());
 
 
