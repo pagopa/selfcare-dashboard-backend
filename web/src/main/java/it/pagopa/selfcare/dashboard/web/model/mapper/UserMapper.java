@@ -1,9 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.*;
 
 import java.util.stream.Collectors;
@@ -117,6 +115,18 @@ public class UserMapper {
             }
         }
 
+        return model;
+    }
+
+    public static UserDto fromUpdateUser(UpdateUserDto userDto) {
+        UserDto model = null;
+        if (userDto != null) {
+            model = new UserDto();
+            model.setEmail(userDto.getEmail());
+            model.setName(userDto.getName());
+            model.setSurname(userDto.getSurname());
+            model.setFiscalCode(userDto.getFiscalCode());
+        }
         return model;
     }
 

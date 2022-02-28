@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "PATCH",
+    "urlPathPattern": "/pdnd-interop-uservice-user-registry/0.0.1/users"
+  },
+  "response": {
+    "status": "201",
+    "jsonBody": {},
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

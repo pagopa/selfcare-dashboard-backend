@@ -751,8 +751,20 @@
           "user"
         ],
         "summary": "getUserByExternalId",
-        "description": "Retrieve the user for a given internal id ",
+        "description": "Retrieve the user for a given internal id",
         "operationId": "getUserByExternalIdUsingPOST",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -775,6 +787,71 @@
           },
           "201": {
             "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "updateUser",
+        "description": "Update previously added user",
+        "operationId": "updateUserUsingPUT",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized"
@@ -1191,6 +1268,34 @@
           "userRole": {
             "type": "string",
             "description": "Logged user's role"
+          }
+        }
+      },
+      "UpdateUserDto": {
+        "title": "UpdateUserDto",
+        "required": [
+          "email",
+          "fiscalCode",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's institutional email"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
