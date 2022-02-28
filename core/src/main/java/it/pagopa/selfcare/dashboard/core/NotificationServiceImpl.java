@@ -52,7 +52,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
 
-    private void sendNotificationRelationshipEvent(String relationshipId, String templateId) {
+    private void sendNotificationRelationshipEvent(String relationshipId, String templateId, String subject) {
         log.trace("sendNotificationRelationshipEvent start");
         log.debug("sendNotificationRelationshipEvent relationshipId = {}", relationshipId);
         Assert.notNull(relationshipId, "A relationship Id is required");
@@ -77,12 +77,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         try {
             Template template = freemarkerConfig.getTemplate(templateId);
-            String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataModel);
-            MessageRequest messageRequest = new MessageRequest();
-            messageRequest.setContent(html);
-            messageRequest.setReceiverEmail(email);
-            messageRequest.setSubject("User had been deleted");
-            notificationConnector.sendNotificationToUser(messageRequest);
+            messageRequestMaker(email, template, subject, dataModel);
         } catch (TemplateException | IOException e) {
             throw new MailPreparationException(e);
         }
@@ -108,14 +103,9 @@ public class NotificationServiceImpl implements NotificationService {
         dataModel.put("requesterSurname", principal.getSurname());
         dataModel.put("productName", productTitle);
         try {
-            Template template = freemarkerConfig.getTemplate("add_referent.ftlh");
-            String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataModel);
-            MessageRequest messageRequest = new MessageRequest();
-            messageRequest.setContent(html);
-            messageRequest.setReceiverEmail(email);
-            messageRequest.setSubject("User had been added");
-            notificationConnector.sendNotificationToUser(messageRequest);
-
+            Template template = freemarkerConfig.getTemplate(CREATE_TEMPLATE);
+            String subject = "A new user has been added";
+            messageRequestMaker(email, template, subject, dataModel);
         } catch (TemplateException | IOException e) {
             throw new MailPreparationException(e);
         }
@@ -124,19 +114,30 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Async
     public void sendNotificationActivatedRelationship(String relationshipId) {
-        sendNotificationRelationshipEvent(relationshipId, ACTIVATE_TEMPLATE);
+        sendNotificationRelationshipEvent(relationshipId, ACTIVATE_TEMPLATE, "User has been activated");
     }
 
     @Override
+    @Async
     public void sendNotificationDeletedRelationship(String relationshipId) {
-        sendNotificationRelationshipEvent(relationshipId, DELETE_TEMPLATE);
+        sendNotificationRelationshipEvent(relationshipId, DELETE_TEMPLATE, "User had been deleted");
     }
 
     @Override
+    @Async
     public void sendNotificationSuspendedRelationship(String relationshipId) {
-        sendNotificationRelationshipEvent(relationshipId, SUSPEND_TEMPLATE);
+        sendNotificationRelationshipEvent(relationshipId, SUSPEND_TEMPLATE, "User has been suspended");
+    }
 
+    private void messageRequestMaker(String email, Template template, String subject, Map<String, String> dataModel) throws TemplateException, IOException {
+        String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataModel);
+        MessageRequest messageRequest = new MessageRequest();
+        messageRequest.setContent(html);
+        messageRequest.setReceiverEmail(email);
+        messageRequest.setSubject(subject);
+        notificationConnector.sendNotificationToUser(messageRequest);
     }
 
 }
