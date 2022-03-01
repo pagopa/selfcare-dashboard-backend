@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +38,9 @@ class UserRegistryConnectorImplTest {
 
     @Captor
     private ArgumentCaptor<EmbeddedExternalId> embeddedCaptor;
+
+    @Captor
+    private ArgumentCaptor<UserRequestDto> userDtoCaptor;
 
     @Test
     void getUser_nullInfo_nullCertification() {
@@ -155,6 +160,41 @@ class UserRegistryConnectorImplTest {
         Executable executable = () -> userConnector.saveUser(id, institutionId, userDto);
         //then
         assertDoesNotThrow(executable);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .patchUser(Mockito.any(), userDtoCaptor.capture());
+        UserRequestDto request = userDtoCaptor.getValue();
+        Map<String, Object> cFields = request.getCFields();
+        assertTrue(cFields.containsKey(String.format("institutionContacts.%s.email", institutionId)));
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void updateUser_nullId() {
+        //given
+        String institutionId = "institutionId";
+        UUID id = null;
+        UserDto userDto = TestUtils.mockInstance(new UserDto());
+        //when
+        Executable executable = () -> userConnector.saveUser(id, institutionId, userDto);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A UUID is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+
+    @Test
+    void updateUser_nullInstitutionId() {
+        //given
+        String institutionId = null;
+        UUID id = UUID.randomUUID();
+        UserDto userDto = TestUtils.mockInstance(new UserDto());
+        //when
+        Executable executable = () -> userConnector.saveUser(id, institutionId, userDto);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An institutionId is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
     }
 
 }

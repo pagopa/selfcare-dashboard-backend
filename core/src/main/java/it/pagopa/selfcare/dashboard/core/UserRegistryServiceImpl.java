@@ -35,9 +35,12 @@ public class UserRegistryServiceImpl implements UserRegistryService {
 
     @Override
     public void updateUser(UUID id, String institutionId, UserDto userDto) {
+        log.trace("updateUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "updateUser id = {}, institutionId = {}, userDto = {}", id, institutionId, userDto);
         Assert.notNull(id, "UUID is required");
         Assert.hasText(institutionId, "An institutionId is required");
         userConnector.saveUser(id, institutionId, userDto);
+        log.trace("updateUser end");
     }
 
 }

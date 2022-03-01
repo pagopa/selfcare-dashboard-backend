@@ -60,6 +60,10 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
 
     @Override
     public void saveUser(UUID id, String institutionId, UserDto userDto) {
+        log.trace("saveUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser id = {}, institutionId = {}, userDto = {}}", id, institutionId, userDto);
+        Assert.notNull(id, "A UUID is required");
+        Assert.hasText(institutionId, "An institutionId is required");
         Map<String, Object> cFields = new HashMap<>();
         String institutionContactsKey = String.format("institutionContacts.%s.email", institutionId);
         cFields.put(institutionContactsKey, userDto.getEmail());
@@ -68,5 +72,6 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
         UserRequestDto requestDto = new UserRequestDto();
         requestDto.setCFields(cFields);
         restClient.patchUser(id, requestDto);
+        log.trace("saveUser end");
     }
 }
