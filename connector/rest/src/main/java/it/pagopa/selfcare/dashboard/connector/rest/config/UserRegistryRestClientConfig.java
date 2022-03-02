@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@Import(RestClientBaseConfig.class)
+@Import({RestClientBaseConfig.class})
 @EnableFeignClients(clients = UserRegistryRestClient.class)
 @PropertySource("classpath:config/user-registry-rest-client.properties")
-public class UserRegistryRestClientConfig {
+class UserRegistryRestClientConfig {
 }

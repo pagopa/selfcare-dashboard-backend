@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,11 +39,12 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipStat
         locations = "classpath:config/party-process-rest-client.properties",
         properties = {
                 "logging.level.it.pagopa.selfcare.dashboard.connector.rest=DEBUG",
-                "spring.application.name=selc-dashboard-connector-rest"
+                "spring.application.name=selc-dashboard-connector-rest",
+                "feign.okhttp.enabled=true"
         })
 @ContextConfiguration(
         initializers = PartyProcessRestClientTest.RandomPortInitializer.class,
-        classes = {PartyProcessRestClientTestConfig.class})
+        classes = {PartyProcessRestClientTestConfig.class, HttpClientConfiguration.class})
 public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @ClassRule

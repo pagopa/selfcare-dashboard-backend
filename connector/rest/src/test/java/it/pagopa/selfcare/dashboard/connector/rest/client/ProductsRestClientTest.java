@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,11 +27,12 @@ import java.util.Map;
         locations = "classpath:config/products-rest-client.properties",
         properties = {
                 "logging.level.it.pagopa.selfcare.dashboard.connector.rest=DEBUG",
-                "spring.application.name=selc-dashboard-connector-rest"
+                "spring.application.name=selc-dashboard-connector-rest",
+                "feign.okhttp.enabled=true"
         })
 @ContextConfiguration(
         initializers = ProductsRestClientTest.RandomPortInitializer.class,
-        classes = {ProductsRestClientTestConfig.class})
+        classes = {ProductsRestClientTestConfig.class, HttpClientConfiguration.class})
 public class ProductsRestClientTest extends BaseFeignRestClientTest {
 
     @ClassRule

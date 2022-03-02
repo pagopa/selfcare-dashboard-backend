@@ -19,7 +19,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorConfig;
+import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.Attribute;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = {
                 PartyConnectorImpl.class,
-                PartyConnectorConfig.class
+                PartyConnectorTestConfig.class
         },
         properties = "USER_STATES_FILTER=ACTIVE,SUSPENDED"
 )

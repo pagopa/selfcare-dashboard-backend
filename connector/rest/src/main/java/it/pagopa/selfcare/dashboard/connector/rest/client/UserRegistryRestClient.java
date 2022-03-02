@@ -4,10 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedE
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -18,7 +15,7 @@ public interface UserRegistryRestClient {
     @ResponseBody
     UserResponse getUserByExternalId(@RequestBody EmbeddedExternalId externalId);
 
-    @PostMapping(value = "${rest-client.user-registry.patchUser.path}")
+    @PatchMapping(value = "${rest-client.user-registry.patchUser.path}")
     @ResponseBody
     void patchUser(@PathVariable("id") UUID id,
                    @RequestBody UserRequestDto userRequestDto);
