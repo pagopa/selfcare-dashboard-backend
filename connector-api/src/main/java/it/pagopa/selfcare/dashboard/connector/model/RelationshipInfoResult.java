@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.connector.api;
+package it.pagopa.selfcare.dashboard.connector.model;
 
 import lombok.Data;
 

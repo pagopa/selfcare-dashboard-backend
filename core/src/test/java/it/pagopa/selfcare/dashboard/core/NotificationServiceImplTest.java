@@ -82,7 +82,7 @@ class NotificationServiceImplTest {
         Executable executable = () -> notificationService.sendNotificationCreateUserRelationship(productTitle, email);
         //then
         IllegalStateException illegalStateException = Assertions.assertThrows(IllegalStateException.class, executable);
-        Assertions.assertEquals("Not SelfCareUSer principal", illegalStateException.getMessage());
+        Assertions.assertEquals("Not SelfCareUser principal", illegalStateException.getMessage());
         Mockito.verifyNoInteractions(notificationConnector);
     }
 

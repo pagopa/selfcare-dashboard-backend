@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
+import it.pagopa.selfcare.dashboard.connector.model.RelationshipInfoResult;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;

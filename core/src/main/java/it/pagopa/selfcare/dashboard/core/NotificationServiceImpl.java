@@ -7,7 +7,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.api.RelationshipInfoResult;
+import it.pagopa.selfcare.dashboard.connector.model.RelationshipInfoResult;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
@@ -37,7 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String ACTIVATE_TEMPLATE = "";
     private static final String DELETE_TEMPLATE = "";
     private static final String SUSPEND_TEMPLATE = "";
-    private static final String CREATE_TEMPLATE = "";
+    private static final String CREATE_TEMPLATE = "add_referent.ftlh";
 
 
     @Autowired
