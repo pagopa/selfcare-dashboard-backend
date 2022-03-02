@@ -50,11 +50,12 @@ public class UserController {
         return result;
     }
 
-    @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
-                           @PathVariable("id") UUID id,
+                           @PathVariable("id")
+                                   UUID id,
                            @ApiParam("${swagger.dashboard.institutions.model.id}")
                            @RequestParam(value = "institutionId")
                                    String institutionId,
@@ -65,6 +66,5 @@ public class UserController {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "id = {}, institutionId = {}, userDto = {}", id, institutionId, updateUserDto);
         userRegistryService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto));
         log.trace("updateUser end");
-
     }
 }

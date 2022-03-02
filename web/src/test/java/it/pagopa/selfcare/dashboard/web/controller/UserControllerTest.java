@@ -85,7 +85,7 @@ class UserControllerTest {
         UpdateUserDto updateUserDto = TestUtils.mockInstance(new UpdateUserDto());
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .post(BASE_URL + "/{id}", id)
+                .put(BASE_URL + "/{id}", id)
                 .queryParam("institutionId", institutionId)
                 .content(mapper.writeValueAsString(updateUserDto))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
