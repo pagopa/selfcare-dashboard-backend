@@ -1,4 +1,4 @@
-# Default values for selfcare-b4f-dashboard.
+# Default values for selfcare-dashboard-backend.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -7,7 +7,7 @@ namespace: selc
 replicaCount: 1
 
 image:
-  repository: selcdacr.azurecr.io/selfcareb4fdashboard
+  repository: selcdacr.azurecr.io/selfcaredashboardbackend
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"

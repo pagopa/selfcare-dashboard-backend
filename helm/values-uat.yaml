@@ -1,5 +1,5 @@
 image:
-  repository: selcuacr.azurecr.io/selfcareb4fdashboard
+  repository: selcuacr.azurecr.io/selfcaredashboardbackend
   tag: 0.0.1-SNAPSHOT
 
 autoscaling:

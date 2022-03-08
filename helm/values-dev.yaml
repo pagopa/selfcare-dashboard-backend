@@ -1,5 +1,5 @@
 image:
-  repository: selcdacr.azurecr.io/selfcareb4fdashboard
+  repository: selcdacr.azurecr.io/selfcaredashboardbackend
 
 autoscaling:
   enabled: false
