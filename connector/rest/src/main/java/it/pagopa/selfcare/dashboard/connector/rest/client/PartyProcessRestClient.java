@@ -24,7 +24,7 @@ public interface PartyProcessRestClient {
     RelationshipsResponse getInstitutionRelationships(@PathVariable("institutionId") String institutionId,
                                                       @RequestParam(value = "roles", required = false) EnumSet<PartyRole> roles,
                                                       @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states,
-                                                      @RequestParam(value = "products", required = false) Set<String> products,
+                                                      @RequestParam(value = "products", required = false) Set<String> productIds,
                                                       @RequestParam(value = "productRoles", required = false) Set<String> productRoles,
                                                       @RequestParam(value = "personId", required = false) String personId);
 

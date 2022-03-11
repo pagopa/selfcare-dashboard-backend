@@ -42,6 +42,7 @@ public class UserInfo {
         private Optional<String> productId = Optional.empty();
         private Optional<Set<String>> productRoles = Optional.empty();
         private Optional<String> userId = Optional.empty();
+        //TODO Optional<EnumSet<>> allowed states
 
         public void setRole(Optional<SelfCareAuthority> role) {
             this.role = role == null ? Optional.empty() : role;
