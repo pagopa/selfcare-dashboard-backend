@@ -972,7 +972,7 @@
           {
             "name": "size",
             "in": "query",
-            "description": "Number of records per page",
+            "description": "Number of records per page, default size is 20",
             "required": false,
             "style": "form",
             "allowReserved": true,
