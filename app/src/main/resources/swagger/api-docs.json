@@ -1109,7 +1109,7 @@
             "name": "institutionId",
             "in": "query",
             "description": "Users group's institutionId",
-            "required": true,
+            "required": false,
             "style": "form",
             "schema": {
               "type": "string"
