@@ -31,6 +31,10 @@
     {
       "name": "user",
       "description": "User Controller"
+    },
+    {
+      "name": "user-groups",
+      "description": "UserGroups operations"
     }
   ],
   "paths": {
@@ -933,6 +937,497 @@
           }
         ]
       }
+    },
+    "/user-groups/": {
+      "post": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "createUserGroup",
+        "description": "Service that allows the insert of a new occurrence for the UserGroup entity",
+        "operationId": "createUserGroupUsingPOST",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/userGroups": {
+      "get": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "getGroupsByInstitutionAndProductIds",
+        "description": "Service that allows to get a specific occurrence of the UserGroup entity by InstitutionId and ProductId, paged and sorted by name",
+        "operationId": "getGroupsByInstitutionAndProductIdsUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Users group's institutionId",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Results page you want to retrieve (0..N)",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Users group's productId",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserGroupResource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/{id}": {
+      "get": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "getUserGroup",
+        "description": "Service to get a specific UserGroup entity",
+        "operationId": "getUserGroupUsingGET",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "updateUserGroup",
+        "description": "Service that allows the modification of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId": "updateUserGroupUsingPUT",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupResource"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "deleteGroup",
+        "description": "Service that allows the deletion of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId": "deleteGroupUsingDELETE",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/{id}/activate": {
+      "post": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "activateGroup",
+        "description": "Service that allows the activation of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId": "activateGroupUsingPOST",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/{id}/members": {
+      "patch": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "addMemberToUserGroup",
+        "description": "${swagger.dashboard.user-group.api.addMember}",
+        "operationId": "addMemberToUserGroupUsingPATCH",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberUUID"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/{id}/suspend": {
+      "post": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "suspendGroup",
+        "description": "Service that allows the suspension of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId": "suspendGroupUsingPOST",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/{userGroupId}/members/{memberId}": {
+      "delete": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "deleteMemberFromUserGroup",
+        "description": "${swagger.dashboard.user-group.api.deleteMember}",
+        "operationId": "deleteMemberFromUserGroupUsingDELETE",
+        "parameters": [
+          {
+            "name": "userGroupId",
+            "in": "path",
+            "description": "Users group's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "description": "Member's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -971,6 +1466,53 @@
           "taxCode": {
             "type": "string",
             "description": "User's fiscal code"
+          }
+        }
+      },
+      "CreateUserGroupDto": {
+        "title": "CreateUserGroupDto",
+        "required": [
+          "description",
+          "institutionId",
+          "members",
+          "name",
+          "productId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
+          },
+          "institutionId": {
+            "type": "string",
+            "description": "Users group's institutionId"
+          },
+          "members": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "List of all the members of the group",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Users group's name"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Users group's productId"
+          },
+          "status": {
+            "type": "string",
+            "description": "Users group's status",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ]
           }
         }
       },
@@ -1096,6 +1638,20 @@
           "surname": {
             "type": "string",
             "description": "User's surname"
+          }
+        }
+      },
+      "MemberUUID": {
+        "title": "MemberUUID",
+        "required": [
+          "member"
+        ],
+        "type": "object",
+        "properties": {
+          "member": {
+            "type": "string",
+            "description": "Member's unique identifier",
+            "format": "uuid"
           }
         }
       },
@@ -1366,6 +1922,103 @@
           "surname": {
             "type": "string",
             "description": "User's surname"
+          }
+        }
+      },
+      "UpdateUserGroupDto": {
+        "title": "UpdateUserGroupDto",
+        "required": [
+          "description",
+          "members",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
+          },
+          "members": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "List of all the members of the group",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Users group's name"
+          }
+        }
+      },
+      "UserGroupResource": {
+        "title": "UserGroupResource",
+        "required": [
+          "description",
+          "id",
+          "institutionId",
+          "members",
+          "name",
+          "productId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Date on which the group was created",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "User by which the group was created"
+          },
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
+          },
+          "id": {
+            "type": "string",
+            "description": "${swagger.user-group.model.id}"
+          },
+          "institutionId": {
+            "type": "string",
+            "description": "${swagger.user-group.model.institutionId}"
+          },
+          "members": {
+            "type": "array",
+            "description": "List of all the members of the group",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "modifiedAt": {
+            "type": "string",
+            "description": "Date on which the group was modified",
+            "format": "date-time"
+          },
+          "modifiedBy": {
+            "type": "string",
+            "description": "User by which the group was modified"
+          },
+          "name": {
+            "type": "string",
+            "description": "Users group's name"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Users group's productId"
+          },
+          "status": {
+            "type": "string",
+            "description": "Users group's status",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ]
           }
         }
       },

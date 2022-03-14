@@ -53,6 +53,9 @@ class SwaggerConfigTest {
     @MockBean
     private UserRegistryService userRegistryServiceMock;
 
+    @MockBean
+    private UserGroupService userGroupServiceMock;
+
     @Autowired
     WebApplicationContext context;
 

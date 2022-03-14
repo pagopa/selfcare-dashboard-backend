@@ -1,22 +1,29 @@
 package it.pagopa.selfcare.dashboard.web.config;
 
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.HttpAuthenticationScheme;
-import springfox.documentation.service.SecurityReference;
-import springfox.documentation.service.Tag;
+import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.ScalarType;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.OperationBuilderPlugin;
+import springfox.documentation.spi.service.contexts.OperationContext;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,8 +68,10 @@ class SwaggerConfig {
                 .tags(new Tag("institutions", environment.getProperty("swagger.dashboard.institutions.api.description")),
                         new Tag("token", environment.getProperty("swagger.dashboard.token.api.description")),
                         new Tag("products", environment.getProperty("swagger.dashboard.product.api.description")),
-                        new Tag("relationships", environment.getProperty("swagger.dashboard.relationships.api.description")))
+                        new Tag("relationships", environment.getProperty("swagger.dashboard.relationships.api.description")),
+                        new Tag("user-groups", environment.getProperty("swagger.dashboard.user-groups.api.description")))
                 .directModelSubstitute(LocalTime.class, String.class)
+                .ignoredParameterTypes(Pageable.class)
                 .securityContexts(Collections.singletonList(SecurityContext.builder()
                         .securityReferences(defaultAuth())
                         .build()))
@@ -78,6 +87,56 @@ class SwaggerConfig {
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
         return Collections.singletonList(new SecurityReference(AUTH_SCHEMA_NAME, authorizationScopes));
+    }
+
+    @Component
+    @Order
+    static class PageableParameterReader implements OperationBuilderPlugin {
+        private final Environment environment;
+        private final TypeResolver resolver;
+
+        @Autowired
+        public PageableParameterReader(Environment environment,
+                                       TypeResolver resolver) {
+            this.environment = environment;
+            this.resolver = resolver;
+        }
+
+        @Override
+        public void apply(OperationContext context) {
+            List<ResolvedMethodParameter> methodParameters = context.getParameters();
+            ResolvedType pageableType = resolver.resolve(Pageable.class);
+            List<RequestParameter> parameters = new ArrayList<>();
+            for (ResolvedMethodParameter methodParameter : methodParameters) {
+                ResolvedType resolvedType = methodParameter.getParameterType();
+                if (pageableType.equals(resolvedType)) {
+                    parameters.add(new RequestParameterBuilder()
+                            .in(ParameterType.QUERY)
+                            .name("page")
+                            .query(q -> q.model(m -> m.scalarModel(ScalarType.INTEGER)))
+                            .description("Results page you want to retrieve (0..N)").build());
+                    parameters.add(new RequestParameterBuilder()
+                            .in(ParameterType.QUERY)
+                            .name("size")
+                            .query(q -> q.model(m -> m.scalarModel(ScalarType.INTEGER)))
+                            .description("Number of records per page").build());
+                    parameters.add(new RequestParameterBuilder()
+                            .in(ParameterType.QUERY)
+                            .name("sort")
+                            .query(q -> q.model(m -> m.collectionModel(c -> c.model(cm -> cm.scalarModel(ScalarType.STRING)))))
+                            .description("Sorting criteria in the format: property(,asc|desc). "
+                                    + "Default sort order is ascending. "
+                                    + "Multiple sort criteria are supported.")
+                            .build());
+                    context.operationBuilder().requestParameters(parameters);
+                }
+            }
+        }
+
+        @Override
+        public boolean supports(DocumentationType delimiter) {
+            return true;
+        }
     }
 
 }
