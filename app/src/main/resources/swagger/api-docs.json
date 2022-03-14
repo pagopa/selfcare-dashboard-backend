@@ -1014,7 +1014,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UserGroupResource"
+                    "$ref": "#/components/schemas/UserGroupPlainResource"
                   }
                 }
               }
@@ -1101,6 +1101,16 @@
             "description": "Users group's unique identifier",
             "required": true,
             "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Users group's institutionId",
+            "required": true,
+            "style": "form",
             "schema": {
               "type": "string"
             }
@@ -1941,6 +1951,54 @@
           "name": {
             "type": "string",
             "description": "Users group's name"
+          }
+        }
+      },
+      "UserGroupPlainResource": {
+        "title": "UserGroupPlainResource",
+        "required": [
+          "description",
+          "id",
+          "institutionId",
+          "membersCount",
+          "name",
+          "productId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
+          },
+          "id": {
+            "type": "string",
+            "description": "Users group's unique identifier"
+          },
+          "institutionId": {
+            "type": "string",
+            "description": "Users group's institutionId"
+          },
+          "membersCount": {
+            "type": "integer",
+            "description": "Number all the members of the group",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "description": "Users group's name"
+          },
+          "productId": {
+            "type": "string",
+            "description": "Users group's productId"
+          },
+          "status": {
+            "type": "string",
+            "description": "Users group's status",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ]
           }
         }
       },
