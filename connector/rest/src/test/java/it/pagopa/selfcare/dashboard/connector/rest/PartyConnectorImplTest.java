@@ -14,10 +14,8 @@ import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
-import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
@@ -47,8 +45,8 @@ import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.*;
 
 
