@@ -938,54 +938,7 @@
         ]
       }
     },
-    "/user-groups/": {
-      "post": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "createUserGroup",
-        "description": "Service that allows the insert of a new occurrence for the UserGroup entity",
-        "operationId": "createUserGroupUsingPOST",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserGroupDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserGroupResource"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
-      }
-    },
-    "/user-groups/userGroups": {
+    "/user-groups": {
       "get": {
         "tags": [
           "user-groups"
@@ -1063,6 +1016,53 @@
                   "items": {
                     "$ref": "#/components/schemas/UserGroupResource"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/user-groups/": {
+      "post": {
+        "tags": [
+          "user-groups"
+        ],
+        "summary": "createUserGroup",
+        "description": "Service that allows the insert of a new occurrence for the UserGroup entity",
+        "operationId": "createUserGroupUsingPOST",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserGroupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupResource"
                 }
               }
             }
@@ -1286,7 +1286,7 @@
           "user-groups"
         ],
         "summary": "addMemberToUserGroup",
-        "description": "${swagger.dashboard.user-group.api.addMember}",
+        "description": "Service to add a member to a specific UserGroup entity",
         "operationId": "addMemberToUserGroupUsingPATCH",
         "parameters": [
           {
@@ -1384,7 +1384,7 @@
           "user-groups"
         ],
         "summary": "deleteMemberFromUserGroup",
-        "description": "${swagger.dashboard.user-group.api.deleteMember}",
+        "description": "Service to delete a member from a specific UserGroup entity",
         "operationId": "deleteMemberFromUserGroupUsingDELETE",
         "parameters": [
           {
@@ -1476,8 +1476,7 @@
           "institutionId",
           "members",
           "name",
-          "productId",
-          "status"
+          "productId"
         ],
         "type": "object",
         "properties": {
@@ -1505,14 +1504,6 @@
           "productId": {
             "type": "string",
             "description": "Users group's productId"
-          },
-          "status": {
-            "type": "string",
-            "description": "Users group's status",
-            "enum": [
-              "ACTIVE",
-              "SUSPENDED"
-            ]
           }
         }
       },
@@ -1972,8 +1963,8 @@
             "format": "date-time"
           },
           "createdBy": {
-            "type": "string",
-            "description": "User by which the group was created"
+            "description": "User by which the group was created",
+            "$ref": "#/components/schemas/UserResource"
           },
           "description": {
             "type": "string",
@@ -1981,11 +1972,11 @@
           },
           "id": {
             "type": "string",
-            "description": "${swagger.user-group.model.id}"
+            "description": "Users group's unique identifier"
           },
           "institutionId": {
             "type": "string",
-            "description": "${swagger.user-group.model.institutionId}"
+            "description": "Users group's institutionId"
           },
           "members": {
             "type": "array",
@@ -2001,8 +1992,8 @@
             "format": "date-time"
           },
           "modifiedBy": {
-            "type": "string",
-            "description": "User by which the group was modified"
+            "description": "User by which the group was modified",
+            "$ref": "#/components/schemas/UserResource"
           },
           "name": {
             "type": "string",
@@ -2025,27 +2016,11 @@
       "UserResource": {
         "title": "UserResource",
         "required": [
-          "certification",
-          "email",
-          "fiscalCode",
           "name",
           "surname"
         ],
         "type": "object",
         "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User's certification source",
-            "example": false
-          },
-          "email": {
-            "type": "string",
-            "description": "User's email"
-          },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
-          },
           "name": {
             "type": "string",
             "description": "User's name"
