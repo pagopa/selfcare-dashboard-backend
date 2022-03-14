@@ -1291,13 +1291,13 @@
       }
     },
     "/user-groups/{id}/members": {
-      "patch": {
+      "put": {
         "tags": [
           "user-groups"
         ],
         "summary": "addMemberToUserGroup",
         "description": "Service to add a member to a specific UserGroup entity",
-        "operationId": "addMemberToUserGroupUsingPATCH",
+        "operationId": "addMemberToUserGroupUsingPUT",
         "parameters": [
           {
             "name": "id",
@@ -1323,14 +1323,17 @@
           "200": {
             "description": "OK"
           },
-          "204": {
-            "description": "No Content"
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
           },
           "403": {
             "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           }
         },
         "security": [
