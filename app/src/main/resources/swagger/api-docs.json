@@ -1277,13 +1277,13 @@
       }
     },
     "/user-groups/{id}/members/{userId}": {
-      "put": {
+      "post": {
         "tags": [
           "user-groups"
         ],
         "summary": "addMemberToUserGroup",
         "description": "Service to add a member to a specific UserGroup entity",
-        "operationId": "addMemberToUserGroupUsingPUT",
+        "operationId": "addMemberToUserGroupUsingPOST",
         "parameters": [
           {
             "name": "id",
