@@ -1633,6 +1633,29 @@
           }
         }
       },
+      "PlainUserResource": {
+        "title": "PlainUserResource",
+        "required": [
+          "id",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
       "ProductInfoResource": {
         "title": "ProductInfoResource",
         "required": [
@@ -1999,7 +2022,7 @@
           },
           "createdBy": {
             "description": "User by which the group was created",
-            "$ref": "#/components/schemas/UserResource"
+            "$ref": "#/components/schemas/PlainUserResource"
           },
           "description": {
             "type": "string",
@@ -2017,7 +2040,7 @@
             "type": "array",
             "description": "List of all the members of the group",
             "items": {
-              "$ref": "#/components/schemas/UserResource"
+              "$ref": "#/components/schemas/PlainUserResource"
             }
           },
           "modifiedAt": {
@@ -2027,7 +2050,7 @@
           },
           "modifiedBy": {
             "description": "User by which the group was modified",
-            "$ref": "#/components/schemas/UserResource"
+            "$ref": "#/components/schemas/PlainUserResource"
           },
           "name": {
             "type": "string",
@@ -2050,15 +2073,26 @@
       "UserResource": {
         "title": "UserResource",
         "required": [
-          "id",
+          "certification",
+          "email",
+          "fiscalCode",
           "name",
           "surname"
         ],
         "type": "object",
         "properties": {
-          "id": {
+          "certification": {
+            "type": "boolean",
+            "description": "User's certification source",
+            "example": false
+          },
+          "email": {
             "type": "string",
-            "description": "User's unique identifier"
+            "description": "User's email"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
           "name": {
             "type": "string",
