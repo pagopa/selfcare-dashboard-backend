@@ -1084,9 +1084,9 @@
         "tags": [
           "user-groups"
         ],
-        "summary": "getUserGroup",
+        "summary": "getUserGroupById",
         "description": "Service to get a specific UserGroup entity",
-        "operationId": "getUserGroupUsingGET",
+        "operationId": "getUserGroupByIdUsingGET",
         "parameters": [
           {
             "name": "id",
