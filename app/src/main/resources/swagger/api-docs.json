@@ -1058,14 +1058,7 @@
         },
         "responses": {
           "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserGroupResource"
-                }
-              }
-            }
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
@@ -1174,18 +1167,11 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserGroupResource"
-                }
-              }
-            }
-          },
           "201": {
             "description": "Created"
+          },
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Unauthorized"
@@ -1209,9 +1195,9 @@
         "tags": [
           "user-groups"
         ],
-        "summary": "deleteGroup",
+        "summary": "deleteUserGroup",
         "description": "Service that allows the deletion of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "deleteGroupUsingDELETE",
+        "operationId": "deleteUserGroupUsingDELETE",
         "parameters": [
           {
             "name": "id",
@@ -1249,9 +1235,9 @@
         "tags": [
           "user-groups"
         ],
-        "summary": "activateGroup",
+        "summary": "activateUserGroup",
         "description": "Service that allows the activation of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "activateGroupUsingPOST",
+        "operationId": "activateUserGroupUsingPOST",
         "parameters": [
           {
             "name": "id",
@@ -1290,7 +1276,7 @@
         ]
       }
     },
-    "/user-groups/{id}/members": {
+    "/user-groups/{id}/members/{userId}": {
       "put": {
         "tags": [
           "user-groups"
@@ -1308,17 +1294,19 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MemberUUID"
-              }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1350,9 +1338,9 @@
         "tags": [
           "user-groups"
         ],
-        "summary": "suspendGroup",
+        "summary": "suspendUserGroup",
         "description": "Service that allows the suspension of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "suspendGroupUsingPOST",
+        "operationId": "suspendUserGroupUsingPOST",
         "parameters": [
           {
             "name": "id",
@@ -1391,7 +1379,7 @@
         ]
       }
     },
-    "/user-groups/{userGroupId}/members/{memberId}": {
+    "/user-groups/{userGroupId}/members/{userId}": {
       "delete": {
         "tags": [
           "user-groups"
@@ -1411,9 +1399,9 @@
             }
           },
           {
-            "name": "memberId",
+            "name": "userId",
             "in": "path",
-            "description": "Member's unique identifier",
+            "description": "User's unique identifier",
             "required": true,
             "style": "simple",
             "schema": {
@@ -1642,20 +1630,6 @@
           "surname": {
             "type": "string",
             "description": "User's surname"
-          }
-        }
-      },
-      "MemberUUID": {
-        "title": "MemberUUID",
-        "required": [
-          "member"
-        ],
-        "type": "object",
-        "properties": {
-          "member": {
-            "type": "string",
-            "description": "Member's unique identifier",
-            "format": "uuid"
           }
         }
       },
@@ -2043,8 +2017,7 @@
             "type": "array",
             "description": "List of all the members of the group",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/UserResource"
             }
           },
           "modifiedAt": {
@@ -2077,11 +2050,16 @@
       "UserResource": {
         "title": "UserResource",
         "required": [
+          "id",
           "name",
           "surname"
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
           "name": {
             "type": "string",
             "description": "User's name"
