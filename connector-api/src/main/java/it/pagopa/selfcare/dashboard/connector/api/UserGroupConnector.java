@@ -6,4 +6,7 @@ public interface UserGroupConnector {
     void createUserGroup(CreateUserGroup userGroupDto);
 
     void delete(String groupId);
+
+    void activate(String groupId);
+
 }

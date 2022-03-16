@@ -6,4 +6,6 @@ public interface UserGroupService {
     void createUserGroup(CreateUserGroup group);
 
     void delete(String groupId);
+
+    void activate(String groupId);
 }

@@ -81,4 +81,14 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         assertDoesNotThrow(executable);
     }
 
+    @Test
+    public void activateUserGroup() {
+        //given
+        String id = "id";
+        //when
+        Executable executable = () -> restClient.activateUserGroupById(id);
+        //then
+        assertDoesNotThrow(executable);
+    }
+
 }

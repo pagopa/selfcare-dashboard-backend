@@ -75,4 +75,28 @@ class UserGroupConnectorImplTest {
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
+
+    @Test
+    void activate() {
+        //given
+        String groupId = "groupId";
+        //when
+        groupConnector.activate(groupId);
+        //then
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .activateUserGroupById(groupId);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void activate_nullGroupId() {
+        //given
+        String groupId = null;
+        //when
+        Executable executable = () -> groupConnector.activate(groupId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
 }

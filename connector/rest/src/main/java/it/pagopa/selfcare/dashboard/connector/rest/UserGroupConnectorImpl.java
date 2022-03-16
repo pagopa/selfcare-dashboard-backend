@@ -45,4 +45,13 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         restClient.deleteUserGroupById(groupId);
         log.trace("delete end");
     }
+
+    @Override
+    public void activate(String groupId) {
+        log.trace("activate start");
+        log.debug("activate groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        restClient.activateUserGroupById(groupId);
+        log.trace("activate end");
+    }
 }

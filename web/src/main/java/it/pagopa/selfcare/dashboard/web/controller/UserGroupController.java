@@ -72,6 +72,7 @@ public class UserGroupController {
                                           String id) {
         log.trace("activateGroup start");
         log.debug("activateGroup id = {}", id);
+        groupService.activate(id);
         log.trace("activateGroup end");
     }
 

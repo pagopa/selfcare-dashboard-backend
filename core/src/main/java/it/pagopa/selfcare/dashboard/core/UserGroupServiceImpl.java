@@ -57,9 +57,18 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public void delete(String groupId) {
         log.trace("delete start");
-        log.debug("groupId = {}", groupId);
+        log.debug("delete groupId = {}", groupId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         groupConnector.delete(groupId);
         log.trace("delete end");
+    }
+
+    @Override
+    public void activate(String groupId) {
+        log.trace("activate start");
+        log.debug("activate groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        groupConnector.activate(groupId);
+        log.trace("activate end");
     }
 }
