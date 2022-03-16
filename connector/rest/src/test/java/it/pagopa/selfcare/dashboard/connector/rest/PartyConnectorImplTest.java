@@ -17,7 +17,6 @@ import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.Attribute;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
@@ -45,17 +44,14 @@ import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = {
-                PartyConnectorImpl.class,
-                PartyConnectorTestConfig.class
-        },
-        properties = "USER_STATES_FILTER=ACTIVE,SUSPENDED"
+                PartyConnectorImpl.class
+        }
 )
 class PartyConnectorImplTest {
 
@@ -467,6 +463,7 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         // when
         Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
@@ -481,7 +478,7 @@ class PartyConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
-        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock, null);
+        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -502,6 +499,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of("productId"));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         // when
         Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
@@ -519,6 +517,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductRoles(Optional.of(Set.of("api", "security")));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         // when
         Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
@@ -537,7 +536,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setRole(Optional.of(selfCareAuthority));
-
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
         // when
         Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
         // then
@@ -550,7 +549,7 @@ class PartyConnectorImplTest {
             }
         }
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.notNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionRelationships(Mockito.eq(institutionId), Mockito.eq(partyRoles), Mockito.isNotNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -559,6 +558,7 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
@@ -603,7 +603,6 @@ class PartyConnectorImplTest {
     @Test
     void getUsers_nullAllowedState() {
         // given
-        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock, null);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -649,7 +648,6 @@ class PartyConnectorImplTest {
     @Test
     void getUsers_emptyAllowedStates() {
         // given
-        PartyConnectorImpl partyConnector = new PartyConnectorImpl(restClientMock, new String[0]);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -1092,17 +1090,20 @@ class PartyConnectorImplTest {
         Optional<String> userId = null;
         Optional<SelfCareAuthority> role = null;
         Optional<String> productId = null;
+        Optional<EnumSet<RelationshipState>> allowedStates = null;
         //when
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
         filter.setUserId(userId);
         filter.setProductRoles(productRoles);
         filter.setProductId(productId);
         filter.setRole(role);
+        filter.setAllowedState(allowedStates);
         //then
         assertEquals(Optional.empty(), filter.getProductId());
         assertEquals(Optional.empty(), filter.getProductRoles());
         assertEquals(Optional.empty(), filter.getUserId());
         assertEquals(Optional.empty(), filter.getRole());
+        assertEquals(Optional.empty(), filter.getAllowedStates());
 
     }
 

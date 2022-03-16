@@ -119,7 +119,7 @@ public class InstitutionController {
                                                                      Optional<SelfCareAuthority> role,
                                                              @ApiParam("${swagger.dashboard.user.model.productRoles}")
                                                              @RequestParam(value = "productRoles", required = false)
-                                                                         Optional<Set<String>> productRoles) {
+                                                                     Optional<Set<String>> productRoles) {
 
         log.trace("getInstitutionUsers start");
         log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
