@@ -54,4 +54,13 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         restClient.activateUserGroupById(groupId);
         log.trace("activate end");
     }
+
+    @Override
+    public void suspend(String groupId) {
+        log.trace("suspend start");
+        log.debug("suspend groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        restClient.suspendUserGroupById(groupId);
+        log.trace("suspend end");
+    }
 }

@@ -91,4 +91,14 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         assertDoesNotThrow(executable);
     }
 
+    @Test
+    public void suspendUserGroup() {
+        //given
+        String id = "id";
+        //when
+        Executable executable = () -> restClient.suspendUserGroupById(id);
+        //then
+        assertDoesNotThrow(executable);
+    }
+
 }

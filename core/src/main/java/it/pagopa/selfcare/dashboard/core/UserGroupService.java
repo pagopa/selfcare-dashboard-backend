@@ -8,4 +8,6 @@ public interface UserGroupService {
     void delete(String groupId);
 
     void activate(String groupId);
+
+    void suspend(String groupId);
 }

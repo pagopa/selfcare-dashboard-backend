@@ -19,4 +19,8 @@ public interface UserGroupRestClient {
     @PostMapping(value = "${rest-client.user-group.activateUserGroup.path}")
     @ResponseBody
     void activateUserGroupById(@PathVariable("id") String id);
+
+    @PostMapping(value = "${rest-client.user-group.suspendUserGroup.path}")
+    @ResponseBody
+    void suspendUserGroupById(@PathVariable("id") String id);
 }

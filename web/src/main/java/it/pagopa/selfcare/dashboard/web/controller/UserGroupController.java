@@ -84,6 +84,7 @@ public class UserGroupController {
                                          String id) {
         log.trace("suspendGroup start");
         log.debug("suspendGroup id = {}", id);
+        groupService.suspend(id);
         log.trace("suspendGroup end");
     }
 

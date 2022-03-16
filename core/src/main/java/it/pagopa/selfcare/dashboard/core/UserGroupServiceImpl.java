@@ -71,4 +71,13 @@ public class UserGroupServiceImpl implements UserGroupService {
         groupConnector.activate(groupId);
         log.trace("activate end");
     }
+
+    @Override
+    public void suspend(String groupId) {
+        log.trace("suspend start");
+        log.debug("suspend groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        groupConnector.suspend(groupId);
+        log.trace("suspend end");
+    }
 }

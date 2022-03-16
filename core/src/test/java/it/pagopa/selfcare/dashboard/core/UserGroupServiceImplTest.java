@@ -145,4 +145,28 @@ class UserGroupServiceImplTest {
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
     }
+
+    @Test
+    void suspend() {
+        // given
+        String groupId = "relationshipId";
+        // when
+        groupService.suspend(groupId);
+        // then
+        Mockito.verify(groupConnector, Mockito.times(1))
+                .suspend(groupId);
+        Mockito.verifyNoMoreInteractions(groupConnector);
+    }
+
+    @Test
+    void suspend_nullGroupId() {
+        //given
+        String groupId = null;
+        //when
+        Executable executable = () -> groupService.suspend(groupId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
 }

@@ -95,4 +95,21 @@ class UserGroupControllerTest {
         Mockito.verifyNoMoreInteractions(groupServiceMock);
     }
 
+    @Test
+    void suspendUserGroup() throws Exception {
+        //given
+        String groupId = "groupId";
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .post(BASE_URL + "/" + groupId + "/suspend")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andReturn();
+        //then
+        assertEquals(0, result.getResponse().getContentLength());
+        Mockito.verify(groupServiceMock, Mockito.times(1))
+                .suspend(groupId);
+        Mockito.verifyNoMoreInteractions(groupServiceMock);
+    }
 }

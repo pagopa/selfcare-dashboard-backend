@@ -9,4 +9,5 @@ public interface UserGroupConnector {
 
     void activate(String groupId);
 
+    void suspend(String groupId);
 }
