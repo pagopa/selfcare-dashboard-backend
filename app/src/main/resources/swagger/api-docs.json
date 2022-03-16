@@ -943,15 +943,15 @@
         "tags": [
           "user-groups"
         ],
-        "summary": "getGroupsByInstitutionAndProductIds",
-        "description": "Service that allows to get a specific occurrence of the UserGroup entity by InstitutionId and ProductId, paged and sorted by name",
-        "operationId": "getGroupsByInstitutionAndProductIdsUsingGET",
+        "summary": "getUserGroups",
+        "description": "Service that allows to get a list of UserGroup entities",
+        "operationId": "getUserGroupsUsingGET",
         "parameters": [
           {
             "name": "institutionId",
             "in": "query",
             "description": "Users group's institutionId",
-            "required": true,
+            "required": false,
             "style": "form",
             "schema": {
               "type": "string"
@@ -999,10 +999,21 @@
             "name": "productId",
             "in": "query",
             "description": "Users group's productId",
-            "required": true,
+            "required": false,
             "style": "form",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "User's unique identifier",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1422,60 +1433,6 @@
           },
           "403": {
             "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
-      }
-    },
-    "/user-groups/{userId}/groups": {
-      "get": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "getGroupsByUserId",
-        "description": "${}",
-        "operationId": "getGroupsByUserIdUsingGET",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "User's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserGroupPlainResource"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
           }
         },
         "security": [
