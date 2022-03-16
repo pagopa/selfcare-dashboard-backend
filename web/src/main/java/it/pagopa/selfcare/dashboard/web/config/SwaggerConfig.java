@@ -119,7 +119,7 @@ class SwaggerConfig {
                             .in(ParameterType.QUERY)
                             .name("size")
                             .query(q -> q.model(m -> m.scalarModel(ScalarType.INTEGER)))
-                            .description("Number of records per page").build());
+                            .description("Number of records per page, default size is 20").build());
                     parameters.add(new RequestParameterBuilder()
                             .in(ParameterType.QUERY)
                             .name("sort")
