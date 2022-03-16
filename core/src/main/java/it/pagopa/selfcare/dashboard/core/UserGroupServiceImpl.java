@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +21,7 @@ public class UserGroupServiceImpl implements UserGroupService {
 
     private final UserGroupConnector groupConnector;
     private final InstitutionService institutionService;
+    final static String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
     @Autowired
     public UserGroupServiceImpl(UserGroupConnector groupConnector, InstitutionService institutionService) {
@@ -50,5 +52,14 @@ public class UserGroupServiceImpl implements UserGroupService {
         groupConnector.createUserGroup(group);
         log.trace("createUserGroup end");
 
+    }
+
+    @Override
+    public void delete(String groupId) {
+        log.trace("delete start");
+        log.debug("groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        groupConnector.delete(groupId);
+        log.trace("delete end");
     }
 }

@@ -69,7 +69,16 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         Executable executable = () -> restClient.createUserGroup(request);
         //then
         assertDoesNotThrow(executable);
+    }
 
+    @Test
+    public void deleteUserGroup() {
+        //given
+        String id = "id";
+        //when
+        Executable executable = () -> restClient.deleteUserGroupById(id);
+        //then
+        assertDoesNotThrow(executable);
     }
 
 }

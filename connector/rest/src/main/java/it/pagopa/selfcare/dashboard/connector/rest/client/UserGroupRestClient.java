@@ -14,5 +14,5 @@ public interface UserGroupRestClient {
 
     @DeleteMapping(value = "${rest-client.user-group.deleteUserGroup.path}")
     @ResponseBody
-    void deleteUserGroupById(@PathVariable("id")String id);
+    void deleteUserGroupById(@PathVariable("id") String id);
 }

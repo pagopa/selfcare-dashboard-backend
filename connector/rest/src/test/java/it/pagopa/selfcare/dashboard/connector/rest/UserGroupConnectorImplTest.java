@@ -13,7 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static it.pagopa.selfcare.dashboard.connector.rest.UserGroupConnectorImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserGroupConnectorImplTest {
@@ -50,5 +52,27 @@ class UserGroupConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+    @Test
+    void delete() {
+        //given
+        String groupId = "groupId";
+        //when
+        groupConnector.delete(groupId);
+        //then
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .deleteUserGroupById(groupId);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
 
+    @Test
+    void delete_nullGroupId() {
+        //given
+        String groupId = null;
+        //when
+        Executable executable = () -> groupConnector.delete(groupId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
 }

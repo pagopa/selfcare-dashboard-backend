@@ -57,9 +57,10 @@ public class UserGroupController {
     public void deleteUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                 @PathVariable("id")
                                         String id) {
-        log.trace("deteleGroup start");
+        log.trace("deleteGroup start");
         log.debug("deleteGroup id = {}", id);
-        log.trace("deteleGroup end");
+        groupService.delete(id);
+        log.trace("deleteGroup end");
 
     }
 
@@ -167,6 +168,7 @@ public class UserGroupController {
                                                   UUID memberId) {
         log.trace("deleteMemberFromUserGroup start");
         log.debug("deleteMemberFromUserGroup userGroupId = {}, memberId = {}", userGroupId, memberId);
+
         log.trace("deleteMemberFromUserGroup end");
     }
 

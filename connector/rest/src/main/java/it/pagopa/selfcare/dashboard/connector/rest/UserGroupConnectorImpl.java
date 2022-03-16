@@ -15,6 +15,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
 
     private final UserGroupRestClient restClient;
 
+    final static String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
     @Autowired
     public UserGroupConnectorImpl(UserGroupRestClient restClient) {
@@ -34,5 +35,14 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         userGroupRequest.setName(userGroupRequest.getName());
         restClient.createUserGroup(userGroupRequest);
         log.trace("createUserGroup end");
+    }
+
+    @Override
+    public void delete(String groupId) {
+        log.trace("delete start");
+        log.debug("delete groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        restClient.deleteUserGroupById(groupId);
+        log.trace("delete end");
     }
 }
