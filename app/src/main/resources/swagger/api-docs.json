@@ -1968,6 +1968,39 @@
           }
         }
       },
+      "UserGroupMemberResource": {
+        "title": "UserGroupMemberResource",
+        "required": [
+          "email",
+          "id",
+          "name",
+          "role",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email"
+          },
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role in product"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
       "UserGroupPlainResource": {
         "title": "UserGroupPlainResource",
         "required": [
@@ -2054,7 +2087,7 @@
             "type": "array",
             "description": "List of all the members of the group",
             "items": {
-              "$ref": "#/components/schemas/PlainUserResource"
+              "$ref": "#/components/schemas/UserGroupMemberResource"
             }
           },
           "modifiedAt": {
