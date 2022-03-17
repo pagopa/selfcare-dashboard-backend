@@ -12,19 +12,25 @@
 
 package it.pagopa.selfcare.dashboard.connector.rest.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
+import it.pagopa.selfcare.dashboard.connector.model.user.InstitutionContact;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 
-@Getter
-@Setter
+@Data
 public class RelationshipInfo {
 
     private String id;
     private String from;
+    private String to;
     private String name;
     private String surname;
+    private String taxCode;
+    private Certification certification;
+    private Map<String, InstitutionContact> institutionContacts;
     private String email;
     private PartyRole role;
     private ProductInfo product;

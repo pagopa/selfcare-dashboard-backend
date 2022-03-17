@@ -1,11 +1,11 @@
 [
   {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "from": "id",
+    "from": "userId1",
     "name": "user1",
     "surname": "string",
     "email": "string",
-    "role": "DELEGATE",
+    "role": "OPERATOR",
     "product": {
       "id": "prod-io",
       "role": "api",
@@ -17,11 +17,11 @@
   },
   {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "from": "id",
-    "name": "user1",
+    "from": "userId1",
+    "name": "user2",
     "surname": "string",
     "email": "string",
-    "role": "OPERATOR",
+    "role": "DELEGATE",
     "product": {
       "id": "prod-pn",
       "role": "security",

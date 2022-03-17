@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,8 @@ public interface ProductsConnector {
 
     List<Product> getProducts();
 
-    Map<String, List<String>> getProductRoleMappings(String productId);
+    Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId);
+
+    Product getProduct(String productId);
 
 }

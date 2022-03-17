@@ -56,379 +56,530 @@
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/institutions/{institutionId}" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitution",
-        "description" : "Service to get a specific institution related to logged user",
-        "operationId" : "getInstitutionUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+    "/institutions/{institutionId}": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitution",
+        "description": "Service to get a specific institution related to logged user",
+        "operationId": "getInstitutionUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionResource"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/institutions/{institutionId}/logo" : {
-      "put" : {
-        "tags" : [ "institutions" ],
-        "summary" : "saveInstitutionLogo",
-        "description" : "Service to upload and store the institution's logo",
-        "operationId" : "saveInstitutionLogoUsingPUT",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+    "/institutions/{institutionId}/logo": {
+      "put": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "saveInstitutionLogo",
+        "description": "Service to upload and store the institution's logo",
+        "operationId": "saveInstitutionLogoUsingPUT",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "required" : [ "logo" ],
-                "type" : "object",
-                "properties" : {
-                  "logo" : {
-                    "type" : "string",
-                    "description" : "Institution's logo",
-                    "format" : "binary"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "logo"
+                ],
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "description": "Institution's logo",
+                    "format": "binary"
                   }
                 }
               }
             }
           }
         },
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               },
-              "multipart/form-data" : {
-                "schema" : {
-                  "type" : "object"
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
           },
-          "201" : {
-            "description" : "Created"
+          "201": {
+            "description": "Created"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/institutions/{institutionId}/products" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionProducts",
-        "description" : "Service to get all the products related to a specific institution",
-        "operationId" : "getInstitutionProductsUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductsResource"
-                  }
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      }
-    },
-    "/institutions/{institutionId}/products/{productId}/users" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionProductUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionProductUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductUserResource"
-                  }
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      },
-      "post" : {
-        "tags" : [ "institutions" ],
-        "summary" : "createInstitutionProductUser",
-        "description" : "Service to Create a user related to a specific pair of institution-product",
-        "operationId" : "createInstitutionProductUserUsingPOST",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateUserDto"
-              }
+    "/institutions/{institutionId}/products": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionProducts",
+        "description": "Service to get all the products related to a specific institution",
+        "operationId": "getInstitutionProductsUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
             }
           }
-        },
-        "responses" : {
-          "201" : {
-            "description" : "Created"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      }
-    },
-    "/institutions/{institutionId}/users" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionUserResource"
-                  }
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      }
-    },
-    "/products/{productId}/roles" : {
-      "get" : {
-        "tags" : [ "products" ],
-        "summary" : "getProductRoles",
-        "description" : "Service to get the Product roles",
-        "operationId" : "getProductRolesUsingGET",
-        "parameters" : [ {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "$ref": "#/components/schemas/ProductsResource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/institutions/{institutionId}/products/{productId}/users": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionProductUsers",
+        "description": "Service to get all the users related to a specific pair of institution-product",
+        "operationId": "getInstitutionProductUsersUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "description": "User's roles in product",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductUserResource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "createInstitutionProductUser",
+        "description": "Service to Create a user related to a specific pair of institution-product",
+        "operationId": "createInstitutionProductUserUsingPOST",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/institutions/{institutionId}/users": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUsers",
+        "description": "Service to get all the users related to a specific pair of institution-product",
+        "operationId": "getInstitutionUsersUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "description": "User's roles in product",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionUserResource"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/institutions/{institutionId}/users/{userId}": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUser",
+        "description": "${swagger.dashboard.institutions.api.getInstitutionUser}",
+        "operationId": "getInstitutionUserUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionUserResource"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/products/{productId}/roles": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "getProductRoles",
+        "description": "Service to get the Product roles",
+        "operationId": "getProductRolesUsingGET",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductRoleMappingsResource"
                   }
                 }
               }
@@ -459,7 +610,7 @@
           "relationships"
         ],
         "summary": "deleteRelationshipById",
-        "description": "{swagger.dashboard.institutions.api.deleteUser}",
+        "description": "Delete the relationship",
         "operationId": "deleteRelationshipByIdUsingDELETE",
         "parameters": [
           {
@@ -530,84 +681,102 @@
             "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/relationships/{relationshipId}/suspend" : {
-      "post" : {
-        "tags" : [ "relationships" ],
-        "summary" : "suspendRelationship",
-        "description" : "Suspend the relationship",
-        "operationId" : "suspendRelationshipUsingPOST",
-        "parameters" : [ {
-          "name" : "relationshipId",
-          "in" : "path",
-          "description" : "Unique relationship identifier between User and Product",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+    "/relationships/{relationshipId}/suspend": {
+      "post": {
+        "tags": [
+          "relationships"
+        ],
+        "summary": "suspendRelationship",
+        "description": "Suspend the relationship",
+        "operationId": "suspendRelationshipUsingPOST",
+        "parameters": [
+          {
+            "name": "relationshipId",
+            "in": "path",
+            "description": "Unique relationship identifier between User and Product",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "201" : {
-            "description" : "Created"
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           },
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized"
           },
-          "403" : {
-            "description" : "Forbidden"
+          "403": {
+            "description": "Forbidden"
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found"
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/token/exchange" : {
-      "get" : {
-        "tags" : [ "token" ],
-        "summary" : "exchange",
-        "description" : "Service create an 'Identity Token' based on a Self Care session token",
-        "operationId" : "exchangeUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
+    "/token/exchange": {
+      "get": {
+        "tags": [
+          "token"
+        ],
+        "summary": "exchange",
+        "description": "Service create an 'Identity Token' based on a Self Care session token",
+        "operationId": "exchangeUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "realm",
+            "in": "query",
+            "description": "The domain for which the requested token is valid",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
           }
-        }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "realm",
-          "in" : "query",
-          "description" : "The domain for which the requested token is valid",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
+        ],
+        "responses": {
           "200": {
             "description": "OK",
             "content": {
@@ -643,8 +812,20 @@
           "user"
         ],
         "summary": "getUserByExternalId",
-        "description": "Retrieve the user for a given internal id ",
+        "description": "Retrieve the user for a given internal id",
         "operationId": "getUserByExternalIdUsingPOST",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -686,34 +867,110 @@
           }
         ]
       }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "updateUser",
+        "description": "Update previously added user",
+        "operationId": "updateUserUsingPUT",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique identifier (i.e.: IPA code)",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
     }
   },
-  "components" : {
-    "schemas" : {
-      "CreateUserDto" : {
-        "title" : "CreateUserDto",
-        "required" : [ "email", "name", "productRole", "surname", "taxCode" ],
-        "type" : "object",
-        "properties" : {
+  "components": {
+    "schemas": {
+      "CreateUserDto": {
+        "title": "CreateUserDto",
+        "required": [
+          "email",
+          "name",
+          "productRoles",
+          "surname",
+          "taxCode"
+        ],
+        "type": "object",
+        "properties": {
           "email": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's email"
           },
           "name": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's name"
           },
-          "productRole": {
-            "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+          "productRoles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "User's roles in product",
+            "items": {
+              "type": "string"
+            }
           },
           "surname": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's surname"
           },
           "taxCode": {
             "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description": "User's fiscal code"
           }
         }
       },
@@ -781,101 +1038,260 @@
           }
         }
       },
-      "InstitutionUserResource" : {
-        "title" : "InstitutionUserResource",
-        "required" : [ "email", "id", "name", "products", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
+      "InstitutionUserResource": {
+        "title": "InstitutionUserResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User provided with certification",
+            "example": false
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+          "email": {
+            "type": "string",
+            "description": "User's email"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "products" : {
-            "type" : "array",
-            "description" : "Authorized user products",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductInfo"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "products": {
+            "type": "array",
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
             }
           },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
+          "status": {
+            "type": "string",
+            "description": "User's status"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
-      "ProductInfo" : {
-        "title" : "ProductInfo",
-        "required" : [ "id", "title" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+      "ProductInfoResource": {
+        "title": "ProductInfoResource",
+        "required": [
+          "id",
+          "roleInfos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "roleInfos": {
+            "type": "array",
+            "description": "User's role infos in product",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleInfoResource"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "Product's title"
           }
         }
       },
-      "ProductUserResource" : {
-        "title" : "ProductUserResource",
-        "required" : [ "email", "id", "name", "relationshipId", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
+      "ProductRoleInfoResource": {
+        "title": "ProductRoleInfoResource",
+        "required": [
+          "relationshipId",
+          "role",
+          "selcRole",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "relationshipId": {
+            "type": "string",
+            "description": "Unique relationship identifier between User and Product"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+          "role": {
+            "type": "string",
+            "description": "User's role in product"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "selcRole": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
-          "relationshipId" : {
-            "type" : "string",
-            "description" : "Unique relationship identifier between User and Product"
-          },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
-          },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "status": {
+            "type": "string",
+            "description": "User's status"
           }
         }
       },
-      "ProductsResource" : {
-        "title" : "ProductsResource",
-        "required" : [ "authorized", "description", "id", "logo", "status", "title", "urlBO" ],
-        "type" : "object",
-        "properties" : {
+      "ProductRoleMappingsResource": {
+        "title": "ProductRoleMappingsResource",
+        "required": [
+          "multiroleAllowed",
+          "partyRole",
+          "productRoles",
+          "selcRole"
+        ],
+        "type": "object",
+        "properties": {
+          "multiroleAllowed": {
+            "type": "boolean",
+            "description": "Indicates if an User can have more than one product role",
+            "example": false
+          },
+          "partyRole": {
+            "type": "string",
+            "description": "Party role",
+            "enum": [
+              "DELEGATE",
+              "MANAGER",
+              "OPERATOR",
+              "SUB_DELEGATE"
+            ]
+          },
+          "productRoles": {
+            "type": "array",
+            "description": "Available product roles",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleResource"
+            }
+          },
+          "selcRole": {
+            "type": "string",
+            "description": "Self Care role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
+          }
+        }
+      },
+      "ProductRoleResource": {
+        "title": "ProductRoleResource",
+        "required": [
+          "code",
+          "description",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Product role internal code"
+          },
+          "description": {
+            "type": "string",
+            "description": "Product role description"
+          },
+          "label": {
+            "type": "string",
+            "description": "Product role label"
+          }
+        }
+      },
+      "ProductUserResource": {
+        "title": "ProductUserResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "id",
+          "name",
+          "product",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User provided with certification",
+            "example": false
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
+          },
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "product": {
+            "description": "Authorized user product",
+            "$ref": "#/components/schemas/ProductInfoResource"
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "User's status"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
+      "ProductsResource": {
+        "title": "ProductsResource",
+        "required": [
+          "authorized",
+          "description",
+          "id",
+          "logo",
+          "status",
+          "title",
+          "urlBO"
+        ],
+        "type": "object",
+        "properties": {
           "activatedAt": {
             "type": "string",
             "description": "Date the products was activated",
@@ -925,6 +1341,34 @@
           }
         }
       },
+      "UpdateUserDto": {
+        "title": "UpdateUserDto",
+        "required": [
+          "email",
+          "fiscalCode",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's institutional email"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
       "UserResource": {
         "title": "UserResource",
         "required": [
@@ -960,12 +1404,12 @@
         }
       }
     },
-    "securitySchemes" : {
-      "bearerAuth" : {
-        "type" : "http",
-        "description" : "A bearer token in the format of a JWS and conformed to the specifications included in [RFC8725](https://tools.ietf.org/html/RFC8725)",
-        "scheme" : "bearer",
-        "bearerFormat" : "JWT"
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "A bearer token in the format of a JWS and conformed to the specifications included in [RFC8725](https://tools.ietf.org/html/RFC8725)",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

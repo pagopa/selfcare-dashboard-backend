@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.handler;
 import it.pagopa.selfcare.commons.web.model.ErrorResource;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -44,6 +45,19 @@ class DashboardExceptionsHandlerTest {
         // when
         ErrorResource resource = handler.handleInvalidProductRoleException(exceptionMock);
         // then
+        assertNotNull(resource);
+        assertEquals(DETAIL_MESSAGE, resource.getMessage());
+    }
+
+    @Test
+    void handleResourceNotFoundException() {
+        //given
+        ResourceNotFoundException exceptionMock = Mockito.mock(ResourceNotFoundException.class);
+        Mockito.when(exceptionMock.getMessage())
+                .thenReturn(DETAIL_MESSAGE);
+        //when
+        ErrorResource resource = handler.handleResourceNotFoundException(exceptionMock);
+        //then
         assertNotNull(resource);
         assertEquals(DETAIL_MESSAGE, resource.getMessage());
     }

@@ -5,5 +5,5 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource("classpath:config/party-connector.properties")
-public class PartyConnectorConfig {
+class PartyConnectorConfig {
 }

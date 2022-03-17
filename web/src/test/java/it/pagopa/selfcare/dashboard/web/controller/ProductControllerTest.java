@@ -2,8 +2,11 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.model.ProductRoleMappingsResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collection;
+import java.util.EnumMap;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -41,6 +45,11 @@ class ProductControllerTest {
     void getProductRoles() throws Exception {
         // given
         String productId = "prod1";
+        Mockito.when(productServiceMock.getProductRoles(Mockito.anyString()))
+                .thenReturn(new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class) {{
+                    put(PartyRole.MANAGER, new ProductRoleInfo());
+                    put(PartyRole.OPERATOR, new ProductRoleInfo());
+                }});
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{productId}/roles", productId)
@@ -49,7 +58,7 @@ class ProductControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         // then
-        Collection<String> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+        Collection<ProductRoleMappingsResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
                 });
         assertNotNull(resources);

@@ -35,20 +35,24 @@ class ProductUserResourceTest {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("id", NotBlank.class);
-        toCheckMap.put("relationshipId", NotBlank.class);
+        toCheckMap.put("certification", NotNull.class);
+        toCheckMap.put("product", NotNull.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("email", NotBlank.class);
         toCheckMap.put("role", NotNull.class);
         toCheckMap.put("status", NotBlank.class);
+        toCheckMap.put("fiscalCode", NotBlank.class);
         ProductUserResource resource = new ProductUserResource();
         resource.setId(null);
-        resource.setRelationshipId(null);
+        resource.setCertification(false);
+        resource.setProduct(null);
         resource.setName(null);
         resource.setSurname(null);
         resource.setEmail(null);
         resource.setRole(null);
         resource.setStatus(null);
+        resource.setFiscalCode(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
@@ -66,7 +70,8 @@ class ProductUserResourceTest {
     @Test
     void validateNotNullFields() {
         // given
-        ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource());
+        ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource(), "setRoleInfos");
+        resource.getProduct().setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then
