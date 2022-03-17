@@ -91,7 +91,6 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
 
     @Test
-    @Disabled
     void getInstitutionRelationships_fullyValued() {
         // given
         String institutionId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
@@ -123,7 +122,6 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
 
     @Test
-    @Disabled
     void getInstitutionRelationships_fullyNull() {
         // given
         String institutionId = testCase2instIdMap.get(TestCase.FULLY_NULL);
@@ -146,7 +144,6 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
 
     @Test
-    @Disabled
     void getInstitutionRelationships_emptyResult() {
         // given
         String institutionId = testCase2instIdMap.get(TestCase.EMPTY_RESULT);

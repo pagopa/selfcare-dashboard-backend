@@ -30,6 +30,7 @@ import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.mail.MailPreparationException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
@@ -242,6 +243,45 @@ class NotificationServiceImplTest {
         Mockito.verify(partyConnector, Mockito.times(1))
                 .getInstitutionByExternalId(institutionExternalId);
         Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+    }
+
+
+    @Test
+    void sendCreatedUserNotification_MailPreparationException() throws IOException {
+        //given
+        String institutionExternalId = "institutionExternalId";
+        String email = "email";
+        String productTitle = "productTitle";
+        Institution institutionMock = TestUtils.mockInstance(new Institution());
+        Mockito.when(partyConnector.getInstitutionByExternalId(Mockito.any()))
+                .thenReturn(institutionMock);
+        SelfCareUser selfCareUser = SelfCareUser.builder("id")
+                .email("test@example.com")
+                .name("name")
+                .surname("surname")
+                .build();
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
+        Mockito.doThrow(RuntimeException.class)
+                .when(notificationConnector)
+                .sendNotificationToUser(Mockito.any());
+        //when
+        Executable executable = () -> {
+            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            Thread.sleep(1000);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
+                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        Throwable e = throwableCaptor.getValue();
+        Assertions.assertNotNull(e);
+        Assertions.assertEquals(MailPreparationException.class, e.getClass());
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getInstitutionByExternalId(institutionExternalId);
+        Mockito.verify(freemarkerConfig, Mockito.times(1))
+                .getTemplate("add_referent.ftlh");
+        Mockito.verify(notificationConnector, Mockito.times(1))
+                .sendNotificationToUser(Mockito.any());
     }
 
 

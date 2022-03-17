@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Import;
 
 @TestConfiguration
 @Import(NotificationManagerRestClientConfig.class)
-public class NotificationManagerRestClientConfigTest {
+public class NotificationManagerRestClientTestConfig {
 
 }

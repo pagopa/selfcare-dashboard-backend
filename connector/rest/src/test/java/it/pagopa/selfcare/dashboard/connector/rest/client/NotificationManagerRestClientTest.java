@@ -5,7 +5,7 @@ import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
-import it.pagopa.selfcare.dashboard.connector.rest.config.NotificationManagerRestClientConfigTest;
+import it.pagopa.selfcare.dashboard.connector.rest.config.NotificationManagerRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
@@ -30,7 +30,7 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 )
 @ContextConfiguration(
         initializers = NotificationManagerRestClientTest.RandomPortInitializer.class,
-        classes = {NotificationManagerRestClientConfigTest.class, HttpClientConfiguration.class}
+        classes = {NotificationManagerRestClientTestConfig.class, HttpClientConfiguration.class}
 )
 class NotificationManagerRestClientTest extends BaseFeignRestClientTest {
 

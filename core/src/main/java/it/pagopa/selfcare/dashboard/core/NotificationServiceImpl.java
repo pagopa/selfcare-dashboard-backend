@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.core;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -95,7 +93,7 @@ public class NotificationServiceImpl implements NotificationService {
             messageRequest.setReceiverEmail(email);
             messageRequest.setSubject(subject);
             notificationConnector.sendNotificationToUser(messageRequest);
-        } catch (TemplateException | IOException e) {
+        } catch (Exception e) {
             throw new MailPreparationException(e);
         }
     }
