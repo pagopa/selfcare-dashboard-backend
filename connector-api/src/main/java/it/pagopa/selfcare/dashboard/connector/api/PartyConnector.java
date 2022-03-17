@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
-import it.pagopa.selfcare.dashboard.connector.model.RelationshipInfoResult;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -12,11 +12,11 @@ import java.util.List;
 
 public interface PartyConnector {
 
-    InstitutionInfo getInstitution(String institutionId);
+    InstitutionInfo getOnBoardedInstitution(String institutionId);
 
-    Collection<InstitutionInfo> getInstitutions();
+    Collection<InstitutionInfo> getOnBoardedInstitutions();
 
-    RelationshipInfoResult getRelationshipInfo(String relationshipId);
+    UserInfo getUser(String relationshipId);
 
     List<PartyProduct> getInstitutionProducts(String institutionId);
 
@@ -31,5 +31,9 @@ public interface PartyConnector {
     void activate(String relationshipId);
 
     void delete(String relationshipId);
+
+    Institution getInstitution(String institutionId);
+
+    Institution getInstitutionByExternalId(String institutionExternalId);
 
 }

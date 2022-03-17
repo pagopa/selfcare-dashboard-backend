@@ -64,14 +64,14 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        Mockito.when(partyConnectorMock.getInstitution(Mockito.any()))
+        Mockito.when(partyConnectorMock.getOnBoardedInstitution(Mockito.any()))
                 .thenReturn(expectedInstitutionInfo);
         // when
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         // then
         assertSame(expectedInstitutionInfo, institutionInfo);
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getInstitution(institutionId);
+                .getOnBoardedInstitution(institutionId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -79,7 +79,7 @@ class InstitutionServiceImplTest {
     void getInstitutions() {
         // given
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        Mockito.when(partyConnectorMock.getInstitutions())
+        Mockito.when(partyConnectorMock.getOnBoardedInstitutions())
                 .thenReturn(List.of(expectedInstitutionInfo));
         // when
         Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
@@ -88,7 +88,7 @@ class InstitutionServiceImplTest {
         assertEquals(1, institutions.size());
         assertSame(expectedInstitutionInfo, institutions.iterator().next());
         Mockito.verify(partyConnectorMock, Mockito.times(1))
-                .getInstitutions();
+                .getOnBoardedInstitutions();
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -651,10 +651,8 @@ class InstitutionServiceImplTest {
             Mockito.verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), createUserDtoCaptor.capture());
             Mockito.verify(notificationServiceMock, Mockito.times(1)).
-                    sendNotificationCreateUserRelationship(Mockito.any(), Mockito.any());
-            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
-                Assertions.assertEquals(partyRole, role1.getPartyRole());
-            });
+                    sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail());
+            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> Assertions.assertEquals(partyRole, role1.getPartyRole()));
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
             Mockito.verifyNoMoreInteractions(partyConnectorMock);
         } else {

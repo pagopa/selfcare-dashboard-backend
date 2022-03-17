@@ -1,13 +1,14 @@
 package it.pagopa.selfcare.dashboard.core;
 
 public interface NotificationService {
-    void sendNotificationCreateUserRelationship(String productTitle, String email);
 
-    void sendNotificationActivatedRelationship(String relationshipId);
+    void sendCreatedUserNotification(String institutionExternalId, String productTitle, String email);
 
-    void sendNotificationDeletedRelationship(String relationshipId);
+    void sendActivatedUserNotification(String relationshipId);
 
-    void sendNotificationSuspendedRelationship(String relationshipId);
+    void sendDeletedUserNotification(String relationshipId);
+
+    void sendSuspendedUserNotification(String relationshipId);
 
 
 }

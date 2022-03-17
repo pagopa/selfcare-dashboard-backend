@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
@@ -9,9 +8,10 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
-import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
@@ -33,50 +33,48 @@ import java.util.Map;
 @ContextConfiguration(
         initializers = ProductsRestClientTest.RandomPortInitializer.class,
         classes = {ProductsRestClientTestConfig.class, HttpClientConfiguration.class})
-public class ProductsRestClientTest extends BaseFeignRestClientTest {
+class ProductsRestClientTest extends BaseFeignRestClientTest {
 
-    @ClassRule
-    public static WireMockClassRule wireMockRule;
+    @Order(1)
+    @RegisterExtension
+    static WireMockExtension wm = WireMockExtension.newInstance()
+            .options(RestTestUtils.getWireMockConfiguration("stubs/products"))
+            .build();
 
     @Autowired
     private ProductsRestClient restClient;
 
-    static {
-        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/products");
-        wireMockRule = new WireMockClassRule(config);
-    }
 
     public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @SneakyThrows
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
-                    String.format("MS_PRODUCT_URL=http://%s:%d",
-                            wireMockRule.getOptions().bindAddress(),
-                            wireMockRule.port())
+                    String.format("MS_PRODUCT_URL=%s",
+                            wm.getRuntimeInfo().getHttpBaseUrl())
             );
         }
     }
 
 
     @Test
-    public void getProducts() {
+    void getProducts() {
         // given and when
         List<Product> response = restClient.getProducts();
         // then
-        Assert.assertFalse(response.isEmpty());
+        Assertions.assertFalse(response.isEmpty());
     }
 
 
     @Test
-    public void getProductRoleMappings() {
+    void getProductRoleMappings() {
         // given
         String productId = "productId";
         // when
         Map<PartyRole, ProductRoleInfo> response = restClient.getProductRoleMappings(productId);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertFalse(response.isEmpty());
+        Assertions.assertNotNull(response);
+        Assertions.assertFalse(response.isEmpty());
     }
 
 }

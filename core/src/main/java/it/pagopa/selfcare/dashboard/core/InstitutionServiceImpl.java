@@ -57,7 +57,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public InstitutionInfo getInstitution(String institutionId) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
-        InstitutionInfo result = partyConnector.getInstitution(institutionId);
+        InstitutionInfo result = partyConnector.getOnBoardedInstitution(institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
@@ -67,7 +67,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = partyConnector.getInstitutions();
+        Collection<InstitutionInfo> result = partyConnector.getOnBoardedInstitutions();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
@@ -215,7 +215,7 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(user, "An User is required");
 
         Product product = productsConnector.getProduct(productId);
-        user.getRoles().forEach(role -> { //TODO
+        user.getRoles().forEach(role -> {
             Optional<PartyRole> partyRole = product.getRoleMappings().entrySet().stream()
                     .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
                     .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
@@ -226,7 +226,7 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
         partyConnector.createUsers(institutionId, productId, user);
-        notificationService.sendNotificationCreateUserRelationship(product.getTitle(), user.getEmail());
+        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
 
 
         log.trace("createUsers end");

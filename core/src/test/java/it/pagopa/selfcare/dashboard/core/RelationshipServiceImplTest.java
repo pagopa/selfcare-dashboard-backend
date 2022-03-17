@@ -49,7 +49,7 @@ class RelationshipServiceImplTest {
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .suspend(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
-                .sendNotificationSuspendedRelationship(relationshipId);
+                .sendSuspendedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -78,7 +78,7 @@ class RelationshipServiceImplTest {
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .activate(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
-                .sendNotificationActivatedRelationship(relationshipId);
+                .sendActivatedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -92,7 +92,7 @@ class RelationshipServiceImplTest {
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .delete(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
-                .sendNotificationDeletedRelationship(relationshipId);
+                .sendDeletedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
