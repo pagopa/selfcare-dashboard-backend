@@ -1,0 +1,15 @@
+image:
+  repository: selcdacr.azurecr.io/selfcaredashboardbackend
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+configEnvSpecific:
+  JAVA_TOOL_OPTIONS: "-javaagent:/applicationinsights-agent.jar"
+  APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL: "OFF"
+  B4F_DASHBOARD_LOG_LEVEL: "DEBUG"
+  REST_CLIENT_LOGGER_LEVEL: "FULL"
