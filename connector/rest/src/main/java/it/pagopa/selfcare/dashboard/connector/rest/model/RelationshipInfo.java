@@ -25,13 +25,14 @@ public class RelationshipInfo {
 
     private String id;
     private String from;
+    private String to;
     private String name;
     private String surname;
-    private String email;
-    private PartyRole role;
     private String taxCode;
     private Certification certification;
     private Map<String, InstitutionContact> institutionContacts;
+    private String email;
+    private PartyRole role;
     private ProductInfo product;
     private RelationshipState state;
     private OffsetDateTime createdAt;

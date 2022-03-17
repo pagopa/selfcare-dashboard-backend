@@ -1,11 +1,11 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
@@ -15,10 +15,10 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingIn
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import lombok.SneakyThrows;
-import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
@@ -34,6 +34,7 @@ import static it.pagopa.selfcare.dashboard.connector.model.PartyRole.MANAGER;
 import static it.pagopa.selfcare.dashboard.connector.model.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(
         locations = "classpath:config/party-process-rest-client.properties",
@@ -45,15 +46,20 @@ import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipStat
 @ContextConfiguration(
         initializers = PartyProcessRestClientTest.RandomPortInitializer.class,
         classes = {PartyProcessRestClientTestConfig.class, HttpClientConfiguration.class})
-public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
+@Disabled
+class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
-    @ClassRule
-    public static WireMockClassRule wireMockRule;
-
-    static {
-        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/party-process");
-        wireMockRule = new WireMockClassRule(config);
-    }
+    @Order(1)
+    @RegisterExtension
+    static WireMockExtension wm = WireMockExtension.newInstance()
+            .options(RestTestUtils.getWireMockConfiguration("stubs/party-process")
+//                    .notifier(new ConsoleNotifier(false))
+//                    .gzipDisabled(true)
+//                    .disableRequestJournal()
+//                    .useChunkedTransferEncoding(Options.ChunkedEncodingPolicy.BODY_FILE)
+            )
+//            .configureStaticDsl(true)
+            .build();
 
 
     public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -61,9 +67,8 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
-                    String.format("USERVICE_PARTY_PROCESS_URL=http://%s:%d/pdnd-interop-uservice-party-process/0.0.1",
-                            wireMockRule.getOptions().bindAddress(),
-                            wireMockRule.port())
+                    String.format("USERVICE_PARTY_PROCESS_URL=%s/pdnd-interop-uservice-party-process/0.0.1",
+                            wm.getRuntimeInfo().getHttpBaseUrl())
             );
         }
     }
@@ -86,7 +91,7 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
 
     @Test
-    public void getInstitutionRelationships_fullyValued() {
+    void getInstitutionRelationships_fullyValued() {
         // given
         String institutionId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
         EnumSet<PartyRole> roles = null;
@@ -95,28 +100,29 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Set<String> productRole = null;
         String userId = null;
         // when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
+        RelationshipsResponse response = restClient.getUserInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertFalse(response.isEmpty());
-        Assert.assertNotNull(response.get(0).getId());
-        Assert.assertNotNull(response.get(0).getFrom());
-        Assert.assertNotNull(response.get(0).getName());
-        Assert.assertNotNull(response.get(0).getSurname());
-        Assert.assertNotNull(response.get(0).getEmail());
-        Assert.assertNotNull(response.get(0).getRole());
-        Assert.assertNotNull(response.get(0).getState());
-        Assert.assertNotNull(response.get(0).getCreatedAt());
-        Assert.assertNotNull(response.get(0).getUpdatedAt());
-        Assert.assertNotNull(response.get(0).getProduct());
-        Assert.assertNotNull(response.get(0).getProduct().getId());
-        Assert.assertNotNull(response.get(0).getProduct().getRole());
-        Assert.assertNotNull(response.get(0).getProduct().getCreatedAt());
+        assertNotNull(response);
+        assertFalse(response.isEmpty());
+        assertNotNull(response.get(0).getId());
+        assertNotNull(response.get(0).getFrom());
+        assertNotNull(response.get(0).getTo());
+        assertNotNull(response.get(0).getName());
+        assertNotNull(response.get(0).getSurname());
+        assertNotNull(response.get(0).getEmail());
+        assertNotNull(response.get(0).getRole());
+        assertNotNull(response.get(0).getState());
+        assertNotNull(response.get(0).getCreatedAt());
+        assertNotNull(response.get(0).getUpdatedAt());
+        assertNotNull(response.get(0).getProduct());
+        assertNotNull(response.get(0).getProduct().getId());
+        assertNotNull(response.get(0).getProduct().getRole());
+        assertNotNull(response.get(0).getProduct().getCreatedAt());
     }
 
 
     @Test
-    public void getInstitutionRelationships_fullyNull() {
+    void getInstitutionRelationships_fullyNull() {
         // given
         String institutionId = testCase2instIdMap.get(TestCase.FULLY_NULL);
         EnumSet<PartyRole> roles = null;
@@ -125,20 +131,20 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Set<String> productRole = null;
         String userId = null;
         // when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
+        RelationshipsResponse response = restClient.getUserInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertFalse(response.isEmpty());
-        Assert.assertNull(response.get(0).getId());
-        Assert.assertNull(response.get(0).getFrom());
-        Assert.assertNull(response.get(0).getRole());
-        Assert.assertNull(response.get(0).getProduct());
-        Assert.assertNull(response.get(0).getState());
+        assertNotNull(response);
+        assertFalse(response.isEmpty());
+        assertNull(response.get(0).getId());
+        assertNull(response.get(0).getFrom());
+        assertNull(response.get(0).getRole());
+        assertNull(response.get(0).getProduct());
+        assertNull(response.get(0).getState());
     }
 
 
     @Test
-    public void getInstitutionRelationships_emptyResult() {
+    void getInstitutionRelationships_emptyResult() {
         // given
         String institutionId = testCase2instIdMap.get(TestCase.EMPTY_RESULT);
         EnumSet<PartyRole> roles = EnumSet.of(MANAGER, OPERATOR);
@@ -147,110 +153,110 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Set<String> productRole = Set.of("api", "security");
         String userId = "userId";
         // when
-        RelationshipsResponse response = restClient.getInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
+        RelationshipsResponse response = restClient.getUserInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
 
         // then
-        Assert.assertNotNull(response);
-        Assert.assertTrue(response.isEmpty());
+        assertNotNull(response);
+        assertTrue(response.isEmpty());
     }
 
 
     @Test
-    public void getInstitutionProducts_fullyValued() {
+    void getInstitutionProducts_fullyValued() {
         // given and when
         Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_VALUED), null);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.getProducts());
-        Assert.assertFalse(response.getProducts().isEmpty());
-        Assert.assertNotNull(response.getProducts().get(0).getId());
-        Assert.assertNotNull(response.getProducts().get(0).getState());
+        assertNotNull(response);
+        assertNotNull(response.getProducts());
+        assertFalse(response.getProducts().isEmpty());
+        assertNotNull(response.getProducts().get(0).getId());
+        assertNotNull(response.getProducts().get(0).getState());
     }
 
 
     @Test
-    public void getInstitutionProducts_fullyNull() {
+    void getInstitutionProducts_fullyNull() {
         // given and when
-        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_NULL),null);
+        Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.FULLY_NULL), null);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getProducts());
+        assertNotNull(response);
+        assertNull(response.getProducts());
     }
 
 
     @Test
-    public void getInstitutionProducts_emptyResult() {
+    void getInstitutionProducts_emptyResult() {
         //given
         EnumSet<ProductState> states = EnumSet.of(ProductState.ACTIVE, ProductState.PENDING);
         // given and when
         Products response = restClient.getInstitutionProducts(testCase2instIdMap.get(TestCase.EMPTY_RESULT), states);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.getProducts());
-        Assert.assertTrue(response.getProducts().isEmpty());
+        assertNotNull(response);
+        assertNotNull(response.getProducts());
+        assertTrue(response.getProducts().isEmpty());
     }
 
 
     @Test
-    public void getOnBoardingInfo_fullyValued() {
+    void getOnBoardingInfo_fullyValued() {
         // given and when
         OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED), null);
         // then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.getPerson());
-        Assert.assertNotNull(response.getInstitutions());
-        Assert.assertNotNull(response.getPerson().getName());
-        Assert.assertNotNull(response.getPerson().getSurname());
-        Assert.assertNotNull(response.getPerson().getTaxCode());
-        Assert.assertNotNull(response.getInstitutions().get(0).getInstitutionId());
-        Assert.assertNotNull(response.getInstitutions().get(0).getDescription());
-        Assert.assertNotNull(response.getInstitutions().get(0).getTaxCode());
-        Assert.assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNotNull(response.getInstitutions().get(0).getState());
-        Assert.assertNotNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNotNull(response.getInstitutions().get(0).getAttributes());
-        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo());
-        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo().getId());
-        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo().getRole());
-        Assert.assertNotNull(response.getInstitutions().get(0).getProductInfo().getCreatedAt());
+        assertNotNull(response);
+        assertNotNull(response.getPerson());
+        assertNotNull(response.getInstitutions());
+        assertNotNull(response.getPerson().getName());
+        assertNotNull(response.getPerson().getSurname());
+        assertNotNull(response.getPerson().getTaxCode());
+        assertNotNull(response.getInstitutions().get(0).getInstitutionId());
+        assertNotNull(response.getInstitutions().get(0).getDescription());
+        assertNotNull(response.getInstitutions().get(0).getTaxCode());
+        assertNotNull(response.getInstitutions().get(0).getDigitalAddress());
+        assertNotNull(response.getInstitutions().get(0).getState());
+        assertNotNull(response.getInstitutions().get(0).getRole());
+        assertNotNull(response.getInstitutions().get(0).getAttributes());
+        assertNotNull(response.getInstitutions().get(0).getProductInfo());
+        assertNotNull(response.getInstitutions().get(0).getProductInfo().getId());
+        assertNotNull(response.getInstitutions().get(0).getProductInfo().getRole());
+        assertNotNull(response.getInstitutions().get(0).getProductInfo().getCreatedAt());
     }
 
 
     @Test
-    public void getOnBoardingInfo_fullyNull() {
+    void getOnBoardingInfo_fullyNull() {
         // given and when
         OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), EnumSet.of(ACTIVE));
         // then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.getPerson());
-        Assert.assertNotNull(response.getInstitutions());
-        Assert.assertNull(response.getPerson().getName());
-        Assert.assertNull(response.getPerson().getSurname());
-        Assert.assertNull(response.getPerson().getTaxCode());
-        Assert.assertNull(response.getInstitutions().get(0).getInstitutionId());
-        Assert.assertNull(response.getInstitutions().get(0).getDescription());
-        Assert.assertNull(response.getInstitutions().get(0).getTaxCode());
-        Assert.assertNull(response.getInstitutions().get(0).getDigitalAddress());
-        Assert.assertNull(response.getInstitutions().get(0).getState());
-        Assert.assertNull(response.getInstitutions().get(0).getRole());
-        Assert.assertNull(response.getInstitutions().get(0).getAttributes());
-        Assert.assertNull(response.getInstitutions().get(0).getProductInfo());
+        assertNotNull(response);
+        assertNotNull(response.getPerson());
+        assertNotNull(response.getInstitutions());
+        assertNull(response.getPerson().getName());
+        assertNull(response.getPerson().getSurname());
+        assertNull(response.getPerson().getTaxCode());
+        assertNull(response.getInstitutions().get(0).getInstitutionId());
+        assertNull(response.getInstitutions().get(0).getDescription());
+        assertNull(response.getInstitutions().get(0).getTaxCode());
+        assertNull(response.getInstitutions().get(0).getDigitalAddress());
+        assertNull(response.getInstitutions().get(0).getState());
+        assertNull(response.getInstitutions().get(0).getRole());
+        assertNull(response.getInstitutions().get(0).getAttributes());
+        assertNull(response.getInstitutions().get(0).getProductInfo());
     }
 
 
     @Test
-    public void getOnBoardingInfo_emptyResult() {
+    void getOnBoardingInfo_emptyResult() {
         // given and when
         OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.EMPTY_RESULT), EnumSet.of(ACTIVE, PENDING));
         // then
-        Assert.assertNotNull(response);
-        Assert.assertTrue(response.getInstitutions().isEmpty());
-        Assert.assertNull(response.getPerson());
+        assertNotNull(response);
+        assertTrue(response.getInstitutions().isEmpty());
+        assertNull(response.getPerson());
     }
 
 
     @Test
-    public void onboardingSubdelegates() {
+    void onboardingSubdelegates() {
         // given
         OnboardingRequest onboardingRequest = new OnboardingRequest();
         onboardingRequest.setInstitutionId("institutionId");
@@ -258,12 +264,12 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // when
         Executable executable = () -> restClient.onboardingSubdelegates(onboardingRequest);
         // then
-        Assertions.assertDoesNotThrow(executable);
+        assertDoesNotThrow(executable);
     }
 
 
     @Test
-    public void onboardingOperators() {
+    void onboardingOperators() {
         // given
         OnboardingRequest onboardingRequest = new OnboardingRequest();
         onboardingRequest.setInstitutionId("institutionId");
@@ -271,39 +277,107 @@ public class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // when
         Executable executable = () -> restClient.onboardingOperators(onboardingRequest);
         // then
-        Assertions.assertDoesNotThrow(executable);
+        assertDoesNotThrow(executable);
     }
 
 
     @Test
-    public void suspendRelationship() {
+    void suspendRelationship() {
         // given
         String relationshipId = "relationshipId";
         // when
         Executable executable = () -> restClient.suspendRelationship(relationshipId);
         // then
-        Assertions.assertDoesNotThrow(executable);
+        assertDoesNotThrow(executable);
     }
 
 
     @Test
-    public void activateRelationship() {
+    void activateRelationship() {
         // given
         String relationshipId = "relationshipId";
         // when
         Executable executable = () -> restClient.activateRelationship(relationshipId);
         // then
-        Assertions.assertDoesNotThrow(executable);
+        assertDoesNotThrow(executable);
     }
 
     @Test
-    public void deleteRelationship() {
+    void deleteRelationship() {
         // given
         String relationshipId = "relationshipId";
         // when
         Executable executable = () -> restClient.deleteRelationshipById(relationshipId);
         // then
-        Assertions.assertDoesNotThrow(executable);
+        assertDoesNotThrow(executable);
+    }
+
+
+    @Test
+    void getInstitution_fullyValued() {
+        // given
+        String id = testCase2instIdMap.get(TestCase.FULLY_VALUED);
+        // when
+        Institution response = restClient.getInstitution(id);
+        assertNotNull(response);
+        assertNotNull(response.getAddress());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getDigitalAddress());
+        assertNotNull(response.getId());
+        assertNotNull(response.getInstitutionId());
+        assertNotNull(response.getTaxCode());
+        assertNotNull(response.getZipCode());
+    }
+
+
+    @Test
+    void getInstitution_fullyNull() {
+        // given
+        String id = testCase2instIdMap.get(TestCase.FULLY_NULL);
+        // when
+        Institution response = restClient.getInstitution(id);
+        assertNotNull(response);
+        assertNull(response.getAddress());
+        assertNull(response.getDescription());
+        assertNull(response.getDigitalAddress());
+        assertNull(response.getId());
+        assertNull(response.getInstitutionId());
+        assertNull(response.getTaxCode());
+        assertNull(response.getZipCode());
+    }
+
+
+    @Test
+    void getInstitutionByExternalId_fullyValued() {
+        // given
+        String institutionId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
+        // when
+        Institution response = restClient.getInstitutionByExternalId(institutionId);
+        assertNotNull(response);
+        assertNotNull(response.getAddress());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getDigitalAddress());
+        assertNotNull(response.getId());
+        assertNotNull(response.getInstitutionId());
+        assertNotNull(response.getTaxCode());
+        assertNotNull(response.getZipCode());
+    }
+
+
+    @Test
+    void getInstitutionByExternalId_fullyNull() {
+        // given
+        String institutionId = testCase2instIdMap.get(TestCase.FULLY_NULL);
+        // when
+        Institution response = restClient.getInstitutionByExternalId(institutionId);
+        assertNotNull(response);
+        assertNull(response.getAddress());
+        assertNull(response.getDescription());
+        assertNull(response.getDigitalAddress());
+        assertNull(response.getId());
+        assertNull(response.getInstitutionId());
+        assertNull(response.getTaxCode());
+        assertNull(response.getZipCode());
     }
 
 }

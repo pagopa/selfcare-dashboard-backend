@@ -13,4 +13,6 @@ public interface ProductsConnector {
 
     Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId);
 
+    Product getProduct(String productId);
+
 }
