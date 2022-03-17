@@ -102,6 +102,7 @@ public class UserGroupController {
                                         UpdateUserGroupDto groupDto) {
         log.trace("updateUserGroup start");
         log.debug("updateUserGroup id = {}, groupDto = {}", id, groupDto);
+        groupService.updateUserGroup(id, GroupMapper.fromDto(groupDto));
         log.debug("updateUserGroup result = {}", id);
         log.trace("updateUserGroup end");
     }

@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +111,28 @@ class UserGroupControllerTest {
         assertEquals(0, result.getResponse().getContentLength());
         Mockito.verify(groupServiceMock, Mockito.times(1))
                 .suspend(groupId);
+        Mockito.verifyNoMoreInteractions(groupServiceMock);
+    }
+
+    @Test
+    void updateUserGroup() throws Exception {
+        //given
+        String groupId = "groupId";
+        UpdateUserGroupDto groupDto = TestUtils.mockInstance(new UpdateUserGroupDto());
+        Set<UUID> mockMembers = Set.of(UUID.randomUUID());
+        groupDto.setMembers(mockMembers);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .put(BASE_URL + "/" + groupId)
+                .content(mapper.writeValueAsString(groupDto))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andReturn();
+        //then
+        assertEquals(0, result.getResponse().getContentLength());
+        Mockito.verify(groupServiceMock, Mockito.times(1))
+                .updateUserGroup(Mockito.anyString(), Mockito.notNull());
         Mockito.verifyNoMoreInteractions(groupServiceMock);
     }
 }

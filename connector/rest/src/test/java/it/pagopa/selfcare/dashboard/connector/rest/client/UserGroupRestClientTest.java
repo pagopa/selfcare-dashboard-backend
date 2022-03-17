@@ -6,8 +6,11 @@ import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserGroupRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupRequestDto;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import lombok.SneakyThrows;
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -19,7 +22,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -57,13 +62,23 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         }
     }
 
+    private enum TestCase {
+        FULLY_VALUED,
+        FULLY_NULL,
+        EMPTY_RESULT
+    }
+
+    private static final Map<UserGroupRestClientTest.TestCase, String> testCase2igroupdMap = new EnumMap<>(UserGroupRestClientTest.TestCase.class) {{
+        put(UserGroupRestClientTest.TestCase.FULLY_VALUED, "groupId1");
+        put(UserGroupRestClientTest.TestCase.FULLY_NULL, "groupId2");
+    }};
     @Autowired
     private UserGroupRestClient restClient;
 
     @Test
     public void createGroup() {
         //given
-        UserGroupRequestDto request = TestUtils.mockInstance(new UserGroupRequestDto());
+        CreateUserGroupRequestDto request = TestUtils.mockInstance(new CreateUserGroupRequestDto());
         request.setMembers(List.of(TestUtils.mockInstance(UUID.randomUUID().toString())));
         //when
         Executable executable = () -> restClient.createUserGroup(request);
@@ -100,5 +115,59 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //then
         assertDoesNotThrow(executable);
     }
+
+    @Test
+    public void updateUserGroup() {
+        //given
+        String id = "id";
+        UpdateUserGroupRequestDto request = TestUtils.mockInstance(new UpdateUserGroupRequestDto());
+        request.setMembers(List.of(TestUtils.mockInstance(UUID.randomUUID().toString())));
+        //when
+        Executable executable = () -> restClient.updateUserGroupById(id, request);
+        //then
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    public void getUserGroupInfo_fullyValued() {
+        //given
+        String groupId = testCase2igroupdMap.get(TestCase.FULLY_VALUED);
+        //when
+        UserGroupResponse response = restClient.getUserGroupById(groupId);
+        //then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getCreatedAt());
+        Assert.assertNotNull(response.getCreatedBy());
+        Assert.assertNotNull(response.getDescription());
+        Assert.assertNotNull(response.getId());
+        Assert.assertNotNull(response.getMembers());
+        Assert.assertNotNull(response.getName());
+        Assert.assertNotNull(response.getInstitutionId());
+        Assert.assertNotNull(response.getModifiedAt());
+        Assert.assertNotNull(response.getModifiedBy());
+        Assert.assertNotNull(response.getStatus());
+
+    }
+
+    @Test
+    public void getUserGroupInfo_fullyNull() {
+        //given
+        String groupId = testCase2igroupdMap.get(TestCase.FULLY_NULL);
+        //when
+        UserGroupResponse response = restClient.getUserGroupById(groupId);
+        //then
+        Assert.assertNotNull(response);
+        Assert.assertNull(response.getCreatedAt());
+        Assert.assertNull(response.getCreatedBy());
+        Assert.assertNull(response.getDescription());
+        Assert.assertNull(response.getId());
+        Assert.assertNull(response.getMembers());
+        Assert.assertNull(response.getName());
+        Assert.assertNull(response.getInstitutionId());
+        Assert.assertNull(response.getModifiedAt());
+        Assert.assertNull(response.getModifiedBy());
+        Assert.assertNull(response.getStatus());
+    }
+
 
 }

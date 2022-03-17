@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 
 public interface UserGroupConnector {
     void createUserGroup(CreateUserGroup userGroupDto);
@@ -10,4 +12,10 @@ public interface UserGroupConnector {
     void activate(String groupId);
 
     void suspend(String groupId);
+
+    void updateUserGroup(String id, UpdateUserGroup userGroup);
+
+    UserGroupInfo getUserGroupById(String id);
+
+//    Collection<UserGroupInfo> getUserGroups();
 }

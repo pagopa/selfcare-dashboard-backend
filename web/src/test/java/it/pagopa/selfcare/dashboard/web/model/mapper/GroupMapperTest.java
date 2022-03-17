@@ -2,7 +2,9 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -15,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GroupMapperTest {
 
     @Test
-    void fromDto_null() {
+    void fromDtoCreateUserGroup_null() {
         //given
         CreateUserGroupDto dto = null;
         //when
@@ -25,7 +27,7 @@ class GroupMapperTest {
     }
 
     @Test
-    void fromDto() {
+    void fromDtoCreateUserGroup() {
         //given
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
@@ -42,9 +44,47 @@ class GroupMapperTest {
     }
 
     @Test
-    void fromDto_nullMembersList() {
+    void fromDtoCreateUserGroup_nullMembersList() {
         //given
         CreateUserGroupDto dto = TestUtils.mockInstance(new CreateUserGroupDto());
+        //when
+        Executable executable = () -> GroupMapper.fromDto(dto);
+        //then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals("Members list must not be null", e.getMessage());
+    }
+
+    @Test
+    void fromDtoUpdateUserGroup_null() {
+        //given
+        UpdateUserGroupDto dto = null;
+        //when
+        UpdateUserGroup model = GroupMapper.fromDto(dto);
+        //then
+        assertNull(model);
+    }
+
+    @Test
+    void fromDtoUpdateUserGroup() {
+        //given
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        UUID id3 = UUID.randomUUID();
+        UUID id4 = UUID.randomUUID();
+        Set<UUID> userIds = Set.of(id1, id2, id3, id4);
+        UpdateUserGroupDto dto = TestUtils.mockInstance(new UpdateUserGroupDto());
+        dto.setMembers(userIds);
+        //when
+        UpdateUserGroup model = GroupMapper.fromDto(dto);
+        //then
+        assertNotNull(model);
+        TestUtils.reflectionEqualsByName(dto, model);
+    }
+
+    @Test
+    void fromDtoUpdateUserGroup_nullMembersList() {
+        //given
+        UpdateUserGroupDto dto = TestUtils.mockInstance(new UpdateUserGroupDto());
         //when
         Executable executable = () -> GroupMapper.fromDto(dto);
         //then

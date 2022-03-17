@@ -1,10 +1,10 @@
 {
   "request": {
-    "method": "POST",
-    "urlPathPattern": "/user-groups/v1/\\w+/suspend"
+    "method": "PUT",
+    "urlPathPattern": "/user-groups/v1/\\w+"
   },
   "response": {
-    "status": "200",
+    "status": "204",
     "jsonBody": {},
     "headers": {
       "Content-Type": "application/json"

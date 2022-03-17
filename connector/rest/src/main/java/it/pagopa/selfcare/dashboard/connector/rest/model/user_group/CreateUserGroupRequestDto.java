@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class UserGroupRequestDto {
+public class CreateUserGroupRequestDto {
     private String institutionId;
     private String productId;
     private String name;

@@ -2,7 +2,9 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -12,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.UUID;
 
 import static it.pagopa.selfcare.dashboard.connector.rest.UserGroupConnectorImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,6 +52,48 @@ class UserGroupConnectorImplTest {
         assertDoesNotThrow(executable);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .createUserGroup(Mockito.any());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void updateGroup_nullGroup() {
+        //given
+        String groupId = "groupId";
+        UpdateUserGroup userGroup = null;
+        //when
+        Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A User Group is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void updateGroup_nullId() {
+        //given
+        String groupId = null;
+        UpdateUserGroup userGroup = TestUtils.mockInstance(new UpdateUserGroup());
+        userGroup.setMembers(List.of("string1", "string2"));
+        //when
+        Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void updateGroup() {
+        //given
+        String groupId = "groupId";
+        UpdateUserGroup userGroup = TestUtils.mockInstance(new UpdateUserGroup());
+        userGroup.setMembers(List.of("string1", "string2"));
+        //when
+        Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .updateUserGroupById(Mockito.any(), Mockito.any());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -122,5 +167,11 @@ class UserGroupConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserGroupById() {
+        UserGroupResponse response = TestUtils.mockInstance(new UserGroupResponse(), "setMembers");
+        response.setMembers(List.of(UUID.randomUUID(), UUID.randomUUID()));
     }
 }

@@ -34,7 +34,6 @@ class UpdateUserGroupDtoTest {
         //given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("name", NotBlank.class);
-
         toCheckMap.put("members", NotEmpty.class);
         toCheckMap.put("description", NotBlank.class);
         UpdateUserGroupDto resource = new UpdateUserGroupDto();
