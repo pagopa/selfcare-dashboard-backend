@@ -10,7 +10,6 @@ import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -40,15 +39,18 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
     private static final String REQUIRED_USER_ID = "A user id is required";
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
+
     private final EnumSet<RelationshipState> allowedStates;
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
+    private final NotificationService notificationService;
 
 
     @Autowired
     public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
                                   PartyConnector partyConnector,
-                                  ProductsConnector productsConnector) {
+                                  ProductsConnector productsConnector,
+                                  NotificationService notificationService) {
         this.allowedStates = allowedStates == null || allowedStates.length == 0
                 ? null
                 : EnumSet.copyOf(Arrays.stream(allowedStates)
@@ -56,6 +58,7 @@ class InstitutionServiceImpl implements InstitutionService {
                 .collect(Collectors.toList()));
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
+        this.notificationService = notificationService;
     }
 
 
@@ -63,7 +66,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public InstitutionInfo getInstitution(String institutionId) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
-        InstitutionInfo result = partyConnector.getInstitution(institutionId);
+        InstitutionInfo result = partyConnector.getOnBoardedInstitution(institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
@@ -73,7 +76,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = partyConnector.getInstitutions();
+        Collection<InstitutionInfo> result = partyConnector.getOnBoardedInstitutions();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
@@ -220,9 +223,10 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(user, "An User is required");
-        Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
+
+        Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
-            Optional<PartyRole> partyRole = productRoleMappings.entrySet().stream()
+            Optional<PartyRole> partyRole = product.getRoleMappings().entrySet().stream()
                     .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
                     .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
                     .map(Map.Entry::getKey)
@@ -232,6 +236,8 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
         partyConnector.createUsers(institutionId, productId, user);
+        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
+
 
         log.trace("createUsers end");
     }

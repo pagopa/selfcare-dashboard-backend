@@ -42,7 +42,7 @@ public class UserController {
                                             @RequestParam(value = "institutionId")
                                                     String institutionId) {
         log.trace("getUserByExternalId start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}" , externalId);
         User user = userRegistryService.getUserByExternalId(externalId.getExternalId());
         UserResource result = UserMapper.toUserResource(user);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);

@@ -70,4 +70,5 @@ public class ProductUserResource {
     @NotBlank
     private String fiscalCode;
 
+
 }

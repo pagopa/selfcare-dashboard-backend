@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
@@ -24,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -33,8 +35,8 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
 
 @Slf4j
 @Service
@@ -79,6 +81,7 @@ class PartyConnectorImpl implements PartyConnector {
         Map<String, it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo> products = new HashMap<>();
         products.put(productInfo.getId(), productInfo);
         userInfo.setProducts(products);
+        userInfo.setInstitutionId(relationshipInfo.getTo());
         return userInfo;
     };
 
@@ -111,34 +114,53 @@ class PartyConnectorImpl implements PartyConnector {
     };
 
     private final PartyProcessRestClient restClient;
+    private final EnumSet<RelationshipState> allowedStates;
 
 
     @Autowired
-    public PartyConnectorImpl(PartyProcessRestClient restClient) {
+    public PartyConnectorImpl(PartyProcessRestClient restClient,
+                              @Value("${dashboard.partyConnector.getUsers.filter.states}") String[] allowedStates) {
         this.restClient = restClient;
+        this.allowedStates = allowedStates == null || allowedStates.length == 0
+                ? null
+                : EnumSet.copyOf(Arrays.stream(allowedStates)
+                .map(RelationshipState::valueOf)
+                .collect(Collectors.toList()));
     }
 
 
     @Override
-    public InstitutionInfo getInstitution(String institutionId) {
-        log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
+    public InstitutionInfo getOnBoardedInstitution(String institutionId) {
+        log.trace("getOnBoardedInstitution start");
+        log.debug("getOnBoardedInstitution institutionId = {}", institutionId);
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
         InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
-        log.trace("getInstitution end");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitution result = {}", result);
+        log.trace("getOnBoardedInstitution end");
         return result;
     }
 
 
     @Override
-    public Collection<InstitutionInfo> getInstitutions() {
-        log.trace("getInstitutions start");
+    public UserInfo getUser(String relationshipId) {
+        log.trace("getUser start");
+        log.debug("getUser = {}", relationshipId);
+        RelationshipInfo relationshipInfo = restClient.getRelationship(relationshipId);
+        UserInfo user = RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
+        log.debug("getUser result = {}", user);
+        log.trace("getUser end");
+        return user;
+    }
+
+
+    @Override
+    public Collection<InstitutionInfo> getOnBoardedInstitutions() {
+        log.trace("getOnBoardedInstitutions start");
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
-        log.trace("getInstitutions end");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitutions result = {}", result);
+        log.trace("getOnBoardedInstitutions end");
         return result;
     }
 
@@ -223,7 +245,7 @@ class PartyConnectorImpl implements PartyConnector {
                     .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole().get()))
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
-        RelationshipsResponse institutionRelationships = restClient.getInstitutionRelationships(institutionId, roles, userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
+        RelationshipsResponse institutionRelationships = restClient.getUserInstitutionRelationships(institutionId, roles, allowedStates, userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
@@ -307,6 +329,30 @@ class PartyConnectorImpl implements PartyConnector {
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         restClient.deleteRelationshipById(relationshipId);
         log.trace("delete end");
+    }
+
+
+    @Override
+    public Institution getInstitution(String institutionId) {
+        log.trace("getInstitution start");
+        log.debug("getInstitution institutionId = {}", institutionId);
+        Assert.hasText(institutionId, "An Institution id is required");
+        Institution institution = restClient.getInstitution(institutionId);
+        log.debug("getInstitution result = {}", institution);
+        log.trace("getInstitution end");
+        return institution;
+    }
+
+
+    @Override
+    public Institution getInstitutionByExternalId(String institutionExternalId) {
+        log.trace("getInstitutionByExternalId start");
+        log.debug("getInstitutionByExternalId institutionExternalId = {}", institutionExternalId);
+        Assert.hasText(institutionExternalId, "An Institution external id is required");
+        Institution institution = restClient.getInstitutionByExternalId(institutionExternalId);
+        log.debug("getInstitutionByExternalId result = {}", institution);
+        log.trace("getInstitutionByExternalId end");
+        return institution;
     }
 
 

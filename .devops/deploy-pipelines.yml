@@ -2,6 +2,12 @@
 # Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
+parameters:
+  - name: 'executeBuild'
+    displayName: 'Remove this flag to skip build and proceed to deploy a docker image previously built'
+    type: boolean
+    default: true
+
 trigger:
   branches:
     include:
@@ -30,14 +36,15 @@ variables:
   # Image Repository Name
   imageRepository: '$(K8S_IMAGE_REPOSITORY_NAME)'
   deployNamespace: '$(DEPLOY_NAMESPACE)'
+  deploymentName: '$(DEPLOYMENT_NAME)'
   settingsXmlROsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
+
 
   ${{ if or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release-uat'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix')) }}:
     environment: 'UAT'
     dockerRegistryServiceConnection: '$(UAT_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(UAT_KUBERNETES_SERVICE_CONN)'
     containerRegistry: '$(UAT_CONTAINER_REGISTRY_NAME)'
-    deployment: deployment-uat
     selfHostedAgentPool: $(UAT_AGENT_POOL)
     mavenGoals: 'package'
     settingsXmlsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
@@ -47,7 +54,6 @@ variables:
     dockerRegistryServiceConnection: '$(PROD_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
     containerRegistry: '$(PROD_CONTAINER_REGISTRY_NAME)'
-    deployment: deployment-prod
     selfHostedAgentPool: $(PROD_AGENT_POOL)
     mavenGoals: 'package'
     settingsXmlsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
@@ -57,7 +63,6 @@ variables:
     dockerRegistryServiceConnection: '$(DEV_CONTAINER_REGISTRY_SERVICE_CONN)'
     kubernetesServiceConnection: '$(DEV_KUBERNETES_SERVICE_CONN)'
     containerRegistry: '$(DEV_CONTAINER_REGISTRY_NAME)'
-    deployment: deployment-dev
     selfHostedAgentPool: $(DEV_AGENT_POOL)
     mavenGoals: 'package'
     settingsXmlsecureFileName: '$(SETTINGS_XML_RO_SECURE_FILE_NAME)'
@@ -85,7 +90,7 @@ stages:
   - stage: 'Build'
     displayName: 'Build_and_Pusblih_to_${{ variables.environment }}'
     dependsOn: Release
-    condition: succeeded()
+    condition: and(succeeded(), ${{ parameters.executeBuild }} )
     variables:
       pomversion: $[ stageDependencies.Release.POM.outputs['getpomversion.outputpomversion'] ]
     jobs:
@@ -125,18 +130,29 @@ stages:
                 $(Build.BuildId)
                 latest
                 $(pomversion)
+
+  - stage: 'Publish_artifact_helm'
+    displayName: 'Publish_artifact_Helm'
+    dependsOn: Build
+    condition: or(succeeded(), not(${{ parameters.executeBuild }}) )
+    jobs:
+      - job: Publish_artifact_helm
+        displayName: Publish_artifact_helm
+        pool:
+          vmImage: $(vmImageNameDefault)
+        steps:
           - task: PublishPipelineArtifact@1
-            displayName: 'Publish Atrifact manifests'
+            displayName: 'Publish Artifact manifests'
             condition: succeeded()
             inputs:
-              targetPath: '$(Build.Repository.LocalPath)/manifests'
-              artifact: 'manifests'
+              targetPath: '$(Build.Repository.LocalPath)/helm'
+              artifact: 'helm'
               publishLocation: 'pipeline'
 
   - stage: 'Deploy'
     displayName: 'Deploy_to_${{ variables.environment }}'
-    dependsOn: ['Release', 'Build']
-    condition: succeeded()
+    dependsOn: "Publish_artifact_helm"
+    condition: or(succeeded(), not(${{ parameters.executeBuild }}) )
     variables:
       pomversion: $[ stageDependencies.Release.POM.outputs['getpomversion.outputpomversion'] ]
     jobs:
@@ -153,16 +169,29 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   inputs:
                     buildType: 'current'
-                    artifactName: 'manifests'
-                    targetPath: '$(Pipeline.Workspace)/manifests'
-                - task: KubernetesManifest@0
-                  displayName: Deploy to Kubernetes cluster
+                    artifactName: 'helm'
+                    targetPath: '$(Pipeline.Workspace)/helm'
+                - task: HelmDeploy@0
+                  displayName: Helm upgrade
                   inputs:
-                    action: deploy
-                    rolloutStatusTimeout: 120
+                    kubernetesServiceEndpoint: ${{ variables.kubernetesServiceConnection }}
+                    namespace: '$(deployNamespace)'
+                    command: upgrade
+                    chartType: filepath
+                    chartPath: $(Pipeline.Workspace)/helm
+                    chartName: $(K8S_IMAGE_REPOSITORY_NAME)
+                    releaseName: $(K8S_IMAGE_REPOSITORY_NAME)
+                    valueFile: "$(Pipeline.Workspace)/helm/values-${{ lower(variables.environment) }}.yaml"
+                    install: true
+                    waitForExecution: true
+                    arguments: "--timeout 2m0s"
+                - task: KubernetesManifest@0
+                  displayName: Patch
+                  inputs:
                     kubernetesServiceConnection: ${{ variables.kubernetesServiceConnection }}
                     namespace: '$(deployNamespace)'
-                    manifests: |
-                      $(Pipeline.Workspace)/manifests/$(deployment).yml
-                      $(Pipeline.Workspace)/manifests/service.yml
-                    containers: '$(containerRegistry)/$(imageRepository):$(pomversion)'
+                    action: patch
+                    kind: deployment
+                    name: '$(deploymentName)'
+                    mergeStrategy: strategic
+                    patch: '{"spec":{"template":{"metadata":{"annotations":{"buildNumber":"$(Build.BuildNumber)"}}}}}'

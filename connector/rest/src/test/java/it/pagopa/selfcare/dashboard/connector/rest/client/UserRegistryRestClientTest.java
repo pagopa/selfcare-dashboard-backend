@@ -1,16 +1,15 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserRegistryRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
 import lombok.SneakyThrows;
-import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
@@ -37,24 +36,22 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @ContextConfiguration(
         initializers = UserRegistryRestClientTest.RandomPortInitializer.class,
         classes = {UserRegistryRestClientTestConfig.class, HttpClientConfiguration.class})
-public class UserRegistryRestClientTest extends BaseFeignRestClientTest {
+class UserRegistryRestClientTest extends BaseFeignRestClientTest {
 
-    @ClassRule
-    public static WireMockClassRule wireMockRule;
+    @Order(1)
+    @RegisterExtension
+    static WireMockExtension wm = WireMockExtension.newInstance()
+            .options(RestTestUtils.getWireMockConfiguration("stubs/user-registry"))
+            .build();
 
-    static {
-        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/user-registry");
-        wireMockRule = new WireMockClassRule(config);
-    }
 
     public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @SneakyThrows
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
-                    String.format("USERVICE_USER_REGISTRY_URL=http://%s:%d/pdnd-interop-uservice-user-registry/0.0.1",
-                            wireMockRule.getOptions().bindAddress(),
-                            wireMockRule.port())
+                    String.format("USERVICE_USER_REGISTRY_URL=%s/pdnd-interop-uservice-user-registry/0.0.1",
+                            wm.getRuntimeInfo().getHttpBaseUrl())
             );
         }
     }
@@ -63,7 +60,7 @@ public class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     private UserRegistryRestClient restClient;
 
     @Test
-    public void userUpdate() {
+    void userUpdate() {
         //given
         UserRequestDto userRequestDto = new UserRequestDto();
         UUID id = UUID.randomUUID();
@@ -79,7 +76,7 @@ public class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void getUserByInternalId() {
+    void getUserByInternalId() {
         //given
         String userId = "userId";
         //when

@@ -33,6 +33,7 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
         Collection<GrantedAuthority> authorities = null;
 
         Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
+
         if (authInfos != null) {
             authorities = authInfos.stream()
                     .map(authInfo -> new SelfCareGrantedAuthority(authInfo.getInstitutionId(), authInfo.getProductRoles().stream()

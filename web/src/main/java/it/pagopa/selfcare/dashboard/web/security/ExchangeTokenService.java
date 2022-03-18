@@ -57,6 +57,7 @@ public class ExchangeTokenService {
         this.jwtService = jwtService;
         this.institutionService = institutionService;
         this.jwtSigningKey = getPrivateKey(jwtSigningKey);
+
         this.duration = Duration.parse(duration);
         this.kid = kid;
     }

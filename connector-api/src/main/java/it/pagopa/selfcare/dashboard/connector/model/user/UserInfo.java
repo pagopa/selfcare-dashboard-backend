@@ -34,6 +34,7 @@ public class UserInfo {
     private boolean certified;
     private Map<String, ProductInfo> products;
     private String status;
+    private String institutionId;
 
 
     @Data
