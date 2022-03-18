@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -127,5 +128,16 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("getUseGroupById groupInfo = {}", groupInfo);
         log.trace("getUserGroupById end");
         return groupInfo;
+    }
+
+    @Override
+    public void addMemberToUserGroup(String id, UUID userId) {
+        log.trace("addMemberToUserGroup start");
+        log.debug("addMemberToUserGroup id = {}, userId = {}", id, userId);
+        Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
+        Assert.notNull(userId, "A userId is required");
+        restClient.addMemberToUserGroup(id, userId);
+        log.trace("addMemberToUserGroup end");
+
     }
 }

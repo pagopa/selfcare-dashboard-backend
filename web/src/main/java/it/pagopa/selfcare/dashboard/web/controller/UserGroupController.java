@@ -109,7 +109,7 @@ public class UserGroupController {
     }
 
     @PostMapping(value = "/{id}/members/{userId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.addMember}")
     public void addMemberToUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                      @PathVariable("id")
@@ -119,6 +119,7 @@ public class UserGroupController {
                                              UUID member) {
         log.trace("addMemberToUserGroup start");
         log.debug("addMemberToUserGroup id = {}", id);
+        groupService.addMemberToUserGroup(id, member);
         log.trace("addMemberToUserGroup end");
     }
 

@@ -6,6 +6,8 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupRes
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @FeignClient(name = "${rest-client.user-groups.serviceCode}", url = "${rest-client.user-groups.base-url}")
 public interface UserGroupRestClient {
 
@@ -33,5 +35,9 @@ public interface UserGroupRestClient {
     @GetMapping(value = "${rest-client.user-group.getUSerGroupById.path}")
     @ResponseBody
     UserGroupResponse getUserGroupById(@PathVariable("id") String id);
+
+    @PutMapping(value = "${rest-client.user-group.addMemberToUserGroup.path}")
+    @ResponseBody
+    void addMemberToUserGroup(@PathVariable("id") String id, @PathVariable("userId") UUID userId);
 
 }

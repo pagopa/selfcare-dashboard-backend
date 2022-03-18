@@ -43,11 +43,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(group.getProductId()));
 
-        Collection<UserInfo> retrievedUsers = institutionService.getInstitutionProductUsers(group.getInstitutionId(), group.getProductId(), userInfoFilter.getRole(), userInfoFilter.getProductRoles());
-        List<String> retrievedId = retrievedUsers.stream()
-                .map(UserInfo::getId)
-                .sorted()
-                .collect(Collectors.toList());
+        List<String> retrievedId = retrievedIds(group.getInstitutionId(), group.getProductId(), userInfoFilter);
 
         if (group.getMembers().stream()
                 .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
@@ -77,6 +73,18 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.trace("activate end");
     }
 
+    private List<String> retrievedIds(String groupInstitution, String groupProduct, UserInfo.UserInfoFilter userInfoFilter) {
+        Collection<UserInfo> retrievedUsers = institutionService.getInstitutionProductUsers(
+                groupInstitution,
+                groupProduct,
+                userInfoFilter.getRole(),
+                userInfoFilter.getProductRoles());
+        return retrievedUsers.stream()
+                .map(UserInfo::getId)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void suspend(String groupId) {
         log.trace("suspend start");
@@ -95,14 +103,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
 
-        Collection<UserInfo> retrievedUsers = institutionService.getInstitutionProductUsers(userGroupInfo.getInstitutionId(),
-                userGroupInfo.getProductId(),
-                userInfoFilter.getRole(),
-                userInfoFilter.getProductRoles());
-        List<String> retrievedId = retrievedUsers.stream()
-                .map(UserInfo::getId)
-                .sorted()
-                .collect(Collectors.toList());
+        List<String> retrievedId = retrievedIds(userGroupInfo.getInstitutionId(), userGroupInfo.getProductId(), userInfoFilter);
 
         if (group.getMembers().stream()
                 .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
@@ -111,6 +112,16 @@ public class UserGroupServiceImpl implements UserGroupService {
         }
         groupConnector.updateUserGroup(groupId, group);
         log.trace("updateUserGroup end");
+    }
+
+    @Override
+    public void addMemberToUserGroup(String groupId, UUID userId) {
+        log.trace("addMemberToUserGroup start");
+        log.debug("addMemberToUserGroup groupId = {}, userId = {}", groupId, userId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        Assert.notNull(userId, "A userId is required");
+        groupConnector.addMemberToUserGroup(groupId, userId);
+        log.trace("addMemberToUserGroup end");
     }
 
     @Override

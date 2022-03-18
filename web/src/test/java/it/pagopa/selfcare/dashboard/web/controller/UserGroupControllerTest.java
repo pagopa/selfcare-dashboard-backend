@@ -177,6 +177,24 @@ class UserGroupControllerTest {
         Mockito.verify(groupServiceMock, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString(), Mockito.any());
         Mockito.verifyNoMoreInteractions(groupServiceMock);
+    }
 
+    @Test
+    void addMemberToUserGroup() throws Exception {
+        //given
+        String groupId = "groupId";
+        UUID memberId = UUID.randomUUID();
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .post(BASE_URL + "/" + groupId + "/members/" + memberId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andReturn();
+        //then
+        assertEquals(0, result.getResponse().getContentLength());
+        Mockito.verify(groupServiceMock, Mockito.times(1))
+                .addMemberToUserGroup(groupId, memberId);
+        Mockito.verifyNoMoreInteractions(groupServiceMock);
     }
 }

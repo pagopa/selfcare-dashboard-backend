@@ -443,4 +443,44 @@ class UserGroupServiceImplTest {
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(groupConnector);
     }
+
+    @Test
+    void addMemberToUserGroup() {
+        //given
+        String groupId = "groupId";
+        UUID userId = UUID.randomUUID();
+        //when
+        Executable executable = () -> groupService.addMemberToUserGroup(groupId, userId);
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(groupConnector, Mockito.times(1))
+                .addMemberToUserGroup(Mockito.anyString(), Mockito.any());
+        Mockito.verifyNoMoreInteractions(groupConnector);
+    }
+
+    @Test
+    void addMemberToUserGroup_nullId() {
+        //given
+        String groupId = null;
+        UUID userId = UUID.randomUUID();
+        //when
+        Executable executable = () -> groupService.addMemberToUserGroup(groupId, userId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void addMemberToUserGroup_nullUserId() {
+        //given
+        String groupId = "groupId";
+        UUID userId = null;
+        //when
+        Executable executable = () -> groupService.addMemberToUserGroup(groupId, userId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A userId is required", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
 }

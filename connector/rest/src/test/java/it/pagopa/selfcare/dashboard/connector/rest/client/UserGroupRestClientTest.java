@@ -169,5 +169,16 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNull(response.getStatus());
     }
 
+    @Test
+    public void addMemberToUserGroup() {
+        //given
+        String groupId = "groupId";
+        UUID memberId = UUID.randomUUID();
+        //when
+        Executable executable = () -> restClient.addMemberToUserGroup(groupId, memberId);
+        //then
+        assertDoesNotThrow(executable);
+    }
+
 
 }
