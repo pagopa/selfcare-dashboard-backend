@@ -21,5 +21,7 @@ public interface UserGroupConnector {
 
     void addMemberToUserGroup(String id, UUID userId);
 
+    void deleteMemberFromUserGroup(String id, UUID userId);
+
 //    Collection<UserGroupInfo> getUserGroups();
 }

@@ -125,6 +125,16 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
+    public void deleteMemberFromUserGroup(String groupId, UUID userId) {
+        log.trace("deleteMemberFromUserGroup start");
+        log.debug("deleteMemberFromUserGroup groupId = {}, userId = {}", groupId, userId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        Assert.notNull(userId, "A userId is required");
+        groupConnector.deleteMemberFromUserGroup(groupId, userId);
+        log.trace("deleteMemberFromUserGroup end");
+    }
+
+    @Override
     public UserGroupInfo getUserGroupById(String groupId, Optional<String> institutionId) {
         log.trace("getUserGroupById start");
         log.debug("getUserGroupById groupId = {}", groupId);

@@ -255,4 +255,44 @@ class UserGroupConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
+    @Test
+    void deleteMemberFromUserGroup() {
+        //given
+        String groupId = "groupId";
+        UUID userId = UUID.randomUUID();
+        //when
+        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(groupId, userId);
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .deleteMemberFromUserGroup(Mockito.anyString(), Mockito.any());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void deleteMemberFromUserGroup_nullId() {
+        //given
+        String groupId = null;
+        UUID userId = UUID.randomUUID();
+        //when
+        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(groupId, userId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void deleteMemberFromUserGroup_nullUserId() {
+        //given
+        String groupId = "groupId";
+        UUID userId = null;
+        //when
+        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(groupId, userId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A userId is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
 }

@@ -138,6 +138,15 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         Assert.notNull(userId, "A userId is required");
         restClient.addMemberToUserGroup(id, userId);
         log.trace("addMemberToUserGroup end");
+    }
 
+    @Override
+    public void deleteMemberFromUserGroup(String id, UUID userId) {
+        log.trace("deleteMemberFromUserGroup start");
+        log.debug("deleteMemberFromUserGroup id = {}, userId = {}", id, userId);
+        Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
+        Assert.notNull(userId, "A userId is required");
+        restClient.deleteMemberFromUserGroup(id, userId);
+        log.trace("deleteMemberFromUserGroup end");
     }
 }

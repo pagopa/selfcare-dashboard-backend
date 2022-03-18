@@ -174,7 +174,7 @@ public class UserGroupController {
                                                   UUID memberId) {
         log.trace("deleteMemberFromUserGroup start");
         log.debug("deleteMemberFromUserGroup userGroupId = {}, memberId = {}", userGroupId, memberId);
-
+        groupService.deleteMemberFromUserGroup(userGroupId, memberId);
         log.trace("deleteMemberFromUserGroup end");
     }
 

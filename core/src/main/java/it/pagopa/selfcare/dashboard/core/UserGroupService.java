@@ -20,5 +20,7 @@ public interface UserGroupService {
 
     void addMemberToUserGroup(String groupId, UUID userId);
 
+    void deleteMemberFromUserGroup(String groupId, UUID userId);
+
     UserGroupInfo getUserGroupById(String groupId, Optional<String> institutionId);
 }

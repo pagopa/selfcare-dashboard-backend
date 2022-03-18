@@ -4,8 +4,10 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGr
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @FeignClient(name = "${rest-client.user-groups.serviceCode}", url = "${rest-client.user-groups.base-url}")
@@ -40,4 +42,15 @@ public interface UserGroupRestClient {
     @ResponseBody
     void addMemberToUserGroup(@PathVariable("id") String id, @PathVariable("userId") UUID userId);
 
+    @DeleteMapping(value = "${rest-client.user-group.deleteMemberFromUserGroup.path}")
+    @ResponseBody
+    void deleteMemberFromUserGroup(@PathVariable("userGroupId") String id,
+                                   @PathVariable("memberId") UUID memberId);
+
+    @GetMapping(value = "${}")
+    @ResponseBody
+    List<UserGroupResponse> getUserGroups(@RequestParam(value = "institutionId", required = false) String institutionId,
+                                          @RequestParam(value = "productId", required = false) String productId,
+                                          @RequestParam(value = "userId", required = false) UUID memberId,
+                                          Pageable pageable);
 }
