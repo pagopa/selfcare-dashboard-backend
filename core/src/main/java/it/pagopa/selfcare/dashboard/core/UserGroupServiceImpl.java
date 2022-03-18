@@ -1,20 +1,22 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.exception.InternalServerErrorException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,12 +24,15 @@ import java.util.stream.Collectors;
 public class UserGroupServiceImpl implements UserGroupService {
 
     private final UserGroupConnector groupConnector;
+    private final UserRegistryConnector userRegistryConnector;
     private final InstitutionService institutionService;
     final static String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
+
     @Autowired
-    public UserGroupServiceImpl(UserGroupConnector groupConnector, InstitutionService institutionService) {
+    public UserGroupServiceImpl(UserGroupConnector groupConnector, UserRegistryConnector userRegistryConnector, InstitutionService institutionService) {
         this.groupConnector = groupConnector;
+        this.userRegistryConnector = userRegistryConnector;
         this.institutionService = institutionService;
     }
 
@@ -41,13 +46,11 @@ public class UserGroupServiceImpl implements UserGroupService {
         Collection<UserInfo> retrievedUsers = institutionService.getInstitutionProductUsers(group.getInstitutionId(), group.getProductId(), userInfoFilter.getRole(), userInfoFilter.getProductRoles());
         List<String> retrievedId = retrievedUsers.stream()
                 .map(UserInfo::getId)
-                .collect(Collectors.toList());
-        List<String> allowedId = retrievedId.stream()
-                .filter(group.getMembers()::contains)
                 .sorted()
                 .collect(Collectors.toList());
+
         if (group.getMembers().stream()
-                .filter(uuid -> Collections.binarySearch(allowedId, uuid) >= 0)
+                .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
                 .count() != group.getMembers().size()) {
             throw new InvalidMemberListException("Some members in the list aren't allowed for this institution");
         }
@@ -98,17 +101,53 @@ public class UserGroupServiceImpl implements UserGroupService {
                 userInfoFilter.getProductRoles());
         List<String> retrievedId = retrievedUsers.stream()
                 .map(UserInfo::getId)
-                .collect(Collectors.toList());
-        List<String> allowedId = retrievedId.stream()
-                .filter(group.getMembers()::contains)
                 .sorted()
                 .collect(Collectors.toList());
+
         if (group.getMembers().stream()
-                .filter(uuid -> Collections.binarySearch(allowedId, uuid) >= 0)
+                .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
                 .count() != group.getMembers().size()) {
             throw new InvalidMemberListException("Some members in the list aren't allowed for this institution");
         }
         groupConnector.updateUserGroup(groupId, group);
         log.trace("updateUserGroup end");
+    }
+
+    @Override
+    public UserGroupInfo getUserGroupById(String groupId, Optional<String> institutionId) {
+        log.trace("getUserGroupById start");
+        log.debug("getUserGroupById groupId = {}", groupId);
+        Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
+        Assert.notNull(institutionId, "An optional of institutionId is required");
+        UserGroupInfo userGroupInfo = groupConnector.getUserGroupById(groupId);
+        institutionId.ifPresent(value -> {
+            if (!value.equalsIgnoreCase(userGroupInfo.getInstitutionId())) {
+                throw new InvalidUserGroupException("Could not find a UserGroup for given institutionId");
+            }
+        });
+        Comparator<UserInfo> userInfoComparator = Comparator.comparing(UserInfo::getId);
+        List<UserInfo> userInfos = institutionService.getInstitutionProductUsers(
+                userGroupInfo.getInstitutionId(),
+                userGroupInfo.getProductId(),
+                null,
+                null).stream()
+                .sorted(userInfoComparator)
+                .collect(Collectors.toList());
+        userGroupInfo.setMembers(userGroupInfo.getMembers().stream()
+                .map(userInfo -> {
+                    int index = Collections.binarySearch(userInfos, userInfo, userInfoComparator);
+                    if (index < 0) {
+                        throw new InternalServerErrorException();
+                    }
+                    return userInfos.get(index);
+                }).collect(Collectors.toList()));
+        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
+        userGroupInfo.setCreatedBy(createdBy);
+        User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());
+        userGroupInfo.setModifiedBy(modifiedBy);
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);
+        log.trace("getUserGroupById end");
+        return userGroupInfo;
     }
 }

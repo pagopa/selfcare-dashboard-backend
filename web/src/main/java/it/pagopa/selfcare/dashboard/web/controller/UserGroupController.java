@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import io.swagger.annotations.*;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapper;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
@@ -131,8 +132,9 @@ public class UserGroupController {
                                               @RequestParam(value = "institutionId", required = false)
                                                       Optional<String> institutionId) {
         log.trace("getUserGroup start");
-        log.debug("getUserGroup id = {}", id);
-        UserGroupResource groupResource = null;
+        log.debug("getUserGroup id = {}, institutionId = {}", id, institutionId);
+        UserGroupInfo groupInfo = groupService.getUserGroupById(id, institutionId);
+        UserGroupResource groupResource = GroupMapper.toResource(groupInfo);
         log.debug("getUserGroup result = {}", groupResource);
         log.trace("getUserGroup end");
         return groupResource;

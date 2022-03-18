@@ -33,4 +33,5 @@ public interface UserGroupRestClient {
     @GetMapping(value = "${rest-client.user-group.getUSerGroupById.path}")
     @ResponseBody
     UserGroupResponse getUserGroupById(@PathVariable("id") String id);
+
 }

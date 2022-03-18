@@ -3,6 +3,8 @@ package it.pagopa.selfcare.dashboard.web.model.user_groups;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
+import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -10,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 
+@Data
 public class UserGroupResource {
     @ApiModelProperty(value = "${swagger.dashboard.user-group.model.id}", required = true)
     @JsonProperty(required = true)
@@ -44,7 +47,7 @@ public class UserGroupResource {
     @ApiModelProperty(value = "${swagger.dashboard.user-group.model.members}", required = true)
     @JsonProperty(required = true)
     @NotEmpty
-    private List<PlainUserResource> members;
+    private List<ProductUserResource> members;
 
     @ApiModelProperty(value = "${swagger.dashboard.user-group.model.createdAt}")
     @JsonProperty

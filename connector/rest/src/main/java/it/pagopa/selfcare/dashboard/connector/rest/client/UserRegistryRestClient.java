@@ -19,4 +19,8 @@ public interface UserRegistryRestClient {
     @ResponseBody
     void patchUser(@PathVariable("id") UUID id,
                    @RequestBody UserRequestDto userRequestDto);
+
+    @GetMapping(value = "${rest-client.user-registry.getUserByInternalId.path}")
+    @ResponseBody
+    UserResponse getUserByInternalId(@PathVariable("id") String id);
 }

@@ -4,6 +4,8 @@ import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
@@ -13,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,11 +35,24 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         groupInfo.setName(groupResponse.getName());
         groupInfo.setDescription(groupResponse.getDescription());
         groupInfo.setStatus(groupResponse.getStatus());
-        groupInfo.setMembers(groupResponse.getMembers());
+        if (groupResponse.getMembers() != null) {
+            List<UserInfo> members = groupResponse.getMembers().stream().map(id -> {
+                UserInfo member = new UserInfo();
+                member.setId(id);
+                return member;
+            }).collect(Collectors.toList());
+            groupInfo.setMembers(members);
+        }
         groupInfo.setCreatedAt(groupResponse.getCreatedAt());
-        groupInfo.setCreatedBy(groupResponse.getCreatedBy());
         groupInfo.setModifiedAt(groupResponse.getModifiedAt());
-        groupInfo.setModifiedBy(groupResponse.getModifiedBy());
+
+        User userInfo1 = new User();
+        userInfo1.setId(groupResponse.getCreatedBy());
+        groupInfo.setCreatedBy(userInfo1);
+        User userInfo = new User();
+        userInfo.setId(groupResponse.getModifiedBy());
+        groupInfo.setModifiedBy(userInfo);
+
         return groupInfo;
     };
 
@@ -104,6 +121,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     public UserGroupInfo getUserGroupById(String id) {
         log.trace("getUserGroupById start");
         log.debug("getUseGroupById id = {}", id);
+        Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         UserGroupResponse response = restClient.getUserGroupById(id);
         UserGroupInfo groupInfo = GROUP_RESPONSE_TO_GROUP_INFO.apply(response);
         log.debug("getUseGroupById groupInfo = {}", groupInfo);

@@ -43,7 +43,7 @@ public class UserController {
                                                     String institutionId) {
         log.trace("getUserByExternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-        User user = userRegistryService.getUser(externalId.getExternalId());
+        User user = userRegistryService.getUserByExternalId(externalId.getExternalId());
         UserResource result = UserMapper.toUserResource(user);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
         log.trace("getUserByExternalId end");

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface UserRegistryService {
 
-    User getUser(String externalId);
+    User getUserByExternalId(String externalId);
 
     void updateUser(UUID id, String institutionId, UserDto userDto);
 }

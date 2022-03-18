@@ -43,7 +43,7 @@ class UserRegistryConnectorImplTest {
     private ArgumentCaptor<UserRequestDto> userDtoCaptor;
 
     @Test
-    void getUser_nullInfo_nullCertification() {
+    void getUserByExternalId_nullInfo_nullCertification() {
         //given
         String externalId = "externalId";
         UserResponse userMock = new UserResponse();
@@ -51,7 +51,7 @@ class UserRegistryConnectorImplTest {
         Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
                 .thenReturn(userMock);
         //when
-        User user = userConnector.getUser(externalId);
+        User user = userConnector.getUserByExternalId(externalId);
         ///then
         assertNull(user.getEmail());
         assertNull(user.getName());
@@ -67,14 +67,14 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
-    void getUser_nullInfo_nullUserResponse() {
+    void getUserByExternalId_nullInfo_nullUserResponse() {
         //given
         String externalId = "externalId";
         UserResponse userMock = null;
         Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
                 .thenReturn(userMock);
         //when
-        User user = userConnector.getUser(externalId);
+        User user = userConnector.getUserByExternalId(externalId);
         ///then
         assertNull(user.getEmail());
         assertNull(user.getName());
@@ -90,7 +90,7 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
-    void getUser_nullInfo_certificationNone() {
+    void getUserByExternalId_nullInfo_certificationNone() {
         //given
         String externalId = "externalId";
         UserResponse userMock = new UserResponse();
@@ -98,7 +98,7 @@ class UserRegistryConnectorImplTest {
         Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
                 .thenReturn(userMock);
         //when
-        User user = userConnector.getUser(externalId);
+        User user = userConnector.getUserByExternalId(externalId);
         ///then
         assertNull(user.getEmail());
         assertNull(user.getName());
@@ -115,11 +115,11 @@ class UserRegistryConnectorImplTest {
 
 
     @Test
-    void getUser_nullExternalId() {
+    void getUserByExternalId_nullExternalId() {
         //given
         String externalId = null;
         //when
-        Executable executable = () -> userConnector.getUser(externalId);
+        Executable executable = () -> userConnector.getUserByExternalId(externalId);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
@@ -127,7 +127,7 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
-    void getUser_certificationNotNone() {
+    void getUserByExternalId_certificationNotNone() {
         //given
         String externalId = "externalId";
         UserResponse userResponseMock = TestUtils.mockInstance(new UserResponse());
@@ -135,7 +135,109 @@ class UserRegistryConnectorImplTest {
         Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
                 .thenReturn(userResponseMock);
         //when
-        User user = userConnector.getUser(externalId);
+        User user = userConnector.getUserByExternalId(externalId);
+        //then
+        assertTrue(user.isCertification());
+        assertEquals(userResponseMock.getName(), user.getName());
+        assertEquals(userResponseMock.getSurname(), user.getSurname());
+        assertEquals(userResponseMock.getExtras().getEmail(), user.getEmail());
+        assertEquals(userResponseMock.getExternalId(), user.getFiscalCode());
+
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByExternalId(embeddedCaptor.capture());
+        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
+        assertEquals(externalId, externalIdCaptured.getExternalId());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserByInternalId_nullInfo_nullCertification() {
+        //given
+        String userId = "userId";
+        UserResponse userMock = new UserResponse();
+        userMock.setCertification(null);
+        Mockito.when(restClientMock.getUserByInternalId(Mockito.any()))
+                .thenReturn(userMock);
+        //when
+        User user = userConnector.getUserByInternalId(userId);
+        ///then
+        assertNull(user.getEmail());
+        assertNull(user.getName());
+        assertFalse(user.isCertification());
+        assertNull(user.getSurname());
+        assertNull(user.getFiscalCode());
+
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByInternalId(Mockito.anyString());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserByInternalId_nullInfo_nullUserResponse() {
+        //given
+        String userId = "userId";
+        UserResponse userMock = null;
+        Mockito.when(restClientMock.getUserByInternalId(Mockito.any()))
+                .thenReturn(userMock);
+        //when
+        User user = userConnector.getUserByInternalId(userId);
+        ///then
+        assertNull(user.getEmail());
+        assertNull(user.getName());
+        assertFalse(user.isCertification());
+        assertNull(user.getSurname());
+        assertNull(user.getFiscalCode());
+
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByInternalId(Mockito.any());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserByInternalId_nullInfo_certificationNone() {
+        //given
+        String userId = "userId";
+        UserResponse userMock = new UserResponse();
+        userMock.setCertification(Certification.NONE);
+        Mockito.when(restClientMock.getUserByInternalId(Mockito.any()))
+                .thenReturn(userMock);
+        //when
+        User user = userConnector.getUserByInternalId(userId);
+        ///then
+        assertNull(user.getEmail());
+        assertNull(user.getName());
+        assertFalse(user.isCertification());
+        assertNull(user.getSurname());
+        assertNull(user.getFiscalCode());
+
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByInternalId(Mockito.anyString());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    @Test
+    void getUserByInternalId_nullExternalId() {
+        //given
+        String userId = null;
+        //when
+        Executable executable = () -> userConnector.getUserByInternalId(userId);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A userId is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserByInternalId_certificationNotNone() {
+        //given
+        String externalId = "externalId";
+        UserResponse userResponseMock = TestUtils.mockInstance(new UserResponse());
+        userResponseMock.setCertification(Certification.SPID);
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
+                .thenReturn(userResponseMock);
+        //when
+        User user = userConnector.getUserByExternalId(externalId);
         //then
         assertTrue(user.isCertification());
         assertEquals(userResponseMock.getName(), user.getName());

@@ -14,16 +14,15 @@ package it.pagopa.selfcare.dashboard.connector.model.user;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.EqualsAndHashCode;
 
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(of = "id")
 public class UserInfo {
 
     private String id;

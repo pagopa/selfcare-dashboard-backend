@@ -7,6 +7,8 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.UUID;
 
 @Data
 public class UserGroupPlainResource {
@@ -44,5 +46,22 @@ public class UserGroupPlainResource {
     @JsonProperty(required = true)
     @NotNull
     private Integer membersCount;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user-group.model.createdAt}")
+    @JsonProperty
+    private Instant createdAt;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user-group.model.createdBy}")
+    @JsonProperty
+    private UUID createdBy;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user-group.model.modifiedAt}")
+    @JsonProperty
+    private Instant modifiedAt;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user-group.model.modifiedBy}")
+    @JsonProperty
+    private UUID modifiedBy;
+
 
 }

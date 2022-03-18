@@ -21,4 +21,5 @@ public class PlainUserResource {
     @JsonProperty(required = true)
     @NotBlank
     private String surname;
+
 }

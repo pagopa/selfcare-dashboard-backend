@@ -44,17 +44,31 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     }
 
     @Override
-    public User getUser(String externalId) {
-        log.trace("getUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", externalId);
+    public User getUserByExternalId(String externalId) {
+        log.trace("getUserByExternalId start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
 
         Assert.hasText(externalId, "A TaxCode is required");
 
         UserResponse userResponse = restClient.getUserByExternalId(new EmbeddedExternalId(externalId));
         User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}", result);
-        log.trace("getUser end");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
+        log.trace("getUserByExternalId end");
 
+        return result;
+    }
+
+    @Override
+    public User getUserByInternalId(String userId) {
+        log.trace("getUserByInternalId start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId userId = {}", userId);
+
+        Assert.hasText(userId, "A userId is required");
+
+        UserResponse userResponse = restClient.getUserByInternalId(userId);
+        User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId result = {}", result);
+        log.trace("getUserByInternalId end");
         return result;
     }
 

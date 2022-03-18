@@ -6,7 +6,9 @@ import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserRegistryRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
 import lombok.SneakyThrows;
+import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -74,6 +76,23 @@ public class UserRegistryRestClientTest extends BaseFeignRestClientTest {
         Executable executable = () -> restClient.patchUser(id, userRequestDto);
         //then
         assertDoesNotThrow(executable);
+    }
+
+    @Test
+    public void getUserByInternalId() {
+        //given
+        String userId = "userId";
+        //when
+        UserResponse response = restClient.getUserByInternalId(userId);
+        //then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.getCertification());
+        Assert.assertNotNull(response.getId());
+        Assert.assertNotNull(response.getName());
+        Assert.assertNotNull(response.getExtras());
+        Assert.assertNotNull(response.getSurname());
+        Assert.assertNotNull(response.getExternalId());
+
     }
 
 }
