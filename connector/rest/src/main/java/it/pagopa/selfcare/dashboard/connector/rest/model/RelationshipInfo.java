@@ -29,7 +29,7 @@ public class RelationshipInfo {
     private String to;
     private String name;
     private String surname;
-    private String taxCode;
+    private String taxCode = "LQNSNV80P25B265F";
     private Certification certification;
     private Map<String, InstitutionContact> institutionContacts;
     private String email;
