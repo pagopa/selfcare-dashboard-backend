@@ -4,10 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.PlainUserResource;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 
 import javax.validation.ValidationException;
 import java.util.UUID;
@@ -52,7 +49,6 @@ public class GroupMapper {
             resource = new UserGroupResource();
             resource.setMembers(model.getMembers().stream()
                     .map(UserMapper::toProductUser)
-                    .peek(productUserResource -> productUserResource.setFiscalCode(null))
                     .collect(Collectors.toList()));
             resource.setId(model.getId());
             resource.setName(model.getName());
@@ -76,6 +72,26 @@ public class GroupMapper {
             resource.setId(model.getId());
             resource.setName(model.getName());
             resource.setSurname(model.getSurname());
+            return resource;
+        }
+        return null;
+    }
+
+    public static UserGroupPlainResource toPlainGroupResource(UserGroupInfo model) {
+        UserGroupPlainResource resource = null;
+        if (model != null) {
+            resource = new UserGroupPlainResource();
+            resource.setId(model.getId());
+            resource.setName(model.getName());
+            resource.setDescription(model.getDescription());
+            resource.setInstitutionId(model.getInstitutionId());
+            resource.setProductId(model.getProductId());
+            resource.setStatus(model.getStatus());
+            resource.setCreatedAt(model.getCreatedAt());
+            resource.setCreatedBy(UUID.fromString(model.getCreatedBy().getId()));
+            resource.setModifiedAt(model.getModifiedAt());
+            resource.setModifiedBy(UUID.fromString(model.getModifiedBy().getId()));
+            resource.setMembersCount(model.getMembers().size());
             return resource;
         }
         return null;

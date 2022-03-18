@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -13,6 +14,7 @@ import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -170,5 +172,23 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);
         log.trace("getUserGroupById end");
         return userGroupInfo;
+    }
+
+    @Override
+    public Collection<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable) {
+        log.trace("getUserGroups start");
+        log.debug("institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
+        Assert.notNull(institutionId, "An optional institutionId is required");
+        Assert.notNull(productId, "An optional productId is required");
+        Assert.notNull(userId, "An optional userId is required");
+        UserGroupFilter userGroupFilter = new UserGroupFilter();
+        userGroupFilter.setInstitutionId(institutionId);
+        userGroupFilter.setUserId(userId);
+        userGroupFilter.setProductId(productId);
+        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroups result = {}", groupInfos);
+        log.trace("getUserGroups start");
+
+        return groupInfos;
     }
 }

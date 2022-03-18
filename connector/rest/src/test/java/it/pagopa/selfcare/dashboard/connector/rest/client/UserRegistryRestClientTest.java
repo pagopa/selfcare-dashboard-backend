@@ -92,7 +92,7 @@ public class UserRegistryRestClientTest extends BaseFeignRestClientTest {
         Assert.assertNotNull(response.getExtras());
         Assert.assertNotNull(response.getSurname());
         Assert.assertNotNull(response.getExternalId());
-
     }
+
 
 }

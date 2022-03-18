@@ -1,8 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -12,9 +14,12 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGr
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -149,4 +154,19 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         restClient.deleteMemberFromUserGroup(id, userId);
         log.trace("deleteMemberFromUserGroup end");
     }
+
+    @Override
+    public Collection<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable) {
+        log.trace("getUserGroups start");
+        log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", filter.getInstitutionId(), filter.getProductId(), filter.getUserId(), pageable);
+        Collection<UserGroupInfo> groupInfos = Collections.emptyList();
+        List<UserGroupResponse> userGroups = restClient.getUserGroups(filter.getInstitutionId().orElse(null), filter.getProductId().orElse(null), filter.getUserId().orElse(null), pageable);
+        if (userGroups != null) {
+            groupInfos = userGroups.stream().map(GROUP_RESPONSE_TO_GROUP_INFO).collect(Collectors.toList());
+        }
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroups result = {}", userGroups);
+        log.trace("getUserGroups end");
+        return groupInfos;
+    }
+
 }

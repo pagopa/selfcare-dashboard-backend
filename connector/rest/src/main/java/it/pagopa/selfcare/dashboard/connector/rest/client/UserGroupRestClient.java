@@ -34,7 +34,7 @@ public interface UserGroupRestClient {
     void updateUserGroupById(@PathVariable("id") String id,
                              @RequestBody UpdateUserGroupRequestDto updateUserGroupRequestDto);
 
-    @GetMapping(value = "${rest-client.user-group.getUSerGroupById.path}")
+    @GetMapping(value = "${rest-client.user-group.getUserGroupById.path}")
     @ResponseBody
     UserGroupResponse getUserGroupById(@PathVariable("id") String id);
 
@@ -47,7 +47,7 @@ public interface UserGroupRestClient {
     void deleteMemberFromUserGroup(@PathVariable("userGroupId") String id,
                                    @PathVariable("memberId") UUID memberId);
 
-    @GetMapping(value = "${}")
+    @GetMapping(value = "${rest-client.user-group.getUserGroups.path}")
     @ResponseBody
     List<UserGroupResponse> getUserGroups(@RequestParam(value = "institutionId", required = false) String institutionId,
                                           @RequestParam(value = "productId", required = false) String productId,

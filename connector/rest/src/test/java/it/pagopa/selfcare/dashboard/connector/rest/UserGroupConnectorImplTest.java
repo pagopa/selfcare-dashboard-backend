@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
@@ -14,9 +15,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -293,6 +299,132 @@ class UserGroupConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserGroups() {
+        //given
+        Optional<String> institutionId = Optional.of("institutionId");
+        Optional<String> productId = Optional.of("productId");
+        Optional<UUID> userId = Optional.of(UUID.randomUUID());
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setInstitutionId(institutionId);
+        filter.setProductId(productId);
+        filter.setUserId(userId);
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
+        UserGroupResponse response1 = TestUtils.mockInstance(new UserGroupResponse(), "setMembers");
+        response1.setMembers(List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        response1.setCreatedAt(Instant.now());
+        response1.setModifiedAt(Instant.now());
+        Mockito.when(restClientMock.getUserGroups(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(response1));
+        //when
+        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        //then
+        assertNotNull(groupInfos);
+        assertEquals(1, groupInfos.size());
+        UserGroupInfo groupInfo = groupInfos.iterator().next();
+        assertEquals(response1.getId(), groupInfo.getId());
+        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(response1.getProductId(), groupInfo.getProductId());
+        assertEquals(response1.getStatus(), groupInfo.getStatus());
+        assertEquals(response1.getDescription(), groupInfo.getDescription());
+        assertEquals(response1.getName(), groupInfo.getName());
+        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(Collectors.toList()));
+        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
+        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
+        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserGroups(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserGroups_nullResponse_emptyInstitutionId_emptyProductId_emptyUserId_unPaged() {
+        //given
+        UserGroupFilter filter = new UserGroupFilter();
+        Pageable pageable = Pageable.unpaged();
+        //when
+        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        //then
+        assertNotNull(groupInfos);
+        assertTrue(groupInfos.isEmpty());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserGroups(Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNotNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserGroups_notEmptyInstitutionId_notEmptyProductId() {
+        //given
+        Optional<String> institutionId = Optional.of("institutionId");
+        Optional<String> productId = Optional.of("productId");
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setInstitutionId(institutionId);
+        filter.setProductId(productId);
+        Pageable pageable = Pageable.unpaged();
+        UserGroupResponse response1 = TestUtils.mockInstance(new UserGroupResponse(), "setMembers");
+        response1.setMembers(List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        response1.setCreatedAt(Instant.now());
+        response1.setModifiedAt(Instant.now());
+        Mockito.when(restClientMock.getUserGroups(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(response1));
+        //when
+        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        //then
+        assertNotNull(groupInfos);
+        assertEquals(1, groupInfos.size());
+        UserGroupInfo groupInfo = groupInfos.iterator().next();
+        assertEquals(response1.getId(), groupInfo.getId());
+        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(response1.getProductId(), groupInfo.getProductId());
+        assertEquals(response1.getStatus(), groupInfo.getStatus());
+        assertEquals(response1.getDescription(), groupInfo.getDescription());
+        assertEquals(response1.getName(), groupInfo.getName());
+        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(Collectors.toList()));
+        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
+        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
+        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserGroups(Mockito.eq(institutionId.get()), Mockito.eq(productId.get()), Mockito.isNull(), Mockito.isNotNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void getUserGroups_notEmptyUserId() {
+        //given
+        Optional<UUID> userId = Optional.of(UUID.randomUUID());
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setUserId(userId);
+        Pageable pageable = Pageable.unpaged();
+        UserGroupResponse response1 = TestUtils.mockInstance(new UserGroupResponse(), "setMembers");
+        response1.setMembers(List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        response1.setCreatedAt(Instant.now());
+        response1.setModifiedAt(Instant.now());
+        Mockito.when(restClientMock.getUserGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(response1));
+        //when
+        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        //then
+        assertNotNull(groupInfos);
+        assertEquals(1, groupInfos.size());
+        UserGroupInfo groupInfo = groupInfos.iterator().next();
+        assertEquals(response1.getId(), groupInfo.getId());
+        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(response1.getProductId(), groupInfo.getProductId());
+        assertEquals(response1.getStatus(), groupInfo.getStatus());
+        assertEquals(response1.getDescription(), groupInfo.getDescription());
+        assertEquals(response1.getName(), groupInfo.getName());
+        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(Collectors.toList()));
+        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
+        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
+        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserGroups(Mockito.isNull(), Mockito.isNull(), Mockito.eq(userId.get()), Mockito.isNotNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
 }

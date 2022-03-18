@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -105,7 +106,7 @@ class GroupMapperTest {
         //when
         UserGroupResource resource = GroupMapper.toResource(model);
         //then
-        assertNull(model);
+        assertNull(resource);
     }
 
     @Test
@@ -153,12 +154,57 @@ class GroupMapperTest {
         assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId());
         assertEquals(model.getMembers().get(0).getName(), resource.getMembers().get(0).getName());
         assertEquals(model.getMembers().get(0).getSurname(), resource.getMembers().get(0).getSurname());
-        assertNull(resource.getMembers().get(0).getFiscalCode());
+        assertEquals(model.getMembers().get(0).getTaxCode(), resource.getMembers().get(0).getFiscalCode());
         assertEquals(model.getMembers().get(0).isCertified(), resource.getMembers().get(0).isCertification());
         assertEquals(model.getMembers().get(0).getEmail(), resource.getMembers().get(0).getEmail());
         assertEquals(model.getMembers().get(0).getRole(), resource.getMembers().get(0).getRole());
         assertEquals(model.getMembers().get(0).getStatus(), resource.getMembers().get(0).getStatus());
         TestUtils.reflectionEqualsByName(resource, model);
+    }
+
+    @Test
+    void toPlainGroupResource_null() {
+        //given
+        UserGroupInfo model = null;
+        //when
+        UserGroupPlainResource resource = GroupMapper.toPlainGroupResource(model);
+        //then
+        assertNull(resource);
+    }
+
+    @Test
+    void toPlainGroupResource_notNull() {
+        //given
+        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        userInfoModel.setProducts(productInfoMap);
+        model.setMembers(List.of(userInfoModel));
+        User userModel = TestUtils.mockInstance(new User());
+        userModel.setId(UUID.randomUUID().toString());
+        model.setCreatedBy(userModel);
+        model.setModifiedBy(userModel);
+        Instant now = Instant.now();
+        model.setModifiedAt(now);
+        model.setCreatedAt(now);
+        //when
+        UserGroupPlainResource resource = GroupMapper.toPlainGroupResource(model);
+        //then
+        assertNotNull(resource);
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getProductId(), resource.getProductId());
+        assertEquals(model.getModifiedAt(), resource.getModifiedAt());
+        assertEquals(model.getCreatedAt(), resource.getCreatedAt());
+        assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().toString());
+        assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().toString());
+        assertEquals(model.getMembers().size(), resource.getMembersCount());
+        assertEquals(model.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getDescription(), resource.getDescription());
     }
 
 }

@@ -66,7 +66,8 @@ public class ProductUserResource {
     private String status;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
+    @JsonProperty(required = true)
+    @NotBlank
     private String fiscalCode;
-
 
 }

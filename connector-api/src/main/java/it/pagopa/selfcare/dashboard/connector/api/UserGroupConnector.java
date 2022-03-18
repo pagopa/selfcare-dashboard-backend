@@ -2,8 +2,11 @@ package it.pagopa.selfcare.dashboard.connector.api;
 
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public interface UserGroupConnector {
@@ -23,5 +26,5 @@ public interface UserGroupConnector {
 
     void deleteMemberFromUserGroup(String id, UUID userId);
 
-//    Collection<UserGroupInfo> getUserGroups();
+    Collection<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable);
 }

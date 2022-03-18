@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InternalServerErrorException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -18,8 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -521,6 +525,72 @@ class UserGroupServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void getUserGroups() {
+        //given
+        Optional<String> institutionId = Optional.of("institutionId");
+        Optional<String> productId = Optional.of("productId");
+        Optional<UUID> userId = Optional.of(UUID.randomUUID());
+        Pageable pageable = PageRequest.of(1, 2);
+        UserGroupInfo userGroupInfo = TestUtils.mockInstance(new UserGroupInfo());
+
+        Mockito.when(groupConnector.getUserGroups(Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(userGroupInfo));
+        //when
+        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, userId, pageable);
+        //then
+        assertNotNull(groupInfos);
+        assertEquals(1, groupInfos.size());
+        Mockito.verify(groupConnector, Mockito.times(1))
+                .getUserGroups(Mockito.any(), Mockito.any());
+        Mockito.verifyNoMoreInteractions(groupConnector);
+    }
+
+    @Test
+    void getUserGroups_nullInstitutionId() {
+        //given
+        Optional<String> institutionId = null;
+        Optional<String> productId = Optional.empty();
+        Optional<UUID> userId = Optional.empty();
+        Pageable pageable = PageRequest.of(1, 2);
+        //when
+        Executable executable = () -> groupService.getUserGroups(institutionId, productId, userId, pageable);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An optional institutionId is required", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void getUserGroups_nullProductId() {
+        //given
+        Optional<String> institutionId = Optional.empty();
+        Optional<String> productId = null;
+        Optional<UUID> userId = Optional.empty();
+        Pageable pageable = PageRequest.of(1, 2);
+        //when
+        Executable executable = () -> groupService.getUserGroups(institutionId, productId, userId, pageable);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An optional productId is required", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void getUserGroups_nullUserId() {
+        //given
+        Optional<String> institutionId = Optional.empty();
+        Optional<String> productId = Optional.empty();
+        Optional<UUID> userId = null;
+        Pageable pageable = PageRequest.of(1, 2);
+        //when
+        Executable executable = () -> groupService.getUserGroups(institutionId, productId, userId, pageable);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An optional userId is required", e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
     }
 }

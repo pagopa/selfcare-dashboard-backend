@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
@@ -189,6 +192,52 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
         Executable executable = () -> restClient.deleteMemberFromUserGroup(groupId, memberId);
         //then
         assertDoesNotThrow(executable);
+    }
+
+    @Test
+    public void getUserGroups_fullyValued() {
+        //given
+        String institutionId = null;
+        String productId = null;
+        UUID userId = null;
+        Pageable pageable = Pageable.unpaged();
+
+        List<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
+        //then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.get(0).getCreatedAt());
+        Assert.assertNotNull(response.get(0).getCreatedBy());
+        Assert.assertNotNull(response.get(0).getDescription());
+        Assert.assertNotNull(response.get(0).getId());
+        Assert.assertNotNull(response.get(0).getMembers());
+        Assert.assertNotNull(response.get(0).getName());
+        Assert.assertNotNull(response.get(0).getInstitutionId());
+        Assert.assertNotNull(response.get(0).getModifiedAt());
+        Assert.assertNotNull(response.get(0).getModifiedBy());
+        Assert.assertNotNull(response.get(0).getStatus());
+    }
+
+    @Test
+    public void getUserGroups_fullyValuedPageable() {
+        //given
+        String institutionId = null;
+        String productId = null;
+        UUID userId = null;
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
+
+        List<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
+        //then
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.get(0).getCreatedAt());
+        Assert.assertNotNull(response.get(0).getCreatedBy());
+        Assert.assertNotNull(response.get(0).getDescription());
+        Assert.assertNotNull(response.get(0).getId());
+        Assert.assertNotNull(response.get(0).getMembers());
+        Assert.assertNotNull(response.get(0).getName());
+        Assert.assertNotNull(response.get(0).getInstitutionId());
+        Assert.assertNotNull(response.get(0).getModifiedAt());
+        Assert.assertNotNull(response.get(0).getModifiedBy());
+        Assert.assertNotNull(response.get(0).getStatus());
     }
 
 }

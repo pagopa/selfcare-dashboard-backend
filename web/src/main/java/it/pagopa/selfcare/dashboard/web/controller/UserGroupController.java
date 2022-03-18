@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -155,11 +157,14 @@ public class UserGroupController {
                                                       @RequestParam(value = "userId", required = false)
                                                               Optional<UUID> memberId,
                                                       Pageable pageable) {
-        log.trace("getGroupsByInstitutionAndProductIds start");
-        log.debug("getGroupsByInstitutionAndProductIds institutionId = {}, productId = {}, pageable = {}", institutionId, productId, pageable);
-        List<UserGroupPlainResource> result = null;
-        log.debug("getGroupsByInstitutionAndProductIds result = {}", result);
-        log.trace("getGroupsByInstitutionAndProductIds end");
+        log.trace("getUserGroups start");
+        log.debug("getUserGroups institutionId = {}, productId = {}, pageable = {}", institutionId, productId, pageable);
+        Collection<UserGroupInfo> groups = groupService.getUserGroups(institutionId, productId, memberId, pageable);
+        List<UserGroupPlainResource> result = groups.stream()
+                .map(GroupMapper::toPlainGroupResource)
+                .collect(Collectors.toList());
+        log.debug("getUserGroups result = {}", result);
+        log.trace("getUserGroups end");
         return result;
     }
 
