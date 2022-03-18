@@ -15,14 +15,9 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
-import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.config.PartyConnectorTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.Attribute;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
@@ -698,7 +693,7 @@ class PartyConnectorImplTest {
     @Test
     void relationship_info_to_user_info_function() throws IOException {
         // given
-        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/relationInfo-to-userInfo.json");
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/relationInfo-to-userInfo.json");
         RelationshipInfo relationshipInfo = mapper.readValue(stub, RelationshipInfo.class);
         // when
         UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
@@ -731,9 +726,9 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
-        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/multi-role.json");
+        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/multi-role.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getUserInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
@@ -776,7 +771,6 @@ class PartyConnectorImplTest {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
 
-
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/merge.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
 
@@ -799,7 +793,6 @@ class PartyConnectorImplTest {
         //given
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-
 
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/higher-role-pending.json");
@@ -837,6 +830,7 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(1, userInfos.size());
     }
 
+
     @Test
     void getUsers_activeRoleUserDifferentStatus_2() throws IOException {
         //given
@@ -846,26 +840,6 @@ class PartyConnectorImplTest {
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/active-role-different-status-2.json");
         RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
         Mockito.when(restClientMock.getUserInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(relationshipsResponse);
-        //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
-        UserInfo userInfo = userInfos.iterator().next();
-        //Then
-        Assertions.assertEquals("user1", userInfo.getName());
-        Assertions.assertEquals(ADMIN, userInfo.getRole());
-        Assertions.assertEquals("ACTIVE", userInfo.getStatus());
-        Assertions.assertEquals(1, userInfos.size());
-    }
-
-    @Test
-    void getUsers_activeRoleUserDifferentStatus_2() throws IOException {
-        //given
-        String institutionId = "institutionId";
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-
-        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/active-role-different-status-2.json");
-        RelationshipsResponse relationshipsResponse = mapper.readValue(stub, RelationshipsResponse.class);
-        Mockito.when(restClientMock.getInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(relationshipsResponse);
         //when
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
@@ -1109,24 +1083,6 @@ class PartyConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
-    @Test
-    void relationship_info_to_user_info_function() throws IOException {
-        // given
-        File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getInstitutionRelationships/relationInfo-to-userInfo.json");
-        RelationshipInfo relationshipInfo = mapper.readValue(stub, RelationshipInfo.class);
-        // when
-        UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
-        // then
-        Assertions.assertEquals(relationshipInfo.getName(), userInfo.getName());
-        Assertions.assertEquals(relationshipInfo.getSurname(), userInfo.getSurname());
-        Assertions.assertEquals(relationshipInfo.getId(), userInfo.getRelationshipId());
-        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
-        Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getProducts().get(0).getStatus());
-        Assertions.assertEquals(relationshipInfo.getEmail(), userInfo.getEmail());
-        Assertions.assertEquals(relationshipInfo.getFrom(), userInfo.getId());
-        Assertions.assertEquals(relationshipInfo.getProduct().getId(), userInfo.getProducts().get(0).getId());
-        Assertions.assertEquals(relationshipInfo.getProduct().getRole(), userInfo.getProducts().get(0).getRole());
-    }
 
     @Test
     void userInfoFilter_emptyOptionals() {

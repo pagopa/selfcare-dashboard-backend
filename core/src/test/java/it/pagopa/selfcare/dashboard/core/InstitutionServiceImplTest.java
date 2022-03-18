@@ -22,20 +22,20 @@ import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.*;
 
@@ -43,13 +43,14 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        classes = {
-                InstitutionServiceImpl.class,
-                CoreTestConfig.class
-        },
-        properties = "USER_STATES_FILTER=ACTIVE,SUSPENDED"
-)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        InstitutionServiceImpl.class,
+        CoreTestConfig.class
+})
+@TestPropertySource(properties = {
+        "USER_STATES_FILTER=ACTIVE,SUSPENDED"
+})
 class InstitutionServiceImplTest {
 
     @MockBean

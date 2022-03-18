@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -33,6 +34,7 @@ import java.util.Map;
 @ContextConfiguration(
         initializers = ProductsRestClientTest.RandomPortInitializer.class,
         classes = {ProductsRestClientTestConfig.class, HttpClientConfiguration.class})
+@Disabled
 class ProductsRestClientTest extends BaseFeignRestClientTest {
 
     @Order(1)

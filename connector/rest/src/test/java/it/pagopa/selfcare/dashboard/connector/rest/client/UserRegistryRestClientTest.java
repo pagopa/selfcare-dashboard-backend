@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.config.UserRegistryRestClient
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -82,13 +83,13 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
         //when
         UserResponse response = restClient.getUserByInternalId(userId);
         //then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.getCertification());
-        Assert.assertNotNull(response.getId());
-        Assert.assertNotNull(response.getName());
-        Assert.assertNotNull(response.getExtras());
-        Assert.assertNotNull(response.getSurname());
-        Assert.assertNotNull(response.getExternalId());
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getCertification());
+        Assertions.assertNotNull(response.getId());
+        Assertions.assertNotNull(response.getName());
+        Assertions.assertNotNull(response.getExtras());
+        Assertions.assertNotNull(response.getSurname());
+        Assertions.assertNotNull(response.getExternalId());
     }
 
 

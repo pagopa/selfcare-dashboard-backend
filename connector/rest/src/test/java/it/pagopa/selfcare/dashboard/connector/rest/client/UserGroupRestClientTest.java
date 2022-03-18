@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
@@ -10,9 +9,10 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGr
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import lombok.SneakyThrows;
-import org.junit.Assert;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
@@ -43,24 +43,22 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @ContextConfiguration(
         initializers = UserGroupRestClientTest.RandomPortInitializer.class,
         classes = {UserGroupRestClientTestConfig.class, HttpClientConfiguration.class})
-public class UserGroupRestClientTest extends BaseFeignRestClientTest {
+class UserGroupRestClientTest extends BaseFeignRestClientTest {
 
-    @ClassRule
-    public static WireMockClassRule wireMockRule;
+    @Order(1)
+    @RegisterExtension
+    static WireMockExtension wm = WireMockExtension.newInstance()
+            .options(RestTestUtils.getWireMockConfiguration("stubs/user-group"))
+            .build();
 
-    static {
-        WireMockConfiguration config = RestTestUtils.getWireMockConfiguration("stubs/user-group");
-        wireMockRule = new WireMockClassRule(config);
-    }
 
     public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @SneakyThrows
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(applicationContext,
-                    String.format("MS_USER_GROUP_URL=http://%s:%d",
-                            wireMockRule.getOptions().bindAddress(),
-                            wireMockRule.port())
+                    String.format("MS_USER_GROUP_URL=%s",
+                            wm.getRuntimeInfo().getHttpBaseUrl())
             );
         }
     }
@@ -79,7 +77,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     private UserGroupRestClient restClient;
 
     @Test
-    public void createGroup() {
+    void createGroup() {
         //given
         CreateUserGroupRequestDto request = TestUtils.mockInstance(new CreateUserGroupRequestDto());
         request.setMembers(List.of(TestUtils.mockInstance(UUID.randomUUID().toString())));
@@ -90,7 +88,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void deleteUserGroup() {
+    void deleteUserGroup() {
         //given
         String id = "id";
         //when
@@ -100,7 +98,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void activateUserGroup() {
+    void activateUserGroup() {
         //given
         String id = "id";
         //when
@@ -110,7 +108,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void suspendUserGroup() {
+    void suspendUserGroup() {
         //given
         String id = "id";
         //when
@@ -120,7 +118,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void updateUserGroup() {
+    void updateUserGroup() {
         //given
         String id = "id";
         UpdateUserGroupRequestDto request = TestUtils.mockInstance(new UpdateUserGroupRequestDto());
@@ -132,48 +130,48 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void getUserGroupInfo_fullyValued() {
+    void getUserGroupInfo_fullyValued() {
         //given
         String groupId = testCase2igroupdMap.get(TestCase.FULLY_VALUED);
         //when
         UserGroupResponse response = restClient.getUserGroupById(groupId);
         //then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.getCreatedAt());
-        Assert.assertNotNull(response.getCreatedBy());
-        Assert.assertNotNull(response.getDescription());
-        Assert.assertNotNull(response.getId());
-        Assert.assertNotNull(response.getMembers());
-        Assert.assertNotNull(response.getName());
-        Assert.assertNotNull(response.getInstitutionId());
-        Assert.assertNotNull(response.getModifiedAt());
-        Assert.assertNotNull(response.getModifiedBy());
-        Assert.assertNotNull(response.getStatus());
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getCreatedAt());
+        Assertions.assertNotNull(response.getCreatedBy());
+        Assertions.assertNotNull(response.getDescription());
+        Assertions.assertNotNull(response.getId());
+        Assertions.assertNotNull(response.getMembers());
+        Assertions.assertNotNull(response.getName());
+        Assertions.assertNotNull(response.getInstitutionId());
+        Assertions.assertNotNull(response.getModifiedAt());
+        Assertions.assertNotNull(response.getModifiedBy());
+        Assertions.assertNotNull(response.getStatus());
 
     }
 
     @Test
-    public void getUserGroupInfo_fullyNull() {
+    void getUserGroupInfo_fullyNull() {
         //given
         String groupId = testCase2igroupdMap.get(TestCase.FULLY_NULL);
         //when
         UserGroupResponse response = restClient.getUserGroupById(groupId);
         //then
-        Assert.assertNotNull(response);
-        Assert.assertNull(response.getCreatedAt());
-        Assert.assertNull(response.getCreatedBy());
-        Assert.assertNull(response.getDescription());
-        Assert.assertNull(response.getId());
-        Assert.assertNull(response.getMembers());
-        Assert.assertNull(response.getName());
-        Assert.assertNull(response.getInstitutionId());
-        Assert.assertNull(response.getModifiedAt());
-        Assert.assertNull(response.getModifiedBy());
-        Assert.assertNull(response.getStatus());
+        Assertions.assertNotNull(response);
+        Assertions.assertNull(response.getCreatedAt());
+        Assertions.assertNull(response.getCreatedBy());
+        Assertions.assertNull(response.getDescription());
+        Assertions.assertNull(response.getId());
+        Assertions.assertNull(response.getMembers());
+        Assertions.assertNull(response.getName());
+        Assertions.assertNull(response.getInstitutionId());
+        Assertions.assertNull(response.getModifiedAt());
+        Assertions.assertNull(response.getModifiedBy());
+        Assertions.assertNull(response.getStatus());
     }
 
     @Test
-    public void addMemberToUserGroup() {
+    void addMemberToUserGroup() {
         //given
         String groupId = "groupId";
         UUID memberId = UUID.randomUUID();
@@ -184,7 +182,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void deleteMemberFromUserGroup() {
+    void deleteMemberFromUserGroup() {
         //given
         String groupId = "groupId";
         UUID memberId = UUID.randomUUID();
@@ -195,7 +193,7 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    public void getUserGroups_fullyValued() {
+    void getUserGroups_fullyValued() {
         //given
         String institutionId = null;
         String productId = null;
@@ -204,21 +202,21 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
 
         List<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
         //then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.get(0).getCreatedAt());
-        Assert.assertNotNull(response.get(0).getCreatedBy());
-        Assert.assertNotNull(response.get(0).getDescription());
-        Assert.assertNotNull(response.get(0).getId());
-        Assert.assertNotNull(response.get(0).getMembers());
-        Assert.assertNotNull(response.get(0).getName());
-        Assert.assertNotNull(response.get(0).getInstitutionId());
-        Assert.assertNotNull(response.get(0).getModifiedAt());
-        Assert.assertNotNull(response.get(0).getModifiedBy());
-        Assert.assertNotNull(response.get(0).getStatus());
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.get(0).getCreatedAt());
+        Assertions.assertNotNull(response.get(0).getCreatedBy());
+        Assertions.assertNotNull(response.get(0).getDescription());
+        Assertions.assertNotNull(response.get(0).getId());
+        Assertions.assertNotNull(response.get(0).getMembers());
+        Assertions.assertNotNull(response.get(0).getName());
+        Assertions.assertNotNull(response.get(0).getInstitutionId());
+        Assertions.assertNotNull(response.get(0).getModifiedAt());
+        Assertions.assertNotNull(response.get(0).getModifiedBy());
+        Assertions.assertNotNull(response.get(0).getStatus());
     }
 
     @Test
-    public void getUserGroups_fullyValuedPageable() {
+    void getUserGroups_fullyValuedPageable() {
         //given
         String institutionId = null;
         String productId = null;
@@ -227,17 +225,17 @@ public class UserGroupRestClientTest extends BaseFeignRestClientTest {
 
         List<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
         //then
-        Assert.assertNotNull(response);
-        Assert.assertNotNull(response.get(0).getCreatedAt());
-        Assert.assertNotNull(response.get(0).getCreatedBy());
-        Assert.assertNotNull(response.get(0).getDescription());
-        Assert.assertNotNull(response.get(0).getId());
-        Assert.assertNotNull(response.get(0).getMembers());
-        Assert.assertNotNull(response.get(0).getName());
-        Assert.assertNotNull(response.get(0).getInstitutionId());
-        Assert.assertNotNull(response.get(0).getModifiedAt());
-        Assert.assertNotNull(response.get(0).getModifiedBy());
-        Assert.assertNotNull(response.get(0).getStatus());
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.get(0).getCreatedAt());
+        Assertions.assertNotNull(response.get(0).getCreatedBy());
+        Assertions.assertNotNull(response.get(0).getDescription());
+        Assertions.assertNotNull(response.get(0).getId());
+        Assertions.assertNotNull(response.get(0).getMembers());
+        Assertions.assertNotNull(response.get(0).getName());
+        Assertions.assertNotNull(response.get(0).getInstitutionId());
+        Assertions.assertNotNull(response.get(0).getModifiedAt());
+        Assertions.assertNotNull(response.get(0).getModifiedBy());
+        Assertions.assertNotNull(response.get(0).getStatus());
     }
 
 }

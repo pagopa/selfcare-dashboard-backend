@@ -2,7 +2,11 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.rest.model.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
 import org.springframework.cloud.openfeign.CollectionFormat;
