@@ -20,7 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.dashboard.connector.rest.UserGroupConnectorImpl.REQUIRED_GROUP_ID_MESSAGE;
@@ -431,7 +434,7 @@ class UserGroupConnectorImplTest {
         UserGroupFilter filter = new UserGroupFilter();
         Pageable pageable = Pageable.unpaged();
         Mockito.when(restClientMock.getUserGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(Collections.emptyList());
+                .thenReturn(null);
         //when
         Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
