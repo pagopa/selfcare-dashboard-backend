@@ -40,7 +40,7 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String REQUIRED_USER_ID = "A user id is required";
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
 
-    private final EnumSet<RelationshipState> allowedStates;
+    private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
     private final NotificationService notificationService;
@@ -52,10 +52,10 @@ class InstitutionServiceImpl implements InstitutionService {
                                   ProductsConnector productsConnector,
                                   NotificationService notificationService) {
         this.allowedStates = allowedStates == null || allowedStates.length == 0
-                ? null
-                : EnumSet.copyOf(Arrays.stream(allowedStates)
+                ? Optional.empty()
+                : Optional.of(EnumSet.copyOf(Arrays.stream(allowedStates)
                 .map(RelationshipState::valueOf)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList())));
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
         this.notificationService = notificationService;
@@ -207,7 +207,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setRole(role);
         userInfoFilter.setProductId(Optional.of(productId));
         userInfoFilter.setProductRoles(productRoles);
-        userInfoFilter.setAllowedState(Optional.of(allowedStates));
+        userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);

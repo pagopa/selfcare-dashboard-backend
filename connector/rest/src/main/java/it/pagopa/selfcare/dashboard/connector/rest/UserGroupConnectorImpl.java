@@ -31,9 +31,9 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
 
     private final UserGroupRestClient restClient;
 
-    final static String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
+    static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
-    private static final Function<UserGroupResponse, UserGroupInfo> GROUP_RESPONSE_TO_GROUP_INFO = groupResponse -> {
+    static final Function<UserGroupResponse, UserGroupInfo> GROUP_RESPONSE_TO_GROUP_INFO = groupResponse -> {
         UserGroupInfo groupInfo = new UserGroupInfo();
         groupInfo.setId(groupResponse.getId());
         groupInfo.setInstitutionId(groupResponse.getInstitutionId());

@@ -371,8 +371,47 @@ class InstitutionServiceImplTest {
         userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)));
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
-        Optional<String> userId = Optional.empty();
         // when
+        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
+        // then
+        Assertions.assertNotNull(userInfos);
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getUsers(institutionId, userInfoFilter);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoInteractions(productsConnectorMock);
+    }
+
+    @Test
+    void nullAllowedStates() {
+        //given
+        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(null, partyConnectorMock, productsConnectorMock, notificationServiceMock);
+        String institutionId = "institutionId";
+        String productId = "productId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(productId));
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+        //when
+        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
+        // then
+        Assertions.assertNotNull(userInfos);
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .getUsers(institutionId, userInfoFilter);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoInteractions(productsConnectorMock);
+    }
+
+    @Test
+    void emptyAllowedStates() {
+        //given
+        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(new String[0], partyConnectorMock, productsConnectorMock, notificationServiceMock);
+        String institutionId = "institutionId";
+        String productId = "productId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(productId));
+        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<Set<String>> productRole = Optional.empty();
+        //when
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
         // then
         Assertions.assertNotNull(userInfos);
@@ -389,6 +428,7 @@ class InstitutionServiceImplTest {
         Optional<String> productId = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
+        UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
         // when
         Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
         // then

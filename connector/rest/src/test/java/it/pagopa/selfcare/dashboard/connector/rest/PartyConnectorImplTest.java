@@ -602,28 +602,20 @@ class PartyConnectorImplTest {
     }
 
     @Test
-    void getUsers_nullAllowedState() {
+    void getUser() {
         // given
-        String institutionId = "institutionId";
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        String relationshipId = "relationshipId";
 
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        String id = "id";
-        relationshipInfo1.setFrom(id);
-        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        relationshipInfo2.setFrom(id);
-        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
-        relationshipsResponse.add(relationshipInfo1);
-        relationshipsResponse.add(relationshipInfo2);
-        Mockito.when(restClientMock.getUserInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(relationshipsResponse);
+        relationshipInfo1.setFrom(relationshipId);
+
+        Mockito.when(restClientMock.getRelationship(Mockito.anyString()))
+                .thenReturn(relationshipInfo1);
         // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        UserInfo userInfo = partyConnector.getUser(relationshipId);
         // then
-        Assertions.assertNotNull(userInfos);
-        Assertions.assertEquals(1, userInfos.size());
-        UserInfo userInfo = userInfos.iterator().next();
-        Assertions.assertEquals(id, userInfo.getId());
+        Assertions.assertNotNull(userInfo);
+        Assertions.assertEquals(relationshipId, userInfo.getId());
         Assertions.assertNotNull(userInfo.getName());
         Assertions.assertNotNull(userInfo.getSurname());
         Assertions.assertNotNull(userInfo.getEmail());
@@ -641,54 +633,9 @@ class PartyConnectorImplTest {
         Assertions.assertNotNull(product.getId());
         Assertions.assertNull(product.getTitle());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.any());
+                .getRelationship(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
-
-    @Test
-    void getUsers_emptyAllowedStates() {
-        // given
-        String institutionId = "institutionId";
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-
-        RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        String id = "id";
-        relationshipInfo1.setFrom(id);
-        RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
-        relationshipInfo2.setFrom(id);
-        RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
-        relationshipsResponse.add(relationshipInfo1);
-        relationshipsResponse.add(relationshipInfo2);
-        Mockito.when(restClientMock.getUserInstitutionRelationships(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(relationshipsResponse);
-        // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
-        // then
-        Assertions.assertNotNull(userInfos);
-        Assertions.assertEquals(1, userInfos.size());
-        UserInfo userInfo = userInfos.iterator().next();
-        Assertions.assertEquals(id, userInfo.getId());
-        Assertions.assertNotNull(userInfo.getName());
-        Assertions.assertNotNull(userInfo.getSurname());
-        Assertions.assertNotNull(userInfo.getEmail());
-        Assertions.assertNotNull(userInfo.getStatus());
-        Assertions.assertNotNull(userInfo.getRole());
-        String prodId = null;
-        Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
-        for (String key :
-                productInfoMap.keySet()) {
-            prodId = key;
-        }
-        Assertions.assertEquals(1, userInfo.getProducts().size());
-        ProductInfo product = productInfoMap.get(prodId);
-        Assertions.assertNotNull(product.getRoleInfos());
-        Assertions.assertNotNull(product.getId());
-        Assertions.assertNull(product.getTitle());
-        Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserInstitutionRelationships(Mockito.eq(institutionId), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNull());
-        Mockito.verifyNoMoreInteractions(restClientMock);
-    }
-
 
     @Test
     void relationship_info_to_user_info_function() throws IOException {

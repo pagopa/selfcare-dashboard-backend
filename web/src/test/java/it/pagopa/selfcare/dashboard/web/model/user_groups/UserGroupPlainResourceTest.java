@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UserGroupPlainResourceTest {
+class UserGroupPlainResourceTest {
     private Validator validator;
 
 

@@ -28,7 +28,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     private final UserGroupConnector groupConnector;
     private final UserRegistryConnector userRegistryConnector;
     private final InstitutionService institutionService;
-    final static String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
+    static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
 
     @Autowired

@@ -42,6 +42,8 @@ import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipStat
 class PartyConnectorImpl implements PartyConnector {
 
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
+    private static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -228,7 +230,7 @@ class PartyConnectorImpl implements PartyConnector {
     public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
 
         Collection<UserInfo> userInfos = Collections.emptyList();
         EnumSet<PartyRole> roles = null;
@@ -254,7 +256,7 @@ class PartyConnectorImpl implements PartyConnector {
     public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
         log.trace("createUsers start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");
 
@@ -328,7 +330,7 @@ class PartyConnectorImpl implements PartyConnector {
     public Institution getInstitution(String institutionId) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Institution institution = restClient.getInstitution(institutionId);
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");

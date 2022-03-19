@@ -427,4 +427,63 @@ class UserGroupConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+    @Test
+    void getUserGroups_nullGroupInfos() {
+        //given
+
+        UserGroupFilter filter = new UserGroupFilter();
+        Pageable pageable = Pageable.unpaged();
+        //when
+        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        //then
+        assertNotNull(groupInfos);
+        assertTrue(groupInfos.isEmpty());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserGroups(Mockito.isNull(), Mockito.isNull(), Mockito.isNull(), Mockito.isNotNull());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void groupResponse_toGroupInfo() {
+        //given
+        UserGroupResponse response1 = TestUtils.mockInstance(new UserGroupResponse(), "setMembers");
+        response1.setMembers(List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        response1.setCreatedAt(Instant.now());
+        response1.setModifiedAt(Instant.now());
+        //when
+        UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response1);
+        //then
+        assertEquals(response1.getId(), groupInfo.getId());
+        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(response1.getProductId(), groupInfo.getProductId());
+        assertEquals(response1.getStatus(), groupInfo.getStatus());
+        assertEquals(response1.getDescription(), groupInfo.getDescription());
+        assertEquals(response1.getName(), groupInfo.getName());
+        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(Collectors.toList()));
+        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
+        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
+        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+    }
+
+    @Test
+    void groupResponse_toGroupInfo_nullMembers() {
+        //given
+        UserGroupResponse response1 = TestUtils.mockInstance(new UserGroupResponse(), "setMembers");
+        //when
+        UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response1);
+        //then
+        assertEquals(response1.getId(), groupInfo.getId());
+        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(response1.getProductId(), groupInfo.getProductId());
+        assertEquals(response1.getStatus(), groupInfo.getStatus());
+        assertEquals(response1.getDescription(), groupInfo.getDescription());
+        assertEquals(response1.getName(), groupInfo.getName());
+        assertEquals(response1.getMembers(), groupInfo.getMembers());
+        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
+        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
+        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+    }
+
 }

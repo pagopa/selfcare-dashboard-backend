@@ -145,12 +145,61 @@ class GroupMapperTest {
         assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().getId());
         assertEquals(model.getModifiedBy().getName(), resource.getModifiedBy().getName());
         assertEquals(model.getModifiedBy().getSurname(), resource.getModifiedBy().getSurname());
+        TestUtils.reflectionEqualsByName(resource, model);
+    }
+
+    @Test
+    void toResource_productInfo() {
+        //given
+        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        userInfoModel.setProducts(productInfoMap);
+        model.setMembers(List.of(userInfoModel));
+        User userModel = TestUtils.mockInstance(new User());
+        model.setCreatedBy(userModel);
+        model.setModifiedBy(userModel);
+        Instant now = Instant.now();
+        model.setModifiedAt(now);
+        model.setCreatedAt(now);
+        //when
+        UserGroupResource resource = GroupMapper.toResource(model);
+        //then
         assertEquals(productInfo.getTitle(), resource.getMembers().get(0).getProduct().getTitle());
         assertEquals(productInfo.getId(), resource.getMembers().get(0).getProduct().getId());
         assertEquals(productInfo.getRoleInfos().get(0).getRole(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getRole());
         assertEquals(productInfo.getRoleInfos().get(0).getSelcRole(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getSelcRole());
         assertEquals(productInfo.getRoleInfos().get(0).getRelationshipId(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getRelationshipId());
         assertEquals(productInfo.getRoleInfos().get(0).getStatus(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getStatus());
+        TestUtils.reflectionEqualsByName(resource, model);
+
+    }
+
+    @Test
+    void toResource_members() {
+        //given
+        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        userInfoModel.setProducts(productInfoMap);
+        model.setMembers(List.of(userInfoModel));
+        User userModel = TestUtils.mockInstance(new User());
+        model.setCreatedBy(userModel);
+        model.setModifiedBy(userModel);
+        Instant now = Instant.now();
+        model.setModifiedAt(now);
+        model.setCreatedAt(now);
+        //when
+        UserGroupResource resource = GroupMapper.toResource(model);
+        //then
         assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId());
         assertEquals(model.getMembers().get(0).getName(), resource.getMembers().get(0).getName());
         assertEquals(model.getMembers().get(0).getSurname(), resource.getMembers().get(0).getSurname());
