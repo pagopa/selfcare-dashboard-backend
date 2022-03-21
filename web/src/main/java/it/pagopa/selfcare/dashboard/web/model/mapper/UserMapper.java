@@ -4,6 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.*;
 
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UserMapper {
@@ -50,17 +51,29 @@ public class UserMapper {
     }
 
     public static InstitutionUserResource toInstitutionUser(UserInfo model) {
-        InstitutionUserResource resource = null;
+        return toInstitutionUser(model, InstitutionUserResource::new);
+    }
+
+    public static InstitutionUserDetailsResource toInstitutionUserDetails(UserInfo model) {
+        InstitutionUserDetailsResource resource = toInstitutionUser(model, InstitutionUserDetailsResource::new);
         if (model != null) {
-            resource = new InstitutionUserResource();
+            resource.setFiscalCode(model.getTaxCode());
+            resource.setCertification(model.isCertified());
+        }
+
+        return resource;
+    }
+
+    private static <T extends InstitutionUserResource> T toInstitutionUser(UserInfo model, Supplier<T> supplier) {
+        T resource = null;
+        if (model != null) {
+            resource = supplier.get();
             resource.setId(model.getId());
             resource.setName(model.getName());
             resource.setSurname(model.getSurname());
             resource.setEmail(model.getEmail());
             resource.setRole(model.getRole());
             resource.setStatus(model.getStatus());
-            resource.setFiscalCode(model.getTaxCode());
-            resource.setCertification(model.isCertified());
             if (model.getProducts() != null) {
                 resource.setProducts(model.getProducts().values()
                         .stream()

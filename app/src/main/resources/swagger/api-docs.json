@@ -531,7 +531,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/InstitutionUserResource"
+                  "$ref": "#/components/schemas/InstitutionUserDetailsResource"
                 }
               }
             }
@@ -1589,8 +1589,8 @@
           }
         }
       },
-      "InstitutionUserResource": {
-        "title": "InstitutionUserResource",
+      "InstitutionUserDetailsResource": {
+        "title": "InstitutionUserDetailsResource",
         "required": [
           "certification",
           "email",
@@ -1616,6 +1616,56 @@
           "fiscalCode": {
             "type": "string",
             "description": "User's fiscal code"
+          },
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "products": {
+            "type": "array",
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
+            }
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "User's status"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
+      "InstitutionUserResource": {
+        "title": "InstitutionUserResource",
+        "required": [
+          "email",
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email"
           },
           "id": {
             "type": "string",
