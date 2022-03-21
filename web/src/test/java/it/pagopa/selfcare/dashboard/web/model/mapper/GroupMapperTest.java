@@ -203,7 +203,6 @@ class GroupMapperTest {
         assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId());
         assertEquals(model.getMembers().get(0).getName(), resource.getMembers().get(0).getName());
         assertEquals(model.getMembers().get(0).getSurname(), resource.getMembers().get(0).getSurname());
-        assertEquals(model.getMembers().get(0).getTaxCode(), resource.getMembers().get(0).getFiscalCode());
         assertEquals(model.getMembers().get(0).isCertified(), resource.getMembers().get(0).isCertification());
         assertEquals(model.getMembers().get(0).getEmail(), resource.getMembers().get(0).getEmail());
         assertEquals(model.getMembers().get(0).getRole(), resource.getMembers().get(0).getRole());

@@ -52,7 +52,6 @@ class ProductUserResourceTest {
         resource.setEmail(null);
         resource.setRole(null);
         resource.setStatus(null);
-        resource.setFiscalCode(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);

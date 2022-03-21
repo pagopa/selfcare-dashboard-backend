@@ -113,7 +113,6 @@ class UserMapperTest {
         ProductUserResource resource = UserMapper.toProductUser(model);
         // then
         assertEquals(model.getId(), resource.getId());
-        assertEquals(model.getTaxCode(), resource.getFiscalCode());
         assertEquals(productInfo.getId(), resource.getProduct().getId());
         assertEquals(productInfo.getTitle(), resource.getProduct().getTitle());
         assertEquals(productInfo.getRoleInfos().get(0).getRole(), resource.getProduct().getRoleInfos().get(0).getRole());

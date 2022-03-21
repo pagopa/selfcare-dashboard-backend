@@ -1850,7 +1850,6 @@
         "required": [
           "certification",
           "email",
-          "fiscalCode",
           "id",
           "name",
           "product",
@@ -1868,10 +1867,6 @@
           "email": {
             "type": "string",
             "description": "User's email"
-          },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
           },
           "id": {
             "type": "string",

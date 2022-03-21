@@ -96,7 +96,6 @@ public class UserMapper {
             resource.setEmail(model.getEmail());
             resource.setRole(model.getRole());
             resource.setStatus(model.getStatus());
-            resource.setFiscalCode(model.getTaxCode());
             resource.setCertification(model.isCertified());
             if (model.getProducts() != null) {
                 resource.setProduct(model.getProducts().values()
