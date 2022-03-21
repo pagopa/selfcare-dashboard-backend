@@ -6,10 +6,10 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
@@ -32,8 +32,8 @@ import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.PartyRole.MANAGER;
 import static it.pagopa.selfcare.dashboard.connector.model.PartyRole.OPERATOR;
-import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(

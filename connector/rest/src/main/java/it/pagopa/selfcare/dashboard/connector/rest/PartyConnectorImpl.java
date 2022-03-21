@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -35,14 +34,16 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
 
 @Slf4j
 @Service
 class PartyConnectorImpl implements PartyConnector {
 
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
+    private static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
@@ -114,18 +115,11 @@ class PartyConnectorImpl implements PartyConnector {
     };
 
     private final PartyProcessRestClient restClient;
-    private final EnumSet<RelationshipState> allowedStates;
 
 
     @Autowired
-    public PartyConnectorImpl(PartyProcessRestClient restClient,
-                              @Value("${dashboard.partyConnector.getUsers.filter.states}") String[] allowedStates) {
+    public PartyConnectorImpl(PartyProcessRestClient restClient) {
         this.restClient = restClient;
-        this.allowedStates = allowedStates == null || allowedStates.length == 0
-                ? null
-                : EnumSet.copyOf(Arrays.stream(allowedStates)
-                .map(RelationshipState::valueOf)
-                .collect(Collectors.toList()));
     }
 
 
@@ -236,7 +230,7 @@ class PartyConnectorImpl implements PartyConnector {
     public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
 
         Collection<UserInfo> userInfos = Collections.emptyList();
         EnumSet<PartyRole> roles = null;
@@ -245,7 +239,7 @@ class PartyConnectorImpl implements PartyConnector {
                     .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole().get()))
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(PartyRole.class)));
         }
-        RelationshipsResponse institutionRelationships = restClient.getUserInstitutionRelationships(institutionId, roles, allowedStates, userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
+        RelationshipsResponse institutionRelationships = restClient.getUserInstitutionRelationships(institutionId, roles, userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
         if (institutionRelationships != null) {
             userInfos = institutionRelationships.stream()
                     .collect(Collectors.toMap(RelationshipInfo::getFrom,
@@ -262,7 +256,7 @@ class PartyConnectorImpl implements PartyConnector {
     public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
         log.trace("createUsers start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");
 
@@ -336,7 +330,7 @@ class PartyConnectorImpl implements PartyConnector {
     public Institution getInstitution(String institutionId) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
-        Assert.hasText(institutionId, "An Institution id is required");
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Institution institution = restClient.getInstitution(institutionId);
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");

@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/pdnd-interop-uservice-user-registry/0.0.1/users/id/userId"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "id": "userId",
+      "externalId": "externalId",
+      "name": "name",
+      "surname": "surname",
+      "certification": "SPID",
+      "extras": {
+        "email": "email",
+        "birthDate": "1996-12-13"
+      }
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

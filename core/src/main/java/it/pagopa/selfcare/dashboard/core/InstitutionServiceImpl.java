@@ -13,11 +13,13 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,15 +40,22 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String REQUIRED_USER_ID = "A user id is required";
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
 
+    private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
     private final NotificationService notificationService;
 
 
     @Autowired
-    public InstitutionServiceImpl(PartyConnector partyConnector,
+    public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
+                                  PartyConnector partyConnector,
                                   ProductsConnector productsConnector,
                                   NotificationService notificationService) {
+        this.allowedStates = allowedStates == null || allowedStates.length == 0
+                ? Optional.empty()
+                : Optional.of(EnumSet.copyOf(Arrays.stream(allowedStates)
+                .map(RelationshipState::valueOf)
+                .collect(Collectors.toList())));
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
         this.notificationService = notificationService;
@@ -198,6 +207,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setRole(role);
         userInfoFilter.setProductId(Optional.of(productId));
         userInfoFilter.setProductRoles(productRoles);
+        userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);

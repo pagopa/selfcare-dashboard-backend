@@ -23,11 +23,11 @@ public class UserRegistryServiceImpl implements UserRegistryService {
     }
 
     @Override
-    public User getUser(String externalId) {
+    public User getUserByExternalId(String externalId) {
         log.trace("getUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", externalId);
         Assert.hasText(externalId, "A TaxCode is required");
-        User result = userConnector.getUser(externalId);
+        User result = userConnector.getUserByExternalId(externalId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}", result);
         log.trace("getUser end");
         return result;

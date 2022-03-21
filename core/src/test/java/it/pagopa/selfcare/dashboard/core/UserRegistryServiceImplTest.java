@@ -31,14 +31,14 @@ class UserRegistryServiceImplTest {
         //given
         String externalId = "externalId";
         User expectedUser = new User();
-        Mockito.when(userConnectorMock.getUser(Mockito.any()))
+        Mockito.when(userConnectorMock.getUserByExternalId(Mockito.any()))
                 .thenReturn(expectedUser);
         //when
-        User user = userRegistryService.getUser(externalId);
+        User user = userRegistryService.getUserByExternalId(externalId);
         //then
         assertSame(expectedUser, user);
         Mockito.verify(userConnectorMock, Mockito.times(1))
-                .getUser(externalId);
+                .getUserByExternalId(externalId);
         Mockito.verifyNoMoreInteractions(userConnectorMock);
     }
 
@@ -48,7 +48,7 @@ class UserRegistryServiceImplTest {
         //given
         String externalId = null;
         //when
-        Executable executable = () -> userRegistryService.getUser(externalId);
+        Executable executable = () -> userRegistryService.getUserByExternalId(externalId);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
