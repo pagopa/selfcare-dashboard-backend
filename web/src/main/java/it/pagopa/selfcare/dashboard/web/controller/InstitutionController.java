@@ -127,7 +127,7 @@ public class InstitutionController {
         List<InstitutionUserResource> result = userInfos.stream()
                 .map(UserMapper::toInstitutionUser)
                 .collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", result);
+        log.debug("getInstitutionUsers result = {}", result);
         log.trace("getInstitutionUsers end");
 
         return result;
@@ -201,7 +201,7 @@ public class InstitutionController {
         List<ProductUserResource> result = userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
+        log.debug("getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
 
         return result;
