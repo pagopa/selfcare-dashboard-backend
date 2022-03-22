@@ -2,10 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
@@ -73,12 +70,14 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("createUserGroup userGroup = {}", userGroup);
         Assert.notNull(userGroup, "A User Group is required");
         CreateUserGroupRequestDto userGroupRequest = new CreateUserGroupRequestDto();
-        userGroupRequest.setDescription(userGroupRequest.getDescription());
+        userGroupRequest.setDescription(userGroup.getDescription());
         userGroupRequest.setMembers(userGroup.getMembers());
         userGroupRequest.setInstitutionId(userGroup.getInstitutionId());
         userGroupRequest.setProductId(userGroup.getProductId());
-        userGroupRequest.setName(userGroupRequest.getName());
+        userGroupRequest.setName(userGroup.getName());
+        userGroupRequest.setStatus(UserGroupStatus.ACTIVE);
         restClient.createUserGroup(userGroupRequest);
+        log.debug("userGroupRequest = {}", userGroupRequest);
         log.trace("createUserGroup end");
     }
 
