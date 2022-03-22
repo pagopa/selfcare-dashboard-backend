@@ -38,7 +38,6 @@ import java.util.*;
 @Service
 public class ExchangeTokenService {
 
-    private static final String ISSUER = "api.selfcare.pagopa.it";
     private static final String PRIVATE_KEY_HEADER_TEMPLATE = "-----BEGIN %s-----";
     private static final String PRIVATE_KEY_FOOTER_TEMPLATE = "-----END %s-----";
 
@@ -47,17 +46,19 @@ public class ExchangeTokenService {
     private final Duration duration;
     private final String kid;
     private final InstitutionService institutionService;
-
+    private final String issuer;
 
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
                                 @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
                                 @Value("${jwt.exchange.duration}") String duration,
-                                @Value("${jwt.exchange.kid}") String kid) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                @Value("${jwt.exchange.kid}") String kid,
+                                @Value("${jwt.exchange.issuer}") String issuer
+    ) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.institutionService = institutionService;
         this.jwtSigningKey = getPrivateKey(jwtSigningKey);
-
+        this.issuer = issuer;
         this.duration = Duration.parse(duration);
         this.kid = kid;
     }
@@ -65,7 +66,7 @@ public class ExchangeTokenService {
 
     public String exchange(String institutionId, String productId, String realm) {
         log.trace("exchange start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}" , institutionId, productId, realm);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -85,7 +86,7 @@ public class ExchangeTokenService {
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
-        claims.setIssuer(ISSUER);
+        claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setTaxCode(institutionInfo.getTaxCode());
@@ -100,8 +101,8 @@ public class ExchangeTokenService {
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}" , claims);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}" , result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", result);
         log.trace("exchange end");
         return result;
     }
@@ -111,8 +112,8 @@ public class ExchangeTokenService {
         boolean isRsa = signingKey.contains("RSA");
         String privateKeyEnvelopName = (isRsa ? "RSA " : "") + "PRIVATE KEY";
         String privateKeyPEM = signingKey
-                .replace("\r" , "")
-                .replace("\n" , "")
+                .replace("\r", "")
+                .replace("\n", "")
                 .replace(String.format(PRIVATE_KEY_HEADER_TEMPLATE, privateKeyEnvelopName), "")
                 .replace(String.format(PRIVATE_KEY_FOOTER_TEMPLATE, privateKeyEnvelopName), "");
 
