@@ -152,8 +152,9 @@ public class UserGroupServiceImpl implements UserGroupService {
         List<UserInfo> userInfos = institutionService.getInstitutionProductUsers(
                 userGroupInfo.getInstitutionId(),
                 userGroupInfo.getProductId(),
-                null,
-                null).stream()
+                Optional.empty(),
+                Optional.empty())
+                .stream()
                 .sorted(userInfoComparator)
                 .collect(Collectors.toList());
         userGroupInfo.setMembers(userGroupInfo.getMembers().stream()

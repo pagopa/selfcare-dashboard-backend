@@ -75,7 +75,7 @@ class UserGroupServiceImplTest {
         Mockito.verify(groupConnector, Mockito.times(1))
                 .createUserGroup(Mockito.any());
         Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
+                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verifyNoMoreInteractions(groupConnector);
         Mockito.verifyNoMoreInteractions(institutionService);
     }
@@ -108,7 +108,7 @@ class UserGroupServiceImplTest {
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
         Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
+                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verifyNoMoreInteractions(institutionService);
         Mockito.verifyNoInteractions(groupConnector);
     }
@@ -223,7 +223,7 @@ class UserGroupServiceImplTest {
         Mockito.verify(groupConnector, Mockito.times(1))
                 .updateUserGroup(Mockito.anyString(), Mockito.any());
         Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
+                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verifyNoMoreInteractions(groupConnector);
         Mockito.verifyNoMoreInteractions(institutionService);
     }
@@ -263,7 +263,7 @@ class UserGroupServiceImplTest {
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
         Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
+                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(institutionService);
@@ -340,7 +340,7 @@ class UserGroupServiceImplTest {
                 .getUserByInternalId(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(userRegistryConnector);
         Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verifyNoMoreInteractions(institutionService);
 
     }
@@ -387,7 +387,7 @@ class UserGroupServiceImplTest {
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(groupConnector);
         Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNull(), Mockito.isNull());
+                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verifyNoMoreInteractions(institutionService);
         Mockito.verifyNoInteractions(userRegistryConnector);
     }
@@ -403,6 +403,8 @@ class UserGroupServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
+        Mockito.verifyNoInteractions(userRegistryConnector, institutionService);
+
     }
 
     @Test
@@ -416,6 +418,8 @@ class UserGroupServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An optional of institutionId is required", e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
+        Mockito.verifyNoInteractions(userRegistryConnector, institutionService);
+
     }
 
     @Test
@@ -438,7 +442,6 @@ class UserGroupServiceImplTest {
 
         Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
                 .thenReturn(foundGroup);
-
         //when
         Executable executable = () -> groupService.getUserGroupById(groupId, institutionId);
         //then
@@ -446,6 +449,7 @@ class UserGroupServiceImplTest {
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(groupConnector);
+        Mockito.verifyNoInteractions(userRegistryConnector, institutionService);
     }
 
     @Test
@@ -536,7 +540,6 @@ class UserGroupServiceImplTest {
         Optional<UUID> userId = Optional.of(UUID.randomUUID());
         Pageable pageable = PageRequest.of(1, 2);
         UserGroupInfo userGroupInfo = TestUtils.mockInstance(new UserGroupInfo());
-
         Mockito.when(groupConnector.getUserGroups(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(userGroupInfo));
         //when
