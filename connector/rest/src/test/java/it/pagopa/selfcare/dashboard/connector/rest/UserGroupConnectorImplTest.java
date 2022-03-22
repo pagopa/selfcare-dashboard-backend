@@ -1,19 +1,15 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +35,9 @@ class UserGroupConnectorImplTest {
     @InjectMocks
     private UserGroupConnectorImpl groupConnector;
 
+    @Captor
+    private ArgumentCaptor<CreateUserGroupRequestDto> requestDtoArgumentCaptor;
+
     @Test
     void createGroup_nullGroup() {
         //given
@@ -61,7 +60,15 @@ class UserGroupConnectorImplTest {
         //then
         assertDoesNotThrow(executable);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .createUserGroup(Mockito.any());
+                .createUserGroup(requestDtoArgumentCaptor.capture());
+        CreateUserGroupRequestDto request = requestDtoArgumentCaptor.getValue();
+        assertEquals(userGroup.getName(), request.getName());
+        assertEquals(userGroup.getDescription(), request.getDescription());
+        assertEquals(userGroup.getMembers(), request.getMembers());
+        assertEquals(userGroup.getInstitutionId(), request.getInstitutionId());
+        assertEquals(userGroup.getProductId(), request.getProductId());
+        assertEquals(UserGroupStatus.ACTIVE, request.getStatus());
+
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
