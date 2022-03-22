@@ -187,7 +187,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         userGroupFilter.setProductId(productId);
         Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroups result = {}", groupInfos);
-        log.trace("getUserGroups start");
+        log.trace("getUserGroups end");
 
         return groupInfos;
     }
