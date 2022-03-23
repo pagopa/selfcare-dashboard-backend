@@ -161,15 +161,18 @@ public class UserGroupServiceImpl implements UserGroupService {
                 .map(userInfo -> {
                     int index = Collections.binarySearch(userInfos, userInfo, userInfoComparator);
                     if (index < 0) {
-                        throw new InternalServerErrorException();
+                        throw new InternalServerErrorException("Incompatible members");
                     }
                     return userInfos.get(index);
                 }).collect(Collectors.toList()));
-        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
-        userGroupInfo.setCreatedBy(createdBy);
-        User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());
-        userGroupInfo.setModifiedBy(modifiedBy);
-
+        if (userGroupInfo.getCreatedBy() != null) {
+            User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
+            userGroupInfo.setCreatedBy(createdBy);
+        }
+        if (userGroupInfo.getModifiedBy() != null) {
+            User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());
+            userGroupInfo.setModifiedBy(modifiedBy);
+        }
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);
         log.trace("getUserGroupById end");
         return userGroupInfo;

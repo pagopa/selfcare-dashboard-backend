@@ -381,7 +381,8 @@ class UserGroupServiceImplTest {
         //when
         Executable executable = () -> groupService.getUserGroupById(groupId, institutionId);
         //then
-        assertThrows(InternalServerErrorException.class, executable);
+        InternalServerErrorException e = assertThrows(InternalServerErrorException.class, executable);
+        assertEquals("Incompatible members", e.getMessage());
 
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
@@ -445,7 +446,8 @@ class UserGroupServiceImplTest {
         //when
         Executable executable = () -> groupService.getUserGroupById(groupId, institutionId);
         //then
-        assertThrows(InvalidUserGroupException.class, executable);
+        InvalidUserGroupException e = assertThrows(InvalidUserGroupException.class, executable);
+        assertEquals("Could not find a UserGroup for given institutionId", e.getMessage());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(groupConnector);
