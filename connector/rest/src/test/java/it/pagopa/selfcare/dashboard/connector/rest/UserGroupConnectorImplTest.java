@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,8 @@ class UserGroupConnectorImplTest {
 
     @Captor
     private ArgumentCaptor<CreateUserGroupRequestDto> requestDtoArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<UpdateUserGroupRequestDto> updateRequestCaptor;
 
     @Test
     void createGroup_nullGroup() {
@@ -110,7 +113,11 @@ class UserGroupConnectorImplTest {
         //then
         assertDoesNotThrow(executable);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .updateUserGroupById(Mockito.any(), Mockito.any());
+                .updateUserGroupById(Mockito.any(), updateRequestCaptor.capture());
+        UpdateUserGroupRequestDto request = updateRequestCaptor.getValue();
+        assertEquals(userGroup.getName(), request.getName());
+        assertEquals(userGroup.getDescription(), request.getDescription());
+        assertEquals(userGroup.getMembers(), request.getMembers());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 

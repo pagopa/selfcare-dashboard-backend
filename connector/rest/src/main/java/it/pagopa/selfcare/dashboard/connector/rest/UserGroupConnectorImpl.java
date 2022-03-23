@@ -118,9 +118,9 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userGroup, "A User Group is required");
         UpdateUserGroupRequestDto userGroupRequest = new UpdateUserGroupRequestDto();
-        userGroupRequest.setDescription(userGroupRequest.getDescription());
+        userGroupRequest.setDescription(userGroup.getDescription());
         userGroupRequest.setMembers(userGroup.getMembers());
-        userGroupRequest.setName(userGroupRequest.getName());
+        userGroupRequest.setName(userGroup.getName());
         restClient.updateUserGroupById(id, userGroupRequest);
         log.trace("updateUserGroup end");
     }
