@@ -89,7 +89,7 @@ public class GroupMapper {
             resource.setStatus(model.getStatus());
             resource.setCreatedBy(UUID.fromString(model.getCreatedBy().getId()));
             resource.setCreatedAt(model.getCreatedAt());
-            if (model.getModifiedBy().getId() != null) {
+            if (model.getModifiedBy() != null) {
                 resource.setModifiedBy(UUID.fromString(model.getModifiedBy().getId()));
                 resource.setModifiedAt(model.getModifiedAt());
             }

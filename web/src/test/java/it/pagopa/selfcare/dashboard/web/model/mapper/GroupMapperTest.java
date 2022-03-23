@@ -289,7 +289,7 @@ class GroupMapperTest {
     @Test
     void toPlainGroupResource_nullModifiedBy() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
+        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo(), "setModifiedBy");
         UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
         List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
@@ -301,7 +301,6 @@ class GroupMapperTest {
         User userModel = TestUtils.mockInstance(new User());
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
-        model.setModifiedBy(new User());
         Instant now = Instant.now();
         model.setCreatedAt(now);
         //when
