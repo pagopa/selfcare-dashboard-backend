@@ -13,8 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,12 +42,6 @@ class UserGroupConnectorImplTest {
 
     @Captor
     private ArgumentCaptor<UpdateUserGroupRequestDto> updateRequestCaptor;
-
-    @SpyBean
-    private SimpleAsyncUncaughtExceptionHandler simpleAsyncUncaughtExceptionHandler;
-
-    @Captor
-    private ArgumentCaptor<Throwable> throwableCaptor;
 
     @Test
     void createGroup_nullGroup() {
@@ -537,16 +529,9 @@ class UserGroupConnectorImplTest {
         String productId = "productId";
         UUID memberId = UUID.randomUUID();
         //when
-        Executable executable = () -> {
-            groupConnector.deleteMembers(memberId.toString(), institutionId, productId);
-            Thread.sleep(1000);
-        };
+        Executable executable = () -> groupConnector.deleteMembers(memberId.toString(), institutionId, productId);
         //when
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
-        Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("Required institutionId", e.getMessage());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }

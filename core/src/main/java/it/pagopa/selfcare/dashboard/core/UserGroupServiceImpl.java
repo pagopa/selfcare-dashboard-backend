@@ -192,7 +192,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public Collection<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable) {
         log.trace("getUserGroups start");
-        log.debug("institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
+        log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
         Assert.notNull(institutionId, "An optional institutionId is required");
         Assert.notNull(productId, "An optional productId is required");
         Assert.notNull(userId, "An optional userId is required");
@@ -210,13 +210,13 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     @Async
     public void deleteMembers(String memberId, String institutionId, String productId) {
-        log.trace("delete start");
-        log.debug("delete memberId = {}, institutionId = {}, productId = {}", memberId, institutionId, productId);
+        log.trace("deleteMembers start");
+        log.debug("deleteMembers memberId = {}, institutionId = {}, productId = {}", memberId, institutionId, productId);
         Assert.hasText(memberId, "Required memberId");
         Assert.hasText(institutionId, "Required institutionId");
         Assert.hasText(productId, "Required productId");
         groupConnector.deleteMembers(memberId, institutionId, productId);
-        log.trace("delete end");
+        log.trace("deleteMembers end");
     }
 
 }

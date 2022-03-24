@@ -1,49 +1,61 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.core.UserGroupServiceImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {UserGroupServiceImpl.class, CoreTestConfig.class})
 class UserGroupServiceImplTest {
 
-    @InjectMocks
-    private UserGroupServiceImpl groupService;
+    @Autowired
+    private UserGroupService groupService;
 
-    @Mock
+    @MockBean
     private UserGroupConnector groupConnector;
 
-    @Mock
-    private InstitutionService institutionService;
+    @MockBean
+    private PartyConnector partyConnector;
 
-    @Mock
+    @MockBean
     private UserRegistryConnector userRegistryConnector;
+
+    @Captor
+    private ArgumentCaptor<Throwable> throwableCaptor;
+
+    @SpyBean
+    private SimpleAsyncUncaughtExceptionHandler simpleAsyncUncaughtExceptionHandler;
 
     @Test
     void createGroup() {
@@ -65,7 +77,7 @@ class UserGroupServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.createUserGroup(userGroup);
@@ -73,10 +85,16 @@ class UserGroupServiceImplTest {
         assertDoesNotThrow(executable);
         Mockito.verify(groupConnector, Mockito.times(1))
                 .createUserGroup(Mockito.any());
-        Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
-        Mockito.verifyNoMoreInteractions(groupConnector);
-        Mockito.verifyNoMoreInteractions(institutionService);
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(userGroup.getInstitutionId()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(userGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
+        Mockito.verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
     @Test
@@ -99,16 +117,23 @@ class UserGroupServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.createUserGroup(userGroup);
         //then
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
-        Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
-        Mockito.verifyNoMoreInteractions(institutionService);
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(userGroup.getInstitutionId()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(userGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
+        Mockito.verifyNoMoreInteractions(partyConnector);
         Mockito.verifyNoInteractions(groupConnector);
     }
 
@@ -211,7 +236,7 @@ class UserGroupServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.updateUserGroup(groupId, userGroup);
@@ -219,12 +244,19 @@ class UserGroupServiceImplTest {
         assertDoesNotThrow(executable);
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
+
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(foundGroup.getInstitutionId()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .updateUserGroup(Mockito.anyString(), Mockito.any());
-        Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
-        Mockito.verifyNoMoreInteractions(groupConnector);
-        Mockito.verifyNoMoreInteractions(institutionService);
+        Mockito.verifyNoMoreInteractions(partyConnector, groupConnector);
     }
 
     @Test
@@ -254,19 +286,26 @@ class UserGroupServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.updateUserGroup(groupId, userGroup);
         //then
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
-        Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
+
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(foundGroup.getInstitutionId()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(institutionService);
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        Mockito.verifyNoMoreInteractions(partyConnector, groupConnector);
     }
 
     @Test
@@ -292,7 +331,7 @@ class UserGroupServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
 
         foundGroup.setMembers(members);
@@ -334,13 +373,20 @@ class UserGroupServiceImplTest {
         assertEquals(modifiedByMock, groupInfo.getModifiedBy());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(groupConnector);
         Mockito.verify(userRegistryConnector, Mockito.times(2))
                 .getUserByInternalId(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(userRegistryConnector);
-        Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
-        Mockito.verifyNoMoreInteractions(institutionService);
+
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
+        Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
+
 
     }
 
@@ -367,7 +413,7 @@ class UserGroupServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock4));
 
         foundGroup.setMembers(members);
@@ -409,13 +455,19 @@ class UserGroupServiceImplTest {
         assertEquals(modifiedByMock, groupInfo.getModifiedBy());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(groupConnector);
         Mockito.verify(userRegistryConnector, Mockito.times(2))
                 .getUserByInternalId(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(userRegistryConnector);
-        Mockito.verify(institutionService, Mockito.times(1))
-                .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
-        Mockito.verifyNoMoreInteractions(institutionService);
+
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
+        Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
     @Test
@@ -429,7 +481,7 @@ class UserGroupServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
-        Mockito.verifyNoInteractions(userRegistryConnector, institutionService);
+        Mockito.verifyNoInteractions(userRegistryConnector, partyConnector);
 
     }
 
@@ -444,7 +496,7 @@ class UserGroupServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An optional of institutionId is required", e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
-        Mockito.verifyNoInteractions(userRegistryConnector, institutionService);
+        Mockito.verifyNoInteractions(userRegistryConnector, partyConnector);
 
     }
 
@@ -476,7 +528,7 @@ class UserGroupServiceImplTest {
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(groupConnector);
-        Mockito.verifyNoInteractions(userRegistryConnector, institutionService);
+        Mockito.verifyNoInteractions(userRegistryConnector, partyConnector);
     }
 
     @Test
@@ -590,7 +642,7 @@ class UserGroupServiceImplTest {
         Executable executable = () -> groupService.getUserGroups(institutionId, productId, userId, pageable);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("An optional institutionId is required", e.getMessage());
+        assertEquals("An optional institutionId is required", e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
     }
 
@@ -605,7 +657,7 @@ class UserGroupServiceImplTest {
         Executable executable = () -> groupService.getUserGroups(institutionId, productId, userId, pageable);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("An optional productId is required", e.getMessage());
+        assertEquals("An optional productId is required", e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
     }
 
@@ -622,5 +674,90 @@ class UserGroupServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An optional userId is required", e.getMessage());
         Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void deleteMembers_nullMemberId() {
+        //given
+        String memberId = null;
+        String institutionId = "institutionId";
+        String productId = "productId";
+        //when
+        Executable executable = () -> {
+            groupService.deleteMembers(memberId, institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
+                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("Required memberId", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void deleteMembers_nullInstitutionId() {
+        //given
+        String memberId = "memberId";
+        String institutionId = null;
+        String productId = "productId";
+        //when
+        Executable executable = () -> {
+            groupService.deleteMembers(memberId, institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
+                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("Required institutionId", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void deleteMembers_nullProductId() {
+        //given
+        String memberId = "memberId";
+        String institutionId = "institutionId";
+        String productId = null;
+        //when
+        Executable executable = () -> {
+            groupService.deleteMembers(memberId, institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
+                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("Required productId", e.getMessage());
+        Mockito.verifyNoInteractions(groupConnector);
+    }
+
+    @Test
+    void deleteMembers() {
+        //given
+        String memberId = "memberId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+        //when
+        Executable executable = () -> {
+            groupService.deleteMembers(memberId, institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(groupConnector, Mockito.times(1))
+                .deleteMembers(memberId, institutionId, productId);
+        Mockito.verifyNoMoreInteractions(groupConnector);
+
     }
 }

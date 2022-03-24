@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +30,7 @@ class RelationshipServiceImplTest {
     private NotificationService notificationService;
 
     @Mock
-    private UserGroupConnector groupConnectorMock;
+    private UserGroupService groupService;
 
 
     @Test
@@ -139,10 +138,8 @@ class RelationshipServiceImplTest {
 
         Mockito.verify(notificationService, Mockito.times(1))
                 .sendDeletedUserNotification(relationshipId);
-//        Mockito.verify(groupConnectorMock, Mockito.times(1))
-//                .deleteMembers(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.verifyNoInteractions(groupConnectorMock);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, groupConnectorMock, notificationService);
+        Mockito.verifyNoInteractions(groupService);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock, notificationService);
     }
 
     @Test
@@ -178,9 +175,9 @@ class RelationshipServiceImplTest {
 
         Mockito.verify(notificationService, Mockito.times(1))
                 .sendDeletedUserNotification(relationshipId);
-        Mockito.verify(groupConnectorMock, Mockito.times(1))
+        Mockito.verify(groupService, Mockito.times(1))
                 .deleteMembers(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, groupConnectorMock, notificationService);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock, groupService, notificationService);
     }
 
     @Test
