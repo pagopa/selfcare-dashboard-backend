@@ -386,8 +386,79 @@ class UserGroupServiceImplTest {
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
         assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
         Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
+    }
+
+    @Test
+    void getUserGroupById_nullModifiedBy() {
+        //given
+        String groupId = "groupId";
+        Optional<String> institutionId = Optional.of("institutionId");
+        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
+        foundGroup.setId(groupId);
+        String id1 = UUID.randomUUID().toString();
+        String id2 = UUID.randomUUID().toString();
+        String id3 = UUID.randomUUID().toString();
+        String id4 = UUID.randomUUID().toString();
+        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+
+        userInfoMock1.setId(id1);
+        userInfoMock2.setId(id2);
+        userInfoMock3.setId(id3);
+        userInfoMock4.setId(id4);
+
+        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
+
+        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
+
+        foundGroup.setMembers(members);
+        foundGroup.setCreatedAt(Instant.now());
+        foundGroup.setModifiedAt(Instant.now());
+        foundGroup.setInstitutionId(institutionId.get());
+        User createdBy = new User();
+        createdBy.setId("createdBy");
+        foundGroup.setCreatedBy(createdBy);
 
 
+        User createdByMock = TestUtils.mockInstance(new User(), "setId");
+        createdByMock.setId("createdBy");
+
+        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+                .thenReturn(foundGroup);
+        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getCreatedBy().getId()))
+                .thenReturn(createdByMock);
+        //when
+        UserGroupInfo groupInfo = groupService.getUserGroupById(groupId, institutionId);
+        //then
+        assertEquals(foundGroup.getId(), groupInfo.getId());
+        assertEquals(foundGroup.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(foundGroup.getProductId(), groupInfo.getProductId());
+        assertEquals(foundGroup.getStatus(), groupInfo.getStatus());
+        assertEquals(foundGroup.getDescription(), groupInfo.getDescription());
+        assertEquals(foundGroup.getName(), groupInfo.getName());
+        assertEquals(foundGroup.getMembers(), groupInfo.getMembers());
+        assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(createdByMock, groupInfo.getCreatedBy());
+        assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
+        assertNull(groupInfo.getModifiedBy());
+        Mockito.verify(groupConnector, Mockito.times(1))
+                .getUserGroupById(Mockito.anyString());
+        Mockito.verify(userRegistryConnector, Mockito.times(1))
+                .getUserByInternalId(Mockito.anyString());
+
+        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
+        assertEquals(Optional.empty(), capturedFilter.getUserId());
+        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
+        assertEquals(Optional.empty(), capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
+        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE)), capturedFilter.getAllowedStates());
+        Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
     @Test

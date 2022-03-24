@@ -48,11 +48,10 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         }
         groupInfo.setCreatedAt(groupResponse.getCreatedAt());
         groupInfo.setModifiedAt(groupResponse.getModifiedAt());
-        if (groupResponse.getCreatedBy() != null) {
-            User userInfo1 = new User();
-            userInfo1.setId(groupResponse.getCreatedBy());
-            groupInfo.setCreatedBy(userInfo1);
-        }
+        User createdBy = new User();
+        createdBy.setId(groupResponse.getCreatedBy());
+        groupInfo.setCreatedBy(createdBy);
+
         if (groupResponse.getModifiedBy() != null) {
             User userInfo = new User();
             userInfo.setId(groupResponse.getModifiedBy());

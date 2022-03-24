@@ -225,6 +225,35 @@ class UserGroupConnectorImplTest {
     }
 
     @Test
+    void getUserGroupById_nullModifiedBy() {
+        //given
+        String id = "id";
+        UserGroupResponse response = TestUtils.mockInstance(new UserGroupResponse(), "setMembers", "setModifiedBy");
+        response.setMembers(List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString()));
+        response.setCreatedAt(Instant.now());
+        response.setModifiedAt(Instant.now());
+        Mockito.when(restClientMock.getUserGroupById(Mockito.anyString()))
+                .thenReturn(response);
+        //when
+        UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
+        //then
+        assertEquals(response.getId(), groupInfo.getId());
+        assertEquals(response.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(response.getProductId(), groupInfo.getProductId());
+        assertEquals(response.getStatus(), groupInfo.getStatus());
+        assertEquals(response.getDescription(), groupInfo.getDescription());
+        assertEquals(response.getName(), groupInfo.getName());
+        assertEquals(response.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(Collectors.toList()));
+        assertEquals(response.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(response.getCreatedBy(), groupInfo.getCreatedBy().getId());
+        assertEquals(response.getModifiedAt(), groupInfo.getModifiedAt());
+        assertNull(groupInfo.getModifiedBy());
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserGroupById(Mockito.anyString());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
     void getUserGroupById_nullId() {
         //given
         String id = null;

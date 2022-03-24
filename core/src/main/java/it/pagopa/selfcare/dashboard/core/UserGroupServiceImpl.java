@@ -176,10 +176,8 @@ public class UserGroupServiceImpl implements UserGroupService {
                     return userInfos.get(index);
                 }).filter(Objects::nonNull)
                 .collect(Collectors.toList()));
-        if (userGroupInfo.getCreatedBy() != null) {
-            User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
-            userGroupInfo.setCreatedBy(createdBy);
-        }
+        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
+        userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
             User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());
             userGroupInfo.setModifiedBy(modifiedBy);
