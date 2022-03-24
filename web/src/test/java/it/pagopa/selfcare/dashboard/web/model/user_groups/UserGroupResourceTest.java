@@ -12,7 +12,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ class UserGroupResourceTest {
         toCheckMap.put("productId", NotBlank.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("description", NotBlank.class);
-        toCheckMap.put("members", NotEmpty.class);
         toCheckMap.put("status", NotNull.class);
         UserGroupResource resource = new UserGroupResource();
         // when
