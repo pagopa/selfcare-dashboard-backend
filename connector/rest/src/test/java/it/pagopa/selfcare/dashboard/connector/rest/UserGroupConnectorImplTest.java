@@ -7,11 +7,14 @@ import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,8 +41,15 @@ class UserGroupConnectorImplTest {
 
     @Captor
     private ArgumentCaptor<CreateUserGroupRequestDto> requestDtoArgumentCaptor;
+
     @Captor
     private ArgumentCaptor<UpdateUserGroupRequestDto> updateRequestCaptor;
+
+    @SpyBean
+    private SimpleAsyncUncaughtExceptionHandler simpleAsyncUncaughtExceptionHandler;
+
+    @Captor
+    private ArgumentCaptor<Throwable> throwableCaptor;
 
     @Test
     void createGroup_nullGroup() {
@@ -500,6 +510,45 @@ class UserGroupConnectorImplTest {
         assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
         assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
         assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+    }
+
+    @Test
+    void deleteMembers() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        UUID memberId = UUID.randomUUID();
+        //when
+        Executable executable = () -> {
+            groupConnector.deleteMembers(memberId.toString(), institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //when
+        assertDoesNotThrow(executable);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .deleteMembers(memberId, institutionId, productId);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void deleteMembers_institutionId() {
+        //given
+        String institutionId = null;
+        String productId = "productId";
+        UUID memberId = UUID.randomUUID();
+        //when
+        Executable executable = () -> {
+            groupConnector.deleteMembers(memberId.toString(), institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //when
+        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
+                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        Throwable e = throwableCaptor.getValue();
+        Assertions.assertNotNull(e);
+        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
+        Assertions.assertEquals("Required institutionId", e.getMessage());
+        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
 }

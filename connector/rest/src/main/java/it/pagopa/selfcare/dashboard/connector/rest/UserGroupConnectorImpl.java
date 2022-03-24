@@ -94,6 +94,17 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     }
 
     @Override
+    public void deleteMembers(String memberId, String institutionId, String productId) {
+        log.trace("delete start");
+        log.debug("delete memberId = {}, institutionId = {}, productId = {}", memberId, institutionId, productId);
+        Assert.hasText(memberId, "Required memberId");
+        Assert.hasText(institutionId, "Required institutionId");
+        Assert.hasText(productId, "Required productId");
+        restClient.deleteMembers(UUID.fromString(memberId), institutionId, productId);
+        log.trace("delete end");
+    }
+
+    @Override
     public void activate(String groupId) {
         log.trace("activate start");
         log.debug("activate groupId = {}", groupId);

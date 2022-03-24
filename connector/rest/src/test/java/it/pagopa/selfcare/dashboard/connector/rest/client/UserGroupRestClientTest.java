@@ -238,4 +238,16 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         Assertions.assertNotNull(response.get(0).getStatus());
     }
 
+    @Test
+    void deleteMemberFromUserGroups() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        UUID memberId = UUID.randomUUID();
+        //when
+        Executable executable = () -> restClient.deleteMembers(memberId, institutionId, productId);
+        //then
+        assertDoesNotThrow(executable);
+    }
+
 }

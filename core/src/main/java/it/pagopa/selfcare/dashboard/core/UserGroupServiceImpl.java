@@ -1,20 +1,22 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.core.exception.InternalServerErrorException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -27,15 +29,15 @@ public class UserGroupServiceImpl implements UserGroupService {
 
     private final UserGroupConnector groupConnector;
     private final UserRegistryConnector userRegistryConnector;
-    private final InstitutionService institutionService;
+    private final PartyConnector partyConnector;
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
 
     @Autowired
-    public UserGroupServiceImpl(UserGroupConnector groupConnector, UserRegistryConnector userRegistryConnector, InstitutionService institutionService) {
+    public UserGroupServiceImpl(UserGroupConnector groupConnector, UserRegistryConnector userRegistryConnector, PartyConnector partyConnector) {
         this.groupConnector = groupConnector;
         this.userRegistryConnector = userRegistryConnector;
-        this.institutionService = institutionService;
+        this.partyConnector = partyConnector;
     }
 
     @Override
@@ -44,8 +46,9 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.debug("createUserGroup group = {}", group);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(group.getProductId()));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE)));
 
-        List<String> retrievedId = retrievedIds(group.getInstitutionId(), group.getProductId(), userInfoFilter);
+        List<String> retrievedId = retrievedIds(group.getInstitutionId(), userInfoFilter);
 
         if (group.getMembers().stream()
                 .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
@@ -75,12 +78,10 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.trace("activate end");
     }
 
-    private List<String> retrievedIds(String groupInstitution, String groupProduct, UserInfo.UserInfoFilter userInfoFilter) {
-        Collection<UserInfo> retrievedUsers = institutionService.getInstitutionProductUsers(
+    private List<String> retrievedIds(String groupInstitution, UserInfo.UserInfoFilter userInfoFilter) {
+        Collection<UserInfo> retrievedUsers = partyConnector.getUsers(
                 groupInstitution,
-                groupProduct,
-                userInfoFilter.getRole(),
-                userInfoFilter.getProductRoles());
+                userInfoFilter);
         return retrievedUsers.stream()
                 .map(UserInfo::getId)
                 .sorted()
@@ -104,8 +105,10 @@ public class UserGroupServiceImpl implements UserGroupService {
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE)));
 
-        List<String> retrievedId = retrievedIds(userGroupInfo.getInstitutionId(), userGroupInfo.getProductId(), userInfoFilter);
+
+        List<String> retrievedId = retrievedIds(userGroupInfo.getInstitutionId(), userInfoFilter);
 
         if (group.getMembers().stream()
                 .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
@@ -149,11 +152,14 @@ public class UserGroupServiceImpl implements UserGroupService {
             }
         });
         Comparator<UserInfo> userInfoComparator = Comparator.comparing(UserInfo::getId);
-        List<UserInfo> userInfos = institutionService.getInstitutionProductUsers(
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE)));
+        List<UserInfo> userInfos = partyConnector.getUsers(
                 userGroupInfo.getInstitutionId(),
-                userGroupInfo.getProductId(),
-                Optional.empty(),
-                Optional.empty())
+                userInfoFilter
+        )
                 .stream()
                 .sorted(userInfoComparator)
                 .collect(Collectors.toList());
@@ -161,10 +167,15 @@ public class UserGroupServiceImpl implements UserGroupService {
                 .map(userInfo -> {
                     int index = Collections.binarySearch(userInfos, userInfo, userInfoComparator);
                     if (index < 0) {
-                        throw new InternalServerErrorException("Incompatible members");
+                        log.error(String.format("Member with uuid %s has no relationship with institution id '%s' and product id '%s'",
+                                userInfo.getId(),
+                                userGroupInfo.getInstitutionId(),
+                                userGroupInfo.getProductId()));
+                        return null;
                     }
                     return userInfos.get(index);
-                }).collect(Collectors.toList()));
+                }).filter(Objects::nonNull)
+                .collect(Collectors.toList()));
         if (userGroupInfo.getCreatedBy() != null) {
             User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
             userGroupInfo.setCreatedBy(createdBy);
@@ -195,4 +206,17 @@ public class UserGroupServiceImpl implements UserGroupService {
 
         return groupInfos;
     }
+
+    @Override
+    @Async
+    public void deleteMembers(String memberId, String institutionId, String productId) {
+        log.trace("delete start");
+        log.debug("delete memberId = {}, institutionId = {}, productId = {}", memberId, institutionId, productId);
+        Assert.hasText(memberId, "Required memberId");
+        Assert.hasText(institutionId, "Required institutionId");
+        Assert.hasText(productId, "Required productId");
+        groupConnector.deleteMembers(memberId, institutionId, productId);
+        log.trace("delete end");
+    }
+
 }

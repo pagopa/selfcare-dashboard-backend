@@ -8,7 +8,6 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.core.exception.InternalServerErrorException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import org.junit.jupiter.api.Assertions;
@@ -346,12 +345,13 @@ class UserGroupServiceImplTest {
     }
 
     @Test
-    void getUserGroupById_internalError() {
+    void getUserGroupById_noRelationshipMember() {
         //given
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
         UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
         foundGroup.setId(groupId);
+        String id1 = UUID.randomUUID().toString();
         String id2 = UUID.randomUUID().toString();
         String id3 = UUID.randomUUID().toString();
         String id4 = UUID.randomUUID().toString();
@@ -360,7 +360,7 @@ class UserGroupServiceImplTest {
         UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
         UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
 
-        userInfoMock1.setId(UUID.randomUUID().toString());
+        userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
@@ -368,29 +368,54 @@ class UserGroupServiceImplTest {
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
         Mockito.when(institutionService.getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock4));
+                .thenReturn(List.of(userInfoMock4));
 
         foundGroup.setMembers(members);
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId.get());
+        User createdBy = new User();
+        createdBy.setId("createdBy");
+        foundGroup.setCreatedBy(createdBy);
+        User modifiedBy = new User();
+        modifiedBy.setId("modifiedBy");
+        foundGroup.setModifiedBy(modifiedBy);
+
+
+        User createdByMock = TestUtils.mockInstance(new User(), "setId");
+        createdByMock.setId("createdBy");
+        User modifiedByMock = TestUtils.mockInstance(new User(), "setId");
+        modifiedByMock.setId("modifiedBy");
 
         Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
                 .thenReturn(foundGroup);
-
+        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getCreatedBy().getId()))
+                .thenReturn(createdByMock);
+        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getModifiedBy().getId()))
+                .thenReturn(modifiedByMock);
         //when
-        Executable executable = () -> groupService.getUserGroupById(groupId, institutionId);
+        UserGroupInfo groupInfo = groupService.getUserGroupById(groupId, institutionId);
         //then
-        InternalServerErrorException e = assertThrows(InternalServerErrorException.class, executable);
-        assertEquals("Incompatible members", e.getMessage());
-
+        assertEquals(foundGroup.getId(), groupInfo.getId());
+        assertEquals(foundGroup.getInstitutionId(), groupInfo.getInstitutionId());
+        assertEquals(foundGroup.getProductId(), groupInfo.getProductId());
+        assertEquals(foundGroup.getStatus(), groupInfo.getStatus());
+        assertEquals(foundGroup.getDescription(), groupInfo.getDescription());
+        assertEquals(foundGroup.getName(), groupInfo.getName());
+        assertEquals(1, groupInfo.getMembers().size());
+        assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
+        assertEquals(createdByMock, groupInfo.getCreatedBy());
+        assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
+        assertEquals(modifiedByMock, groupInfo.getModifiedBy());
         Mockito.verify(groupConnector, Mockito.times(1))
                 .getUserGroupById(Mockito.anyString());
         Mockito.verifyNoMoreInteractions(groupConnector);
+        Mockito.verify(userRegistryConnector, Mockito.times(2))
+                .getUserByInternalId(Mockito.anyString());
+        Mockito.verifyNoMoreInteractions(userRegistryConnector);
         Mockito.verify(institutionService, Mockito.times(1))
                 .getInstitutionProductUsers(Mockito.anyString(), Mockito.anyString(), Mockito.isNotNull(), Mockito.isNotNull());
         Mockito.verifyNoMoreInteractions(institutionService);
-        Mockito.verifyNoInteractions(userRegistryConnector);
     }
 
     @Test
