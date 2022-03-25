@@ -124,6 +124,14 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.debug("addMemberToUserGroup groupId = {}, userId = {}", groupId, userId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
+        UserGroupInfo retrievedGroup = groupConnector.getUserGroupById(groupId);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(retrievedGroup.getProductId()));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)));
+        List<String> retrievedIds = retrievedIds(retrievedGroup.getInstitutionId(), userInfoFilter);
+        if (!retrievedIds.contains(userId.toString())) {
+            throw new InvalidMemberListException("This user is not allowed for this institution");
+        }
         groupConnector.addMemberToUserGroup(groupId, userId);
         log.trace("addMemberToUserGroup end");
     }
