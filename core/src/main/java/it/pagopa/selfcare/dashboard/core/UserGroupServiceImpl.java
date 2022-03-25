@@ -46,7 +46,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.debug("createUserGroup group = {}", group);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(group.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE)));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)));
 
         List<String> retrievedId = retrievedIds(group.getInstitutionId(), userInfoFilter);
 
@@ -105,8 +105,7 @@ public class UserGroupServiceImpl implements UserGroupService {
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE)));
-
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)));
 
         List<String> retrievedId = retrievedIds(userGroupInfo.getInstitutionId(), userInfoFilter);
 
@@ -155,7 +154,7 @@ public class UserGroupServiceImpl implements UserGroupService {
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE)));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)));
         List<UserInfo> userInfos = partyConnector.getUsers(
                 userGroupInfo.getInstitutionId(),
                 userInfoFilter
