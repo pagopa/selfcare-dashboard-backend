@@ -130,7 +130,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         userInfoFilter.setAllowedState(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)));
         List<String> retrievedIds = retrievedIds(retrievedGroup.getInstitutionId(), userInfoFilter);
         if (!retrievedIds.contains(userId.toString())) {
-            throw new InvalidMemberListException("This user is not allowed for this institution");
+            throw new InvalidMemberListException("This user is not allowed for this group");
         }
         groupConnector.addMemberToUserGroup(groupId, userId);
         log.trace("addMemberToUserGroup end");
