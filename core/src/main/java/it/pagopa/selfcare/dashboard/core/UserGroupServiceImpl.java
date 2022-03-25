@@ -214,13 +214,24 @@ public class UserGroupServiceImpl implements UserGroupService {
 
     @Override
     @Async
-    public void deleteMembers(String memberId, String institutionId, String productId) {
+    public void deleteMembersByRelationshipId(String relationshipId) {
         log.trace("deleteMembers start");
-        log.debug("deleteMembers memberId = {}, institutionId = {}, productId = {}", memberId, institutionId, productId);
-        Assert.hasText(memberId, "Required memberId");
-        Assert.hasText(institutionId, "Required institutionId");
-        Assert.hasText(productId, "Required productId");
-        groupConnector.deleteMembers(memberId, institutionId, productId);
+        log.debug("deleteMembers relationshipId = {}", relationshipId);
+        Assert.hasText(relationshipId, "A relationshipId is required");
+        UserInfo user = partyConnector.getUser(relationshipId);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        String productId = user.getProducts().keySet().iterator().next();
+        Assert.notNull(productId, "A product Id is required");
+        String institutionId = user.getInstitutionId();
+        Assert.notNull(institutionId, "An institution id is required");
+        String userId = user.getId();
+        Assert.notNull(userId, "A user id is required");
+        userInfoFilter.setProductId(Optional.ofNullable(productId));
+        userInfoFilter.setUserId(Optional.ofNullable(user.getId()));
+        Collection<UserInfo> users = partyConnector.getUsers(user.getInstitutionId(), userInfoFilter);
+        if (users.isEmpty()) {
+            groupConnector.deleteMembers(userId, institutionId, productId);
+        }
         log.trace("deleteMembers end");
     }
 

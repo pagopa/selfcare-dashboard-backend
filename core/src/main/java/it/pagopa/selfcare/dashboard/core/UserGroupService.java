@@ -28,6 +28,6 @@ public interface UserGroupService {
 
     Collection<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable);
 
-    void deleteMembers(String memberId, String institutionId, String productId);
+    void deleteMembersByRelationshipId(String relationshipId);
 
 }
