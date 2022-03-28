@@ -362,10 +362,9 @@ class ExchangeTokenServiceTest {
         assertNotNull(institution);
         assertEquals(institutionId, institution.getId());
         assertEquals(productRole, institution.getRole());
+        List<String> groups = (List<String>) exchangedClaims.get("groups");
+        assertEquals(groupInfo.getId(), groups.get(0));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
-        ExchangeTokenService.Groups groups = exchangedClaims.getGroups();
-        assertNotNull(groups);
-        assertEquals(groupInfo.getId(), groups.getGroupIds().get(0));
         Mockito.verify(jwtServiceMock, Mockito.times(1))
                 .getClaims(Mockito.any());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
@@ -412,12 +411,6 @@ class ExchangeTokenServiceTest {
             return institution;
         }
 
-        public ExchangeTokenService.Groups getGroups() {
-            LinkedHashMap<String, List<String>> o = (LinkedHashMap) get(GROUP_IDS);
-            ExchangeTokenService.Groups groups = new ExchangeTokenService.Groups();
-            groups.setGroupIds(o.get("groupIds"));
-            return groups;
-        }
     }
 
 

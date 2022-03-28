@@ -109,9 +109,7 @@ public class ExchangeTokenService {
             List<String> groupIds = groupInfos.stream()
                     .map(UserGroupInfo::getId)
                     .collect(Collectors.toList());
-            Groups groups = new Groups();
-            groups.setGroupIds(groupIds);
-            claims.setGroupIds(groups);
+            claims.setGroupIds(groupIds);
         }
         String result = Jwts.builder()
                 .setClaims(claims)
@@ -168,13 +166,6 @@ public class ExchangeTokenService {
         private String role;
     }
 
-    @Getter
-    @Setter
-    @ToString
-    static class Groups implements Serializable {
-        private List<String> groupIds;
-    }
-
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
@@ -194,7 +185,7 @@ public class ExchangeTokenService {
             return this;
         }
 
-        public Claims setGroupIds(Groups groupIds) {
+        public Claims setGroupIds(List<String> groupIds) {
             setValue(GROUP_IDS, groupIds);
             return this;
         }
