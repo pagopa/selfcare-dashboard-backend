@@ -8,15 +8,19 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
+import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +37,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,10 +51,12 @@ public class ExchangeTokenService {
     private final Duration duration;
     private final String kid;
     private final InstitutionService institutionService;
+    private final UserGroupService groupService;
     private final String issuer;
 
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
+                                UserGroupService groupService,
                                 @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
                                 @Value("${jwt.exchange.duration}") String duration,
                                 @Value("${jwt.exchange.kid}") String kid,
@@ -57,6 +64,7 @@ public class ExchangeTokenService {
     ) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.institutionService = institutionService;
+        this.groupService = groupService;
         this.jwtSigningKey = getPrivateKey(jwtSigningKey);
         this.issuer = issuer;
         this.duration = Duration.parse(duration);
@@ -83,6 +91,8 @@ public class ExchangeTokenService {
         Assert.notNull(selcClaims, "Session token claims is required");
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         Assert.notNull(institutionInfo, "Institution info is required");
+        SelfCareUser principal = (SelfCareUser) authentication.getPrincipal();
+        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(UUID.fromString(principal.getId())), Pageable.unpaged());
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
@@ -95,7 +105,12 @@ public class ExchangeTokenService {
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-
+        if (!groupInfos.isEmpty()) {
+            List<String> groupIds = groupInfos.stream()
+                    .map(UserGroupInfo::getId)
+                    .collect(Collectors.toList());
+            claims.setGroupIds(groupIds);
+        }
         String result = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
@@ -151,10 +166,10 @@ public class ExchangeTokenService {
         private String role;
     }
 
-
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
+        public static final String GROUP_IDS = "groups";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
@@ -170,6 +185,10 @@ public class ExchangeTokenService {
             return this;
         }
 
+        public Claims setGroupIds(List<String> groupIds) {
+            setValue(GROUP_IDS, groupIds);
+            return this;
+        }
     }
 
 }
