@@ -26,6 +26,7 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     private static final Function<UserResponse, User> USER_RESPONSE_TO_USER_FUNCTION = userResponse -> {
         User user = new User();
         if (userResponse != null) {
+            user.setId(userResponse.getId());
             user.setName(userResponse.getName());
             user.setSurname(userResponse.getSurname());
             user.setFiscalCode(userResponse.getExternalId());

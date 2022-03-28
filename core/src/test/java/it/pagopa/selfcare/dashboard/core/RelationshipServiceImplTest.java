@@ -24,6 +24,9 @@ class RelationshipServiceImplTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private UserGroupService groupService;
+
 
     @Test
     void suspend_nullRelationshipId() {
@@ -84,18 +87,19 @@ class RelationshipServiceImplTest {
 
     @Test
     void delete() {
-        // given
+        //given
         String relationshipId = "relationshipId";
-        // when
+        //when
         relationshipService.delete(relationshipId);
-        // then
+        //then
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .delete(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
                 .sendDeletedUserNotification(relationshipId);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verify(groupService, Mockito.times(1))
+                .deleteMembersByRelationshipId(relationshipId);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock, notificationService, groupService);
     }
-
     @Test
     void delete_nullRelationshipId() {
         // given
@@ -105,7 +109,7 @@ class RelationshipServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
-        Mockito.verifyNoInteractions(notificationService);
-        Mockito.verifyNoInteractions(partyConnectorMock);
+        Mockito.verifyNoInteractions(partyConnectorMock, groupService, partyConnectorMock);
+
     }
 }

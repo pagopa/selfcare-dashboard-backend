@@ -87,10 +87,12 @@ public class GroupMapper {
             resource.setInstitutionId(model.getInstitutionId());
             resource.setProductId(model.getProductId());
             resource.setStatus(model.getStatus());
-            resource.setCreatedAt(model.getCreatedAt());
             resource.setCreatedBy(UUID.fromString(model.getCreatedBy().getId()));
-            resource.setModifiedAt(model.getModifiedAt());
-            resource.setModifiedBy(UUID.fromString(model.getModifiedBy().getId()));
+            resource.setCreatedAt(model.getCreatedAt());
+            if (model.getModifiedBy() != null) {
+                resource.setModifiedBy(UUID.fromString(model.getModifiedBy().getId()));
+                resource.setModifiedAt(model.getModifiedAt());
+            }
             resource.setMembersCount(model.getMembers().size());
             return resource;
         }

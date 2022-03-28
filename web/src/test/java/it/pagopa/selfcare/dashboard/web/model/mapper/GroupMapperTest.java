@@ -212,6 +212,36 @@ class GroupMapperTest {
     }
 
     @Test
+    void toResource_nullPlainResource() {
+        //given
+        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        userInfoModel.setProducts(productInfoMap);
+        model.setMembers(List.of(userInfoModel));
+        User userModel = null;
+        model.setCreatedBy(userModel);
+        model.setModifiedBy(userModel);
+        //when
+        UserGroupResource resource = GroupMapper.toResource(model);
+        //then
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getDescription(), resource.getDescription());
+        assertEquals(model.getStatus(), resource.getStatus());
+        assertEquals(model.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(model.getProductId(), resource.getProductId());
+        assertEquals(model.getStatus(), resource.getStatus());
+        assertNull(resource.getCreatedBy());
+        assertNull(resource.getModifiedBy());
+        TestUtils.reflectionEqualsByName(resource, model);
+    }
+
+    @Test
     void toPlainGroupResource_null() {
         //given
         UserGroupInfo model = null;
@@ -250,6 +280,39 @@ class GroupMapperTest {
         assertEquals(model.getCreatedAt(), resource.getCreatedAt());
         assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().toString());
         assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().toString());
+        assertEquals(model.getMembers().size(), resource.getMembersCount());
+        assertEquals(model.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getDescription(), resource.getDescription());
+    }
+
+    @Test
+    void toPlainGroupResource_nullModifiedBy() {
+        //given
+        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo(), "setModifiedBy");
+        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        userInfoModel.setProducts(productInfoMap);
+        model.setMembers(List.of(userInfoModel));
+        User userModel = TestUtils.mockInstance(new User());
+        userModel.setId(UUID.randomUUID().toString());
+        model.setCreatedBy(userModel);
+        Instant now = Instant.now();
+        model.setCreatedAt(now);
+        //when
+        UserGroupPlainResource resource = GroupMapper.toPlainGroupResource(model);
+        //then
+        assertNotNull(resource);
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getProductId(), resource.getProductId());
+        assertEquals(model.getCreatedAt(), resource.getCreatedAt());
+        assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().toString());
+        assertNull(resource.getModifiedBy());
+        assertNull(resource.getModifiedAt());
         assertEquals(model.getMembers().size(), resource.getMembersCount());
         assertEquals(model.getInstitutionId(), resource.getInstitutionId());
         assertEquals(model.getName(), resource.getName());

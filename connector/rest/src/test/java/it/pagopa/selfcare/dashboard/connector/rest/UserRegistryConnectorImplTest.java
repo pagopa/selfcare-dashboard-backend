@@ -161,6 +161,7 @@ class UserRegistryConnectorImplTest {
         //when
         User user = userConnector.getUserByInternalId(userId);
         ///then
+        assertNull(user.getId());
         assertNull(user.getEmail());
         assertNull(user.getName());
         assertFalse(user.isCertification());
@@ -182,6 +183,7 @@ class UserRegistryConnectorImplTest {
         //when
         User user = userConnector.getUserByInternalId(userId);
         ///then
+        assertNull(user.getId());
         assertNull(user.getEmail());
         assertNull(user.getName());
         assertFalse(user.isCertification());
@@ -204,6 +206,7 @@ class UserRegistryConnectorImplTest {
         //when
         User user = userConnector.getUserByInternalId(userId);
         ///then
+        assertNull(user.getId());
         assertNull(user.getEmail());
         assertNull(user.getName());
         assertFalse(user.isCertification());
@@ -240,6 +243,7 @@ class UserRegistryConnectorImplTest {
         User user = userConnector.getUserByExternalId(externalId);
         //then
         assertTrue(user.isCertification());
+        assertEquals(userResponseMock.getId(), user.getId());
         assertEquals(userResponseMock.getName(), user.getName());
         assertEquals(userResponseMock.getSurname(), user.getSurname());
         assertEquals(userResponseMock.getExtras().getEmail(), user.getEmail());
