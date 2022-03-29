@@ -448,7 +448,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionUserResource"
+                  "$ref": "#/components/schemas/InstitutionUserDetailsResource"
                 }
               }
             }
@@ -1334,28 +1334,38 @@
             "type" : "string",
             "description" : "Institution's name"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
-      "InstitutionUserResource" : {
-        "title" : "InstitutionUserResource",
-        "required" : [ "certification", "email", "fiscalCode", "id", "name", "products", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "certification" : {
-            "type" : "boolean",
-            "description" : "User provided with certification",
-            "example" : false
+      "InstitutionUserDetailsResource": {
+        "title": "InstitutionUserDetailsResource",
+        "required": [
+          "certification",
+          "email",
+          "fiscalCode",
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User provided with certification",
+            "example": false
           },
-          "email" : {
-            "type" : "string",
+          "email": {
+            "type": "string",
             "description" : "User's email"
           },
           "fiscalCode" : {
@@ -1382,26 +1392,80 @@
             "description" : "User's role",
             "enum" : [ "ADMIN", "LIMITED" ]
           },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
+          "status": {
+            "type": "string",
+            "description": "User's status"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
-      "PlainUserResource" : {
-        "title" : "PlainUserResource",
-        "required" : [ "id", "name", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+      "InstitutionUserResource": {
+        "title": "InstitutionUserResource",
+        "required": [
+          "email",
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email"
           },
-          "name" : {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "products": {
+            "type": "array",
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
+            }
+          },
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "User's status"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
+      "PlainUserResource": {
+        "title": "PlainUserResource",
+        "required": [
+          "id",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
+          },
+          "name": {
             "type" : "string",
             "description" : "User's name"
           },
@@ -1506,22 +1570,27 @@
         }
       },
       "ProductUserResource" : {
-        "title" : "ProductUserResource",
-        "required" : [ "certification", "email", "fiscalCode", "id", "name", "product", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "certification" : {
-            "type" : "boolean",
-            "description" : "User provided with certification",
-            "example" : false
+        "title": "ProductUserResource",
+        "required": [
+          "certification",
+          "email",
+          "id",
+          "name",
+          "product",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "certification": {
+            "type": "boolean",
+            "description": "User provided with certification",
+            "example": false
           },
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
-          },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "email": {
+            "type": "string",
+            "description": "User's email"
           },
           "id" : {
             "type" : "string",
