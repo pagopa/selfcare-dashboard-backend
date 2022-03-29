@@ -127,7 +127,7 @@ public class InstitutionController {
         List<InstitutionUserResource> result = userInfos.stream()
                 .map(UserMapper::toInstitutionUser)
                 .collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", result);
+        log.debug("getInstitutionUsers result = {}", result);
         log.trace("getInstitutionUsers end");
 
         return result;
@@ -138,17 +138,17 @@ public class InstitutionController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
-    public InstitutionUserResource getInstitutionUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                      @PathVariable("institutionId")
-                                                              String institutionId,
-                                                      @ApiParam("${swagger.dashboard.user.model.id}")
-                                                      @PathVariable("userId")
-                                                              String userId) {
+    public InstitutionUserDetailsResource getInstitutionUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                             @PathVariable("institutionId")
+                                                                     String institutionId,
+                                                             @ApiParam("${swagger.dashboard.user.model.id}")
+                                                             @PathVariable("userId")
+                                                                     String userId) {
 
         log.trace("getInstitutionUser start");
         log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
         UserInfo userInfo = institutionService.getInstitutionUser(institutionId, userId);
-        InstitutionUserResource result = UserMapper.toInstitutionUser(userInfo);
+        InstitutionUserDetailsResource result = UserMapper.toInstitutionUserDetails(userInfo);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
         log.trace("getInstitutionUser end");
 
@@ -201,7 +201,7 @@ public class InstitutionController {
         List<ProductUserResource> result = userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
+        log.debug("getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
 
         return result;

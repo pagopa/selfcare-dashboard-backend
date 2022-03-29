@@ -50,6 +50,42 @@ class UserMapperTest {
         TestUtils.reflectionEqualsByName(resource, model);
     }
 
+    @Test
+    void toInstitutionUserDetails() {
+        // given
+        UserInfo model = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        model.setProducts(productInfoMap);
+        // when
+        InstitutionUserDetailsResource resource = UserMapper.toInstitutionUserDetails(model);
+        // then
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getSurname(), resource.getSurname());
+        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getRole(), resource.getRole());
+        assertEquals(model.getStatus(), resource.getStatus());
+        ProductInfo prodInfo = model.getProducts().get(productInfo.getId());
+        assertEquals(productInfo.getId(), prodInfo.getId());
+        assertEquals(productInfo.getTitle(), prodInfo.getTitle());
+        assertEquals(model.getTaxCode(), resource.getFiscalCode());
+        assertEquals(model.isCertified(), resource.isCertification());
+        TestUtils.reflectionEqualsByName(resource, model);
+    }
+
+    @Test
+    void toInstitutionUserDetail_null() {
+        //given
+        UserInfo model = null;
+        //when
+        InstitutionUserDetailsResource resource = UserMapper.toInstitutionUserDetails(model);
+        //then
+        assertNull(resource);
+    }
 
     @Test
     void toProductUser_null() {
@@ -77,7 +113,6 @@ class UserMapperTest {
         ProductUserResource resource = UserMapper.toProductUser(model);
         // then
         assertEquals(model.getId(), resource.getId());
-        assertEquals(model.getTaxCode(), resource.getFiscalCode());
         assertEquals(productInfo.getId(), resource.getProduct().getId());
         assertEquals(productInfo.getTitle(), resource.getProduct().getTitle());
         assertEquals(productInfo.getRoleInfos().get(0).getRole(), resource.getProduct().getRoleInfos().get(0).getRole());

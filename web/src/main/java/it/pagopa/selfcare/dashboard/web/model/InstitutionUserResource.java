@@ -61,15 +61,4 @@ public class InstitutionUserResource {
     @Valid
     private List<ProductInfoResource> products;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
-    private String fiscalCode;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.certified}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
-    private boolean certification;
-
-
 }
