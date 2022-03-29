@@ -14,6 +14,8 @@ public interface UserGroupConnector {
 
     void delete(String groupId);
 
+    void deleteMembers(String memberId, String institutionId, String productId);
+
     void activate(String groupId);
 
     void suspend(String groupId);

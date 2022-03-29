@@ -40,12 +40,19 @@ public interface UserGroupRestClient {
 
     @PutMapping(value = "${rest-client.user-group.addMemberToUserGroup.path}")
     @ResponseBody
-    void addMemberToUserGroup(@PathVariable("id") String id, @PathVariable("userId") UUID userId);
+    void addMemberToUserGroup(@PathVariable("id") String id, @PathVariable("memberId") UUID userId);
 
     @DeleteMapping(value = "${rest-client.user-group.deleteMemberFromUserGroup.path}")
     @ResponseBody
-    void deleteMemberFromUserGroup(@PathVariable("userGroupId") String id,
+    void deleteMemberFromUserGroup(@PathVariable("id") String id,
                                    @PathVariable("memberId") UUID memberId);
+
+    @DeleteMapping(value = "${rest-client.user-group.deleteMembers.path}")
+    @ResponseBody
+    void deleteMembers(@PathVariable("memberId") UUID memberId,
+                       @RequestParam(value = "institutionId", required = false) String institutionId,
+                       @RequestParam(value = "productId", required = false) String productId);
+
 
     @GetMapping(value = "${rest-client.user-group.getUserGroups.path}")
     @ResponseBody

@@ -1,2198 +1,1801 @@
 {
-  "openapi": "3.0.3",
-  "info": {
-    "title": "selc-dashboard",
-    "description": "Self Care Dashboard API documentation",
-    "version": "0.0.1-SNAPSHOT"
+  "openapi" : "3.0.3",
+  "info" : {
+    "title" : "selc-dashboard",
+    "description" : "Self Care Dashboard API documentation",
+    "version" : "0.0.1-SNAPSHOT"
   },
-  "servers": [
-    {
-      "url": "http://localhost:80",
-      "description": "Inferred Url"
-    }
-  ],
-  "tags": [
-    {
-      "name": "institutions",
-      "description": "Institution operations"
-    },
-    {
-      "name": "products",
-      "description": "Products operations"
-    },
-    {
-      "name": "relationships",
-      "description": "Relationships operations"
-    },
-    {
-      "name": "token",
-      "description": "Token operations"
-    },
-    {
-      "name": "user",
-      "description": "User Controller"
-    },
-    {
-      "name": "user-groups",
-      "description": "UserGroups operations"
-    }
-  ],
-  "paths": {
-    "/institutions": {
-      "get": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "getInstitutions",
-        "description": "Service to get all the institutions related to logged user",
-        "operationId": "getInstitutionsUsingGET",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/InstitutionResource"
+  "servers" : [ {
+    "url" : "http://localhost:80",
+    "description" : "Inferred Url"
+  } ],
+  "tags" : [ {
+    "name" : "institutions",
+    "description" : "Institution operations"
+  }, {
+    "name" : "products",
+    "description" : "Products operations"
+  }, {
+    "name" : "relationships",
+    "description" : "Relationships operations"
+  }, {
+    "name" : "token",
+    "description" : "Token operations"
+  }, {
+    "name" : "user",
+    "description" : "User Controller"
+  }, {
+    "name" : "user-groups",
+    "description" : "UserGroups operations"
+  } ],
+  "paths" : {
+    "/institutions" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutions",
+        "description" : "Service to get all the institutions related to logged user",
+        "operationId" : "getInstitutionsUsingGET",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/InstitutionResource"
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/institutions/{institutionId}": {
-      "get": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "getInstitution",
-        "description": "Service to get a specific institution related to logged user",
-        "operationId": "getInstitutionUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/institutions/{institutionId}" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitution",
+        "description" : "Service to get a specific institution related to logged user",
+        "operationId" : "getInstitutionUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstitutionResource"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InstitutionResource"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/institutions/{institutionId}/logo": {
-      "put": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "saveInstitutionLogo",
-        "description": "Service to upload and store the institution's logo",
-        "operationId": "saveInstitutionLogoUsingPUT",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/institutions/{institutionId}/logo" : {
+      "put" : {
+        "tags" : [ "institutions" ],
+        "summary" : "saveInstitutionLogo",
+        "description" : "Service to upload and store the institution's logo",
+        "operationId" : "saveInstitutionLogoUsingPUT",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "required": [
-                  "logo"
-                ],
-                "type": "object",
-                "properties": {
-                  "logo": {
-                    "type": "string",
-                    "description": "Institution's logo",
-                    "format": "binary"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "required" : [ "logo" ],
+                "type" : "object",
+                "properties" : {
+                  "logo" : {
+                    "type" : "string",
+                    "description" : "Institution's logo",
+                    "format" : "binary"
                   }
                 }
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object"
                 }
               },
-              "multipart/form-data": {
-                "schema": {
-                  "type": "object"
+              "multipart/form-data" : {
+                "schema" : {
+                  "type" : "object"
                 }
               }
             }
           },
-          "201": {
-            "description": "Created"
+          "201" : {
+            "description" : "Created"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/institutions/{institutionId}/products": {
-      "get": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "getInstitutionProducts",
-        "description": "Service to get all the products related to a specific institution",
-        "operationId": "getInstitutionProductsUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/institutions/{institutionId}/products" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutionProducts",
+        "description" : "Service to get all the products related to a specific institution",
+        "operationId" : "getInstitutionProductsUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProductsResource"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProductsResource"
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/institutions/{institutionId}/products/{productId}/users": {
-      "get": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "getInstitutionProductUsers",
-        "description": "Service to get all the users related to a specific pair of institution-product",
-        "operationId": "getInstitutionProductUsersUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "path",
-            "description": "Product's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "role",
-            "in": "query",
-            "description": "User's role",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "ADMIN",
-                "LIMITED"
-              ]
-            }
-          },
-          {
-            "name": "productRoles",
-            "in": "query",
-            "description": "User's roles in product",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string"
-            }
+    "/institutions/{institutionId}/products/{productId}/users" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutionProductUsers",
+        "description" : "Service to get all the users related to a specific pair of institution-product",
+        "operationId" : "getInstitutionProductUsersUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProductUserResource"
+        }, {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "role",
+          "in" : "query",
+          "description" : "User's role",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ADMIN", "LIMITED" ]
+          }
+        }, {
+          "name" : "productRoles",
+          "in" : "query",
+          "description" : "User's roles in product",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProductUserResource"
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       },
-      "post": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "createInstitutionProductUser",
-        "description": "Service to Create a user related to a specific pair of institution-product",
-        "operationId": "createInstitutionProductUserUsingPOST",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "path",
-            "description": "Product's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+      "post" : {
+        "tags" : [ "institutions" ],
+        "summary" : "createInstitutionProductUser",
+        "description" : "Service to Create a user related to a specific pair of institution-product",
+        "operationId" : "createInstitutionProductUserUsingPOST",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
+        }, {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateUserDto"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/institutions/{institutionId}/users": {
-      "get": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "getInstitutionUsers",
-        "description": "Service to get all the users related to a specific pair of institution-product",
-        "operationId": "getInstitutionUsersUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "query",
-            "description": "Product's unique identifier",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "role",
-            "in": "query",
-            "description": "User's role",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "ADMIN",
-                "LIMITED"
-              ]
-            }
-          },
-          {
-            "name": "productRoles",
-            "in": "query",
-            "description": "User's roles in product",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string"
-            }
+    "/institutions/{institutionId}/users" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutionUsers",
+        "description" : "Service to get all the users related to a specific pair of institution-product",
+        "operationId" : "getInstitutionUsersUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/InstitutionUserResource"
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "role",
+          "in" : "query",
+          "description" : "User's role",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ADMIN", "LIMITED" ]
+          }
+        }, {
+          "name" : "productRoles",
+          "in" : "query",
+          "description" : "User's roles in product",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/InstitutionUserResource"
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/institutions/{institutionId}/users/{userId}": {
-      "get": {
-        "tags": [
-          "institutions"
-        ],
-        "summary": "getInstitutionUser",
-        "description": "${swagger.dashboard.institutions.api.getInstitutionUser}",
-        "operationId": "getInstitutionUserUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "User's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/institutions/{institutionId}/users/{userId}" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutionUser",
+        "description" : "${swagger.dashboard.institutions.api.getInstitutionUser}",
+        "operationId" : "getInstitutionUserUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstitutionUserDetailsResource"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InstitutionUserResource"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/products/{productId}/roles": {
-      "get": {
-        "tags": [
-          "products"
-        ],
-        "summary": "getProductRoles",
-        "description": "Service to get the Product roles",
-        "operationId": "getProductRolesUsingGET",
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "description": "Product's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/products/{productId}/roles" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "getProductRoles",
+        "description" : "Service to get the Product roles",
+        "operationId" : "getProductRolesUsingGET",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProductRoleMappingsResource"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ProductRoleMappingsResource"
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/relationships/{relationshipId}": {
-      "delete": {
-        "tags": [
-          "relationships"
-        ],
-        "summary": "deleteRelationshipById",
-        "description": "Delete the relationship",
-        "operationId": "deleteRelationshipByIdUsingDELETE",
-        "parameters": [
-          {
-            "name": "relationshipId",
-            "in": "path",
-            "description": "Unique relationship identifier between User and Product",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/relationships/{relationshipId}" : {
+      "delete" : {
+        "tags" : [ "relationships" ],
+        "summary" : "deleteRelationshipById",
+        "description" : "Delete the relationship",
+        "operationId" : "deleteRelationshipByIdUsingDELETE",
+        "parameters" : [ {
+          "name" : "relationshipId",
+          "in" : "path",
+          "description" : "Unique relationship identifier between User and Product",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/relationships/{relationshipId}/activate": {
-      "post": {
-        "tags": [
-          "relationships"
-        ],
-        "summary": "activateRelationship",
-        "description": "Activate the relationship",
-        "operationId": "activateRelationshipUsingPOST",
-        "parameters": [
-          {
-            "name": "relationshipId",
-            "in": "path",
-            "description": "Unique relationship identifier between User and Product",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/relationships/{relationshipId}/activate" : {
+      "post" : {
+        "tags" : [ "relationships" ],
+        "summary" : "activateRelationship",
+        "description" : "Activate the relationship",
+        "operationId" : "activateRelationshipUsingPOST",
+        "parameters" : [ {
+          "name" : "relationshipId",
+          "in" : "path",
+          "description" : "Unique relationship identifier between User and Product",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/relationships/{relationshipId}/suspend": {
-      "post": {
-        "tags": [
-          "relationships"
-        ],
-        "summary": "suspendRelationship",
-        "description": "Suspend the relationship",
-        "operationId": "suspendRelationshipUsingPOST",
-        "parameters": [
-          {
-            "name": "relationshipId",
-            "in": "path",
-            "description": "Unique relationship identifier between User and Product",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/relationships/{relationshipId}/suspend" : {
+      "post" : {
+        "tags" : [ "relationships" ],
+        "summary" : "suspendRelationship",
+        "description" : "Suspend the relationship",
+        "operationId" : "suspendRelationshipUsingPOST",
+        "parameters" : [ {
+          "name" : "relationshipId",
+          "in" : "path",
+          "description" : "Unique relationship identifier between User and Product",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/token/exchange": {
-      "get": {
-        "tags": [
-          "token"
-        ],
-        "summary": "exchange",
-        "description": "Service create an 'Identity Token' based on a Self Care session token",
-        "operationId": "exchangeUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "query",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "query",
-            "description": "Product's unique identifier",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "realm",
-            "in": "query",
-            "description": "The domain for which the requested token is valid",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
+    "/token/exchange" : {
+      "get" : {
+        "tags" : [ "token" ],
+        "summary" : "exchange",
+        "description" : "Service create an 'Identity Token' based on a Self Care session token",
+        "operationId" : "exchangeUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IdentityTokenResource"
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "realm",
+          "in" : "query",
+          "description" : "The domain for which the requested token is valid",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/IdentityTokenResource"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/users/external-id": {
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "summary": "getUserByExternalId",
-        "description": "Retrieve the user for a given internal id",
-        "operationId": "getUserByExternalIdUsingPOST",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "query",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
+    "/users/external-id" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "getUserByExternalId",
+        "description" : "Retrieve the user for a given internal id",
+        "operationId" : "getUserByExternalIdUsingPOST",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmbeddedExternalIdDto"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/EmbeddedExternalIdDto"
               }
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResource"
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResource"
                 }
               }
             }
           },
-          "201": {
-            "description": "Created"
+          "201" : {
+            "description" : "Created"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/users/{id}": {
-      "put": {
-        "tags": [
-          "user"
-        ],
-        "summary": "updateUser",
-        "description": "Update previously added user",
-        "operationId": "updateUserUsingPUT",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "User's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "institutionId",
-            "in": "query",
-            "description": "Institution's unique identifier (i.e.: IPA code)",
-            "required": true,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
+    "/users/{id}" : {
+      "put" : {
+        "tags" : [ "user" ],
+        "summary" : "updateUser",
+        "description" : "Update previously added user",
+        "operationId" : "updateUserUsingPUT",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserDto"
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateUserDto"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups": {
-      "get": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "getUserGroups",
-        "description": "Service that allows to get a list of UserGroup entities",
-        "operationId": "getUserGroupsUsingGET",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "query",
-            "description": "Users group's institutionId",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Results page you want to retrieve (0..N)",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "size",
-            "in": "query",
-            "description": "Number of records per page, default size is 20",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "required": false,
-            "style": "form",
-            "allowReserved": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "name": "productId",
-            "in": "query",
-            "description": "Users group's productId",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "query",
-            "description": "User's unique identifier",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+    "/user-groups" : {
+      "get" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "getUserGroups",
+        "description" : "Service that allows to get a list of UserGroup entities",
+        "operationId" : "getUserGroupsUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Users group's institutionId",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "Results page you want to retrieve (0..N)",
+          "required" : false,
+          "style" : "form",
+          "allowReserved" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Number of records per page, default size is 20",
+          "required" : false,
+          "style" : "form",
+          "allowReserved" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "style" : "form",
+          "allowReserved" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserGroupPlainResource"
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Users group's productId",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "userId",
+          "in" : "query",
+          "description" : "User's unique identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserGroupPlainResource"
                   }
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups/": {
-      "post": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "createUserGroup",
-        "description": "Service that allows the insert of a new occurrence for the UserGroup entity",
-        "operationId": "createUserGroupUsingPOST",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserGroupDto"
+    "/user-groups/" : {
+      "post" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "createUserGroup",
+        "description" : "Service that allows the insert of a new occurrence for the UserGroup entity",
+        "operationId" : "createUserGroupUsingPOST",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateUserGroupDto"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           },
-          "409": {
-            "description": "Conflict"
+          "409" : {
+            "description" : "Conflict"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups/{id}": {
-      "get": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "getUserGroupById",
-        "description": "Service to get a specific UserGroup entity",
-        "operationId": "getUserGroupByIdUsingGET",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "institutionId",
-            "in": "query",
-            "description": "Users group's institutionId",
-            "required": false,
-            "style": "form",
-            "schema": {
-              "type": "string"
-            }
+    "/user-groups/{id}" : {
+      "get" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "getUserGroupById",
+        "description" : "Service to get a specific UserGroup entity",
+        "operationId" : "getUserGroupByIdUsingGET",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserGroupResource"
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Users group's institutionId",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserGroupResource"
                 }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       },
-      "put": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "updateUserGroup",
-        "description": "Service that allows the modification of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "updateUserGroupUsingPUT",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+      "put" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "updateUserGroup",
+        "description" : "Service that allows the modification of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId" : "updateUserGroupUsingPUT",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateUserGroupDto"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateUserGroupDto"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "Created"
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           },
-          "409": {
-            "description": "Conflict"
+          "409" : {
+            "description" : "Conflict"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       },
-      "delete": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "deleteUserGroup",
-        "description": "Service that allows the deletion of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "deleteUserGroupUsingDELETE",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+      "delete" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "deleteUserGroup",
+        "description" : "Service that allows the deletion of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId" : "deleteUserGroupUsingDELETE",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups/{id}/activate": {
-      "post": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "activateUserGroup",
-        "description": "Service that allows the activation of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "activateUserGroupUsingPOST",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/user-groups/{id}/activate" : {
+      "post" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "activateUserGroup",
+        "description" : "Service that allows the activation of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId" : "activateUserGroupUsingPOST",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups/{id}/members/{userId}": {
-      "post": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "addMemberToUserGroup",
-        "description": "Service to add a member to a specific UserGroup entity",
-        "operationId": "addMemberToUserGroupUsingPOST",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "User's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+    "/user-groups/{id}/members/{userId}" : {
+      "post" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "addMemberToUserGroup",
+        "description" : "Service to add a member to a specific UserGroup entity",
+        "operationId" : "addMemberToUserGroupUsingPOST",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups/{id}/suspend": {
-      "post": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "suspendUserGroup",
-        "description": "Service that allows the suspension of a specific occurrence for the UserGroup entity by an Admin user",
-        "operationId": "suspendUserGroupUsingPOST",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
+    "/user-groups/{id}/suspend" : {
+      "post" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "suspendUserGroup",
+        "description" : "Service that allows the suspension of a specific occurrence for the UserGroup entity by an Admin user",
+        "operationId" : "suspendUserGroupUsingPOST",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
-          "204": {
-            "description": "No Content"
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           },
-          "404": {
-            "description": "Not Found"
+          "404" : {
+            "description" : "Not Found"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
-    "/user-groups/{userGroupId}/members/{userId}": {
-      "delete": {
-        "tags": [
-          "user-groups"
-        ],
-        "summary": "deleteMemberFromUserGroup",
-        "description": "Service to delete a member from a specific UserGroup entity",
-        "operationId": "deleteMemberFromUserGroupUsingDELETE",
-        "parameters": [
-          {
-            "name": "userGroupId",
-            "in": "path",
-            "description": "Users group's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "User's unique identifier",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+    "/user-groups/{userGroupId}/members/{userId}" : {
+      "delete" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "deleteMemberFromUserGroup",
+        "description" : "Service to delete a member from a specific UserGroup entity",
+        "operationId" : "deleteMemberFromUserGroupUsingDELETE",
+        "parameters" : [ {
+          "name" : "userGroupId",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
           }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
           },
-          "401": {
-            "description": "Unauthorized"
+          "401" : {
+            "description" : "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "403" : {
+            "description" : "Forbidden"
           }
         },
-        "security": [
-          {
-            "bearerAuth": [
-              "global"
-            ]
-          }
-        ]
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     }
   },
-  "components": {
-    "schemas": {
-      "CreateUserDto": {
-        "title": "CreateUserDto",
-        "required": [
-          "email",
-          "name",
-          "productRoles",
-          "surname",
-          "taxCode"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's email"
+  "components" : {
+    "schemas" : {
+      "CreateUserDto" : {
+        "title" : "CreateUserDto",
+        "required" : [ "email", "name", "productRoles", "surname", "taxCode" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "productRoles": {
-            "uniqueItems": true,
-            "type": "array",
-            "description": "User's roles in product",
-            "items": {
-              "type": "string"
+          "productRoles" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "description" : "User's roles in product",
+            "items" : {
+              "type" : "string"
             }
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           },
-          "taxCode": {
-            "type": "string",
-            "description": "User's fiscal code"
+          "taxCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           }
         }
       },
-      "CreateUserGroupDto": {
-        "title": "CreateUserGroupDto",
-        "required": [
-          "description",
-          "institutionId",
-          "members",
-          "name",
-          "productId"
-        ],
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string",
-            "description": "Users group's description"
+      "CreateUserGroupDto" : {
+        "title" : "CreateUserGroupDto",
+        "required" : [ "description", "institutionId", "members", "name", "productId" ],
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "Users group's description"
           },
-          "institutionId": {
-            "type": "string",
-            "description": "Users group's institutionId"
+          "institutionId" : {
+            "type" : "string",
+            "description" : "Users group's institutionId"
           },
-          "members": {
-            "uniqueItems": true,
-            "type": "array",
-            "description": "List of all the members of the group",
-            "items": {
-              "type": "string",
-              "format": "uuid"
+          "members" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "description" : "List of all the members of the group",
+            "items" : {
+              "type" : "string",
+              "format" : "uuid"
             }
           },
-          "name": {
-            "type": "string",
-            "description": "Users group's name"
+          "name" : {
+            "type" : "string",
+            "description" : "Users group's name"
           },
-          "productId": {
-            "type": "string",
-            "description": "Users group's productId"
+          "productId" : {
+            "type" : "string",
+            "description" : "Users group's productId"
           }
         }
       },
-      "EmbeddedExternalIdDto": {
-        "title": "EmbeddedExternalIdDto",
-        "type": "object",
-        "properties": {
-          "externalId": {
-            "type": "string"
+      "EmbeddedExternalIdDto" : {
+        "title" : "EmbeddedExternalIdDto",
+        "type" : "object",
+        "properties" : {
+          "externalId" : {
+            "type" : "string"
           }
         }
       },
-      "IdentityTokenResource": {
-        "title": "IdentityTokenResource",
-        "required": [
-          "token"
-        ],
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "The Identity Token"
+      "IdentityTokenResource" : {
+        "title" : "IdentityTokenResource",
+        "required" : [ "token" ],
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string",
+            "description" : "The Identity Token"
           }
         }
       },
-      "InstitutionResource": {
-        "title": "InstitutionResource",
-        "required": [
-          "fiscalCode",
-          "id",
-          "mailAddress",
-          "name",
-          "status",
-          "userRole"
-        ],
-        "type": "object",
-        "properties": {
-          "category": {
-            "type": "string",
-            "description": "Institution's category"
+      "InstitutionResource" : {
+        "title" : "InstitutionResource",
+        "required" : [ "fiscalCode", "id", "mailAddress", "name", "status", "userRole" ],
+        "type" : "object",
+        "properties" : {
+          "category" : {
+            "type" : "string",
+            "description" : "Institution's category"
           },
-          "fiscalCode": {
-            "type": "string",
-            "description": "Fiscal code corresponding to the institution"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "Fiscal code corresponding to the institution"
           },
-          "id": {
-            "type": "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+          "id" : {
+            "type" : "string",
+            "description" : "Institution's unique identifier (i.e.: IPA code)"
           },
-          "mailAddress": {
-            "type": "string",
-            "description": "Institution's email address"
+          "mailAddress" : {
+            "type" : "string",
+            "description" : "Institution's email address"
           },
-          "name": {
-            "type": "string",
-            "description": "Institution's name"
+          "name" : {
+            "type" : "string",
+            "description" : "Institution's name"
           },
-          "status": {
-            "type": "string",
-            "description": "Institution's status"
+          "status" : {
+            "type" : "string",
+            "description" : "Institution's status"
           },
-          "userRole": {
-            "type": "string",
-            "description": "Logged user's role"
+          "userRole" : {
+            "type" : "string",
+            "description" : "Logged user's role"
           }
         }
       },
-      "InstitutionUserDetailsResource": {
-        "title": "InstitutionUserDetailsResource",
-        "required": [
-          "certification",
-          "email",
-          "fiscalCode",
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User provided with certification",
-            "example": false
+      "InstitutionUserResource" : {
+        "title" : "InstitutionUserResource",
+        "required" : [ "certification", "email", "fiscalCode", "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "certification" : {
+            "type" : "boolean",
+            "description" : "User provided with certification",
+            "example" : false
           },
-          "email": {
-            "type": "string",
-            "description": "User's email"
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "products": {
-            "type": "array",
-            "description": "Authorized user products",
-            "items": {
-              "$ref": "#/components/schemas/ProductInfoResource"
+          "products" : {
+            "type" : "array",
+            "description" : "Authorized user products",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductInfoResource"
             }
           },
-          "role": {
-            "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
+          "role" : {
+            "type" : "string",
+            "description" : "User's role",
+            "enum" : [ "ADMIN", "LIMITED" ]
           },
-          "status": {
-            "type": "string",
-            "description": "User's status"
+          "status" : {
+            "type" : "string",
+            "description" : "User's status"
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       },
-      "InstitutionUserResource": {
-        "title": "InstitutionUserResource",
-        "required": [
-          "email",
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's email"
+      "PlainUserResource" : {
+        "title" : "PlainUserResource",
+        "required" : [ "id", "name", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
+          }
+        }
+      },
+      "ProductInfoResource" : {
+        "title" : "ProductInfoResource",
+        "required" : [ "id", "roleInfos" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Product's unique identifier"
           },
-          "products": {
-            "type": "array",
-            "description": "Authorized user products",
-            "items": {
-              "$ref": "#/components/schemas/ProductInfoResource"
+          "roleInfos" : {
+            "type" : "array",
+            "description" : "User's role infos in product",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductRoleInfoResource"
             }
           },
-          "role": {
-            "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "description": "User's status"
-          },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "title" : {
+            "type" : "string",
+            "description" : "Product's title"
           }
         }
       },
-      "PlainUserResource": {
-        "title": "PlainUserResource",
-        "required": [
-          "id",
-          "name",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+      "ProductRoleInfoResource" : {
+        "title" : "ProductRoleInfoResource",
+        "required" : [ "relationshipId", "role", "selcRole", "status" ],
+        "type" : "object",
+        "properties" : {
+          "relationshipId" : {
+            "type" : "string",
+            "description" : "Unique relationship identifier between User and Product"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "role" : {
+            "type" : "string",
+            "description" : "User's role in product"
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "selcRole" : {
+            "type" : "string",
+            "description" : "User's role",
+            "enum" : [ "ADMIN", "LIMITED" ]
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "User's status"
           }
         }
       },
-      "ProductInfoResource": {
-        "title": "ProductInfoResource",
-        "required": [
-          "id",
-          "roleInfos"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Product's unique identifier"
+      "ProductRoleMappingsResource" : {
+        "title" : "ProductRoleMappingsResource",
+        "required" : [ "multiroleAllowed", "partyRole", "productRoles", "selcRole" ],
+        "type" : "object",
+        "properties" : {
+          "multiroleAllowed" : {
+            "type" : "boolean",
+            "description" : "Indicates if an User can have more than one product role",
+            "example" : false
           },
-          "roleInfos": {
-            "type": "array",
-            "description": "User's role infos in product",
-            "items": {
-              "$ref": "#/components/schemas/ProductRoleInfoResource"
+          "partyRole" : {
+            "type" : "string",
+            "description" : "Party role",
+            "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
+          },
+          "productRoles" : {
+            "type" : "array",
+            "description" : "Available product roles",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductRoleResource"
             }
           },
-          "title": {
-            "type": "string",
-            "description": "Product's title"
+          "selcRole" : {
+            "type" : "string",
+            "description" : "Self Care role",
+            "enum" : [ "ADMIN", "LIMITED" ]
           }
         }
       },
-      "ProductRoleInfoResource": {
-        "title": "ProductRoleInfoResource",
-        "required": [
-          "relationshipId",
-          "role",
-          "selcRole",
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "relationshipId": {
-            "type": "string",
-            "description": "Unique relationship identifier between User and Product"
+      "ProductRoleResource" : {
+        "title" : "ProductRoleResource",
+        "required" : [ "code", "description", "label" ],
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "Product role internal code"
           },
-          "role": {
-            "type": "string",
-            "description": "User's role in product"
+          "description" : {
+            "type" : "string",
+            "description" : "Product role description"
           },
-          "selcRole": {
-            "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "description": "User's status"
+          "label" : {
+            "type" : "string",
+            "description" : "Product role label"
           }
         }
       },
-      "ProductRoleMappingsResource": {
-        "title": "ProductRoleMappingsResource",
-        "required": [
-          "multiroleAllowed",
-          "partyRole",
-          "productRoles",
-          "selcRole"
-        ],
-        "type": "object",
-        "properties": {
-          "multiroleAllowed": {
-            "type": "boolean",
-            "description": "Indicates if an User can have more than one product role",
-            "example": false
+      "ProductUserResource" : {
+        "title" : "ProductUserResource",
+        "required" : [ "certification", "email", "fiscalCode", "id", "name", "product", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "certification" : {
+            "type" : "boolean",
+            "description" : "User provided with certification",
+            "example" : false
           },
-          "partyRole": {
-            "type": "string",
-            "description": "Party role",
-            "enum": [
-              "DELEGATE",
-              "MANAGER",
-              "OPERATOR",
-              "SUB_DELEGATE"
-            ]
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "productRoles": {
-            "type": "array",
-            "description": "Available product roles",
-            "items": {
-              "$ref": "#/components/schemas/ProductRoleResource"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
+          },
+          "product" : {
+            "description" : "Authorized user product",
+            "$ref" : "#/components/schemas/ProductInfoResource"
+          },
+          "role" : {
+            "type" : "string",
+            "description" : "User's role",
+            "enum" : [ "ADMIN", "LIMITED" ]
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "User's status"
+          },
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
+          }
+        }
+      },
+      "ProductsResource" : {
+        "title" : "ProductsResource",
+        "required" : [ "authorized", "description", "id", "logo", "status", "title", "urlBO" ],
+        "type" : "object",
+        "properties" : {
+          "activatedAt" : {
+            "type" : "string",
+            "description" : "Date the products was activated",
+            "format" : "date-time"
+          },
+          "authorized" : {
+            "type" : "boolean",
+            "description" : "flag indicating whether the logged user has the authorization to manage the product",
+            "example" : false
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Product's description"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "Product's unique identifier"
+          },
+          "logo" : {
+            "type" : "string",
+            "description" : "Product's logo"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Product's status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Product's title"
+          },
+          "urlBO" : {
+            "type" : "string",
+            "description" : "URL that redirects to the back-office section, where is possible to manage the product"
+          },
+          "urlPublic" : {
+            "type" : "string",
+            "description" : "URL that redirects to the public information webpage of the product"
+          },
+          "userRole" : {
+            "type" : "string",
+            "description" : "Logged user's role"
+          }
+        }
+      },
+      "UpdateUserDto" : {
+        "title" : "UpdateUserDto",
+        "required" : [ "email", "fiscalCode", "name", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "User's institutional email"
+          },
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
+          },
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
+          }
+        }
+      },
+      "UpdateUserGroupDto" : {
+        "title" : "UpdateUserGroupDto",
+        "required" : [ "description", "members", "name" ],
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "Users group's description"
+          },
+          "members" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "description" : "List of all the members of the group",
+            "items" : {
+              "type" : "string",
+              "format" : "uuid"
             }
           },
-          "selcRole": {
-            "type": "string",
-            "description": "Self Care role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
+          "name" : {
+            "type" : "string",
+            "description" : "Users group's name"
           }
         }
       },
-      "ProductRoleResource": {
-        "title": "ProductRoleResource",
-        "required": [
-          "code",
-          "description",
-          "label"
-        ],
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "Product role internal code"
+      "UserGroupPlainResource" : {
+        "title" : "UserGroupPlainResource",
+        "required" : [ "description", "id", "institutionId", "membersCount", "name", "productId", "status" ],
+        "type" : "object",
+        "properties" : {
+          "createdAt" : {
+            "type" : "string",
+            "description" : "Date on which the group was created",
+            "format" : "date-time"
           },
-          "description": {
-            "type": "string",
-            "description": "Product role description"
+          "createdBy" : {
+            "type" : "string",
+            "description" : "User by which the group was created",
+            "format" : "uuid"
           },
-          "label": {
-            "type": "string",
-            "description": "Product role label"
+          "description" : {
+            "type" : "string",
+            "description" : "Users group's description"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "Users group's unique identifier"
+          },
+          "institutionId" : {
+            "type" : "string",
+            "description" : "Users group's institutionId"
+          },
+          "membersCount" : {
+            "type" : "integer",
+            "description" : "Number all the members of the group",
+            "format" : "int32"
+          },
+          "modifiedAt" : {
+            "type" : "string",
+            "description" : "Date on which the group was modified",
+            "format" : "date-time"
+          },
+          "modifiedBy" : {
+            "type" : "string",
+            "description" : "User by which the group was modified",
+            "format" : "uuid"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Users group's name"
+          },
+          "productId" : {
+            "type" : "string",
+            "description" : "Users group's productId"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Users group's status",
+            "enum" : [ "ACTIVE", "SUSPENDED" ]
           }
         }
       },
-      "ProductUserResource": {
-        "title": "ProductUserResource",
-        "required": [
-          "certification",
-          "email",
-          "id",
-          "name",
-          "product",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User provided with certification",
-            "example": false
+      "UserGroupResource" : {
+        "title" : "UserGroupResource",
+        "required" : [ "description", "id", "institutionId", "members", "name", "productId", "status" ],
+        "type" : "object",
+        "properties" : {
+          "createdAt" : {
+            "type" : "string",
+            "description" : "Date on which the group was created",
+            "format" : "date-time"
           },
-          "email": {
-            "type": "string",
-            "description": "User's email"
+          "createdBy" : {
+            "description" : "User by which the group was created",
+            "$ref" : "#/components/schemas/PlainUserResource"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "description" : {
+            "type" : "string",
+            "description" : "Users group's description"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "id" : {
+            "type" : "string",
+            "description" : "Users group's unique identifier"
           },
-          "product": {
-            "description": "Authorized user product",
-            "$ref": "#/components/schemas/ProductInfoResource"
+          "institutionId" : {
+            "type" : "string",
+            "description" : "Users group's institutionId"
           },
-          "role": {
-            "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "description": "User's status"
-          },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
-          }
-        }
-      },
-      "ProductsResource": {
-        "title": "ProductsResource",
-        "required": [
-          "authorized",
-          "description",
-          "id",
-          "logo",
-          "status",
-          "title",
-          "urlBO"
-        ],
-        "type": "object",
-        "properties": {
-          "activatedAt": {
-            "type": "string",
-            "description": "Date the products was activated",
-            "format": "date-time"
-          },
-          "authorized": {
-            "type": "boolean",
-            "description": "flag indicating whether the logged user has the authorization to manage the product",
-            "example": false
-          },
-          "description": {
-            "type": "string",
-            "description": "Product's description"
-          },
-          "id": {
-            "type": "string",
-            "description": "Product's unique identifier"
-          },
-          "logo": {
-            "type": "string",
-            "description": "Product's logo"
-          },
-          "status": {
-            "type": "string",
-            "description": "Product's status",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "PENDING"
-            ]
-          },
-          "title": {
-            "type": "string",
-            "description": "Product's title"
-          },
-          "urlBO": {
-            "type": "string",
-            "description": "URL that redirects to the back-office section, where is possible to manage the product"
-          },
-          "urlPublic": {
-            "type": "string",
-            "description": "URL that redirects to the public information webpage of the product"
-          },
-          "userRole": {
-            "type": "string",
-            "description": "Logged user's role"
-          }
-        }
-      },
-      "UpdateUserDto": {
-        "title": "UpdateUserDto",
-        "required": [
-          "email",
-          "fiscalCode",
-          "name",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's institutional email"
-          },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
-          },
-          "name": {
-            "type": "string",
-            "description": "User's name"
-          },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
-          }
-        }
-      },
-      "UpdateUserGroupDto": {
-        "title": "UpdateUserGroupDto",
-        "required": [
-          "description",
-          "members",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string",
-            "description": "Users group's description"
-          },
-          "members": {
-            "uniqueItems": true,
-            "type": "array",
-            "description": "List of all the members of the group",
-            "items": {
-              "type": "string",
-              "format": "uuid"
+          "members" : {
+            "type" : "array",
+            "description" : "List of all the members of the group",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductUserResource"
             }
           },
-          "name": {
-            "type": "string",
-            "description": "Users group's name"
+          "modifiedAt" : {
+            "type" : "string",
+            "description" : "Date on which the group was modified",
+            "format" : "date-time"
+          },
+          "modifiedBy" : {
+            "description" : "User by which the group was modified",
+            "$ref" : "#/components/schemas/PlainUserResource"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Users group's name"
+          },
+          "productId" : {
+            "type" : "string",
+            "description" : "Users group's productId"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Users group's status",
+            "enum" : [ "ACTIVE", "SUSPENDED" ]
           }
         }
       },
-      "UserGroupPlainResource": {
-        "title": "UserGroupPlainResource",
-        "required": [
-          "description",
-          "id",
-          "institutionId",
-          "membersCount",
-          "name",
-          "productId",
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "createdAt": {
-            "type": "string",
-            "description": "Date on which the group was created",
-            "format": "date-time"
+      "UserResource" : {
+        "title" : "UserResource",
+        "required" : [ "certification", "email", "fiscalCode", "name", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "certification" : {
+            "type" : "boolean",
+            "description" : "User's certification source",
+            "example" : false
           },
-          "createdBy": {
-            "type": "string",
-            "description": "User by which the group was created",
-            "format": "uuid"
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "description": {
-            "type": "string",
-            "description": "Users group's description"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           },
-          "id": {
-            "type": "string",
-            "description": "Users group's unique identifier"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "institutionId": {
-            "type": "string",
-            "description": "Users group's institutionId"
-          },
-          "membersCount": {
-            "type": "integer",
-            "description": "Number all the members of the group",
-            "format": "int32"
-          },
-          "modifiedAt": {
-            "type": "string",
-            "description": "Date on which the group was modified",
-            "format": "date-time"
-          },
-          "modifiedBy": {
-            "type": "string",
-            "description": "User by which the group was modified",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string",
-            "description": "Users group's name"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Users group's productId"
-          },
-          "status": {
-            "type": "string",
-            "description": "Users group's status",
-            "enum": [
-              "ACTIVE",
-              "SUSPENDED"
-            ]
-          }
-        }
-      },
-      "UserGroupResource": {
-        "title": "UserGroupResource",
-        "required": [
-          "description",
-          "id",
-          "institutionId",
-          "members",
-          "name",
-          "productId",
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "createdAt": {
-            "type": "string",
-            "description": "Date on which the group was created",
-            "format": "date-time"
-          },
-          "createdBy": {
-            "description": "User by which the group was created",
-            "$ref": "#/components/schemas/PlainUserResource"
-          },
-          "description": {
-            "type": "string",
-            "description": "Users group's description"
-          },
-          "id": {
-            "type": "string",
-            "description": "Users group's unique identifier"
-          },
-          "institutionId": {
-            "type": "string",
-            "description": "Users group's institutionId"
-          },
-          "members": {
-            "type": "array",
-            "description": "List of all the members of the group",
-            "items": {
-              "$ref": "#/components/schemas/ProductUserResource"
-            }
-          },
-          "modifiedAt": {
-            "type": "string",
-            "description": "Date on which the group was modified",
-            "format": "date-time"
-          },
-          "modifiedBy": {
-            "description": "User by which the group was modified",
-            "$ref": "#/components/schemas/PlainUserResource"
-          },
-          "name": {
-            "type": "string",
-            "description": "Users group's name"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Users group's productId"
-          },
-          "status": {
-            "type": "string",
-            "description": "Users group's status",
-            "enum": [
-              "ACTIVE",
-              "SUSPENDED"
-            ]
-          }
-        }
-      },
-      "UserResource": {
-        "title": "UserResource",
-        "required": [
-          "certification",
-          "email",
-          "fiscalCode",
-          "name",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User's certification source",
-            "example": false
-          },
-          "email": {
-            "type": "string",
-            "description": "User's email"
-          },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
-          },
-          "name": {
-            "type": "string",
-            "description": "User's name"
-          },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "description": "A bearer token in the format of a JWS and conformed to the specifications included in [RFC8725](https://tools.ietf.org/html/RFC8725)",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "type" : "http",
+        "description" : "A bearer token in the format of a JWS and conformed to the specifications included in [RFC8725](https://tools.ietf.org/html/RFC8725)",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
       }
     }
   }

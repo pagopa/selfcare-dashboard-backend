@@ -2,10 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
@@ -51,13 +48,15 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         }
         groupInfo.setCreatedAt(groupResponse.getCreatedAt());
         groupInfo.setModifiedAt(groupResponse.getModifiedAt());
+        User createdBy = new User();
+        createdBy.setId(groupResponse.getCreatedBy());
+        groupInfo.setCreatedBy(createdBy);
 
-        User userInfo1 = new User();
-        userInfo1.setId(groupResponse.getCreatedBy());
-        groupInfo.setCreatedBy(userInfo1);
-        User userInfo = new User();
-        userInfo.setId(groupResponse.getModifiedBy());
-        groupInfo.setModifiedBy(userInfo);
+        if (groupResponse.getModifiedBy() != null) {
+            User userInfo = new User();
+            userInfo.setId(groupResponse.getModifiedBy());
+            groupInfo.setModifiedBy(userInfo);
+        }
 
         return groupInfo;
     };
@@ -73,12 +72,14 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("createUserGroup userGroup = {}", userGroup);
         Assert.notNull(userGroup, "A User Group is required");
         CreateUserGroupRequestDto userGroupRequest = new CreateUserGroupRequestDto();
-        userGroupRequest.setDescription(userGroupRequest.getDescription());
+        userGroupRequest.setDescription(userGroup.getDescription());
         userGroupRequest.setMembers(userGroup.getMembers());
         userGroupRequest.setInstitutionId(userGroup.getInstitutionId());
         userGroupRequest.setProductId(userGroup.getProductId());
-        userGroupRequest.setName(userGroupRequest.getName());
+        userGroupRequest.setName(userGroup.getName());
+        userGroupRequest.setStatus(UserGroupStatus.ACTIVE);
         restClient.createUserGroup(userGroupRequest);
+        log.debug("userGroupRequest = {}", userGroupRequest);
         log.trace("createUserGroup end");
     }
 
@@ -88,6 +89,17 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("delete groupId = {}", groupId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         restClient.deleteUserGroupById(groupId);
+        log.trace("delete end");
+    }
+
+    @Override
+    public void deleteMembers(String memberId, String institutionId, String productId) {
+        log.trace("delete start");
+        log.debug("delete memberId = {}, institutionId = {}, productId = {}", memberId, institutionId, productId);
+        Assert.hasText(memberId, "Required memberId");
+        Assert.hasText(institutionId, "Required institutionId");
+        Assert.hasText(productId, "Required productId");
+        restClient.deleteMembers(UUID.fromString(memberId), institutionId, productId);
         log.trace("delete end");
     }
 
@@ -116,9 +128,9 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userGroup, "A User Group is required");
         UpdateUserGroupRequestDto userGroupRequest = new UpdateUserGroupRequestDto();
-        userGroupRequest.setDescription(userGroupRequest.getDescription());
+        userGroupRequest.setDescription(userGroup.getDescription());
         userGroupRequest.setMembers(userGroup.getMembers());
-        userGroupRequest.setName(userGroupRequest.getName());
+        userGroupRequest.setName(userGroup.getName());
         restClient.updateUserGroupById(id, userGroupRequest);
         log.trace("updateUserGroup end");
     }

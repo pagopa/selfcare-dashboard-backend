@@ -7,7 +7,6 @@ import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -45,8 +44,7 @@ public class UserGroupResource {
     private UserGroupStatus status;
 
     @ApiModelProperty(value = "${swagger.dashboard.user-group.model.members}", required = true)
-    @JsonProperty(required = true)
-    @NotEmpty
+    @JsonProperty()
     private List<ProductUserResource> members;
 
     @ApiModelProperty(value = "${swagger.dashboard.user-group.model.createdAt}")

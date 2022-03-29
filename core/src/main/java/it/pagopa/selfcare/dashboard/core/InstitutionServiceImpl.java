@@ -143,6 +143,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setRole(role);
         userInfoFilter.setProductId(productId);
         userInfoFilter.setProductRoles(productRoles);
+        userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
@@ -184,6 +185,7 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(userId, REQUIRED_USER_ID);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setUserId(Optional.of(userId));
+        userInfoFilter.setAllowedState(allowedStates);
 
         Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
         if (!userInfos.iterator().hasNext()) {

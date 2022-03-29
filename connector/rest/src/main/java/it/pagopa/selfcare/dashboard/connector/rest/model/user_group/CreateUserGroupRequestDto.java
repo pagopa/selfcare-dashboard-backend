@@ -12,5 +12,5 @@ public class CreateUserGroupRequestDto {
     private String name;
     private String description;
     private UserGroupStatus status;
-    List<String> members;
+    private List<String> members;
 }
