@@ -16,6 +16,7 @@ import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.InstitutionContact;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
 import lombok.Data;
 
 import java.time.OffsetDateTime;

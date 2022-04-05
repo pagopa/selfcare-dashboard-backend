@@ -1,12 +1,10 @@
-package it.pagopa.selfcare.dashboard.connector.rest.model;
+package it.pagopa.selfcare.dashboard.connector.rest.model.product;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
 
-@Setter
-@Getter
+@Data
 public class ProductInfo {
 
     private String id;

@@ -3,6 +3,9 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 
 import java.util.function.Supplier;
 import java.util.stream.Collectors;

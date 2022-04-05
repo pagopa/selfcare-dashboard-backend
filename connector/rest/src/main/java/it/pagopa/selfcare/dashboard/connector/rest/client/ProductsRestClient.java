@@ -4,6 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,5 +28,9 @@ public interface ProductsRestClient extends ProductsConnector {
     @GetMapping(value = "${rest-client.products.getProduct.path}")
     @ResponseBody
     Product getProduct(@PathVariable("productId") String productId);
+
+    @GetMapping(value = "${rest-client.products.getProductsTree.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    List<ProductTree> getProductsTree();
 
 }

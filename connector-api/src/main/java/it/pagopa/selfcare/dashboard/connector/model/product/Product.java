@@ -1,14 +1,12 @@
 package it.pagopa.selfcare.dashboard.connector.model.product;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
 import java.util.EnumMap;
 
-@Setter
-@Getter
+@Data
 public class Product {
 
     private String id;

@@ -6,6 +6,7 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -77,6 +78,16 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         // then
         Assertions.assertNotNull(response);
         Assertions.assertFalse(response.isEmpty());
+    }
+
+    @Test
+    void getProductsTree() {
+        //given
+        //when
+        List<ProductTree> response = restClient.getProductsTree();
+        //then
+        Assertions.assertFalse(response.isEmpty());
+        Assertions.assertEquals(2, response.get(0).getChildren().size());
     }
 
 }

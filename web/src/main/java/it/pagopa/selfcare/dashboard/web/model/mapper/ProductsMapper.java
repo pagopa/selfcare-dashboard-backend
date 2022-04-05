@@ -3,8 +3,10 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
-import it.pagopa.selfcare.dashboard.web.model.ProductRoleMappingsResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.product.SubProductResource;
 
 import java.util.Collection;
 import java.util.Map;
@@ -12,25 +14,40 @@ import java.util.stream.Collectors;
 
 public class ProductsMapper {
 
-    public static ProductsResource toResource(Product model) {
+    public static ProductsResource toResource(ProductTree model) {
         ProductsResource resource = null;
         if (model != null) {
             resource = new ProductsResource();
-            resource.setId(model.getId());
-            resource.setLogo(model.getLogo());
-            resource.setTitle(model.getTitle());
-            resource.setDescription(model.getDescription());
-            resource.setUrlPublic(model.getUrlPublic());
-            resource.setUrlBO(model.getUrlBO());
-            resource.setActivatedAt(model.getActivatedAt());
-            resource.setAuthorized(model.isAuthorized());
-            resource.setUserRole(model.getUserRole());
-            resource.setStatus(model.getStatus());
+            resource.setId(model.getNode().getId());
+            resource.setLogo(model.getNode().getLogo());
+            resource.setTitle(model.getNode().getTitle());
+            resource.setDescription(model.getNode().getDescription());
+            resource.setUrlPublic(model.getNode().getUrlPublic());
+            resource.setUrlBO(model.getNode().getUrlBO());
+            resource.setActivatedAt(model.getNode().getActivatedAt());
+            resource.setAuthorized(model.getNode().isAuthorized());
+            resource.setUserRole(model.getNode().getUserRole());
+            resource.setStatus(model.getNode().getStatus());
+            if (model.getChildren() != null) {
+                resource.setChildren(model.getChildren().stream()
+                        .map(ProductsMapper::toChildren)
+                        .collect(Collectors.toList()));
+            }
         }
 
         return resource;
     }
 
+    private static SubProductResource toChildren(Product model) {
+        SubProductResource resource = null;
+        if (model != null) {
+            resource = new SubProductResource();
+            resource.setId(model.getId());
+            resource.setStatus(model.getStatus());
+            resource.setTitle(model.getTitle());
+        }
+        return resource;
+    }
 
     public static Collection<ProductRoleMappingsResource> toProductRoleMappingsResource(Map<PartyRole, ProductRoleInfo> roleMappings) {
         Collection<ProductRoleMappingsResource> resource = null;

@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
 import lombok.Getter;
 import lombok.Setter;
 

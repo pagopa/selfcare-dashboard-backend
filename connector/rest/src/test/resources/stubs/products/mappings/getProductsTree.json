@@ -1,0 +1,42 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/products/tree"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": [
+      {
+        "node": {
+          "logo": "products logo",
+          "title": "products title",
+          "description": "products description",
+          "urlPublic": "urlPublic",
+          "urlBO": "urlBO",
+          "activationDateTime": "2021-10-29T12:51:11.104Z"
+        },
+        "children": [
+          {
+            "logo": "products logo",
+            "title": "products title",
+            "description": "products description",
+            "urlPublic": "urlPublic",
+            "urlBO": "urlBO",
+            "activationDateTime": "2021-10-29T12:51:11.104Z"
+          },
+          {
+            "logo": "products logo",
+            "title": "products title",
+            "description": "products description",
+            "urlPublic": "urlPublic",
+            "urlBO": "urlBO",
+            "activationDateTime": "2021-10-29T12:51:11.104Z"
+          }
+        ]
+      }
+    ],
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -4,8 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.dashboard.core.ProductService;
-import it.pagopa.selfcare.dashboard.web.model.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,5 +43,12 @@ public class ProductController {
 
         return result;
     }
+
+//    @GetMapping(value = "")
+//    @ResponseStatus(HttpStatus.OK)
+//    @ApiOperation(value = "", notes = "")
+//    public Collection<> getActiveSubProducts(){
+//
+//    }
 
 }

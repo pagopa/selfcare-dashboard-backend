@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
@@ -15,7 +15,7 @@ import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
-    private static final Product PRODUCT = TestUtils.mockInstance(new Product());
+    private static final ProductTree PRODUCT = TestUtils.mockInstance(new ProductTree());
 
     @Autowired
     protected MockMvc mvc;

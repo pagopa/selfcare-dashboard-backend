@@ -6,14 +6,19 @@ import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -166,7 +171,7 @@ public class InstitutionController {
         log.trace("getInstitutionProducts start");
         log.debug("getInstitutionProducts institutionId = {}", institutionId);
 
-        List<Product> products = institutionService.getInstitutionProducts(institutionId);
+        List<ProductTree> products = institutionService.getInstitutionProducts(institutionId);
         List<ProductsResource> result = products.stream()
                 .map(ProductsMapper::toResource)
                 .collect(Collectors.toList());
@@ -228,5 +233,6 @@ public class InstitutionController {
         institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
         log.trace("createInstitutionProductUser end");
     }
+
 
 }
