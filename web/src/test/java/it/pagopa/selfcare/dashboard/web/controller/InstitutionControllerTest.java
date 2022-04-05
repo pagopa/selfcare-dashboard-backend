@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
@@ -47,7 +48,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
-    private static final ProductTree PRODUCT = TestUtils.mockInstance(new ProductTree());
+    private static final ProductTree PRODUCT;
+
+    static {
+        PRODUCT = TestUtils.mockInstance(new ProductTree());
+        PRODUCT.setChildren(List.of(TestUtils.mockInstance(new Product())));
+    }
 
     @Autowired
     protected MockMvc mvc;
@@ -175,6 +181,7 @@ class InstitutionControllerTest {
                 });
         assertNotNull(products);
         assertFalse(products.isEmpty());
+        assertEquals(1, products.get(0).getChildren().size());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
                 .getInstitutionProducts(institutionId);
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
