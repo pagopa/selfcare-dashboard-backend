@@ -1324,15 +1324,15 @@
           },
           "id" : {
             "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+            "description": "Institution's unique identifier (i.e.: IPA code)"
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
           "status": {
             "type": "string",
@@ -1366,15 +1366,15 @@
           },
           "email": {
             "type": "string",
-            "description" : "User's email"
+            "description": "User's email"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
           },
           "name" : {
             "type" : "string",
@@ -1382,15 +1382,18 @@
           },
           "products" : {
             "type" : "array",
-            "description" : "Authorized user products",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductInfoResource"
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
             }
           },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
           "status": {
             "type": "string",
@@ -1466,12 +1469,12 @@
             "description": "User's unique identifier"
           },
           "name": {
-            "type" : "string",
-            "description" : "User's name"
+            "type": "string",
+            "description": "User's name"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
@@ -1592,15 +1595,15 @@
             "type": "string",
             "description": "User's email"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
-          "product" : {
+          "product": {
             "description" : "Authorized user product",
             "$ref" : "#/components/schemas/ProductInfoResource"
           },

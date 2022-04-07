@@ -93,14 +93,14 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getInstitutionRelationships_fullyValued() {
         // given
-        String institutionId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
+        String externalId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
         EnumSet<PartyRole> roles = null;
         EnumSet<RelationshipState> states = null;
         Set<String> products = null;
         Set<String> productRole = null;
         String userId = null;
         // when
-        RelationshipsResponse response = restClient.getUserInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
+        RelationshipsResponse response = restClient.getUserInstitutionRelationships(externalId, roles, states, products, productRole, userId);
         // then
         assertNotNull(response);
         assertFalse(response.isEmpty());
@@ -124,14 +124,14 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getInstitutionRelationships_fullyNull() {
         // given
-        String institutionId = testCase2instIdMap.get(TestCase.FULLY_NULL);
+        String externalId = testCase2instIdMap.get(TestCase.FULLY_NULL);
         EnumSet<PartyRole> roles = null;
         EnumSet<RelationshipState> states = null;
         Set<String> products = null;
         Set<String> productRole = null;
         String userId = null;
         // when
-        RelationshipsResponse response = restClient.getUserInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
+        RelationshipsResponse response = restClient.getUserInstitutionRelationships(externalId, roles, states, products, productRole, userId);
         // then
         assertNotNull(response);
         assertFalse(response.isEmpty());
@@ -146,14 +146,14 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getInstitutionRelationships_emptyResult() {
         // given
-        String institutionId = testCase2instIdMap.get(TestCase.EMPTY_RESULT);
+        String externalId = testCase2instIdMap.get(TestCase.EMPTY_RESULT);
         EnumSet<PartyRole> roles = EnumSet.of(MANAGER, OPERATOR);
         EnumSet<RelationshipState> states = EnumSet.of(ACTIVE, PENDING);
         Set<String> products = Set.of("prod1", "prod2");
         Set<String> productRole = Set.of("api", "security");
         String userId = "userId";
         // when
-        RelationshipsResponse response = restClient.getUserInstitutionRelationships(institutionId, roles, states, products, productRole, userId);
+        RelationshipsResponse response = restClient.getUserInstitutionRelationships(externalId, roles, states, products, productRole, userId);
 
         // then
         assertNotNull(response);
@@ -350,9 +350,9 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getInstitutionByExternalId_fullyValued() {
         // given
-        String institutionId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
+        String externalId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
         // when
-        Institution response = restClient.getInstitutionByExternalId(institutionId);
+        Institution response = restClient.getInstitutionByExternalId(externalId);
         assertNotNull(response);
         assertNotNull(response.getAddress());
         assertNotNull(response.getDescription());
@@ -367,9 +367,9 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getInstitutionByExternalId_fullyNull() {
         // given
-        String institutionId = testCase2instIdMap.get(TestCase.FULLY_NULL);
+        String externalId = testCase2instIdMap.get(TestCase.FULLY_NULL);
         // when
-        Institution response = restClient.getInstitutionByExternalId(institutionId);
+        Institution response = restClient.getInstitutionByExternalId(externalId);
         assertNotNull(response);
         assertNull(response.getAddress());
         assertNull(response.getDescription());
