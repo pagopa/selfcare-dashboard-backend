@@ -41,6 +41,7 @@ public class RelationshipInfo {
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
+    //FIXME
     public String getEmail() {
         if (institutionContacts != null) {
             for (Map.Entry<String, List<InstitutionContact>> e : institutionContacts.entrySet()) {
