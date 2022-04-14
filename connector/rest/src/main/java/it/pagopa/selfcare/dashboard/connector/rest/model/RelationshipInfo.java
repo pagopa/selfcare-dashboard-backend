@@ -32,7 +32,7 @@ public class RelationshipInfo {
     private String surname;
     private String taxCode;
     private Certification certification;
-    //    private Map<String, InstitutionContact> institutionContacts;
+    //FIXME private Map<String, InstitutionContact> institutionContacts;
     private Map<String, List<InstitutionContact>> institutionContacts;
     private String email;
     private PartyRole role;
