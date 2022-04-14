@@ -84,9 +84,9 @@ class NotificationServiceImplTest {
 
     private static Stream<Arguments> getRelationshipBasedNotificationArgumentsProvider() {
         return Stream.of(
-                Arguments.of("ACTIVATE", "activate_referent.ftlh", "User has been activated", (BiConsumer<NotificationService, String>) NotificationService::sendActivatedUserNotification),
-                Arguments.of("DELETE", "delete_referent.ftlh", "User had been deleted", (BiConsumer<NotificationService, String>) NotificationService::sendDeletedUserNotification),
-                Arguments.of("SUSPEND", "suspend_referent.ftlh", "User has been suspended", (BiConsumer<NotificationService, String>) NotificationService::sendSuspendedUserNotification)
+                Arguments.of("ACTIVATE", "user_activated.ftlh", "User has been activated", (BiConsumer<NotificationService, String>) NotificationService::sendActivatedUserNotification),
+                Arguments.of("DELETE", "user_deleted.ftlh", "User had been deleted", (BiConsumer<NotificationService, String>) NotificationService::sendDeletedUserNotification),
+                Arguments.of("SUSPEND", "user_suspended.ftlh", "User has been suspended", (BiConsumer<NotificationService, String>) NotificationService::sendSuspendedUserNotification)
         );
     }
 
@@ -279,7 +279,7 @@ class NotificationServiceImplTest {
         Mockito.verify(partyConnector, Mockito.times(1))
                 .getInstitutionByExternalId(institutionExternalId);
         Mockito.verify(freemarkerConfig, Mockito.times(1))
-                .getTemplate("add_referent.ftlh");
+                .getTemplate("user_added.ftlh");
         Mockito.verify(notificationConnector, Mockito.times(1))
                 .sendNotificationToUser(Mockito.any());
     }
@@ -310,7 +310,7 @@ class NotificationServiceImplTest {
         Mockito.verify(partyConnector, Mockito.times(1))
                 .getInstitutionByExternalId(institutionExternalId);
         Mockito.verify(freemarkerConfig, Mockito.times(1))
-                .getTemplate("add_referent.ftlh");
+                .getTemplate("user_added.ftlh");
         Mockito.verify(notificationConnector, Mockito.times(1))
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
