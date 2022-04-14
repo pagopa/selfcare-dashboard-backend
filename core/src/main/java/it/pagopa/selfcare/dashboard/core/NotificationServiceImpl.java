@@ -34,10 +34,10 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String DELETE_SUBJECT = "User had been deleted";
     private static final String SUSPEND_SUBJECT = "User has been suspended";
     private static final String CREATE_SUBJECT = "A new user has been added";
-    private static final String ACTIVATE_TEMPLATE = "activate_referent.ftlh";
-    private static final String DELETE_TEMPLATE = "delete_referent.ftlh";
-    private static final String SUSPEND_TEMPLATE = "suspend_referent.ftlh";
-    private static final String CREATE_TEMPLATE = "add_referent.ftlh";
+    private static final String ACTIVATE_TEMPLATE = "user_activated.ftlh";
+    private static final String DELETE_TEMPLATE = "user_deleted.ftlh";
+    private static final String SUSPEND_TEMPLATE = "user_suspended.ftlh";
+    private static final String CREATE_TEMPLATE = "user_added.ftlh";
 
     private final Configuration freemarkerConfig;
     private final NotificationServiceConnector notificationConnector;

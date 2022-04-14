@@ -567,8 +567,14 @@ class PartyConnectorImplTest {
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
+        //FIXME
+        InstitutionContact institutionContactMock = TestUtils.mockInstance(new InstitutionContact());
+        Map<String, List<InstitutionContact>> institutionContact = new HashMap<>();
+        institutionContact.put("institutionContact", List.of(institutionContactMock));
+        relationshipInfo1.setInstitutionContacts(institutionContact);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
+        relationshipInfo2.setInstitutionContacts(institutionContact);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
         relationshipsResponse.add(relationshipInfo1);
         relationshipsResponse.add(relationshipInfo2);
@@ -611,7 +617,11 @@ class PartyConnectorImplTest {
 
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo1.setFrom(relationshipId);
-
+        //FIXME
+        InstitutionContact institutionContactMock = TestUtils.mockInstance(new InstitutionContact());
+        Map<String, List<InstitutionContact>> institutionContact = new HashMap<>();
+        institutionContact.put("institutionContact", List.of(institutionContactMock));
+        relationshipInfo1.setInstitutionContacts(institutionContact);
         Mockito.when(restClientMock.getRelationship(Mockito.anyString()))
                 .thenReturn(relationshipInfo1);
         // when
