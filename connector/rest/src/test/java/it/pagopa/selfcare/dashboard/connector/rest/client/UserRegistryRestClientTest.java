@@ -3,9 +3,10 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
+import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserRegistryRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
@@ -20,11 +21,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumSet;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestPropertySource(
         locations = "classpath:config/user-registry-rest-client.properties",
@@ -63,15 +64,10 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     @Test
     void userUpdate() {
         //given
-        UserRequestDto userRequestDto = new UserRequestDto();
         UUID id = UUID.randomUUID();
-        Map<String, Object> cFields = new HashMap<>();
-        cFields.put("name", "name");
-        cFields.put("surname", "surname");
-        cFields.put("institutionContacts.institutionId.email", "email");
-        userRequestDto.setCFields(cFields);
+        MutableUserFieldsDto mutableUserFieldsDto = TestUtils.mockInstance(new MutableUserFieldsDto());
         //when
-        Executable executable = () -> restClient.patchUser(id, userRequestDto);
+        Executable executable = () -> restClient.patchUser(id, mutableUserFieldsDto);
         //then
         assertDoesNotThrow(executable);
     }
@@ -79,17 +75,14 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getUserByInternalId() {
         //given
-        String userId = "userId";
+        UUID userId = UUID.randomUUID();
         //when
-        UserResponse response = restClient.getUserByInternalId(userId);
+        UserResource response = restClient.getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
         //then
         Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getCertification());
         Assertions.assertNotNull(response.getId());
-        Assertions.assertNotNull(response.getName());
-        Assertions.assertNotNull(response.getExtras());
-        Assertions.assertNotNull(response.getSurname());
-        Assertions.assertNotNull(response.getExternalId());
+        Assertions.assertNotNull(response.getName().getValue());
+        assertNotNull(response.getFamilyName().getValue());
     }
 
 

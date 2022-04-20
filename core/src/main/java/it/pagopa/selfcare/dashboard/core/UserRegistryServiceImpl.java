@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
+import it.pagopa.selfcare.dashboard.core.model.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,11 @@ public class UserRegistryServiceImpl implements UserRegistryService {
     }
 
     @Override
-    public User getUserByExternalId(String externalId) {
+    public User search(String externalId) {
         log.trace("getUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", externalId);
         Assert.hasText(externalId, "A TaxCode is required");
-        User result = userConnector.getUserByExternalId(externalId);
+        User result = userConnector.search(externalId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}", result);
         log.trace("getUser end");
         return result;
@@ -39,7 +40,7 @@ public class UserRegistryServiceImpl implements UserRegistryService {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "updateUser id = {}, institutionId = {}, userDto = {}", id, institutionId, userDto);
         Assert.notNull(id, "UUID is required");
         Assert.hasText(institutionId, "An institutionId is required");
-        userConnector.saveUser(id, institutionId, userDto);
+        userConnector.updateUser(id, institutionId, UserMapper.map(userDto));
         log.trace("updateUser end");
     }
 

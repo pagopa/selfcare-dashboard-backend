@@ -70,8 +70,8 @@ public class GroupMapper {
         if (model != null) {
             resource = new PlainUserResource();
             resource.setId(model.getId());
-            resource.setName(model.getName());
-            resource.setSurname(model.getSurname());
+            resource.setName(model.getName().getValue());
+            resource.setSurname(model.getFamilyName().getValue());
             return resource;
         }
         return null;

@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,6 @@ public class UserMapper {
                     .collect(Collectors.toList())
             );
         }
-
         return resource;
     }
 
@@ -44,13 +44,34 @@ public class UserMapper {
         UserResource resource = null;
         if (model != null) {
             resource = new UserResource();
-            resource.setCertification(model.isCertification());
-            resource.setName(model.getName());
-            resource.setEmail(model.getEmail());
-            resource.setSurname(model.getSurname());
+            resource.setId(UUID.fromString(model.getId()));
             resource.setFiscalCode(model.getFiscalCode());
+            resource.setName(map(model.getName()));
+            resource.setFamilyName(map(model.getFamilyName()));
+            resource.setEmail(map(model.getEmail()));
+            resource.setWorkContact(model.getWorkContact());
         }
         return resource;
+    }
+
+    public static CertifiableFieldResource<String> map(String certifiableField, Certification certification) {
+        CertifiableFieldResource<String> resource = null;
+        if (certifiableField != null) {
+            resource = new CertifiableFieldResource<>();
+            resource.setValue(certifiableField);
+            resource.setCertification(Certification.valueOf(certification.toString()));
+        }
+        return resource;
+    }
+
+    private static <T> CertifiableFieldResource<T> map(CertifiableField<T> certifiableField) {
+        CertifiableFieldResource<T> certifiableFieldResource = null;
+        if (certifiableField != null) {
+            certifiableFieldResource = new CertifiableFieldResource<>();
+            certifiableFieldResource.setValue(certifiableField.getValue());
+            certifiableFieldResource.setCertification(certifiableField.getCertification());
+        }
+        return certifiableFieldResource;
     }
 
     public static InstitutionUserResource toInstitutionUser(UserInfo model) {
@@ -111,7 +132,6 @@ public class UserMapper {
         return resource;
     }
 
-
     public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto) {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = null;
         if (dto != null) {
@@ -139,8 +159,8 @@ public class UserMapper {
             model = new UserDto();
             model.setEmail(userDto.getEmail());
             model.setName(userDto.getName());
-            model.setSurname(userDto.getSurname());
-            model.setFiscalCode(userDto.getFiscalCode());
+            model.setFamilyName(userDto.getSurname());
+//            model.setFiscalCode(userDto.getFiscalCode());
         }
         return model;
     }

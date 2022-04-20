@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -141,15 +142,15 @@ class UserMapperTest {
     @Test
     void toUserResource_notNull() {
         //given
-        User model = TestUtils.mockInstance(new User());
+        User model = TestUtils.mockInstance(new User(), "setId");
+        model.setId(UUID.randomUUID().toString());
         //when
         UserResource resource = UserMapper.toUserResource(model);
         //then
-        assertEquals(model.getEmail(), resource.getEmail());
-        assertEquals(model.getName(), resource.getName());
-        assertEquals(model.getSurname(), resource.getSurname());
-        assertEquals(model.isCertification(), resource.isCertification());
-        TestUtils.reflectionEqualsByName(resource, model);
+        assertEquals(model.getId(), resource.getId().toString());
+        assertEquals(model.getEmail().getValue(), resource.getEmail().getValue());
+        assertEquals(model.getName().getValue(), resource.getName().getValue());
+        assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());
     }
 
     @Test

@@ -58,7 +58,7 @@ class UserControllerTest {
         EmbeddedExternalIdDto externalIdDto = new EmbeddedExternalIdDto();
         externalIdDto.setExternalId(externalId);
         User user = TestUtils.mockInstance(new User());
-        Mockito.when(userRegistryServiceMock.getUserByExternalId(Mockito.anyString()))
+        Mockito.when(userRegistryServiceMock.search(Mockito.anyString()))
                 .thenReturn(user);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -73,7 +73,7 @@ class UserControllerTest {
         UserResource userResponse = mapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
         Assertions.assertNotNull(userResponse);
         Mockito.verify(userRegistryServiceMock, Mockito.times(1))
-                .getUserByExternalId(externalId);
+                .search(externalId);
         Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
     }
 

@@ -32,18 +32,18 @@ public class UserController {
         this.userRegistryService = userRegistryService;
     }
 
-    @PostMapping(value = "/external-id")
+    @PostMapping(value = "/search")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByExternalId}")
-    public UserResource getUserByExternalId(@ApiParam("${swagger.dashboard.user.model.externalId}")
-                                            @RequestBody
-                                                    EmbeddedExternalIdDto externalId,
-                                            @ApiParam("${swagger.dashboard.institutions.model.id}")
-                                            @RequestParam(value = "institutionId")
-                                                    String institutionId) {
+    public UserResource search(@ApiParam("${swagger.dashboard.user.model.externalId}")
+                               @RequestBody
+                                       EmbeddedExternalIdDto externalId,
+                               @ApiParam("${swagger.dashboard.institutions.model.id}")
+                               @RequestParam(value = "institutionId")
+                                       String institutionId) {
         log.trace("getUserByExternalId start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}" , externalId);
-        User user = userRegistryService.getUserByExternalId(externalId.getExternalId());
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
+        User user = userRegistryService.search(externalId.getExternalId());
         UserResource result = UserMapper.toUserResource(user);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
         log.trace("getUserByExternalId end");

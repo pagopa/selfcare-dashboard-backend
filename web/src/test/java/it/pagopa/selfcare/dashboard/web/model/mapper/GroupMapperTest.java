@@ -138,14 +138,13 @@ class GroupMapperTest {
         assertEquals(model.getProductId(), resource.getProductId());
         assertEquals(model.getStatus(), resource.getStatus());
         assertEquals(model.getCreatedAt(), resource.getCreatedAt());
-        assertEquals(model.getCreatedBy().getName(), resource.getCreatedBy().getName());
-        assertEquals(model.getCreatedBy().getSurname(), resource.getCreatedBy().getSurname());
+        assertEquals(model.getCreatedBy().getName().getValue(), resource.getCreatedBy().getName());
+        assertEquals(model.getCreatedBy().getFamilyName().getValue(), resource.getCreatedBy().getSurname());
         assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().getId());
         assertEquals(model.getModifiedAt(), resource.getModifiedAt());
         assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().getId());
-        assertEquals(model.getModifiedBy().getName(), resource.getModifiedBy().getName());
-        assertEquals(model.getModifiedBy().getSurname(), resource.getModifiedBy().getSurname());
-        TestUtils.reflectionEqualsByName(resource, model);
+        assertEquals(model.getModifiedBy().getName().getValue(), resource.getModifiedBy().getName());
+        assertEquals(model.getModifiedBy().getFamilyName().getValue(), resource.getModifiedBy().getSurname());
     }
 
     @Test
@@ -175,7 +174,6 @@ class GroupMapperTest {
         assertEquals(productInfo.getRoleInfos().get(0).getSelcRole(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getSelcRole());
         assertEquals(productInfo.getRoleInfos().get(0).getRelationshipId(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getRelationshipId());
         assertEquals(productInfo.getRoleInfos().get(0).getStatus(), resource.getMembers().get(0).getProduct().getRoleInfos().get(0).getStatus());
-        TestUtils.reflectionEqualsByName(resource, model);
 
     }
 
@@ -207,7 +205,6 @@ class GroupMapperTest {
         assertEquals(model.getMembers().get(0).getEmail(), resource.getMembers().get(0).getEmail());
         assertEquals(model.getMembers().get(0).getRole(), resource.getMembers().get(0).getRole());
         assertEquals(model.getMembers().get(0).getStatus(), resource.getMembers().get(0).getStatus());
-        TestUtils.reflectionEqualsByName(resource, model);
     }
 
     @Test

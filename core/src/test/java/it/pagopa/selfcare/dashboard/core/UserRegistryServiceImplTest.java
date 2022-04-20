@@ -31,14 +31,14 @@ class UserRegistryServiceImplTest {
         //given
         String externalId = "externalId";
         User expectedUser = new User();
-        Mockito.when(userConnectorMock.getUserByExternalId(Mockito.any()))
+        Mockito.when(userConnectorMock.search(Mockito.any()))
                 .thenReturn(expectedUser);
         //when
-        User user = userRegistryService.getUserByExternalId(externalId);
+        User user = userRegistryService.search(externalId);
         //then
         assertSame(expectedUser, user);
         Mockito.verify(userConnectorMock, Mockito.times(1))
-                .getUserByExternalId(externalId);
+                .search(externalId);
         Mockito.verifyNoMoreInteractions(userConnectorMock);
     }
 
@@ -48,7 +48,7 @@ class UserRegistryServiceImplTest {
         //given
         String externalId = null;
         //when
-        Executable executable = () -> userRegistryService.getUserByExternalId(externalId);
+        Executable executable = () -> userRegistryService.search(externalId);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
@@ -66,7 +66,7 @@ class UserRegistryServiceImplTest {
         //then
         assertDoesNotThrow(executable);
         Mockito.verify(userConnectorMock, Mockito.times(1))
-                .saveUser(Mockito.any(), Mockito.anyString(), Mockito.any());
+                .updateUser(Mockito.any(), Mockito.anyString(), Mockito.any());
         Mockito.verifyNoMoreInteractions(userConnectorMock);
     }
 

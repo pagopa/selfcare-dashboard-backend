@@ -8,11 +8,12 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,16 +33,9 @@ class UserResourceTest {
     void validateNullFields() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("name", NotBlank.class);
-        toCheckMap.put("surname", NotBlank.class);
-        toCheckMap.put("email", NotBlank.class);
-        toCheckMap.put("certification", NotBlank.class);
+        toCheckMap.put("id", NotNull.class);
 
         UserResource userResource = new UserResource();
-        userResource.setName(null);
-        userResource.setEmail(null);
-        userResource.setCertification(false);
-        userResource.setSurname(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(userResource);
@@ -58,6 +52,7 @@ class UserResourceTest {
     @Test
     void validateNotNullFields() {
         // given
+        USER_RESOURCE.setId(UUID.randomUUID());
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(USER_RESOURCE);
         // then

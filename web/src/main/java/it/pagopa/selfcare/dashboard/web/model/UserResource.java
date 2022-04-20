@@ -1,31 +1,33 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import it.pagopa.selfcare.dashboard.connector.model.user.CertifiableFieldResource;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
+
+import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Data
+@FieldNameConstants(asEnum = true)
 public class UserResource {
 
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
+    @NotNull
+    private UUID id;
+
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
-    @JsonProperty(required = true)
-    private String name;
+    private CertifiableFieldResource<String> name;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}", required = true)
-    @JsonProperty(required = true)
-    private String surname;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.certification}", required = true)
-    @JsonProperty(required = true)
-    private boolean certification;
+    private CertifiableFieldResource<String> familyName;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.email}", required = true)
-    @JsonProperty(required = true)
-    private String email;
+    private CertifiableFieldResource<String> email;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
-    @JsonProperty(required = true)
     private String fiscalCode;
 
-
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.workContact}")
+    private CertifiableFieldResource<String> workContact;
 }
