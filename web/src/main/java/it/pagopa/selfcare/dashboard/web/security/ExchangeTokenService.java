@@ -6,16 +6,21 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
+import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,12 +37,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ExchangeTokenService {
 
-    private static final String ISSUER = "api.selfcare.pagopa.it";
     private static final String PRIVATE_KEY_HEADER_TEMPLATE = "-----BEGIN %s-----";
     private static final String PRIVATE_KEY_FOOTER_TEMPLATE = "-----END %s-----";
 
@@ -46,16 +51,22 @@ public class ExchangeTokenService {
     private final Duration duration;
     private final String kid;
     private final InstitutionService institutionService;
-
+    private final UserGroupService groupService;
+    private final String issuer;
 
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
+                                UserGroupService groupService,
                                 @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
                                 @Value("${jwt.exchange.duration}") String duration,
-                                @Value("${jwt.exchange.kid}") String kid) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                @Value("${jwt.exchange.kid}") String kid,
+                                @Value("${jwt.exchange.issuer}") String issuer
+    ) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.institutionService = institutionService;
+        this.groupService = groupService;
         this.jwtSigningKey = getPrivateKey(jwtSigningKey);
+        this.issuer = issuer;
         this.duration = Duration.parse(duration);
         this.kid = kid;
     }
@@ -63,7 +74,7 @@ public class ExchangeTokenService {
 
     public String exchange(String institutionId, String productId, String realm) {
         log.trace("exchange start");
-        log.debug("exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -80,10 +91,12 @@ public class ExchangeTokenService {
         Assert.notNull(selcClaims, "Session token claims is required");
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         Assert.notNull(institutionInfo, "Institution info is required");
+        SelfCareUser principal = (SelfCareUser) authentication.getPrincipal();
+        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(UUID.fromString(principal.getId())), Pageable.unpaged());
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setAudience(realm);
-        claims.setIssuer(ISSUER);
+        claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setTaxCode(institutionInfo.getTaxCode());
@@ -92,14 +105,19 @@ public class ExchangeTokenService {
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-
+        if (!groupInfos.isEmpty()) {
+            List<String> groupIds = groupInfos.stream()
+                    .map(UserGroupInfo::getId)
+                    .collect(Collectors.toList());
+            claims.setGroupIds(groupIds);
+        }
         String result = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .compact();
-        log.debug("Exchanged claims = {}", claims);
-        log.debug("Exchanged token = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", result);
         log.trace("exchange end");
         return result;
     }
@@ -148,10 +166,10 @@ public class ExchangeTokenService {
         private String role;
     }
 
-
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
+        public static final String GROUP_IDS = "groups";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
@@ -167,6 +185,10 @@ public class ExchangeTokenService {
             return this;
         }
 
+        public Claims setGroupIds(List<String> groupIds) {
+            setValue(GROUP_IDS, groupIds);
+            return this;
+        }
     }
 
 }

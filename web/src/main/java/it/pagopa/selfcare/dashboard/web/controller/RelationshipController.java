@@ -31,12 +31,12 @@ public class RelationshipController {
     public void suspendRelationship(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
                                     @PathVariable("relationshipId")
                                             String relationshipId) {
-        if (log.isDebugEnabled()) {
-            log.trace("suspendUser");
-            log.debug("suspendUser relationshipId = {}", relationshipId);
-        }
 
+        log.trace("suspendUser start");
+        log.debug("suspendUser relationshipId = {}", relationshipId);
         relationshipService.suspend(relationshipId);
+        log.trace("suspendUser end");
+
     }
 
 
@@ -46,12 +46,25 @@ public class RelationshipController {
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
                                      @PathVariable("relationshipId")
                                              String relationshipId) {
-        if (log.isDebugEnabled()) {
-            log.trace("activateUser");
-            log.debug("activateUser relationshipId = {}", relationshipId);
-        }
 
+        log.trace("activateUser start");
+        log.debug("activateUser relationshipId = {}", relationshipId);
         relationshipService.activate(relationshipId);
+        log.trace("activateUser end");
+
     }
+
+    @DeleteMapping(value = "/{relationshipId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
+    public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
+                                       @PathVariable("relationshipId")
+                                               String relationshipId) {
+        log.trace("deleteUser start");
+        log.debug("deleteUser relationshipId = {}", relationshipId);
+        relationshipService.delete(relationshipId);
+        log.trace("deleteUser end");
+    }
+
 
 }

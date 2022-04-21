@@ -6,4 +6,6 @@ public interface RelationshipService {
 
     void activate(String relationshipId);
 
+    void delete(String relationshipId);
+
 }

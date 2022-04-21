@@ -15,14 +15,13 @@ package it.pagopa.selfcare.dashboard.web.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Getter
-@Setter
+@Data
 public class ProductUserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
@@ -30,10 +29,10 @@ public class ProductUserResource {
     @NotBlank
     private String id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.relationshipId}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.certified}", required = true)
     @JsonProperty(required = true)
-    @NotBlank
-    private String relationshipId;
+    @NotNull
+    private boolean certification;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
     @JsonProperty(required = true)
@@ -55,9 +54,16 @@ public class ProductUserResource {
     @NotNull
     private SelfCareAuthority role;
 
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.product}", required = true)
+    @JsonProperty(required = true)
+    @NotNull
+    @Valid
+    private ProductInfoResource product;
+
     @ApiModelProperty(value = "${swagger.dashboard.user.model.status}", required = true)
     @JsonProperty(required = true)
     @NotBlank
     private String status;
+
 
 }

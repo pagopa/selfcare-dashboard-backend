@@ -12,13 +12,11 @@
 
 package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Setter
-@Getter
+@Data
 public class OnboardingRequest {
 
     private String institutionId;

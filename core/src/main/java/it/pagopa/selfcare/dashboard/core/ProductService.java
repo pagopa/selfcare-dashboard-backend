@@ -1,9 +1,12 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import java.util.Collection;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+
+import java.util.Map;
 
 public interface ProductService {
 
-    Collection<String> getProductRoles(String productId);
+    Map<PartyRole, ProductRoleInfo> getProductRoles(String productId);
 
 }

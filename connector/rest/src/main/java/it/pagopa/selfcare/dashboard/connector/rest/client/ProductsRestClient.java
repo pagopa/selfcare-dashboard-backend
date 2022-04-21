@@ -1,7 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,10 @@ public interface ProductsRestClient extends ProductsConnector {
 
     @GetMapping(value = "${rest-client.products.getProductRoleMappings.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    Map<String, List<String>> getProductRoleMappings(@PathVariable("productId") String productId);
+    Map<PartyRole, ProductRoleInfo> getProductRoleMappings(@PathVariable("productId") String productId);
+
+    @GetMapping(value = "${rest-client.products.getProduct.path}")
+    @ResponseBody
+    Product getProduct(@PathVariable("productId") String productId);
 
 }

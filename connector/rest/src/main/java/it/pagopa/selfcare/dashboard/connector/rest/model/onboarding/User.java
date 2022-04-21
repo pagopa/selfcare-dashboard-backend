@@ -12,7 +12,7 @@
 
 package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
-import it.pagopa.selfcare.dashboard.connector.rest.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import lombok.Getter;
 import lombok.Setter;
 

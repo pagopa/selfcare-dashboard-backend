@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.AuthoritiesRetriever;
@@ -32,6 +33,7 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
         Collection<GrantedAuthority> authorities = null;
 
         Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
+
         if (authInfos != null) {
             authorities = authInfos.stream()
                     .map(authInfo -> new SelfCareGrantedAuthority(authInfo.getInstitutionId(), authInfo.getProductRoles().stream()
@@ -42,7 +44,7 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
                     .collect(Collectors.toList());
         }
 
-        log.debug("retrieved authorities = {}", authorities);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "retrieved authorities = {}" , authorities);
         log.trace("retrieveAuthorities end");
         return authorities;
     }
