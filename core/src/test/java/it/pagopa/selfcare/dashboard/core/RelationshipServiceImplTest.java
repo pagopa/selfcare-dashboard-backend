@@ -21,6 +21,12 @@ class RelationshipServiceImplTest {
     @InjectMocks
     private RelationshipServiceImpl relationshipService;
 
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private UserGroupService groupService;
+
 
     @Test
     void suspend_nullRelationshipId() {
@@ -32,6 +38,7 @@ class RelationshipServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
         Mockito.verifyNoInteractions(partyConnectorMock);
+        Mockito.verifyNoInteractions(notificationService);
     }
 
 
@@ -44,6 +51,8 @@ class RelationshipServiceImplTest {
         // then
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .suspend(relationshipId);
+        Mockito.verify(notificationService, Mockito.times(1))
+                .sendSuspendedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -57,6 +66,7 @@ class RelationshipServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
+        Mockito.verifyNoInteractions(notificationService);
         Mockito.verifyNoInteractions(partyConnectorMock);
     }
 
@@ -70,7 +80,36 @@ class RelationshipServiceImplTest {
         // then
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .activate(relationshipId);
+        Mockito.verify(notificationService, Mockito.times(1))
+                .sendActivatedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
+    @Test
+    void delete() {
+        //given
+        String relationshipId = "relationshipId";
+        //when
+        relationshipService.delete(relationshipId);
+        //then
+        Mockito.verify(partyConnectorMock, Mockito.times(1))
+                .delete(relationshipId);
+        Mockito.verify(notificationService, Mockito.times(1))
+                .sendDeletedUserNotification(relationshipId);
+        Mockito.verify(groupService, Mockito.times(1))
+                .deleteMembersByRelationshipId(relationshipId);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock, notificationService, groupService);
+    }
+    @Test
+    void delete_nullRelationshipId() {
+        // given
+        String relationshipId = null;
+        // when
+        Executable executable = () -> relationshipService.delete(relationshipId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("A Relationship id is required", e.getMessage());
+        Mockito.verifyNoInteractions(partyConnectorMock, groupService, partyConnectorMock);
+
+    }
 }

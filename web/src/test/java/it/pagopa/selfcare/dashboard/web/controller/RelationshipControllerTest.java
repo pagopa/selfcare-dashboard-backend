@@ -67,4 +67,22 @@ class RelationshipControllerTest {
         Mockito.verifyNoMoreInteractions(relationshipServiceMock);
     }
 
+    @Test
+    void deleteRelationship() throws Exception {
+        // given
+        String relationshipId = "rel1";
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .delete(BASE_URL + "/{relationshipId}", relationshipId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andReturn();
+        // then
+        assertEquals(0, result.getResponse().getContentLength());
+        Mockito.verify(relationshipServiceMock, Mockito.times(1))
+                .delete(relationshipId);
+        Mockito.verifyNoMoreInteractions(relationshipServiceMock);
+    }
+
 }

@@ -1,14 +1,14 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +30,11 @@ class UserMapperTest {
         // given
         UserInfo model = TestUtils.mockInstance(new UserInfo());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        model.setProducts(List.of(productInfo));
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        model.setProducts(productInfoMap);
         // when
         InstitutionUserResource resource = UserMapper.toInstitutionUser(model);
         // then
@@ -40,12 +44,48 @@ class UserMapperTest {
         assertEquals(model.getEmail(), resource.getEmail());
         assertEquals(model.getRole(), resource.getRole());
         assertEquals(model.getStatus(), resource.getStatus());
-        ProductInfo prodInfo = model.getProducts().iterator().next();
+        ProductInfo prodInfo = model.getProducts().get(productInfo.getId());
         assertEquals(productInfo.getId(), prodInfo.getId());
         assertEquals(productInfo.getTitle(), prodInfo.getTitle());
         TestUtils.reflectionEqualsByName(resource, model);
     }
 
+    @Test
+    void toInstitutionUserDetails() {
+        // given
+        UserInfo model = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        Map<String, ProductInfo> productInfoMap = new HashMap<>();
+        productInfo.setRoleInfos(roleInfos);
+        productInfoMap.put(productInfo.getId(), productInfo);
+        model.setProducts(productInfoMap);
+        // when
+        InstitutionUserDetailsResource resource = UserMapper.toInstitutionUserDetails(model);
+        // then
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getSurname(), resource.getSurname());
+        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getRole(), resource.getRole());
+        assertEquals(model.getStatus(), resource.getStatus());
+        ProductInfo prodInfo = model.getProducts().get(productInfo.getId());
+        assertEquals(productInfo.getId(), prodInfo.getId());
+        assertEquals(productInfo.getTitle(), prodInfo.getTitle());
+        assertEquals(model.getTaxCode(), resource.getFiscalCode());
+        assertEquals(model.isCertified(), resource.isCertification());
+        TestUtils.reflectionEqualsByName(resource, model);
+    }
+
+    @Test
+    void toInstitutionUserDetail_null() {
+        //given
+        UserInfo model = null;
+        //when
+        InstitutionUserDetailsResource resource = UserMapper.toInstitutionUserDetails(model);
+        //then
+        assertNull(resource);
+    }
 
     @Test
     void toProductUser_null() {
@@ -62,11 +102,23 @@ class UserMapperTest {
     void toProductUser_notNull() {
         // given
         UserInfo model = TestUtils.mockInstance(new UserInfo());
+        ProductInfo productMock = TestUtils.mockInstance(new ProductInfo());
+        productMock.setRoleInfos(List.of(TestUtils.mockInstance(new RoleInfo())));
+        Map<String, ProductInfo> product = new HashMap<>();
+        product.put(productMock.getId(), productMock);
+        model.setProducts(product);
+        String id = model.getProducts().keySet().toArray()[0].toString();
+        ProductInfo productInfo = model.getProducts().get(id);
         // when
         ProductUserResource resource = UserMapper.toProductUser(model);
         // then
         assertEquals(model.getId(), resource.getId());
-        assertEquals(model.getRelationshipId(), resource.getRelationshipId());
+        assertEquals(productInfo.getId(), resource.getProduct().getId());
+        assertEquals(productInfo.getTitle(), resource.getProduct().getTitle());
+        assertEquals(productInfo.getRoleInfos().get(0).getRole(), resource.getProduct().getRoleInfos().get(0).getRole());
+        assertEquals(productInfo.getRoleInfos().get(0).getSelcRole(), resource.getProduct().getRoleInfos().get(0).getSelcRole());
+        assertEquals(productInfo.getRoleInfos().get(0).getRelationshipId(), resource.getProduct().getRoleInfos().get(0).getRelationshipId());
+        assertEquals(productInfo.getRoleInfos().get(0).getStatus(), resource.getProduct().getRoleInfos().get(0).getStatus());
         assertEquals(model.getName(), resource.getName());
         assertEquals(model.getSurname(), resource.getSurname());
         assertEquals(model.getEmail(), resource.getEmail());
@@ -75,6 +127,29 @@ class UserMapperTest {
         TestUtils.reflectionEqualsByName(resource, model);
     }
 
+    @Test
+    void toUserResource_null() {
+        // given
+        User model = null;
+        // when
+        UserResource resource = UserMapper.toUserResource(model);
+        // then
+        assertNull(resource);
+    }
+
+    @Test
+    void toUserResource_notNull() {
+        //given
+        User model = TestUtils.mockInstance(new User());
+        //when
+        UserResource resource = UserMapper.toUserResource(model);
+        //then
+        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getName(), resource.getName());
+        assertEquals(model.getSurname(), resource.getSurname());
+        assertEquals(model.isCertification(), resource.isCertification());
+        TestUtils.reflectionEqualsByName(resource, model);
+    }
 
     @Test
     void fromCreateUserDto_null() {
@@ -96,7 +171,27 @@ class UserMapperTest {
         // then
         assertNotNull(model);
         TestUtils.reflectionEqualsByName(model, dto, "partyRole");
-        assertNull(model.getPartyRole());
+    }
+
+    @Test
+    void fromUpdateUserDto_null() {
+        //given
+        UpdateUserDto dto = null;
+        //when
+        UserDto model = UserMapper.fromUpdateUser(dto);
+        //then
+        assertNull(model);
+    }
+
+    @Test
+    void fromUpdateUserDto_notNull() {
+        //given
+        UpdateUserDto dto = TestUtils.mockInstance(new UpdateUserDto());
+        //when
+        UserDto model = UserMapper.fromUpdateUser(dto);
+        //then
+        assertNotNull(model);
+        TestUtils.reflectionEqualsByName(dto, model);
     }
 
 }

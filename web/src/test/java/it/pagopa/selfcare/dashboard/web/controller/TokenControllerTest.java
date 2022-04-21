@@ -62,4 +62,6 @@ class TokenControllerTest {
         Mockito.verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 
+
+
 }

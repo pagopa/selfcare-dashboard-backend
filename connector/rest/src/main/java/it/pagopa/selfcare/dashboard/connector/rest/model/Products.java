@@ -9,6 +9,6 @@ import java.util.List;
 @Setter
 public class Products {
 
-    private List<ProductInfo> products;
+    private List<Product> products;
 
 }

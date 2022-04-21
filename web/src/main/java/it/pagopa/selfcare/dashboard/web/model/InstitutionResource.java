@@ -41,4 +41,5 @@ public class InstitutionResource {
     @JsonProperty(required = true)
     @NotBlank
     private String status;
+
 }

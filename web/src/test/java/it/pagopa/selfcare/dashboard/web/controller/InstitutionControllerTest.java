@@ -9,11 +9,14 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
+import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,11 +38,12 @@ import org.springframework.util.MimeTypeUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class})
+@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class, DashboardExceptionsHandler.class})
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
@@ -80,7 +85,6 @@ class InstitutionControllerTest {
                 .storeInstitutionLogo(Mockito.eq(institutionId), Mockito.any(), Mockito.eq(contentType), Mockito.eq(filename));
         Mockito.verifyNoMoreInteractions(storageServiceMock);
     }
-
 
     @Test
     void getInstitution_institutionInfoNotNull() throws Exception {
@@ -128,7 +132,6 @@ class InstitutionControllerTest {
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
-
     @Test
     void getInstitutions_institutionInfoNotNull() throws Exception {
         // given
@@ -151,7 +154,6 @@ class InstitutionControllerTest {
                 .getInstitutions();
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
-
 
     @Test
     void getInstitutionProducts_notNull() throws Exception {
@@ -207,7 +209,7 @@ class InstitutionControllerTest {
     void getInstitutionUsers_empty() throws Exception {
         // given
         String institutionId = "institutionId";
-        Mockito.when(institutionServiceMock.getInstitutionUsers(Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(institutionServiceMock.getInstitutionUsers(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -224,10 +226,9 @@ class InstitutionControllerTest {
         assertNotNull(products);
         assertTrue(products.isEmpty());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
-                .getInstitutionUsers(institutionId, Optional.empty(), Optional.empty());
+                .getInstitutionUsers(institutionId, Optional.empty(), Optional.empty(), Optional.empty());
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
-
 
     @Test
     void getInstitutionUsers_notEmpty() throws Exception {
@@ -235,13 +236,15 @@ class InstitutionControllerTest {
         String institutionId = "institutionId";
         String productId = "institutionId";
         SelfCareAuthority role = SelfCareAuthority.ADMIN;
-        Mockito.when(institutionServiceMock.getInstitutionUsers(Mockito.any(), Mockito.any(), Mockito.any()))
+        String[] productRole = {"api", "security"};
+        Mockito.when(institutionServiceMock.getInstitutionUsers(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Collections.singletonList(TestUtils.mockInstance(new UserInfo())));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{institutionId}/users", institutionId)
                 .queryParam("role", role.toString())
                 .queryParam("productId", productId)
+                .queryParam("productRoles", productRole)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -254,17 +257,60 @@ class InstitutionControllerTest {
         assertNotNull(products);
         assertFalse(products.isEmpty());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
-                .getInstitutionUsers(institutionId, Optional.of(productId), Optional.of(role));
+                .getInstitutionUsers(institutionId, Optional.of(productId), Optional.of(role), Optional.of(Set.of(productRole)));
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
+    @Test
+    void getInstitutionUser_nullUser() throws Exception {
+        //given
+        String institutionId = "institutionId";
+        String userId = "notFound";
+        Mockito.when(institutionServiceMock.getInstitutionUser(Mockito.any(), Mockito.any()))
+                .thenThrow(ResourceNotFoundException.class);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()))
+                .andReturn();
+        //then
+        Assertions.assertEquals(0, result.getResponse().getContentLength());
+
+    }
+
+    @Test
+    void getInstitutionUser_notNullUser() throws Exception {
+        //given
+        String institutionId = "institutionId";
+        String userId = "notFound";
+        UserInfo userInfo = TestUtils.mockInstance(new UserInfo());
+
+        Mockito.when(institutionServiceMock.getInstitutionUser(Mockito.any(), Mockito.any()))
+                .thenReturn(userInfo);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        //then
+        InstitutionUserResource userResource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionUserResource.class);
+        assertNotNull(userResource);
+        Mockito.verify(institutionServiceMock, Mockito.times(1))
+                .getInstitutionUser(institutionId, userId);
+        Mockito.verifyNoMoreInteractions(institutionServiceMock);
+
+    }
 
     @Test
     void getInstitutionProductUsers_empty() throws Exception {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        Mockito.when(institutionServiceMock.getInstitutionProductUsers(Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(institutionServiceMock.getInstitutionProductUsers(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -281,10 +327,9 @@ class InstitutionControllerTest {
         assertNotNull(products);
         assertTrue(products.isEmpty());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
-                .getInstitutionProductUsers(institutionId, productId, Optional.empty());
+                .getInstitutionProductUsers(institutionId, productId, Optional.empty(), Optional.empty());
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
-
 
     @Test
     void getInstitutionProductUsers_notEmpty() throws Exception {
@@ -292,7 +337,8 @@ class InstitutionControllerTest {
         String institutionId = "institutionId";
         String productId = "productId";
         SelfCareAuthority role = SelfCareAuthority.ADMIN;
-        Mockito.when(institutionServiceMock.getInstitutionProductUsers(Mockito.any(), Mockito.any(), Mockito.any()))
+        String[] productRole = {"api", "security"};
+        Mockito.when(institutionServiceMock.getInstitutionProductUsers(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(Collections.singletonList(TestUtils.mockInstance(new UserInfo())));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -310,7 +356,7 @@ class InstitutionControllerTest {
         assertNotNull(products);
         assertFalse(products.isEmpty());
         Mockito.verify(institutionServiceMock, Mockito.times(1))
-                .getInstitutionProductUsers(institutionId, productId, Optional.of(role));
+                .getInstitutionProductUsers(institutionId, productId, Optional.of(role), Optional.empty());
         Mockito.verifyNoMoreInteractions(institutionServiceMock);
     }
 
@@ -319,7 +365,9 @@ class InstitutionControllerTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        CreateUserDto user = TestUtils.mockInstance(new CreateUserDto());
+        CreateUserDto user = TestUtils.mockInstance(new CreateUserDto(), "setProductRoles");
+        Set<String> productRoles = Set.of("productRole");
+        user.setProductRoles(productRoles);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)

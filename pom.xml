@@ -22,7 +22,7 @@
     <description>Self Care Dashboard Backend</description>
 
     <properties>
-        <selc-commons.version>0.0.1-SNAPSHOT</selc-commons.version>
+        <selc-commons.version>1.3.1</selc-commons.version>
     </properties>
 
     <dependencyManagement>
@@ -65,12 +65,12 @@
             </dependency>
             <dependency>
                 <groupId>it.pagopa.selfcare</groupId>
-                <artifactId>selc-commons-integration-rest</artifactId>
+                <artifactId>selc-commons-connector-rest</artifactId>
                 <version>${selc-commons.version}</version>
             </dependency>
             <dependency>
                 <groupId>it.pagopa.selfcare</groupId>
-                <artifactId>selc-commons-integration-rest</artifactId>
+                <artifactId>selc-commons-connector-rest</artifactId>
                 <version>${selc-commons.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>

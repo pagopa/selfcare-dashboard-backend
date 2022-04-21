@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.io.Serializable;
 import java.util.List;
 
+
 class SelfCarePermissionEvaluatorTest {
 
     private final SelfCarePermissionEvaluator permissionEvaluator = new SelfCarePermissionEvaluator();
@@ -88,7 +89,6 @@ class SelfCarePermissionEvaluatorTest {
         Assertions.assertFalse(hasPermission);
     }
 
-
     @Test
     void hasPermission_withObjectDomain_notPermitted_invalidRole() {
         // given
@@ -105,7 +105,6 @@ class SelfCarePermissionEvaluatorTest {
         Assertions.assertFalse(hasPermission);
     }
 
-
     @Test
     void hasPermission_withObjectDomain_permitted() {
         // given
@@ -121,7 +120,6 @@ class SelfCarePermissionEvaluatorTest {
         // then
         Assertions.assertTrue(hasPermission);
     }
-
 
     @Test
     void hasPermission_withObjectDomain_anyPermittedAsAdmin() {

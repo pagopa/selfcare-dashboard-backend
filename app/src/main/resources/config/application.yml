@@ -20,4 +20,4 @@ info:
 
 logging:
   level:
-    it.pagopa.selfcare.dashboard: ${B4F_DASHBOARD_LOG_LEVEL:DEBUG}
+    it.pagopa.selfcare: ${B4F_DASHBOARD_LOG_LEVEL:DEBUG}

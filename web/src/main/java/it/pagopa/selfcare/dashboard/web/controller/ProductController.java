@@ -4,6 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.dashboard.core.ProductService;
+import it.pagopa.selfcare.dashboard.web.model.ProductRoleMappingsResource;
+import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,15 +32,16 @@ public class ProductController {
     @GetMapping(value = "/{productId}/roles")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductRoles}")
-    public Collection<String> getProductRoles(@ApiParam("${swagger.dashboard.products.model.id}")
-                                              @PathVariable("productId")
-                                                      String productId) {
-        if (log.isDebugEnabled()) {
-            log.trace("ProductController.getProductRoles");
-            log.debug("productId = {}", productId);
-        }
+    public Collection<ProductRoleMappingsResource> getProductRoles(@ApiParam("${swagger.dashboard.products.model.id}")
+                                                                   @PathVariable("productId")
+                                                                           String productId) {
+        log.trace("getProductRoles start");
+        log.debug("productId = {}", productId);
+        Collection<ProductRoleMappingsResource> result = ProductsMapper.toProductRoleMappingsResource(productService.getProductRoles(productId));
+        log.debug("getProductRoles result = {}", result);
+        log.trace("getProductRoles start");
 
-        return productService.getProductRoles(productId);
+        return result;
     }
 
 }

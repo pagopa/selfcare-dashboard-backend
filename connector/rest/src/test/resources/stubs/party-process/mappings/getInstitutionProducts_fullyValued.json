@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/products"
+    "url": "/pdnd-interop-uservice-party-process/0.0.1/external/institutions/institutionId1/products"
   },
   "response": {
     "status": "200",
@@ -9,8 +9,7 @@
       "products": [
         {
           "id": "string",
-          "role": "string",
-          "createdAt": "2021-11-29T19:14:40.712Z"
+          "state": "ACTIVE"
         }
       ]
     },
