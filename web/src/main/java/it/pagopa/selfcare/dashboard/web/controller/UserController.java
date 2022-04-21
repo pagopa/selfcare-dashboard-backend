@@ -4,12 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.core.UserRegistryService;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.UserResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,8 +42,8 @@ public class UserController {
                                        String institutionId) {
         log.trace("getUserByExternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-        User user = userRegistryService.search(externalId.getExternalId());
-        UserResource result = UserMapper.toUserResource(user);
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource user = userRegistryService.search(externalId.getExternalId());
+        UserResource result = UserMapper.toUserResource(user, institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
         log.trace("getUserByExternalId end");
         return result;

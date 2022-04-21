@@ -1,10 +1,16 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
+import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -132,9 +138,10 @@ class UserMapperTest {
     @Test
     void toUserResource_null() {
         // given
-        User model = null;
+        String institutionId = "institutionId";
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = null;
         // when
-        UserResource resource = UserMapper.toUserResource(model);
+        UserResource resource = UserMapper.toUserResource(model, institutionId);
         // then
         assertNull(resource);
     }
@@ -142,12 +149,13 @@ class UserMapperTest {
     @Test
     void toUserResource_notNull() {
         //given
-        User model = TestUtils.mockInstance(new User(), "setId");
-        model.setId(UUID.randomUUID().toString());
+        String institutionId = "institutionId";
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
+        model.setId(UUID.randomUUID());
         //when
-        UserResource resource = UserMapper.toUserResource(model);
+        UserResource resource = UserMapper.toUserResource(model, institutionId);
         //then
-        assertEquals(model.getId(), resource.getId().toString());
+        assertEquals(model.getId(), resource.getId());
         assertEquals(model.getEmail().getValue(), resource.getEmail().getValue());
         assertEquals(model.getName().getValue(), resource.getName().getValue());
         assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());

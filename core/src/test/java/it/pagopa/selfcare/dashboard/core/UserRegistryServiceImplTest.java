@@ -2,8 +2,8 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -30,11 +30,11 @@ class UserRegistryServiceImplTest {
     void getUser() {
         //given
         String externalId = "externalId";
-        User expectedUser = new User();
+        UserResource expectedUser = new UserResource();
         Mockito.when(userConnectorMock.search(Mockito.any()))
                 .thenReturn(expectedUser);
         //when
-        User user = userRegistryService.search(externalId);
+        UserResource user = userRegistryService.search(externalId, );
         //then
         assertSame(expectedUser, user);
         Mockito.verify(userConnectorMock, Mockito.times(1))
@@ -48,7 +48,7 @@ class UserRegistryServiceImplTest {
         //given
         String externalId = null;
         //when
-        Executable executable = () -> userRegistryService.search(externalId);
+        Executable executable = () -> userRegistryService.search(externalId, );
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());

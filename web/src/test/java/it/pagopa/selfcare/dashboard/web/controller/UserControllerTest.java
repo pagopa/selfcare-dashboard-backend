@@ -2,13 +2,12 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
 import it.pagopa.selfcare.dashboard.core.UserRegistryService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.UserResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,13 +50,13 @@ class UserControllerTest {
 
 
     @Test
-    void getUser_notNull() throws Exception {
+    void search_notNull() throws Exception {
         //given
         String externalId = "externalId";
         String institutionId = "institutionId";
         EmbeddedExternalIdDto externalIdDto = new EmbeddedExternalIdDto();
         externalIdDto.setExternalId(externalId);
-        User user = TestUtils.mockInstance(new User());
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource user = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource());
         Mockito.when(userRegistryServiceMock.search(Mockito.anyString()))
                 .thenReturn(user);
         //when

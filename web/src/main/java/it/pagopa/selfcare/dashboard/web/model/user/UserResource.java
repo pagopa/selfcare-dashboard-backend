@@ -1,7 +1,6 @@
-package it.pagopa.selfcare.dashboard.web.model;
+package it.pagopa.selfcare.dashboard.web.model.user;
 
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.dashboard.connector.model.user.CertifiableFieldResource;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 
@@ -27,7 +26,4 @@ public class UserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
     private String fiscalCode;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.workContact}")
-    private CertifiableFieldResource<String> workContact;
 }

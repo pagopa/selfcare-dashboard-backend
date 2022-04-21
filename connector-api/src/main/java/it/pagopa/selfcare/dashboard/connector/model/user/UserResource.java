@@ -1,11 +1,8 @@
-package it.pagopa.selfcare.dashboard.connector.rest.model.user_registry;
+package it.pagopa.selfcare.dashboard.connector.model.user;
 
-import it.pagopa.selfcare.dashboard.connector.model.user.CertifiableFieldResource;
-import it.pagopa.selfcare.dashboard.connector.model.user.WorkContactResource;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
 
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,7 +10,6 @@ import java.util.UUID;
 @FieldNameConstants(asEnum = true)
 public class UserResource {
 
-    @NotNull
     @FieldNameConstants.Exclude
     private UUID id;
     private String fiscalCode;
@@ -21,5 +17,6 @@ public class UserResource {
     private CertifiableFieldResource<String> familyName;
     private CertifiableFieldResource<String> email;
     private Map<String, WorkContactResource> workContacts;
+
 
 }

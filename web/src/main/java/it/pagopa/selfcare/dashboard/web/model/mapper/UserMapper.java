@@ -2,12 +2,13 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
+import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -40,16 +41,17 @@ public class UserMapper {
         return resource;
     }
 
-    public static UserResource toUserResource(User model) {
-        UserResource resource = null;
+    public static it.pagopa.selfcare.dashboard.web.model.user.UserResource toUserResource(UserResource model, String institutionId) {
+        it.pagopa.selfcare.dashboard.web.model.user.UserResource resource = null;
         if (model != null) {
-            resource = new UserResource();
-            resource.setId(UUID.fromString(model.getId()));
+            resource = new it.pagopa.selfcare.dashboard.web.model.user.UserResource();
+            resource.setId(model.getId());
             resource.setFiscalCode(model.getFiscalCode());
-            resource.setName(map(model.getName()));
-            resource.setFamilyName(map(model.getFamilyName()));
-            resource.setEmail(map(model.getEmail()));
-            resource.setWorkContact(model.getWorkContact());
+            resource.setName(toBoleanCertified(model.getName()));
+            resource.setFamilyName(toBoleanCertified(model.getFamilyName()));
+            if (institutionId != null) {
+                resource.setEmail(toBoleanCertified(model.getWorkContacts().get(institutionId).getEmail()));
+            }
         }
         return resource;
     }
@@ -59,19 +61,19 @@ public class UserMapper {
         if (certifiableField != null) {
             resource = new CertifiableFieldResource<>();
             resource.setValue(certifiableField);
-            resource.setCertification(Certification.valueOf(certification.toString()));
+            resource.setCertification(certification);
         }
         return resource;
     }
 
-    private static <T> CertifiableFieldResource<T> map(CertifiableField<T> certifiableField) {
-        CertifiableFieldResource<T> certifiableFieldResource = null;
-        if (certifiableField != null) {
-            certifiableFieldResource = new CertifiableFieldResource<>();
-            certifiableFieldResource.setValue(certifiableField.getValue());
-            certifiableFieldResource.setCertification(certifiableField.getCertification());
+    public static it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldResource<String> toBoleanCertified(CertifiableFieldResource<String> certifiableFieldResource) {
+        it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldResource<String> resource = null;
+        if (certifiableFieldResource != null) {
+            resource = new it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldResource<>();
+            resource.setCertified(Certification.isCertified(certifiableFieldResource.getCertification()));
+            resource.setValue(certifiableFieldResource.getValue());
         }
-        return certifiableFieldResource;
+        return resource;
     }
 
     public static InstitutionUserResource toInstitutionUser(UserInfo model) {
@@ -160,7 +162,7 @@ public class UserMapper {
             model.setEmail(userDto.getEmail());
             model.setName(userDto.getName());
             model.setFamilyName(userDto.getSurname());
-//            model.setFiscalCode(userDto.getFiscalCode());
+            //FIXME
         }
         return model;
     }

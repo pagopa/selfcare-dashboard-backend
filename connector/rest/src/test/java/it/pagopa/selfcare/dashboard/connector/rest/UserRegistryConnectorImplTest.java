@@ -1,11 +1,12 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
+import it.pagopa.selfcare.dashboard.connector.model.user.WorkContactResource;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
@@ -15,8 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import static it.pagopa.selfcare.dashboard.connector.model.user.Certification.NONE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.Certification.SPID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
@@ -34,71 +39,72 @@ class UserRegistryConnectorImplTest {
     private UserRegistryRestClient restClientMock;
 
     @Test
-    void getUserByExternalId_nullInfo_nullCertification() {
+    void search_nullInfo() {
+        //given
+        String externalId = "externalId";
+        UserResource userMock = new UserResource();
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+                .thenReturn(userMock);
+        //when
+        UserResource user = userConnector.search(externalId);
+        ///then
+        assertNull(user.getName());
+        assertNull(user.getFamilyName());
+        assertNull(user.getEmail());
+        assertNull(user.getId());
+        assertNull(user.getWorkContacts());
+        assertNull(user.getFiscalCode());
+        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
+        assertEquals(externalId, externalIdCaptured.getFiscalCode());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void search_nullInfo_nullUserResponse() {
+        //given
+        String externalId = "externalId";
+        UserResource userMock = null;
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+                .thenReturn(userMock);
+        //when
+        UserResource user = userConnector.search(externalId);
+        ///then
+        assertNull(user);
+        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
+        assertEquals(externalId, externalIdCaptured.getFiscalCode());
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+
+    @Test
+    void search_certificationNone() {
         //given
         String externalId = "externalId";
         UserResource userMock = TestUtils.mockInstance(new UserResource());
         userMock.setId(UUID.randomUUID());
+        Map<String, WorkContactResource> workContacts = new HashMap<>();
+        workContacts.put("institutionId", TestUtils.mockInstance(new WorkContactResource()));
+        userMock.setWorkContacts(workContacts);
         Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        User user = userConnector.search(externalId);
+        UserResource user = userConnector.search(externalId);
         ///then
-        assertNull(user.getEmail().getCertification());
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getWorkContact());
-        assertNull(user.getFiscalCode());
+        assertEquals(NONE, user.getName().getCertification());
+        assertEquals(NONE, user.getEmail().getCertification());
+        assertEquals(NONE, user.getFamilyName().getCertification());
+        user.getWorkContacts().forEach((key1, value) -> assertEquals(NONE, value.getEmail().getCertification()));
+        assertNotNull(user.getFiscalCode());
+
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByExternalId(Mockito.eq(EnumSet.of(UserResource.Fields.fiscalCode)), embeddedCaptor.capture());
-        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-        assertEquals(externalId, externalIdCaptured.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(restClientMock);
-    }
-
-    @Test
-    void getUserByExternalId_nullInfo_nullUserResponse() {
-        //given
-        String externalId = "externalId";
-        UserResource userMock = null;
-        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
-                .thenReturn(userMock);
-        //when
-        User user = userConnector.search(externalId);
-        ///then
-        assertNull(user.getEmail());
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getWorkContact());
-        assertNull(user.getFiscalCode());
-        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
-        Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByExternalId(Mockito.eq(EnumSet.of(UserResource.Fields.fiscalCode)), embeddedCaptor.capture());
-        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-        assertEquals(externalId, externalIdCaptured.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(restClientMock);
-    }
-
-    @Test
-    void getUserByExternalId_nullInfo_certificationNone() {
-        //given
-        String externalId = "externalId";
-        UserResource userMock = null;
-        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
-                .thenReturn(userMock);
-        //when
-        User user = userConnector.search(externalId);
-        ///then
-        assertNull(user.getEmail());
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getWorkContact());
-        assertNull(user.getFiscalCode());
-
-        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
-//        Mockito.verify(restClientMock, Mockito.times(1))
-//                .getUserByExternalId(embeddedCaptor.capture());
+                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -106,7 +112,7 @@ class UserRegistryConnectorImplTest {
 
 
     @Test
-    void getUserByExternalId_nullExternalId() {
+    void search_nullExternalId() {
         //given
         String externalId = null;
         //when
@@ -118,22 +124,34 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
-    void getUserByExternalId_certificationNotNone() {
+    void search_certificationNotNone() {
         //given
         String externalId = "externalId";
         UserResource userResourceMock = TestUtils.mockInstance(new UserResource());
-//        userResourceMock.setCertification(Certification.SPID);
-//        Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
-//                .thenReturn(userResourceMock);
+        userResourceMock.getEmail().setCertification(Certification.SPID);
+        userResourceMock.getFamilyName().setCertification(Certification.SPID);
+        userResourceMock.getName().setCertification(Certification.SPID);
+        Map<String, WorkContactResource> workContacts = new HashMap<>();
+        WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
+        workContact.getEmail().setCertification(Certification.SPID);
+        userResourceMock.setWorkContacts(workContacts);
+        workContacts.put("institutionId", workContact);
+        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+                .thenReturn(userResourceMock);
         //when
-        User user = userConnector.search(externalId);
+        UserResource user = userConnector.search(externalId);
         //then
-        assertEquals(userResourceMock.getName(), user.getName());
+        assertEquals(SPID, user.getName().getCertification());
+        assertEquals(SPID, user.getEmail().getCertification());
+        assertEquals(SPID, user.getFamilyName().getCertification());
+        user.getWorkContacts().forEach((key1, value) -> assertEquals(SPID, value.getEmail().getCertification()));
+        assertNotNull(user.getFiscalCode());
 
-//        Mockito.verify(restClientMock, Mockito.times(1))
-//                .getUserByExternalId(embeddedCaptor.capture());
-//        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-//        assertEquals(externalId, externalIdCaptured.getFiscalCode());
+        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
+        assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -145,14 +163,14 @@ class UserRegistryConnectorImplTest {
 //        Mockito.when(restClientMock.getUserByInternalId(Mockito.any()))
 //                .thenReturn(userMock);
         //when
-        User user = userConnector.getUserByInternalId(userId);
+//        User user = userConnector.getUserByInternalId(userId);
         ///then
-        assertNull(user.getId());
-        assertNull(user.getEmail());
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getWorkContact());
-        assertNull(user.getFiscalCode());
+//        assertNull(user.getId());
+//        assertNull(user.getEmail());
+//        assertNull(user.getName());
+//        assertNull(user.getFamilyName());
+//        assertNull(user.getWorkContact());
+//        assertNull(user.getFiscalCode());
 
 //        Mockito.verify(restClientMock, Mockito.times(1))
 //                .getUserByInternalId(Mockito.anyString());
@@ -167,14 +185,14 @@ class UserRegistryConnectorImplTest {
 //        Mockito.when(restClientMock.getUserByInternalId(Mockito.any()))
 //                .thenReturn(userMock);
         //when
-        User user = userConnector.getUserByInternalId(userId);
-        ///then
-        assertNull(user.getId());
-        assertNull(user.getEmail());
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getWorkContact());
-        assertNull(user.getFiscalCode());
+//        User user = userConnector.getUserByInternalId(userId);
+//        ///then
+//        assertNull(user.getId());
+//        assertNull(user.getEmail());
+//        assertNull(user.getName());
+//        assertNull(user.getFamilyName());
+//        assertNull(user.getWorkContact());
+//        assertNull(user.getFiscalCode());
 
 //        Mockito.verify(restClientMock, Mockito.times(1))
 //                .getUserByInternalId(Mockito.any());
@@ -189,14 +207,14 @@ class UserRegistryConnectorImplTest {
 //        Mockito.when(restClientMock.getUserByInternalId(Mockito.any()))
 //                .thenReturn(userMock);
         //when
-        User user = userConnector.getUserByInternalId(userId);
-        ///then
-        assertNull(user.getId());
-        assertNull(user.getEmail());
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getWorkContact());
-        assertNull(user.getFiscalCode());
+//        User user = userConnector.getUserByInternalId(userId);
+//        ///then
+//        assertNull(user.getId());
+//        assertNull(user.getEmail());
+//        assertNull(user.getName());
+//        assertNull(user.getFamilyName());
+//        assertNull(user.getWorkContact());
+//        assertNull(user.getFiscalCode());
 
 //        Mockito.verify(restClientMock, Mockito.times(1))
 //                .getUserByInternalId(Mockito.anyString());
@@ -224,7 +242,7 @@ class UserRegistryConnectorImplTest {
 //        Mockito.when(restClientMock.getUserByExternalId(Mockito.any()))
 //                .thenReturn(userResourceMock);
         //when
-        User user = userConnector.search(externalId);
+        UserResource user = userConnector.getUserByInternalId(externalId);
         //then
         assertEquals(userResourceMock.getId(), user.getId());
         assertEquals(userResourceMock.getName(), user.getName());
