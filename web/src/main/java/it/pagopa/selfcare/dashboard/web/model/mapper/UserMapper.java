@@ -9,7 +9,10 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldBooleanResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,34 @@ public class UserMapper {
         return resource;
     }
 
+    public static SaveUser map(it.pagopa.selfcare.dashboard.web.model.user.UserDto model, String institutionId) {
+        SaveUser resource = null;
+        Map<String, WorkContact> workContact = new HashMap<>();
+        if (model != null) {
+            resource = new SaveUser();
+            resource.setName(model.getName());
+            resource.setEmail(model.getEmail());
+            resource.setFamilyName(model.getSurname());
+            resource.setFiscalCode(model.getFiscalCode());
+            if (institutionId != null) {
+                WorkContact contact = new WorkContact();
+                contact.setEmail(model.getEmail());
+                workContact.put(institutionId, contact);
+                resource.setWorkContacts(workContact);
+            }
+        }
+        return resource;
+    }
+
+    public static UserIdResource toIdResource(UserId model) {
+        UserIdResource resource = null;
+        if (model != null) {
+            resource = new UserIdResource();
+            resource.setId(model.getId());
+        }
+        return resource;
+    }
+
     public static it.pagopa.selfcare.dashboard.web.model.user.UserResource toUserResource(UserResource model, String institutionId) {
         it.pagopa.selfcare.dashboard.web.model.user.UserResource resource = null;
         if (model != null) {
@@ -51,7 +82,8 @@ public class UserMapper {
             resource.setName(toBoleanCertified(model.getName()));
             resource.setFamilyName(toBoleanCertified(model.getFamilyName()));
             if (institutionId != null) {
-                resource.setEmail(toBoleanCertified(model.getWorkContacts().get(institutionId).getEmail()));
+                if (model.getWorkContacts().containsKey(institutionId))
+                    resource.setEmail(toBoleanCertified(model.getWorkContacts().get(institutionId).getEmail()));
             }
         }
         return resource;
@@ -156,16 +188,22 @@ public class UserMapper {
         return model;
     }
 
-    public static UserDto fromUpdateUser(UpdateUserDto userDto) {
-        UserDto model = null;
+    public static UserDto fromUpdateUser(UpdateUserDto userDto, String institutionId) {
+        UserDto resource = null;
+        Map<String, WorkContact> workContact = new HashMap<>();
         if (userDto != null) {
-            model = new UserDto();
-            model.setEmail(userDto.getEmail());
-            model.setName(userDto.getName());
-            model.setFamilyName(userDto.getSurname());
-            //FIXME
+            resource = new UserDto();
+            resource.setName(userDto.getName());
+            resource.setEmail(userDto.getEmail());
+            resource.setFamilyName(userDto.getSurname());
+            if (institutionId != null) {
+                WorkContact contact = new WorkContact();
+                contact.setEmail(userDto.getEmail());
+                workContact.put(institutionId, contact);
+                resource.setWorkContacts(workContact);
+            }
         }
-        return model;
+        return resource;
     }
 
 }

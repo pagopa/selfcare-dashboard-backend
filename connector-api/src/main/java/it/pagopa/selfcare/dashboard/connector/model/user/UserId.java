@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.connector.rest.model.user_registry;
+package it.pagopa.selfcare.dashboard.connector.model.user;
 
 import lombok.Data;
 

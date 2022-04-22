@@ -4,11 +4,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.core.UserRegistryService;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.user.UserDto;
+import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,17 +66,26 @@ public class UserController {
                                    UpdateUserDto updateUserDto) {
         log.trace("updateUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "id = {}, institutionId = {}, userDto = {}", id, institutionId, updateUserDto);
-        userRegistryService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto));
+        userRegistryService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto, institutionId));
         log.trace("updateUser end");
     }
 
     @PostMapping(value = "/save-user")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.saveUser}")
-    public void saveUser(@RequestBody
-                         @Valid
-                                 UserDto userDto) {
-
+    public UserIdResource saveUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                   @RequestParam(value = "institutionId")
+                                           String institutionId,
+                                   @RequestBody
+                                   @Valid
+                                           UserDto userDto) {
+        log.trace("saveUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser userDto = {}", userDto);
+        UserId id = userRegistryService.saveUser(institutionId, UserMapper.map(userDto, institutionId));
+        UserIdResource result = UserMapper.toIdResource(id);
+        log.debug("saveUser result = {}", result);
+        log.trace("saveUser end");
+        return result;
     }
 
     @GetMapping(value = "/{id}")
@@ -85,7 +96,13 @@ public class UserController {
                                             @ApiParam("${swagger.dashboard.institutions.model.id}")
                                             @RequestParam(value = "institutionId")
                                                     String institutionId) {
-        return null;
+        log.trace("getUserByInternalId start");
+        log.debug("getUserByInternalId id = {}, institutionId = {}", id, institutionId);
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource userResource = userRegistryService.getUserByInternalId(id);
+        UserResource result = UserMapper.toUserResource(userResource, institutionId);
+        log.debug("getUserByInternalId result = {}", result);
+        log.trace("getUserByInternalId end");
+        return result;
     }
 
     @DeleteMapping(value = "/{id}")

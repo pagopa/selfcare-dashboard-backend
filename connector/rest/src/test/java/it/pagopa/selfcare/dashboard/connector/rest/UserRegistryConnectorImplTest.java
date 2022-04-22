@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
-import it.pagopa.selfcare.dashboard.connector.model.user.WorkContactResource;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
 import org.junit.jupiter.api.Test;
@@ -274,7 +271,7 @@ class UserRegistryConnectorImplTest {
         UUID id = UUID.randomUUID();
         MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto());
         //when
-        Executable executable = () -> userConnector.updateUser(id, institutionId, userDto);
+        Executable executable = () -> userConnector.updateUser(id, userDto);
         //then
         assertDoesNotThrow(executable);
         ArgumentCaptor<MutableUserFieldsDto> userDtoCaptor = ArgumentCaptor.forClass(MutableUserFieldsDto.class);
@@ -288,31 +285,34 @@ class UserRegistryConnectorImplTest {
     @Test
     void updateUser_nullId() {
         //given
-        String institutionId = "institutionId";
         UUID id = null;
         MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto());
 
         //when
-        Executable executable = () -> userConnector.updateUser(id, institutionId, userDto);
+        Executable executable = () -> userConnector.updateUser(id, userDto);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A UUID is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-
     @Test
-    void updateUser_nullInstitutionId() {
+    void saveUser() {
         //given
-        String institutionId = null;
-        UUID id = UUID.randomUUID();
-        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto());
+        UserId id = TestUtils.mockInstance(new UserId());
+        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto());
+        Mockito.when(restClientMock.saveUser(Mockito.any()))
+                .thenReturn(id);
         //when
-        Executable executable = () -> userConnector.updateUser(id, institutionId, userDto);
+        UserId userId = userConnector.saveUser(saveUserDto);
         //then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("An institutionId is required", e.getMessage());
-        Mockito.verifyNoInteractions(restClientMock);
+        assertEquals(id.getId(), userId.getId());
+        ArgumentCaptor<SaveUserDto> savedDto = ArgumentCaptor.forClass(SaveUserDto.class);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .saveUser(savedDto.capture());
+        SaveUserDto captured = savedDto.getValue();
+        assertSame(saveUserDto, captured);
+        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
 }

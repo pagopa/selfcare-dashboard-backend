@@ -1,10 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.SaveUserDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserId;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

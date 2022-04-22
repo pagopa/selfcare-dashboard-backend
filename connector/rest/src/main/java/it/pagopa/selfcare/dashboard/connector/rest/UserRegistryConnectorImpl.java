@@ -3,6 +3,8 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
@@ -49,12 +51,23 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     }
 
     @Override
-    public void updateUser(UUID id, String institutionId, MutableUserFieldsDto userDto) {
-        log.trace("saveUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser id = {}, institutionId = {}, userDto = {}}", id, institutionId, userDto);
+    public void updateUser(UUID id, MutableUserFieldsDto userDto) {
+        log.trace("update start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "update id = {}, userDto = {}}", id, userDto);
         Assert.notNull(id, "A UUID is required");
-        Assert.hasText(institutionId, "An institutionId is required");
         restClient.patchUser(id, userDto);
-        log.trace("saveUser end");
+        log.trace("update end");
     }
+
+    @Override
+    public UserId saveUser(SaveUserDto dto) {
+        log.trace("saveUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser dto = {}}", dto);
+        UserId userId = restClient.saveUser(dto);
+        log.debug("saveUser result = {}", userId);
+        log.trace("saveUser end");
+        return userId;
+    }
+
+
 }

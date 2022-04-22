@@ -187,8 +187,9 @@ class UserMapperTest {
     void fromUpdateUserDto_null() {
         //given
         UpdateUserDto dto = null;
+        String institutionId = "institutionId";
         //when
-        UserDto model = UserMapper.fromUpdateUser(dto);
+        UserDto model = UserMapper.fromUpdateUser(dto, institutionId);
         //then
         assertNull(model);
     }
@@ -197,11 +198,27 @@ class UserMapperTest {
     void fromUpdateUserDto_notNull() {
         //given
         UpdateUserDto dto = TestUtils.mockInstance(new UpdateUserDto());
+        String institutionId = "institutionId";
         //when
-        UserDto model = UserMapper.fromUpdateUser(dto);
+        UserDto model = UserMapper.fromUpdateUser(dto, institutionId);
         //then
         assertNotNull(model);
+        assertNotNull(model.getWorkContacts());
+        assertEquals(dto.getEmail(), model.getWorkContacts().get(institutionId).getEmail());
+        assertEquals(dto.getEmail(), model.getEmail());
+        assertEquals(dto.getName(), model.getName());
+        assertEquals(dto.getSurname(), model.getFamilyName());
         TestUtils.reflectionEqualsByName(dto, model);
+    }
+
+    @Test
+    void fromUpdateUserDto_nullInstitutionId() {
+        //given
+        UpdateUserDto dto = TestUtils.mockInstance(new UpdateUserDto());
+        //when
+        UserDto model = UserMapper.fromUpdateUser(dto, null);
+        //then
+        assertNull(model.getWorkContacts());
     }
 
 }

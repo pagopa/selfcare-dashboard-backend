@@ -14,7 +14,21 @@ public class UserMapper {
             resource.setEmail(map(model.getEmail(), Certification.NONE));
             resource.setFamilyName(map(model.getFamilyName(), Certification.NONE));
             resource.setName(map(model.getName(), Certification.NONE));
-            resource.setBirthDate(map(model.getBirthDate(), Certification.NONE));
+            resource.setWorkContacts(model.getWorkContacts().entrySet().stream()
+                    .map(entry -> Map.entry(entry.getKey(), map(entry.getValue())))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        }
+        return resource;
+    }
+
+    public static SaveUserDto map(SaveUser model) {
+        SaveUserDto resource = null;
+        if (model != null) {
+            resource = new SaveUserDto();
+            resource.setEmail(map(model.getEmail(), Certification.NONE));
+            resource.setFamilyName(map(model.getFamilyName(), Certification.NONE));
+            resource.setName(map(model.getName(), Certification.NONE));
+            resource.setFiscalCode(model.getFiscalCode());
             resource.setWorkContacts(model.getWorkContacts().entrySet().stream()
                     .map(entry -> Map.entry(entry.getKey(), map(entry.getValue())))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
