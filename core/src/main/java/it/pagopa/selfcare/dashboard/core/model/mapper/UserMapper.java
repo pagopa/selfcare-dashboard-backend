@@ -51,4 +51,17 @@ public class UserMapper {
         return resource;
     }
 
+    public static User toUser(UserResource model) {
+        User resource = null;
+        if (model != null) {
+            resource = new User();
+            resource.setId(model.getId().toString());
+            resource.setFiscalCode(model.getFiscalCode());
+            resource.setName(model.getName().getValue());
+            resource.setSurname(model.getFamilyName().getValue());
+            resource.setEmail(model.getEmail().getValue());
+        }
+        return resource;
+    }
+
 }

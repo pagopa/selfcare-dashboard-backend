@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.core.UserRegistryService;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.web.model.user.UserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class UserController {
 
     @PostMapping(value = "/search")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByExternalId}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}")
     public UserResource search(@ApiParam("${swagger.dashboard.user.model.externalId}")
                                @RequestBody
                                        EmbeddedExternalIdDto externalId,
@@ -66,4 +67,33 @@ public class UserController {
         userRegistryService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto));
         log.trace("updateUser end");
     }
+
+    @PostMapping(value = "/save-user")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.saveUser}")
+    public void saveUser(@RequestBody
+                         @Valid
+                                 UserDto userDto) {
+
+    }
+
+    @GetMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}")
+    public UserResource getUserByInternalId(@ApiParam("${swagger.dashboard.user.model.id}")
+                                            @PathVariable("id") UUID id,
+                                            @ApiParam("${swagger.dashboard.institutions.model.id}")
+                                            @RequestParam(value = "institutionId")
+                                                    String institutionId) {
+        return null;
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.deleteUserById}")
+    public void deleteUserById(@ApiParam("${swagger.dashboard.user.model.id}")
+                               @PathVariable("id") UUID id) {
+
+    }
+
 }

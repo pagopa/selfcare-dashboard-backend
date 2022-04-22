@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
+import it.pagopa.selfcare.dashboard.core.model.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -183,10 +184,10 @@ public class UserGroupServiceImpl implements UserGroupService {
                     return userInfos.get(index);
                 }).filter(Objects::nonNull)
                 .collect(Collectors.toList()));
-        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
+        User createdBy = UserMapper.toUser(userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId()));
         userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
-            User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());
+            User modifiedBy = UserMapper.toUser(userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId()));
             userGroupInfo.setModifiedBy(modifiedBy);
         }
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);

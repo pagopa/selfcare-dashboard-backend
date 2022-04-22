@@ -13,17 +13,14 @@ public class UserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
     @NotNull
+    @FieldNameConstants.Exclude
     private UUID id;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
-    private CertifiableFieldResource<String> name;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}", required = true)
-    private CertifiableFieldResource<String> familyName;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.email}", required = true)
-    private CertifiableFieldResource<String> email;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
+    private CertifiableFieldBooleanResource<String> name;
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
+    private CertifiableFieldBooleanResource<String> familyName;
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionEmail}")
+    private CertifiableFieldBooleanResource<String> email;
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
     private String fiscalCode;
 }

@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldBooleanResource;
 
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -66,10 +67,10 @@ public class UserMapper {
         return resource;
     }
 
-    public static it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldResource<String> toBoleanCertified(CertifiableFieldResource<String> certifiableFieldResource) {
-        it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldResource<String> resource = null;
+    public static CertifiableFieldBooleanResource<String> toBoleanCertified(CertifiableFieldResource<String> certifiableFieldResource) {
+        CertifiableFieldBooleanResource<String> resource = null;
         if (certifiableFieldResource != null) {
-            resource = new it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldResource<>();
+            resource = new CertifiableFieldBooleanResource<>();
             resource.setCertified(Certification.isCertified(certifiableFieldResource.getCertification()));
             resource.setValue(certifiableFieldResource.getValue());
         }

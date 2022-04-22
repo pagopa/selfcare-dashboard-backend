@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class CertifiableFieldResource<T> {
+public class CertifiableFieldBooleanResource<T> {
     private boolean certified;
     private T value;
 }

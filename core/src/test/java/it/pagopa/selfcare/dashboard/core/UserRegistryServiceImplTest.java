@@ -30,11 +30,11 @@ class UserRegistryServiceImplTest {
     void getUser() {
         //given
         String externalId = "externalId";
-        UserResource expectedUser = new UserResource();
+        UserResource expectedUser = TestUtils.mockInstance(new UserResource());
         Mockito.when(userConnectorMock.search(Mockito.any()))
                 .thenReturn(expectedUser);
         //when
-        UserResource user = userRegistryService.search(externalId, );
+        UserResource user = userRegistryService.search(externalId);
         //then
         assertSame(expectedUser, user);
         Mockito.verify(userConnectorMock, Mockito.times(1))
@@ -48,7 +48,7 @@ class UserRegistryServiceImplTest {
         //given
         String externalId = null;
         //when
-        Executable executable = () -> userRegistryService.search(externalId, );
+        Executable executable = () -> userRegistryService.search(externalId);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());

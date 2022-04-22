@@ -37,15 +37,12 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
         return userResource;
     }
 
-    //TODO fix signature
     @Override
     public UserResource getUserByInternalId(String userId) {
         log.trace("getUserByInternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId userId = {}", userId);
-
         Assert.hasText(userId, "A userId is required");
-        //TODO fix passed fields
-        UserResource result = restClient.getUserByInternalId(UUID.fromString(userId), EnumSet.of(UserResource.Fields.fiscalCode));
+        UserResource result = restClient.getUserByInternalId(UUID.fromString(userId), EnumSet.allOf(UserResource.Fields.class));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId result = {}", result);
         log.trace("getUserByInternalId end");
         return result;
