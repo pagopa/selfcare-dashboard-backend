@@ -244,4 +244,26 @@ class UserRegistryServiceImplTest {
         Mockito.verifyNoMoreInteractions(userConnectorMock, partyConnector);
     }
 
+    @Test
+    void deleteById_nullId() {
+        //given
+        //when
+        Executable exe = () -> userRegistryService.deleteById(null);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, exe);
+        assertEquals("A UUID is required", e.getMessage());
+        Mockito.verifyNoInteractions(userConnectorMock);
+    }
+
+    @Test
+    void deleteById() {
+        //given
+        String userId = UUID.randomUUID().toString();
+        //when
+        userRegistryService.deleteById(userId);
+        //then
+        Mockito.verify(userConnectorMock, Mockito.times(1))
+                .deleteById(userId);
+    }
+
 }

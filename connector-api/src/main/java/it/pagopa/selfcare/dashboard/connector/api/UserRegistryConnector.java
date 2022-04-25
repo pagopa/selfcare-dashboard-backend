@@ -15,4 +15,6 @@ public interface UserRegistryConnector {
     void updateUser(UUID id, MutableUserFieldsDto entity);
 
     UserId saveUser(SaveUserDto entity);
+
+    void deleteById(String userId);
 }

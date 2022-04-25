@@ -69,5 +69,14 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
         return userId;
     }
 
+    @Override
+    public void deleteById(String userId) {
+        log.trace("deleteById start");
+        log.debug("deleteById id = {}", userId);
+        Assert.hasText(userId, "A UUID is required");
+        restClient.deleteById(UUID.fromString(userId));
+        log.trace("deleteById end");
+    }
+
 
 }

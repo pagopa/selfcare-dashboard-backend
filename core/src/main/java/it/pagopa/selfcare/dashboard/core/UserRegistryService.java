@@ -16,4 +16,7 @@ public interface UserRegistryService {
     UserResource getUserByInternalId(UUID id);
 
     UserId saveUser(String institutionId, SaveUser userDto);
+
+    void deleteById(String userId);
+
 }

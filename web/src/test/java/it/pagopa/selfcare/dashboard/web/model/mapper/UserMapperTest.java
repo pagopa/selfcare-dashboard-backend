@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
@@ -152,12 +149,51 @@ class UserMapperTest {
         String institutionId = "institutionId";
         it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
         model.setId(UUID.randomUUID());
+        Map<String, WorkContactResource> workContacts = new HashMap<>();
+        WorkContactResource workcontact = TestUtils.mockInstance(new WorkContactResource());
+        workContacts.put(institutionId, workcontact);
+        model.setWorkContacts(workContacts);
         //when
         UserResource resource = UserMapper.toUserResource(model, institutionId);
         //then
         assertEquals(model.getId(), resource.getId());
         assertEquals(model.getEmail().getValue(), resource.getEmail().getValue());
         assertEquals(model.getName().getValue(), resource.getName().getValue());
+        assertEquals(model.getWorkContacts().get(institutionId).getEmail().getValue(), resource.getEmail().getValue());
+        assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());
+    }
+
+    @Test
+    void toResource_nullWorkContact() {
+        //given
+        String institutionId = "institutionId";
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
+        model.setId(UUID.randomUUID());
+        //when
+        UserResource resource = UserMapper.toUserResource(model, institutionId);
+        //then
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getName().getValue(), resource.getName().getValue());
+        assertNull(resource.getEmail());
+        assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());
+    }
+
+    @Test
+    void toResource_differentInstitutionId() {
+        //given
+        String institutionId = "institutionId";
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
+        model.setId(UUID.randomUUID());
+        Map<String, WorkContactResource> workContacts = new HashMap<>();
+        WorkContactResource workcontact = TestUtils.mockInstance(new WorkContactResource());
+        workContacts.put("institution2", workcontact);
+        model.setWorkContacts(workContacts);
+        //when
+        UserResource resource = UserMapper.toUserResource(model, institutionId);
+        //then
+        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getName().getValue(), resource.getName().getValue());
+        assertNull(resource.getEmail());
         assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());
     }
 

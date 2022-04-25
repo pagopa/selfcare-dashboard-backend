@@ -315,4 +315,42 @@ class UserRegistryConnectorImplTest {
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
+    @Test
+    void saveUser_nullInfo() {
+        //given
+        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto());
+        //when
+        UserId id = userConnector.saveUser(saveUserDto);
+        //then
+        assertNull(id);
+        ArgumentCaptor<SaveUserDto> savedDto = ArgumentCaptor.forClass(SaveUserDto.class);
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .saveUser(savedDto.capture());
+        SaveUserDto captured = savedDto.getValue();
+        assertSame(saveUserDto, captured);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void deleteById() {
+        //given
+        UUID id = UUID.randomUUID();
+        //when
+        userConnector.deleteById(id.toString());
+        //then
+        Mockito.verify(restClientMock, Mockito.times(1))
+                .deleteById(id);
+        Mockito.verifyNoMoreInteractions(restClientMock);
+    }
+
+    @Test
+    void deleteById_nullId() {
+        //given
+        //when
+        Executable executable = () -> userConnector.deleteById(null);
+        //then
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A UUID is required", illegalArgumentException.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
 }

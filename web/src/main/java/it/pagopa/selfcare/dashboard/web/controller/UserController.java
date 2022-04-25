@@ -111,6 +111,10 @@ public class UserController {
     public void deleteUserById(@ApiParam("${swagger.dashboard.user.model.id}")
                                @PathVariable("id") UUID id) {
 
+        log.trace("deleteUserById start");
+        log.debug("deleteUserById id = {}", id);
+        userRegistryService.deleteById(id.toString());
+        log.trace("deleteUserById end");
     }
 
 }

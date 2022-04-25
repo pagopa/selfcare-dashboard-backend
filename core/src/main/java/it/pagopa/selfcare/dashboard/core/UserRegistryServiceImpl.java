@@ -81,4 +81,13 @@ public class UserRegistryServiceImpl implements UserRegistryService {
         return result;
     }
 
+    @Override
+    public void deleteById(String userId) {
+        log.trace("deleteById start");
+        log.debug("deleteById userId = {}", userId);
+        Assert.hasText(userId, "A UUID is required");
+        userConnector.deleteById(userId);
+        log.trace("deleteById end");
+    }
+
 }

@@ -36,9 +36,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
 
     private static final String BASE_URL = "/users";
-    private static it.pagopa.selfcare.dashboard.connector.model.user.UserResource USER_RESOURCE;
+    private static final it.pagopa.selfcare.dashboard.connector.model.user.UserResource USER_RESOURCE;
 
-    {
+    static {
         USER_RESOURCE = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource());
         USER_RESOURCE.setId(UUID.randomUUID());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
@@ -76,10 +76,10 @@ class UserControllerTest {
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/search")
-                .queryParam("institutionId", institutionId)
-                .content(mapper.writeValueAsString(externalIdDto))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+                        .queryParam("institutionId", institutionId)
+                        .content(mapper.writeValueAsString(externalIdDto))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         //then
@@ -173,6 +173,25 @@ class UserControllerTest {
         assertEquals(dto.getFiscalCode(), saveUser.getFiscalCode());
         assertTrue(saveUser.getWorkContacts().containsKey(institutionId));
         assertEquals(dto.getEmail(), saveUser.getWorkContacts().get(institutionId).getEmail());
+        Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
+    }
+
+
+    @Test
+    void deleteUserById() throws Exception {
+        //given
+        UUID id = UUID.randomUUID();
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .delete(BASE_URL + "/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andReturn();
+        //then
+        assertEquals(0, result.getResponse().getContentLength());
+        Mockito.verify(userRegistryServiceMock, Mockito.times(1))
+                .deleteById(id.toString());
         Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
     }
 
