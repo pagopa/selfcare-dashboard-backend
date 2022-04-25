@@ -83,8 +83,11 @@ public class UserMapper {
             resource.setFamilyName(toBoleanCertified(model.getFamilyName()));
             if (institutionId != null) {
                 if (model.getWorkContacts() != null)
-                    if (model.getWorkContacts().containsKey(institutionId))
-                        resource.setEmail(toBoleanCertified(model.getWorkContacts().get(institutionId).getEmail()));
+                    resource.setEmail(model.getWorkContacts().entrySet().stream()
+                            .filter(e -> e.getKey().equals(institutionId))
+                            .findAny()
+                            .map(entry -> toBoleanCertified(entry.getValue().getEmail()))
+                            .orElse(null));
             }
         }
         return resource;
