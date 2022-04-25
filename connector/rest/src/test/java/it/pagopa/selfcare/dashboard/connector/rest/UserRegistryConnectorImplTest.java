@@ -169,7 +169,7 @@ class UserRegistryConnectorImplTest {
         assertNull(user.getWorkContacts());
         assertNull(user.getFiscalCode());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(Mockito.eq(userId), Mockito.eq(EnumSet.allOf(UserResource.Fields.class)));
+                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -186,7 +186,7 @@ class UserRegistryConnectorImplTest {
         assertNull(user);
 
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(Mockito.eq(userId), Mockito.eq(EnumSet.allOf(UserResource.Fields.class)));
+                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -215,7 +215,7 @@ class UserRegistryConnectorImplTest {
         assertNotNull(user.getFiscalCode());
 
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(Mockito.eq(userId), Mockito.eq(EnumSet.allOf(UserResource.Fields.class)));
+                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -260,7 +260,7 @@ class UserRegistryConnectorImplTest {
         assertNotNull(user.getFiscalCode());
 
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(Mockito.eq(userId), Mockito.eq(EnumSet.allOf(UserResource.Fields.class)));
+                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
