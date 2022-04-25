@@ -5,8 +5,11 @@ import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserRegistryRestClientTestConfig;
+import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
@@ -24,8 +27,7 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 import java.util.EnumSet;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(
         locations = "classpath:config/user-registry-rest-client.properties",
@@ -73,9 +75,9 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     }
 
     @Test
-    void getUserByInternalId() {
+    void getUserByInternalId_fullyValued() {
         //given
-        UUID userId = UUID.randomUUID();
+        UUID userId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
         //when
         UserResource response = restClient.getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
         //then
@@ -85,5 +87,48 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
         assertNotNull(response.getFamilyName().getValue());
     }
 
+    @Test
+    void getUserByInternalId_fullyNull() {
+        //given
+        UUID userId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa7");
+        //when
+        UserResource response = restClient.getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
+        //then
+        assertNotNull(response);
+        assertNull(response.getId());
+    }
+
+    @Test
+    void search_fullyValued() {
+        //given
+        String externalId = "externalId1";
+        //when
+        UserResource response = restClient.search(EnumSet.allOf(UserResource.Fields.class), new EmbeddedExternalId(externalId));
+        //then
+        assertNotNull(response);
+        assertNotNull(response.getWorkContacts());
+        assertEquals(externalId, response.getFiscalCode());
+    }
+
+    @Test
+    void saveUser() {
+        //given
+        SaveUserDto userDto = TestUtils.mockInstance(new SaveUserDto());
+        //when
+        UserId id = restClient.saveUser(userDto);
+        //then
+        assertNotNull(id);
+    }
+
+
+    @Test
+    void delete() {
+        //given
+        UUID uuid = UUID.randomUUID();
+        //when
+        Executable executable = () -> restClient.deleteById(uuid);
+        //then
+        assertDoesNotThrow(executable);
+    }
 
 }

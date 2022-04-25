@@ -40,7 +40,7 @@ class UserRegistryConnectorImplTest {
         //given
         String externalId = "externalId";
         UserResource userMock = new UserResource();
-        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
         UserResource user = userConnector.search(externalId);
@@ -53,7 +53,7 @@ class UserRegistryConnectorImplTest {
         assertNull(user.getFiscalCode());
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -64,7 +64,7 @@ class UserRegistryConnectorImplTest {
         //given
         String externalId = "externalId";
         UserResource userMock = null;
-        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
         UserResource user = userConnector.search(externalId);
@@ -72,7 +72,7 @@ class UserRegistryConnectorImplTest {
         assertNull(user);
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -88,7 +88,7 @@ class UserRegistryConnectorImplTest {
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         workContacts.put("institutionId", TestUtils.mockInstance(new WorkContactResource()));
         userMock.setWorkContacts(workContacts);
-        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
         UserResource user = userConnector.search(externalId);
@@ -101,7 +101,7 @@ class UserRegistryConnectorImplTest {
 
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -133,7 +133,7 @@ class UserRegistryConnectorImplTest {
         workContact.getEmail().setCertification(Certification.SPID);
         userResourceMock.setWorkContacts(workContacts);
         workContacts.put("institutionId", workContact);
-        Mockito.when(restClientMock.getUserByExternalId(Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userResourceMock);
         //when
         UserResource user = userConnector.search(externalId);
@@ -146,7 +146,7 @@ class UserRegistryConnectorImplTest {
 
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByExternalId(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);

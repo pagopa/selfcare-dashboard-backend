@@ -32,7 +32,7 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
         log.trace("getUserByExternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
         Assert.hasText(externalId, "A TaxCode is required");
-        UserResource userResource = restClient.getUserByExternalId(EnumSet.allOf(UserResource.Fields.class), new EmbeddedExternalId(externalId));
+        UserResource userResource = restClient.search(EnumSet.allOf(UserResource.Fields.class), new EmbeddedExternalId(externalId));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", userResource);
         log.trace("getUserByExternalId end");
 

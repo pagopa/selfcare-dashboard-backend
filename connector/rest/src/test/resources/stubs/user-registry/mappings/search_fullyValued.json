@@ -1,7 +1,7 @@
 {
   "request": {
-    "method": "GET",
-    "urlPathPattern": "/pdnd-interop-uservice-user-registry/0.0.1/users/3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    "method": "POST",
+    "urlPathPattern": "/pdnd-interop-uservice-user-registry/0.0.1/users/search"
   },
   "response": {
     "status": "200",
@@ -18,7 +18,7 @@
         "certification": "NONE",
         "value": "string"
       },
-      "fiscalCode": "string",
+      "fiscalCode": "externalId1",
       "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
       "name": {
         "certification": "NONE",
