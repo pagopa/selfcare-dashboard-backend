@@ -100,7 +100,7 @@ public class ExchangeTokenService {
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setTaxCode(institutionInfo.getTaxCode());
-        institution.setRole(grantedAuthority.getRoleOnProducts().get(productId).getProductRole());
+        institution.setRole(grantedAuthority.getRoleOnProducts().get(productId).getProductRoles().iterator().next());
         claims.setInstitution(institution);
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
