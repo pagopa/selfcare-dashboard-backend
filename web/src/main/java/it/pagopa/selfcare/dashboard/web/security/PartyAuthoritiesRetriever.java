@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,11 +41,14 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
                             .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(),
                                     productRole.getProductRole(),
                                     productRole.getProductId()))
-                            .collect(Collectors.toList())))
+                            .collect(Collectors.toMap(ProductGrantedAuthority::getProductId,
+                                    Function.identity(),
+                                    ProductGrantedAuthority.MERGE))
+                            .values()))
                     .collect(Collectors.toList());
         }
 
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "retrieved authorities = {}" , authorities);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "retrieved authorities = {}", authorities);
         log.trace("retrieveAuthorities end");
         return authorities;
     }
