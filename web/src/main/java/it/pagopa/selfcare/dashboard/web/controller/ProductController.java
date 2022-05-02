@@ -44,11 +44,4 @@ public class ProductController {
         return result;
     }
 
-//    @GetMapping(value = "")
-//    @ResponseStatus(HttpStatus.OK)
-//    @ApiOperation(value = "", notes = "")
-//    public Collection<> getActiveSubProducts(){
-//
-//    }
-
 }

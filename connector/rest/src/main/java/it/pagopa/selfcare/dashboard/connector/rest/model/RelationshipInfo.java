@@ -35,10 +35,11 @@ public class RelationshipInfo {
     private Certification certification;
     //FIXME private Map<String, InstitutionContact> institutionContacts;
     private Map<String, List<InstitutionContact>> institutionContacts;
-    private String email;
     private PartyRole role;
     private ProductInfo product;
     private RelationshipState state;
+    private String email;
+    private String pricingPlan;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 
