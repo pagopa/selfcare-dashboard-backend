@@ -104,7 +104,6 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // then
         assertNotNull(response);
         assertFalse(response.isEmpty());
-        assertNotNull(response.get(0));
         response.forEach(relationshipInfo -> {
             TestUtils.checkNotNullFields(relationshipInfo);
             relationshipInfo.getInstitutionContacts().values().forEach(institutionContacts -> {
@@ -202,7 +201,6 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNotNull(response);
         assertNotNull(response.getInstitutions());
         assertFalse(response.getInstitutions().isEmpty());
-        assertNotNull(response.getInstitutions().get(0));
         response.getInstitutions().forEach(onboardingData -> {
             TestUtils.checkNotNullFields(onboardingData);
             assertNotNull(onboardingData.getAttributes());
@@ -224,12 +222,9 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), null, EnumSet.of(ACTIVE));
         // then
         assertNotNull(response);
-        assertNotNull(response.getPerson());
+        assertNotNull(response.getUserId());
         assertNotNull(response.getInstitutions());
-        assertNull(response.getPerson().getName());
-        assertNull(response.getPerson().getSurname());
-        assertNull(response.getPerson().getTaxCode());
-        assertNull(response.getInstitutions().get(0).getExternalId());
+        assertNull(response.getInstitutions().get(0).getInstitutionId());
         assertNull(response.getInstitutions().get(0).getDescription());
         assertNull(response.getInstitutions().get(0).getTaxCode());
         assertNull(response.getInstitutions().get(0).getDigitalAddress());
@@ -247,7 +242,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // then
         assertNotNull(response);
         assertTrue(response.getInstitutions().isEmpty());
-        assertNull(response.getPerson());
+        assertNull(response.getUserId());
     }
 
 
