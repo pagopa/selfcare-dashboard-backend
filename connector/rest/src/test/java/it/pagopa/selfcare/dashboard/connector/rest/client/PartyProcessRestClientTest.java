@@ -200,7 +200,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getOnBoardingInfo_fullyValued() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED), null);
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_VALUED), null, null);
         // then
         assertNotNull(response);
         assertNotNull(response.getPerson());
@@ -231,7 +231,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getOnBoardingInfo_fullyNull() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), EnumSet.of(ACTIVE));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), null, EnumSet.of(ACTIVE));
         // then
         assertNotNull(response);
         assertNotNull(response.getPerson());
@@ -253,7 +253,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getOnBoardingInfo_emptyResult() {
         // given and when
-        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.EMPTY_RESULT), EnumSet.of(ACTIVE, PENDING));
+        OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.EMPTY_RESULT), null, EnumSet.of(ACTIVE, PENDING));
         // then
         assertNotNull(response);
         assertTrue(response.getInstitutions().isEmpty());

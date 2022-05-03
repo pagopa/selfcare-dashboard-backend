@@ -71,13 +71,13 @@
         "description" : "Service to get a specific institution related to logged user",
         "operationId" : "getInstitutionUsingGET",
         "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+          "name": "institutionId",
+          "in": "path",
+          "description": "Institution's unique internal identifier",
+          "required": true,
+          "style": "simple",
+          "schema": {
+            "type": "string"
           }
         } ],
         "responses" : {
@@ -112,16 +112,17 @@
         "summary" : "saveInstitutionLogo",
         "description" : "Service to upload and store the institution's logo",
         "operationId" : "saveInstitutionLogoUsingPUT",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          } ],
         "requestBody" : {
           "content" : {
             "multipart/form-data" : {
@@ -179,16 +180,17 @@
         "summary" : "getInstitutionProducts",
         "description" : "Service to get all the products related to a specific institution",
         "operationId" : "getInstitutionProductsUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          } ],
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -224,16 +226,17 @@
         "summary" : "getInstitutionProductUsers",
         "description" : "Service to get all the users related to a specific pair of institution-product",
         "operationId" : "getInstitutionProductUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }, {
           "name" : "productId",
           "in" : "path",
           "description" : "Product's unique identifier",
@@ -296,16 +299,17 @@
         "summary" : "createInstitutionProductUser",
         "description" : "Service to Create a user related to a specific pair of institution-product",
         "operationId" : "createInstitutionProductUserUsingPOST",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }, {
           "name" : "productId",
           "in" : "path",
           "description" : "Product's unique identifier",
@@ -349,16 +353,17 @@
         "summary" : "getInstitutionUsers",
         "description" : "Service to get all the users related to a specific pair of institution-product",
         "operationId" : "getInstitutionUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }, {
           "name" : "productId",
           "in" : "query",
           "description" : "Product's unique identifier",
@@ -423,16 +428,17 @@
         "summary" : "getInstitutionUser",
         "description" : "${swagger.dashboard.institutions.api.getInstitutionUser}",
         "operationId" : "getInstitutionUserUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }, {
           "name" : "userId",
           "in" : "path",
           "description" : "User's unique identifier",
@@ -627,16 +633,17 @@
         "summary" : "exchange",
         "description" : "Service create an 'Identity Token' based on a Self Care session token",
         "operationId" : "exchangeUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }, {
           "name" : "productId",
           "in" : "query",
           "description" : "Product's unique identifier",
@@ -687,16 +694,17 @@
         "summary" : "getUserByExternalId",
         "description" : "Retrieve the user for a given internal id",
         "operationId" : "getUserByExternalIdUsingPOST",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        "parameters" : [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          } ],
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -751,16 +759,17 @@
             "type" : "string",
             "format" : "uuid"
           }
-        }, {
-          "name" : "institutionId",
-          "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
+        },
+          {
+            "name": "institutionId",
+            "in": "query",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          } ],
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1324,7 +1333,7 @@
           },
           "id" : {
             "type" : "string",
-            "description" : "Institution's unique identifier (i.e.: IPA code)"
+            "description": "Institution's unique internal identifier"
           },
           "mailAddress" : {
             "type" : "string",

@@ -110,17 +110,15 @@ class InstitutionServiceImpl implements InstitutionService {
                             .peek(product -> product.getNode().setUserRole(LIMITED.name()))
                             .peek(product -> product.getNode().setStatus(institutionsProductsMap.get(product.getNode().getId()).getStatus()))
                             .collect(Collectors.toList());
-                    for (ProductTree productTree : productTrees) {
-                        if (null != productTree.getChildren()) {
-                            productTree.setChildren(productTree.getChildren().stream()
+                    productTrees.stream()
+                            .filter(productTree -> productTree.getChildren() != null)
+                            .forEach(productTree -> productTree.setChildren(productTree.getChildren().stream()
                                     .filter(product -> institutionsProductsMap.containsKey(product.getId()))
                                     .filter(product -> userAuthProducts.containsKey(product.getId()))
                                     .peek(product -> product.setAuthorized(true))
                                     .peek(product -> product.setUserRole(LIMITED.name()))
                                     .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
-                                    .collect(Collectors.toList()));
-                        }
-                    }
+                                    .collect(Collectors.toList())));
                 } else {
                     productTrees.forEach(product -> {
                         product.getNode().setAuthorized(userAuthProducts.containsKey(product.getNode().getId()));
@@ -130,15 +128,14 @@ class InstitutionServiceImpl implements InstitutionService {
                         Optional.ofNullable(userAuthProducts.get(product.getNode().getId()))
                                 .ifPresentOrElse(authority -> product.getNode().setUserRole(authority.getAuthority()), () -> product.getNode().setUserRole(null));
                     });
-                    productTrees.forEach(productTree -> {
-                        if (productTree.getChildren() != null) {
-                            productTree.getChildren().forEach(product ->
+                    productTrees.stream()
+                            .map(ProductTree::getChildren)
+                            .filter(Objects::nonNull)
+                            .flatMap(Collection::stream)
+                            .forEach(product ->
                                     product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
                                             .map(PartyProduct::getStatus)
                                             .orElse(ProductStatus.INACTIVE)));
-                        }
-                    });
-
                 }
             }
         }

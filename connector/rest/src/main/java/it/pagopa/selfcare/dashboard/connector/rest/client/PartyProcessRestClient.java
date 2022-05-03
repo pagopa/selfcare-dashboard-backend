@@ -43,6 +43,7 @@ public interface PartyProcessRestClient {
     @ResponseBody
     @CollectionFormat(feign.CollectionFormat.CSV)
     OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
+                                     @RequestParam(value = "institutionExternalId", required = false) String institutionExternalId,
                                      @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
 
     @GetMapping(value = "${rest-client.party-process.getRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)

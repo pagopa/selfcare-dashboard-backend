@@ -131,7 +131,7 @@ class PartyConnectorImpl implements PartyConnector {
     public InstitutionInfo getOnBoardedInstitution(String institutionId) {
         log.trace("getOnBoardedInstitution start");
         log.debug("getOnBoardedInstitution institutionId = {}", institutionId);
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitution result = {}", result);
@@ -155,7 +155,7 @@ class PartyConnectorImpl implements PartyConnector {
     @Override
     public Collection<InstitutionInfo> getOnBoardedInstitutions() {
         log.trace("getOnBoardedInstitutions start");
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitutions result = {}", result);
         log.trace("getOnBoardedInstitutions end");
@@ -203,7 +203,7 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("getAuthInfo start");
         log.debug("getAuthInfo institutionId = {}", institutionId);
         Collection<AuthInfo> authInfos = Collections.emptyList();
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             authInfos = onBoardingInfo.getInstitutions().stream()
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
