@@ -30,7 +30,7 @@ class InstitutionMapperTest {
         // given
         String institutionId = "institutionId";
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setInstitutionId");
-        institutionInfo.setInstitutionId(institutionId);
+        institutionInfo.setExternalId(institutionId);
         SelfCareAuthority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
@@ -40,7 +40,7 @@ class InstitutionMapperTest {
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
-        assertEquals(institutionInfo.getInstitutionId(), resource.getId());
+        assertEquals(institutionInfo.getExternalId(), resource.getId());
         assertEquals(institutionInfo.getCategory(), resource.getCategory());
         assertEquals(institutionInfo.getDescription(), resource.getName());
         assertEquals(institutionInfo.getTaxCode(), resource.getFiscalCode());

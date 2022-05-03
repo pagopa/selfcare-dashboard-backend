@@ -52,7 +52,11 @@ class PartyConnectorImpl implements PartyConnector {
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setInstitutionId(onboardingData.getInstitutionId());
+        institutionInfo.setOriginId(onboardingData.getOriginId());
+        institutionInfo.setId(onboardingData.getId());
+        institutionInfo.setOrigin(onboardingData.getOrigin());
+        institutionInfo.setInstitutionType(onboardingData.getInstitutionType());
+        institutionInfo.setExternalId(onboardingData.getExternalId());
         institutionInfo.setDescription(onboardingData.getDescription());
         institutionInfo.setTaxCode(onboardingData.getTaxCode());
         institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
@@ -171,7 +175,7 @@ class PartyConnectorImpl implements PartyConnector {
             institutions = onBoardingInfo.getInstitutions().stream()
                     .map(ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION)
                     .collect(Collectors.collectingAndThen(
-                            Collectors.toMap(InstitutionInfo::getInstitutionId, Function.identity(), MERGE_FUNCTION),
+                            Collectors.toMap(InstitutionInfo::getExternalId, Function.identity(), MERGE_FUNCTION),
                             Map::values
                     ));
         }
@@ -208,7 +212,7 @@ class PartyConnectorImpl implements PartyConnector {
             authInfos = onBoardingInfo.getInstitutions().stream()
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
                     .collect(Collectors.collectingAndThen(
-                            Collectors.groupingBy(OnboardingData::getInstitutionId,
+                            Collectors.groupingBy(OnboardingData::getExternalId,
                                     Collectors.mapping(onboardingData -> {
                                         PartyProductRole productRole = new PartyProductRole();
                                         productRole.setProductId(onboardingData.getProductInfo().getId());

@@ -19,7 +19,11 @@ public class InstitutionMapper {
 
         } else {
             resource = new InstitutionResource();
-            resource.setId(model.getInstitutionId());
+            resource.setId(model.getId());
+            resource.setExternalId(model.getExternalId());
+            resource.setInstitutionType(model.getInstitutionType());
+            resource.setOrigin(model.getOrigin());
+            resource.setOriginId(model.getOriginId());
             resource.setName(model.getDescription());
             resource.setCategory(model.getCategory());
             resource.setFiscalCode(model.getTaxCode());

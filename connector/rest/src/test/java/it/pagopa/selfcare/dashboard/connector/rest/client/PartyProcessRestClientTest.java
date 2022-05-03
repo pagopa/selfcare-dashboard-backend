@@ -210,7 +210,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNotNull(response.getPerson().getTaxCode());
         assertNotNull(response.getPerson().getCertification());
         assertNotNull(response.getPerson().getInstitutionContacts());
-        assertNotNull(response.getInstitutions().get(0).getInstitutionId());
+        assertNotNull(response.getInstitutions().get(0).getExternalId());
         assertNotNull(response.getInstitutions().get(0).getBilling());
         assertNotNull(response.getInstitutions().get(0).getOrigin());
         assertNotNull(response.getInstitutions().get(0).getInstitutionType());
@@ -239,7 +239,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNull(response.getPerson().getName());
         assertNull(response.getPerson().getSurname());
         assertNull(response.getPerson().getTaxCode());
-        assertNull(response.getInstitutions().get(0).getInstitutionId());
+        assertNull(response.getInstitutions().get(0).getExternalId());
         assertNull(response.getInstitutions().get(0).getDescription());
         assertNull(response.getInstitutions().get(0).getTaxCode());
         assertNull(response.getInstitutions().get(0).getDigitalAddress());

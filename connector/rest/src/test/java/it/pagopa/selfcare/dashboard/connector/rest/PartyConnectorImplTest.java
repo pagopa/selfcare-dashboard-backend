@@ -203,7 +203,7 @@ class PartyConnectorImplTest {
         assertNotNull(institutionInfo);
         assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
         assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
-        assertEquals(onboardingData.getInstitutionId(), institutionInfo.getInstitutionId());
+        assertEquals(onboardingData.getExternalId(), institutionInfo.getExternalId());
         assertEquals(onboardingData.getState().toString(), institutionInfo.getStatus());
         assertEquals(onboardingData.getAttributes().get(0).getDescription(), institutionInfo.getCategory());
         Mockito.verify(restClientMock, Mockito.times(1))
@@ -222,7 +222,7 @@ class PartyConnectorImplTest {
         OnboardingData onboardingData2 = TestUtils.mockInstance(new OnboardingData(), 2, "setState", "setInstitutionId");
         onboardingData2.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData2.setState(RelationshipState.PENDING);
-        onboardingData2.setInstitutionId(onboardingData1.getInstitutionId());
+        onboardingData2.setExternalId(onboardingData1.getExternalId());
         OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setState");
         onboardingData3.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData3.setState(RelationshipState.PENDING);
@@ -241,7 +241,7 @@ class PartyConnectorImplTest {
         assertEquals(1, institutionInfos.size());
         assertEquals(onboardingData1.getDescription(), institutionInfos.get(0).getDescription());
         assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData1.getInstitutionId(), institutionInfos.get(0).getInstitutionId());
+        assertEquals(onboardingData1.getExternalId(), institutionInfos.get(0).getExternalId());
         assertEquals(onboardingData1.getState().toString(), institutionInfos.get(0).getStatus());
         assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
         institutionInfos = map.get(RelationshipState.PENDING.name());
@@ -249,7 +249,7 @@ class PartyConnectorImplTest {
         assertEquals(1, institutionInfos.size());
         assertEquals(onboardingData3.getDescription(), institutionInfos.get(0).getDescription());
         assertEquals(onboardingData3.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData3.getInstitutionId(), institutionInfos.get(0).getInstitutionId());
+        assertEquals(onboardingData3.getExternalId(), institutionInfos.get(0).getExternalId());
         assertEquals(onboardingData3.getState().toString(), institutionInfos.get(0).getStatus());
         assertEquals(onboardingData3.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
         Mockito.verify(restClientMock, Mockito.times(1))
@@ -410,7 +410,7 @@ class PartyConnectorImplTest {
         OnboardingData onboardingData2 = TestUtils.mockInstance(new OnboardingData(), 2, "setProductInfo");
         onboardingData2.setState(ACTIVE);
         OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setInstitutionId");
-        onboardingData3.setInstitutionId(onboardingData1.getInstitutionId());
+        onboardingData3.setExternalId(onboardingData1.getExternalId());
         onboardingData3.setState(ACTIVE);
         onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any(), Mockito.any(), Mockito.any()))
