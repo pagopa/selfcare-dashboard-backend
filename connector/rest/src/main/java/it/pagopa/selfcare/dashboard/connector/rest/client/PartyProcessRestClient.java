@@ -26,7 +26,7 @@ public interface PartyProcessRestClient {
     @GetMapping(value = "${rest-client.party-process.getUserInstitutionRelationships.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @CollectionFormat(feign.CollectionFormat.CSV)
-    RelationshipsResponse getUserInstitutionRelationships(@PathVariable("externalId") String institutionId,
+    RelationshipsResponse getUserInstitutionRelationships(@PathVariable("id") String institutionId,
                                                           @RequestParam(value = "roles", required = false) EnumSet<PartyRole> roles,
                                                           @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states,
                                                           @RequestParam(value = "products", required = false) Set<String> productIds,
@@ -36,7 +36,7 @@ public interface PartyProcessRestClient {
     @GetMapping(value = "${rest-client.party-process.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @CollectionFormat(feign.CollectionFormat.CSV)
-    Products getInstitutionProducts(@PathVariable("externalId") String institutionId,
+    Products getInstitutionProducts(@PathVariable("id") String institutionId,
                                     @RequestParam(value = "states", required = false) EnumSet<ProductState> states);
 
     @GetMapping(value = "${rest-client.party-process.getOnBoardingInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)

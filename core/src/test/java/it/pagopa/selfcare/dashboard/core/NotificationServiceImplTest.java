@@ -92,14 +92,14 @@ class NotificationServiceImplTest {
 
 
     @Test
-    void sendCreatedUserNotification_nullinstitutionExternalId() {
+    void sendCreatedUserNotification_nullInstitutionId() {
         //given
-        String institutionExternalId = null;
+        String institutionId = null;
         String email = "email";
         String productTitle = "productTitle";
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -109,7 +109,7 @@ class NotificationServiceImplTest {
         Throwable e = throwableCaptor.getValue();
         Assertions.assertNotNull(e);
         Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("Institution external id is required", e.getMessage());
+        Assertions.assertEquals("Institution id is required", e.getMessage());
 
         Mockito.verifyNoInteractions(partyConnector, freemarkerConfig, notificationConnector);
     }
@@ -117,12 +117,12 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification_nullEmail() {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = null;
         String productTitle = "productTitle";
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -141,12 +141,12 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification_nullProductId() {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = "email";
         String productTitle = null;
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -164,15 +164,15 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification_nullInstitutionDescription() {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution(), "setDescription");
-        Mockito.when(partyConnector.getInstitutionByExternalId(Mockito.any()))
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -184,7 +184,7 @@ class NotificationServiceImplTest {
         Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
         Assertions.assertEquals("An institution description is required", e.getMessage());
         Mockito.verify(partyConnector, Mockito.times(1))
-                .getInstitutionByExternalId(institutionExternalId);
+                .getInstitution(institutionId);
         Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
     }
 
@@ -192,15 +192,15 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification_nullAuth() {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = "email";
         String productTitle = "productId";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitutionByExternalId(Mockito.any()))
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -212,7 +212,7 @@ class NotificationServiceImplTest {
         Assertions.assertEquals(IllegalStateException.class, e.getClass());
         Assertions.assertEquals("Authentication is required", e.getMessage());
         Mockito.verify(partyConnector, Mockito.times(1))
-                .getInstitutionByExternalId(institutionExternalId);
+                .getInstitution(institutionId);
         Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
     }
 
@@ -220,16 +220,16 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification_nullPrincipal() {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = "email";
         String productTitle = "productId";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitutionByExternalId(Mockito.any()))
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -241,7 +241,7 @@ class NotificationServiceImplTest {
         Assertions.assertEquals(IllegalStateException.class, e.getClass());
         Assertions.assertEquals("Not SelfCareUser principal", e.getMessage());
         Mockito.verify(partyConnector, Mockito.times(1))
-                .getInstitutionByExternalId(institutionExternalId);
+                .getInstitution(institutionId);
         Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
     }
 
@@ -249,11 +249,11 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification_MailPreparationException() throws IOException {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitutionByExternalId(Mockito.any()))
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
@@ -266,7 +266,7 @@ class NotificationServiceImplTest {
                 .sendNotificationToUser(Mockito.any());
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
@@ -277,7 +277,7 @@ class NotificationServiceImplTest {
         Assertions.assertNotNull(e);
         Assertions.assertEquals(MailPreparationException.class, e.getClass());
         Mockito.verify(partyConnector, Mockito.times(1))
-                .getInstitutionByExternalId(institutionExternalId);
+                .getInstitution(institutionId);
         Mockito.verify(freemarkerConfig, Mockito.times(1))
                 .getTemplate("user_added.ftlh");
         Mockito.verify(notificationConnector, Mockito.times(1))
@@ -288,11 +288,11 @@ class NotificationServiceImplTest {
     @Test
     void sendCreatedUserNotification() throws IOException {
         //given
-        String institutionExternalId = "institutionExternalId";
+        String institutionId = "institutionId";
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitutionByExternalId(Mockito.any()))
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
@@ -302,13 +302,13 @@ class NotificationServiceImplTest {
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionExternalId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
             Thread.sleep(1000);
         };
         //then
         assertDoesNotThrow(executable);
         Mockito.verify(partyConnector, Mockito.times(1))
-                .getInstitutionByExternalId(institutionExternalId);
+                .getInstitution(institutionId);
         Mockito.verify(freemarkerConfig, Mockito.times(1))
                 .getTemplate("user_added.ftlh");
         Mockito.verify(notificationConnector, Mockito.times(1))
