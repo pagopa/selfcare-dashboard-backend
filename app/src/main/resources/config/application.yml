@@ -9,6 +9,12 @@ spring:
     include:
       - swaggerEN
       - AzureStorage
+  zipkin:
+    enabled: false
+  sleuth:
+    baggage:
+      remote-fields: X-Client-Ip
+      correlation-fields: X-Client-Ip
 
 info:
   build:
@@ -21,3 +27,5 @@ info:
 logging:
   level:
     it.pagopa.selfcare: ${B4F_DASHBOARD_LOG_LEVEL:DEBUG}
+  pattern:
+    level: "%5p [${spring.zipkin.service.name:${spring.application.name:-}},%X{traceId:-},%X{spanId:-}] [%X{uid:-},%X{X-Client-Ip:-}]"
