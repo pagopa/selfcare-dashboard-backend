@@ -222,16 +222,8 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         OnBoardingInfo response = restClient.getOnBoardingInfo(testCase2instIdMap.get(TestCase.FULLY_NULL), null, EnumSet.of(ACTIVE));
         // then
         assertNotNull(response);
-        assertNotNull(response.getUserId());
-        assertNotNull(response.getInstitutions());
-        assertNull(response.getInstitutions().get(0).getInstitutionId());
-        assertNull(response.getInstitutions().get(0).getDescription());
-        assertNull(response.getInstitutions().get(0).getTaxCode());
-        assertNull(response.getInstitutions().get(0).getDigitalAddress());
-        assertNull(response.getInstitutions().get(0).getState());
-        assertNull(response.getInstitutions().get(0).getRole());
-        assertNull(response.getInstitutions().get(0).getAttributes());
-        assertNull(response.getInstitutions().get(0).getProductInfo());
+        assertNull(response.getUserId());
+        assertNull(response.getInstitutions());
     }
 
 
