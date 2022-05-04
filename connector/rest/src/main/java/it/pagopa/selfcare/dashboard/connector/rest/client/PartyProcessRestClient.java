@@ -7,7 +7,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
 import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -52,11 +52,11 @@ public interface PartyProcessRestClient {
 
     @PostMapping(value = "${rest-client.party-process.onboardingSubdelegates.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    void onboardingSubdelegates(@RequestBody OnboardingRequest request);
+    void onboardingSubdelegates(@RequestBody OnboardingUsersRequest request);
 
     @PostMapping(value = "${rest-client.party-process.onboardingOperators.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    void onboardingOperators(@RequestBody OnboardingRequest request);
+    void onboardingOperators(@RequestBody OnboardingUsersRequest request);
 
     @PostMapping(value = "${rest-client.party-process.suspendRelationship.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

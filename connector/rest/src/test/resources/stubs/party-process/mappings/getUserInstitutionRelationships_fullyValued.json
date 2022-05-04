@@ -35,7 +35,7 @@
         "product": {
           "id": "string",
           "role": "string",
-          "createdAt": "2022-05-04T09:59:34.372Z"
+          "createdAt": "2022-05-04T10:49:18.869Z"
         },
         "state": "PENDING",
         "pricingPlan": "string",
@@ -51,8 +51,8 @@
           "recipientCode": "string",
           "publicServices": true
         },
-        "createdAt": "2022-05-04T09:59:34.372Z",
-        "updatedAt": "2022-05-04T09:59:34.372Z"
+        "createdAt": "2022-05-04T10:49:18.869Z",
+        "updatedAt": "2022-05-04T10:49:18.869Z"
       }
     ],
     "headers": {

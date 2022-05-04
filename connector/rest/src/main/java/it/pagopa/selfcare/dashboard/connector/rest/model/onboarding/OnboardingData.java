@@ -18,8 +18,8 @@ public class OnboardingData {
     private String originId;
     private String description;
     private String taxCode;
-    private String address;
     private String digitalAddress;
+    private String address;
     private String zipCode;
     private RelationshipState state;
     private PartyRole role;

@@ -108,11 +108,13 @@
     },
     "/institutions/{institutionId}/logo" : {
       "put" : {
-        "tags" : [ "institutions" ],
-        "summary" : "saveInstitutionLogo",
-        "description" : "Service to upload and store the institution's logo",
-        "operationId" : "saveInstitutionLogoUsingPUT",
-        "parameters" : [
+        "tags": [
+          "institutions"
+        ],
+        "summary": "saveInstitutionLogo",
+        "description": "Service to upload and store the institution's logo",
+        "operationId": "saveInstitutionLogoUsingPUT",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "path",
@@ -122,17 +124,20 @@
             "schema": {
               "type": "string"
             }
-          } ],
-        "requestBody" : {
-          "content" : {
-            "multipart/form-data" : {
-              "schema" : {
-                "required" : [ "logo" ],
-                "type" : "object",
-                "properties" : {
-                  "logo" : {
-                    "type" : "string",
-                    "description" : "Institution's logo",
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "logo"
+                ],
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "description": "Institution's logo",
                     "format" : "binary"
                   }
                 }
@@ -176,11 +181,13 @@
     },
     "/institutions/{institutionId}/products" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionProducts",
-        "description" : "Service to get all the products related to a specific institution",
-        "operationId" : "getInstitutionProductsUsingGET",
-        "parameters" : [
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionProducts",
+        "description": "Service to get all the products related to a specific institution",
+        "operationId": "getInstitutionProductsUsingGET",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "path",
@@ -190,16 +197,17 @@
             "schema": {
               "type": "string"
             }
-          } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductsResource"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductsResource"
                   }
                 }
               }
@@ -222,11 +230,13 @@
     },
     "/institutions/{institutionId}/products/{productId}/users" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionProductUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionProductUsersUsingGET",
-        "parameters" : [
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionProductUsers",
+        "description": "Service to get all the users related to a specific pair of institution-product",
+        "operationId": "getInstitutionProductUsersUsingGET",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "path",
@@ -236,17 +246,19 @@
             "schema": {
               "type": "string"
             }
-          }, {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
           "in" : "query",
           "description" : "User's role",
           "required" : false,
@@ -295,11 +307,13 @@
         } ]
       },
       "post" : {
-        "tags" : [ "institutions" ],
-        "summary" : "createInstitutionProductUser",
-        "description" : "Service to Create a user related to a specific pair of institution-product",
-        "operationId" : "createInstitutionProductUserUsingPOST",
-        "parameters" : [
+        "tags": [
+          "institutions"
+        ],
+        "summary": "createInstitutionProductUser",
+        "description": "Service to Create a user related to a specific pair of institution-product",
+        "operationId": "createInstitutionProductUserUsingPOST",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "path",
@@ -309,17 +323,19 @@
             "schema": {
               "type": "string"
             }
-          }, {
-          "name" : "productId",
-          "in" : "path",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "requestBody" : {
+        ],
+        "requestBody": {
           "content" : {
             "application/json" : {
               "schema" : {
@@ -349,11 +365,13 @@
     },
     "/institutions/{institutionId}/users" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionUsersUsingGET",
-        "parameters" : [
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUsers",
+        "description": "Service to get all the users related to a specific pair of institution-product",
+        "operationId": "getInstitutionUsersUsingGET",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "path",
@@ -363,17 +381,19 @@
             "schema": {
               "type": "string"
             }
-          }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
           "in" : "query",
           "description" : "User's role",
           "required" : false,
@@ -424,11 +444,13 @@
     },
     "/institutions/{institutionId}/users/{userId}" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUser",
-        "description" : "${swagger.dashboard.institutions.api.getInstitutionUser}",
-        "operationId" : "getInstitutionUserUsingGET",
-        "parameters" : [
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUser",
+        "description": "${swagger.dashboard.institutions.api.getInstitutionUser}",
+        "operationId": "getInstitutionUserUsingGET",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "path",
@@ -438,17 +460,19 @@
             "schema": {
               "type": "string"
             }
-          }, {
-          "name" : "userId",
-          "in" : "path",
-          "description" : "User's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
+        ],
+        "responses": {
           "200" : {
             "description" : "OK",
             "content" : {
@@ -629,11 +653,13 @@
     },
     "/token/exchange" : {
       "get" : {
-        "tags" : [ "token" ],
-        "summary" : "exchange",
-        "description" : "Service create an 'Identity Token' based on a Self Care session token",
-        "operationId" : "exchangeUsingGET",
-        "parameters" : [
+        "tags": [
+          "token"
+        ],
+        "summary": "exchange",
+        "description": "Service create an 'Identity Token' based on a Self Care session token",
+        "operationId": "exchangeUsingGET",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "query",
@@ -643,17 +669,19 @@
             "schema": {
               "type": "string"
             }
-          }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "realm",
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "realm",
           "in" : "query",
           "description" : "The domain for which the requested token is valid",
           "required" : true,
@@ -690,11 +718,13 @@
     },
     "/users/external-id" : {
       "post" : {
-        "tags" : [ "user" ],
-        "summary" : "getUserByExternalId",
-        "description" : "Retrieve the user for a given internal id",
-        "operationId" : "getUserByExternalIdUsingPOST",
-        "parameters" : [
+        "tags": [
+          "user"
+        ],
+        "summary": "getUserByExternalId",
+        "description": "Retrieve the user for a given internal id",
+        "operationId": "getUserByExternalIdUsingPOST",
+        "parameters": [
           {
             "name": "institutionId",
             "in": "query",
@@ -704,17 +734,18 @@
             "schema": {
               "type": "string"
             }
-          } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/EmbeddedExternalIdDto"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbeddedExternalIdDto"
               }
             }
           }
         },
-        "responses" : {
+        "responses": {
           "200" : {
             "description" : "OK",
             "content" : {
@@ -749,17 +780,18 @@
         "summary" : "updateUser",
         "description" : "Update previously added user",
         "operationId" : "updateUserUsingPUT",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "description" : "User's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string",
-            "format" : "uuid"
-          }
-        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           {
             "name": "institutionId",
             "in": "query",
@@ -769,17 +801,18 @@
             "schema": {
               "type": "string"
             }
-          } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/UpdateUserDto"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
               }
             }
           }
         },
-        "responses" : {
+        "responses": {
           "201" : {
             "description" : "Created"
           },
@@ -1319,37 +1352,70 @@
         }
       },
       "InstitutionResource" : {
-        "title" : "InstitutionResource",
-        "required" : [ "fiscalCode", "id", "mailAddress", "name", "status", "userRole" ],
-        "type" : "object",
-        "properties" : {
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
+        "title": "InstitutionResource",
+        "required": [
+          "externalId",
+          "fiscalCode",
+          "id",
+          "institutionType",
+          "mailAddress",
+          "name",
+          "origin",
+          "originId",
+          "status",
+          "userRole"
+        ],
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier (i.e.: IPA code)"
           },
-          "id" : {
-            "type" : "string",
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
+          },
+          "id": {
+            "type": "string",
             "description": "Institution's unique internal identifier"
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "institutionType": {
+            "type": "string",
+            "description": "Institution's type",
+            "enum": [
+              "GSP",
+              "PA",
+              "PT",
+              "SCP"
+            ]
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "origin": {
+            "type": "string",
+            "description": "Institution's details origin"
+          },
+          "originId": {
+            "type": "string",
+            "description": "Institution's details origin Id"
+          },
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },

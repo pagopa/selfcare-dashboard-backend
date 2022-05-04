@@ -23,7 +23,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
 import org.junit.jupiter.api.Assertions;
@@ -95,7 +95,7 @@ class PartyConnectorImplTest {
     private PartyProcessRestClient restClientMock;
 
     @Captor
-    private ArgumentCaptor<OnboardingRequest> onboardingRequestCaptor;
+    private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
 
 
     @Test
@@ -952,11 +952,10 @@ class PartyConnectorImplTest {
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-    private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingRequest> onboardingRequestCaptor) {
-        OnboardingRequest request = onboardingRequestCaptor.getValue();
+    private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor) {
+        OnboardingUsersRequest request = onboardingRequestCaptor.getValue();
         Assertions.assertNotNull(request);
         Assertions.assertEquals(institutionId, request.getInstitutionId());
-        Assertions.assertNull(request.getContract());
         Assertions.assertNotNull(request.getUsers());
         Assertions.assertEquals(1, request.getUsers().size());
         Assertions.assertEquals(createUserDto.getName(), request.getUsers().get(0).getName());

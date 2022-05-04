@@ -28,19 +28,25 @@ class InstitutionMapperTest {
     @Test
     void toResourceNotNull() {
         // given
-        String institutionId = "institutionId";
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setInstitutionId");
+        String internalInstitutionId = "institutionId";
+        String institutionId = "externalId";
+        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setId");
+        institutionInfo.setId(internalInstitutionId);
         institutionInfo.setExternalId(institutionId);
         SelfCareAuthority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(new ProductGrantedAuthority(selcRole, "productRole", "productId")))));
+                Collections.singletonList(new SelfCareGrantedAuthority(internalInstitutionId, Collections.singleton(new ProductGrantedAuthority(selcRole, "productRole", "productId")))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
-        assertEquals(institutionInfo.getExternalId(), resource.getId());
+        assertEquals(institutionInfo.getExternalId(), resource.getExternalId());
+        assertEquals(institutionInfo.getId(), resource.getId());
+        assertEquals(institutionInfo.getInstitutionType(), resource.getInstitutionType());
+        assertEquals(institutionInfo.getOriginId(), resource.getOriginId());
+        assertEquals(institutionInfo.getOrigin(), resource.getOrigin());
         assertEquals(institutionInfo.getCategory(), resource.getCategory());
         assertEquals(institutionInfo.getDescription(), resource.getName());
         assertEquals(institutionInfo.getTaxCode(), resource.getFiscalCode());

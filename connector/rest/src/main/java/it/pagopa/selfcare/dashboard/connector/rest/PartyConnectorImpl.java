@@ -20,7 +20,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
@@ -268,8 +268,8 @@ class PartyConnectorImpl implements PartyConnector {
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");
 
-        OnboardingRequest onboardingRequest = new OnboardingRequest();
-        onboardingRequest.setInstitutionId(institutionId);
+        OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
+        onboardingUsersRequest.setInstitutionId(institutionId);
         Map<PartyRole, List<User>> partyRoleToUsersMap = createUserDto.getRoles().stream()
                 .map(role -> {
                     User user = new User();
@@ -288,13 +288,13 @@ class PartyConnectorImpl implements PartyConnector {
         }
 
         partyRoleToUsersMap.forEach((key, value) -> {
-            onboardingRequest.setUsers(value);
+            onboardingUsersRequest.setUsers(value);
             switch (key) {
                 case SUB_DELEGATE:
-                    restClient.onboardingSubdelegates(onboardingRequest);
+                    restClient.onboardingSubdelegates(onboardingUsersRequest);
                     break;
                 case OPERATOR:
-                    restClient.onboardingOperators(onboardingRequest);
+                    restClient.onboardingOperators(onboardingUsersRequest);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid Party role");

@@ -16,7 +16,6 @@ public class InstitutionMapper {
 
         if (model == null) {
             resource = null;
-
         } else {
             resource = new InstitutionResource();
             resource.setId(model.getId());
