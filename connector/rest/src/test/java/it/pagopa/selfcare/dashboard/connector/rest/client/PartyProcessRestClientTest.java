@@ -104,20 +104,17 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // then
         assertNotNull(response);
         assertFalse(response.isEmpty());
-        assertNotNull(response.get(0).getId());
-        assertNotNull(response.get(0).getFrom());
-        assertNotNull(response.get(0).getTo());
-        assertNotNull(response.get(0).getName());
-        assertNotNull(response.get(0).getSurname());
-        assertNotNull(response.get(0).getEmail());
-        assertNotNull(response.get(0).getRole());
-        assertNotNull(response.get(0).getState());
-        assertNotNull(response.get(0).getCreatedAt());
-        assertNotNull(response.get(0).getUpdatedAt());
-        assertNotNull(response.get(0).getProduct());
-        assertNotNull(response.get(0).getProduct().getId());
-        assertNotNull(response.get(0).getProduct().getRole());
-        assertNotNull(response.get(0).getProduct().getCreatedAt());
+        assertNotNull(response.get(0));
+        response.forEach(relationshipInfo -> {
+            TestUtils.checkNotNullFields(relationshipInfo);
+            relationshipInfo.getInstitutionContacts().values().forEach(institutionContacts -> {
+                assertNotNull(institutionContacts);
+                assertFalse(institutionContacts.isEmpty());
+                institutionContacts.forEach(TestUtils::checkNotNullFields);
+            });
+            TestUtils.checkNotNullFields(relationshipInfo.getInstitutionUpdate());
+            TestUtils.checkNotNullFields(relationshipInfo.getBilling());
+        });
     }
 
 

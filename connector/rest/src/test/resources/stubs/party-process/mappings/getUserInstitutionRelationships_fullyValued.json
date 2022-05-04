@@ -12,16 +12,47 @@
         "to": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "name": "string",
         "surname": "string",
-        "email": "string",
+        "taxCode": "string",
+        "certification": "SPID",
+        "institutionContacts": {
+          "additionalProp1": [
+            {
+              "email": "string"
+            }
+          ],
+          "additionalProp2": [
+            {
+              "email": "string"
+            }
+          ],
+          "additionalProp3": [
+            {
+              "email": "string"
+            }
+          ]
+        },
         "role": "MANAGER",
         "product": {
           "id": "string",
           "role": "string",
-          "createdAt": "2021-12-14T09:09:56.751Z"
+          "createdAt": "2022-05-04T09:59:34.372Z"
         },
         "state": "PENDING",
-        "createdAt": "2021-12-14T09:09:56.751Z",
-        "updatedAt": "2021-12-14T09:09:56.751Z"
+        "pricingPlan": "string",
+        "institutionUpdate": {
+          "institutionType": "PA",
+          "description": "AGENCY X",
+          "digitalAddress": "email@pec.mail.org",
+          "address": "via del campo",
+          "taxCode": "string"
+        },
+        "billing": {
+          "vatNumber": "string",
+          "recipientCode": "string",
+          "publicServices": true
+        },
+        "createdAt": "2022-05-04T09:59:34.372Z",
+        "updatedAt": "2022-05-04T09:59:34.372Z"
       }
     ],
     "headers": {
