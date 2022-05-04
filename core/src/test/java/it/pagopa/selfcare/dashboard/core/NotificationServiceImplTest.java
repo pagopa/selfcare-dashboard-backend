@@ -100,7 +100,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -123,7 +123,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -147,7 +147,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -173,7 +173,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -201,7 +201,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -230,7 +230,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -267,7 +267,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -303,7 +303,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -333,7 +333,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -358,7 +358,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -385,7 +385,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -413,7 +413,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -444,7 +444,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -481,7 +481,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -521,7 +521,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -562,7 +562,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -618,7 +618,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
@@ -687,7 +687,7 @@ class NotificationServiceImplTest {
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
-            Thread.sleep(1000);
+            Thread.sleep(500);
         };
         //then
         assertDoesNotThrow(executable);
