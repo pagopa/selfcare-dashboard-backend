@@ -208,7 +208,13 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNotNull(response.getPerson().getName());
         assertNotNull(response.getPerson().getSurname());
         assertNotNull(response.getPerson().getTaxCode());
+        assertNotNull(response.getPerson().getCertification());
+        assertNotNull(response.getPerson().getInstitutionContacts());
         assertNotNull(response.getInstitutions().get(0).getInstitutionId());
+        assertNotNull(response.getInstitutions().get(0).getBilling());
+        assertNotNull(response.getInstitutions().get(0).getOrigin());
+        assertNotNull(response.getInstitutions().get(0).getInstitutionType());
+        assertNotNull(response.getInstitutions().get(0).getZipCode());
         assertNotNull(response.getInstitutions().get(0).getDescription());
         assertNotNull(response.getInstitutions().get(0).getTaxCode());
         assertNotNull(response.getInstitutions().get(0).getDigitalAddress());

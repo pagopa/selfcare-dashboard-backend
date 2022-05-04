@@ -12,7 +12,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Attributes;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Attribute;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -193,7 +193,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData = TestUtils.mockInstance(new OnboardingData());
-        onboardingData.setAttributes(List.of(TestUtils.mockInstance(new Attributes())));
+        onboardingData.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onBoardingInfo.setInstitutions(Collections.singletonList(onboardingData));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any(), Mockito.any()))
                 .thenReturn(onBoardingInfo);
@@ -217,14 +217,14 @@ class PartyConnectorImplTest {
         // given
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = TestUtils.mockInstance(new OnboardingData(), 1, "setState");
-        onboardingData1.setAttributes(List.of(TestUtils.mockInstance(new Attributes())));
+        onboardingData1.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData1.setState(ACTIVE);
         OnboardingData onboardingData2 = TestUtils.mockInstance(new OnboardingData(), 2, "setState", "setInstitutionId");
-        onboardingData2.setAttributes(List.of(TestUtils.mockInstance(new Attributes())));
+        onboardingData2.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData2.setState(RelationshipState.PENDING);
         onboardingData2.setInstitutionId(onboardingData1.getInstitutionId());
         OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setState");
-        onboardingData3.setAttributes(List.of(TestUtils.mockInstance(new Attributes())));
+        onboardingData3.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData3.setState(RelationshipState.PENDING);
         onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3, onboardingData3));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any(), Mockito.any()))

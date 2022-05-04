@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Attributes;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Attribute;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
@@ -27,6 +27,6 @@ public class OnboardingData {
     private String pricingPlan;
     private Billing billing;
     private String origin;
-    private List<Attributes> attributes;
+    private List<Attribute> attributes;
 
 }

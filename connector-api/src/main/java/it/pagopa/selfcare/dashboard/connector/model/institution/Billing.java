@@ -7,6 +7,6 @@ public class Billing {
 
     private String vatNumber;
     private String recipientCode;
-    private boolean publicService;
+    private boolean publicServices;
 
 }

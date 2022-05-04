@@ -18,6 +18,6 @@ public class Institution {
     private String taxCode;
     private String origin;
     private InstitutionType institutionType;
-    private List<Attributes> attributes;
+    private List<Attribute> attributes;
 
 }
