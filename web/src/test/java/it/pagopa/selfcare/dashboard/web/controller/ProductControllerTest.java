@@ -6,7 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.model.ProductRoleMappingsResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

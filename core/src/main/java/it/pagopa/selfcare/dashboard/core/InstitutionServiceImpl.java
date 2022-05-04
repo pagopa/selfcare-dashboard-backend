@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
@@ -83,12 +84,11 @@ class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public List<Product> getInstitutionProducts(String institutionId) {
+    public List<ProductTree> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");
         log.debug("getInstitutionProducts institutionId = {}", institutionId);
-        List<Product> products = productsConnector.getProducts();
-
-        if (!products.isEmpty()) {
+        List<ProductTree> productTrees = productsConnector.getProductsTree();
+        if (!productTrees.isEmpty()) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
                     .stream()
@@ -103,30 +103,48 @@ class InstitutionServiceImpl implements InstitutionService {
                         .collect(Collectors.toMap(PartyProduct::getId, Function.identity()));
 
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
-                    products = products.stream()
-                            .filter(product -> institutionsProductsMap.containsKey(product.getId()))
-                            .filter(product -> userAuthProducts.containsKey(product.getId()))
-                            .peek(product -> product.setAuthorized(true))
-                            .peek(product -> product.setUserRole(LIMITED.name()))
-                            .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
+                    productTrees = productTrees.stream()
+                            .filter(product -> institutionsProductsMap.containsKey(product.getNode().getId()))
+                            .filter(product -> userAuthProducts.containsKey(product.getNode().getId()))
+                            .peek(product -> product.getNode().setAuthorized(true))
+                            .peek(product -> product.getNode().setUserRole(LIMITED.name()))
+                            .peek(product -> product.getNode().setStatus(institutionsProductsMap.get(product.getNode().getId()).getStatus()))
                             .collect(Collectors.toList());
-
+                    for (ProductTree productTree : productTrees) {
+                        if (null != productTree.getChildren()) {
+                            productTree.setChildren(productTree.getChildren().stream()
+                                    .filter(product -> institutionsProductsMap.containsKey(product.getId()))
+                                    .filter(product -> userAuthProducts.containsKey(product.getId()))
+                                    .peek(product -> product.setAuthorized(true))
+                                    .peek(product -> product.setUserRole(LIMITED.name()))
+                                    .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
+                                    .collect(Collectors.toList()));
+                        }
+                    }
                 } else {
-                    products.forEach(product -> {
-                        product.setAuthorized(userAuthProducts.containsKey(product.getId()));
-                        product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
+                    productTrees.forEach(product -> {
+                        product.getNode().setAuthorized(userAuthProducts.containsKey(product.getNode().getId()));
+                        product.getNode().setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getNode().getId()))
                                 .map(PartyProduct::getStatus)
                                 .orElse(ProductStatus.INACTIVE));
-                        Optional.ofNullable(userAuthProducts.get(product.getId()))
-                                .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null));
+                        Optional.ofNullable(userAuthProducts.get(product.getNode().getId()))
+                                .ifPresentOrElse(authority -> product.getNode().setUserRole(authority.getAuthority()), () -> product.getNode().setUserRole(null));
                     });
+                    productTrees.forEach(productTree -> {
+                        if (productTree.getChildren() != null) {
+                            productTree.getChildren().forEach(product ->
+                                    product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
+                                            .map(PartyProduct::getStatus)
+                                            .orElse(ProductStatus.INACTIVE)));
+                        }
+                    });
+
                 }
             }
         }
-
-        log.debug("getInstitutionProducts result = {}", products);
+        log.debug("getInstitutionProducts result = {}", productTrees);
         log.trace("getInstitutionProducts end");
-        return products;
+        return productTrees;
     }
 
 
@@ -240,7 +258,8 @@ class InstitutionServiceImpl implements InstitutionService {
         partyConnector.createUsers(institutionId, productId, user);
         notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
 
-
         log.trace("createUsers end");
     }
+
+
 }

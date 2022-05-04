@@ -14,25 +14,55 @@
       "person": {
         "name": "string",
         "surname": "string",
-        "taxCode": "string"
+        "taxCode": "string",
+        "certification": "SPID",
+        "institutionContacts": {
+          "additionalProp1": [
+            {
+              "email": "string"
+            }
+          ],
+          "additionalProp2": [
+            {
+              "email": "string"
+            }
+          ],
+          "additionalProp3": [
+            {
+              "email": "string"
+            }
+          ]
+        }
       },
       "institutions": [
         {
-          "institutionId": "string",
+          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "externalId": "string",
+          "originId": "string",
           "description": "string",
           "taxCode": "string",
           "digitalAddress": "string",
+          "address": "string",
+          "zipCode": "string",
           "state": "PENDING",
           "role": "MANAGER",
           "productInfo": {
             "id": "string",
             "role": "string",
-            "createdAt": "2021-11-29T15:18:04.026Z"
+            "createdAt": "2022-05-04T07:29:04.854Z"
           },
+          "institutionType": "PA",
+          "pricingPlan": "string",
+          "billing": {
+            "vatNumber": "string",
+            "recipientCode": "string",
+            "publicServices": true
+          },
+          "origin": "IPA",
           "attributes": [
             {
-              "id": "string",
-              "name": "string",
+              "origin": "string",
+              "code": "string",
               "description": "string"
             }
           ]

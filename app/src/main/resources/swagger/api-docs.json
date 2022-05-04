@@ -448,7 +448,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref": "#/components/schemas/InstitutionUserDetailsResource"
+                  "$ref" : "#/components/schemas/InstitutionUserDetailsResource"
                 }
               }
             }
@@ -1324,57 +1324,47 @@
           },
           "id" : {
             "type" : "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description" : "Institution's unique identifier (i.e.: IPA code)"
           },
-          "mailAddress": {
-            "type": "string",
-            "description": "Institution's email address"
+          "mailAddress" : {
+            "type" : "string",
+            "description" : "Institution's email address"
           },
-          "name": {
-            "type": "string",
-            "description": "Institution's name"
+          "name" : {
+            "type" : "string",
+            "description" : "Institution's name"
           },
-          "status": {
-            "type": "string",
-            "description": "Institution's status"
+          "status" : {
+            "type" : "string",
+            "description" : "Institution's status"
           },
-          "userRole": {
-            "type": "string",
-            "description": "Logged user's role"
+          "userRole" : {
+            "type" : "string",
+            "description" : "Logged user's role"
           }
         }
       },
-      "InstitutionUserDetailsResource": {
-        "title": "InstitutionUserDetailsResource",
-        "required": [
-          "certification",
-          "email",
-          "fiscalCode",
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User provided with certification",
-            "example": false
+      "InstitutionUserDetailsResource" : {
+        "title" : "InstitutionUserDetailsResource",
+        "required" : [ "certification", "email", "fiscalCode", "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "certification" : {
+            "type" : "boolean",
+            "description" : "User provided with certification",
+            "example" : false
           },
-          "email": {
-            "type": "string",
-            "description": "User's email"
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
           },
           "name" : {
             "type" : "string",
@@ -1382,99 +1372,81 @@
           },
           "products" : {
             "type" : "array",
-            "description": "Authorized user products",
-            "items": {
-              "$ref": "#/components/schemas/ProductInfoResource"
+            "description" : "Authorized user products",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductInfoResource"
             }
           },
-          "role": {
-            "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
+          "role" : {
+            "type" : "string",
+            "description" : "User's role",
+            "enum" : [ "ADMIN", "LIMITED" ]
           },
-          "status": {
-            "type": "string",
-            "description": "User's status"
+          "status" : {
+            "type" : "string",
+            "description" : "User's status"
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       },
-      "InstitutionUserResource": {
-        "title": "InstitutionUserResource",
-        "required": [
-          "email",
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's email"
+      "InstitutionUserResource" : {
+        "title" : "InstitutionUserResource",
+        "required" : [ "email", "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "products": {
-            "type": "array",
-            "description": "Authorized user products",
-            "items": {
-              "$ref": "#/components/schemas/ProductInfoResource"
+          "products" : {
+            "type" : "array",
+            "description" : "Authorized user products",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductInfoResource"
             }
           },
-          "role": {
-            "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
+          "role" : {
+            "type" : "string",
+            "description" : "User's role",
+            "enum" : [ "ADMIN", "LIMITED" ]
           },
-          "status": {
-            "type": "string",
-            "description": "User's status"
+          "status" : {
+            "type" : "string",
+            "description" : "User's status"
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       },
-      "PlainUserResource": {
-        "title": "PlainUserResource",
-        "required": [
-          "id",
-          "name",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+      "PlainUserResource" : {
+        "title" : "PlainUserResource",
+        "required" : [ "id", "name", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       },
@@ -1573,37 +1545,28 @@
         }
       },
       "ProductUserResource" : {
-        "title": "ProductUserResource",
-        "required": [
-          "certification",
-          "email",
-          "id",
-          "name",
-          "product",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User provided with certification",
-            "example": false
+        "title" : "ProductUserResource",
+        "required" : [ "certification", "email", "id", "name", "product", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "certification" : {
+            "type" : "boolean",
+            "description" : "User provided with certification",
+            "example" : false
           },
-          "email": {
-            "type": "string",
-            "description": "User's email"
+          "email" : {
+            "type" : "string",
+            "description" : "User's email"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "product": {
+          "product" : {
             "description" : "Authorized user product",
             "$ref" : "#/components/schemas/ProductInfoResource"
           },
@@ -1637,6 +1600,13 @@
             "description" : "flag indicating whether the logged user has the authorization to manage the product",
             "example" : false
           },
+          "children" : {
+            "type" : "array",
+            "description" : "Product's sub products list",
+            "items" : {
+              "$ref" : "#/components/schemas/SubProductResource"
+            }
+          },
           "description" : {
             "type" : "string",
             "description" : "Product's description"
@@ -1669,6 +1639,26 @@
           "userRole" : {
             "type" : "string",
             "description" : "Logged user's role"
+          }
+        }
+      },
+      "SubProductResource" : {
+        "title" : "SubProductResource",
+        "required" : [ "id", "status", "title" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Product's unique identifier"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Product's status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Product's title"
           }
         }
       },

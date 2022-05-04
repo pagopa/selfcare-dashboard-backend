@@ -13,9 +13,11 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.InstitutionContact;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
@@ -34,10 +36,12 @@ public class RelationshipInfo {
     private Certification certification;
     //FIXME private Map<String, InstitutionContact> institutionContacts;
     private Map<String, List<InstitutionContact>> institutionContacts;
-    private String email;
     private PartyRole role;
     private ProductInfo product;
     private RelationshipState state;
+    private String pricingPlan;
+    private InstitutionUpdate institutionUpdate;
+    private Billing billing;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 

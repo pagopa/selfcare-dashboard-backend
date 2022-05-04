@@ -1,12 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.model.institution;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.Objects;
 
-@Getter
-@Setter
+@Data
 public class InstitutionInfo {
 
     private String institutionId;

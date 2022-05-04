@@ -15,6 +15,7 @@ package it.pagopa.selfcare.dashboard.web.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import lombok.Data;
 
 import javax.validation.Valid;
