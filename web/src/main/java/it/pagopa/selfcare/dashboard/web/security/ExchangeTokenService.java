@@ -117,6 +117,7 @@ public class ExchangeTokenService {
             role.setRole(productRoleCode);
             roles.add(role);
         });
+
         institution.setRoles(roles);
         claims.setInstitution(institution);
         claims.setDesiredExpiration(claims.getExpiration());
