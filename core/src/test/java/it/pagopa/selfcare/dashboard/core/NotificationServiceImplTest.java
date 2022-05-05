@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -365,7 +367,7 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         userInfo.getUser().setEmail(null);
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
         Executable executable = () -> {
@@ -381,7 +383,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("User email is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
@@ -393,7 +395,7 @@ class NotificationServiceImplTest {
         //given
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts", "setInstitutionId");
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
         Executable executable = () -> {
@@ -409,7 +411,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution id is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
@@ -422,7 +424,7 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         userInfo.setProducts(Map.of("1", TestUtils.mockInstance(new ProductInfo(), "setId")));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
         Executable executable = () -> {
@@ -438,7 +440,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Id is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
@@ -451,7 +453,7 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         userInfo.setProducts(Map.of("1", TestUtils.mockInstance(new ProductInfo())));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution(), "setDescription");
         when(partyConnectorMock.getInstitution(any()))
@@ -470,7 +472,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution description is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verifyNoInteractions(productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
@@ -486,7 +488,7 @@ class NotificationServiceImplTest {
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
@@ -508,7 +510,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Title is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -526,7 +528,7 @@ class NotificationServiceImplTest {
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
@@ -549,7 +551,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Authentication is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -567,7 +569,7 @@ class NotificationServiceImplTest {
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
@@ -591,7 +593,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Not SelfCareUser principal", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -610,7 +612,7 @@ class NotificationServiceImplTest {
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo(), "setRoleInfos");
         productInfoMock.setRoleInfos(List.of(TestUtils.mockInstance(new RoleInfo())));
         userInfo.setProducts(Map.of("1", productInfoMock));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
@@ -642,7 +644,7 @@ class NotificationServiceImplTest {
         //then
         assertDoesNotThrow(executable);
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -678,7 +680,7 @@ class NotificationServiceImplTest {
         roleInfo.setRole(productRole);
         productInfoMock.setRoleInfos(List.of(roleInfo));
         userInfo.setProducts(Map.of("1", productInfoMock));
-        when(userServiceMock.findByRelationshipId(any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
@@ -712,7 +714,7 @@ class NotificationServiceImplTest {
         //then
         assertDoesNotThrow(executable);
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId);
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))

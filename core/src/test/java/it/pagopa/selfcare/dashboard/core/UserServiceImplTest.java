@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -15,10 +14,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.UUID;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class UserServiceImplTest {
@@ -37,16 +42,16 @@ class UserServiceImplTest {
     void getUser() {
         //given
         String externalId = "externalId";
-        User expectedUser = TestUtils.mockInstance(new User());
-        Mockito.when(userConnectorMock.search(Mockito.any()))
+        User expectedUser = mockInstance(new User());
+        when(userConnectorMock.search(any(), any()))
                 .thenReturn(expectedUser);
         //when
         User user = userRegistryService.search(externalId);
         //then
         assertSame(expectedUser, user);
-        Mockito.verify(userConnectorMock, Mockito.times(1))
-                .search(externalId);
-        Mockito.verifyNoMoreInteractions(userConnectorMock);
+        verify(userConnectorMock, times(1))
+                .search(externalId, EnumSet.of(name, familyName, email, fiscalCode, workContacts));
+        verifyNoMoreInteractions(userConnectorMock);
     }
 
 
@@ -59,7 +64,7 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
@@ -70,23 +75,23 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("UUID is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void getUserByInternalId() {
         //given
-        UUID id = UUID.randomUUID();
-        User userMock = TestUtils.mockInstance(new User());
-        Mockito.when(userConnectorMock.getUserByInternalId(Mockito.anyString()))
+        UUID id = randomUUID();
+        User userMock = mockInstance(new User());
+        when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
         //when
         User user = userRegistryService.getUserByInternalId(id);
         //then
         assertSame(userMock, user);
-        Mockito.verify(userConnectorMock, Mockito.times(1))
-                .getUserByInternalId(id.toString());
-        Mockito.verifyNoMoreInteractions(userConnectorMock);
+        verify(userConnectorMock, times(1))
+                .getUserByInternalId(id.toString(), EnumSet.of(name, familyName, email, fiscalCode, workContacts));
+        verifyNoMoreInteractions(userConnectorMock);
     }
 
 
@@ -94,56 +99,56 @@ class UserServiceImplTest {
     void updateUser() {
         //given
         String institutionId = "institutionId";
-        UUID id = UUID.randomUUID();
-        UserDto user = TestUtils.mockInstance(new UserDto());
-        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
+        UUID id = randomUUID();
+        UserDto user = mockInstance(new UserDto());
+        WorkContact workContact = mockInstance(new WorkContact());
         user.setWorkContacts(Map.of(institutionId, workContact));
-        Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.anyString()))
+        Institution institutionMock = mockInstance(new Institution());
+        when(partyConnector.getInstitution(Mockito.anyString()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getInstitution(institutionId);
         ArgumentCaptor<MutableUserFieldsDto> mutableFieldsCaptor = ArgumentCaptor.forClass(MutableUserFieldsDto.class);
-        Mockito.verify(userConnectorMock, Mockito.times(1))
-                .updateUser(Mockito.any(), mutableFieldsCaptor.capture());
+        verify(userConnectorMock, times(1))
+                .updateUser(any(), mutableFieldsCaptor.capture());
         MutableUserFieldsDto capturedFields = mutableFieldsCaptor.getValue();
         assertTrue(capturedFields.getWorkContacts().containsKey(institutionId));
         assertEquals(user.getWorkContacts().get(institutionId).getEmail(), capturedFields.getWorkContacts().get(institutionId).getEmail().getValue());
         assertEquals(user.getFamilyName(), capturedFields.getFamilyName().getValue());
         assertEquals(user.getEmail(), capturedFields.getWorkContacts().get(institutionId).getEmail().getValue());
-        Mockito.verifyNoMoreInteractions(userConnectorMock, partyConnector);
+        verifyNoMoreInteractions(userConnectorMock, partyConnector);
     }
 
     @Test
     void updateUser_nullInstitution() {
         //given
         String institutionId = "institutionId";
-        UUID id = UUID.randomUUID();
-        UserDto user = TestUtils.mockInstance(new UserDto());
+        UUID id = randomUUID();
+        UserDto user = mockInstance(new UserDto());
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
         ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
         assertEquals("There are no institution for given institutionId", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void updateUser_nullInstitutionId() {
         //given
         String institutionId = null;
-        UUID id = UUID.randomUUID();
-        UserDto user = TestUtils.mockInstance(new UserDto());
+        UUID id = randomUUID();
+        UserDto user = mockInstance(new UserDto());
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An institutionId is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
@@ -151,40 +156,40 @@ class UserServiceImplTest {
         //given
         String institutionId = "institutionId";
         UUID id = null;
-        UserDto user = TestUtils.mockInstance(new UserDto());
+        UserDto user = mockInstance(new UserDto());
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("UUID is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void updateUser_nullDto() {
         //given
         String institutionId = "institutionId";
-        UUID id = UUID.randomUUID();
+        UUID id = randomUUID();
         UserDto user = null;
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userDto is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void saveUser_nullInstitutionId() {
         //given
         String institutionId = null;
-        SaveUser user = TestUtils.mockInstance(new SaveUser());
+        SaveUser user = mockInstance(new SaveUser());
         //when
         Executable executable = () -> userRegistryService.saveUser(institutionId, user);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An institutionId is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
@@ -197,43 +202,43 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userDto is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void saveUser_institutionNotFound() {
         //given
         String institutionId = "institutionId";
-        SaveUser user = TestUtils.mockInstance(new SaveUser());
+        SaveUser user = mockInstance(new SaveUser());
         //when
         Executable executable = () -> userRegistryService.saveUser(institutionId, user);
         //then
         ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
         assertEquals("There are no institution for given institutionId", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void saveUser() {
         //given
         String institutionId = "institutionId";
-        UserId userId = TestUtils.mockInstance(new UserId());
-        SaveUser user = TestUtils.mockInstance(new SaveUser());
-        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
+        UserId userId = mockInstance(new UserId());
+        SaveUser user = mockInstance(new SaveUser());
+        WorkContact workContact = mockInstance(new WorkContact());
         user.setWorkContacts(Map.of(institutionId, workContact));
-        Mockito.when(userConnectorMock.saveUser(Mockito.any()))
+        when(userConnectorMock.saveUser(any()))
                 .thenReturn(userId);
-        Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.anyString()))
+        Institution institutionMock = mockInstance(new Institution());
+        when(partyConnector.getInstitution(Mockito.anyString()))
                 .thenReturn(institutionMock);
         //when
         UserId id = userRegistryService.saveUser(institutionId, user);
         //then
         assertEquals(userId, id);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getInstitution(institutionId);
         ArgumentCaptor<SaveUserDto> saveCaptor = ArgumentCaptor.forClass(SaveUserDto.class);
-        Mockito.verify(userConnectorMock, Mockito.times(1))
+        verify(userConnectorMock, times(1))
                 .saveUser(saveCaptor.capture());
         SaveUserDto capturedSave = saveCaptor.getValue();
         assertEquals(user.getEmail(), capturedSave.getEmail().getValue());
@@ -241,7 +246,7 @@ class UserServiceImplTest {
         assertEquals(user.getName(), capturedSave.getName().getValue());
         assertTrue(capturedSave.getWorkContacts().containsKey(institutionId));
         assertEquals(user.getFiscalCode(), capturedSave.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(userConnectorMock, partyConnector);
+        verifyNoMoreInteractions(userConnectorMock, partyConnector);
     }
 
     @Test
@@ -252,17 +257,17 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, exe);
         assertEquals("A UUID is required", e.getMessage());
-        Mockito.verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock);
     }
 
     @Test
     void deleteById() {
         //given
-        String userId = UUID.randomUUID().toString();
+        String userId = randomUUID().toString();
         //when
         userRegistryService.deleteById(userId);
         //then
-        Mockito.verify(userConnectorMock, Mockito.times(1))
+        verify(userConnectorMock, times(1))
                 .deleteById(userId);
     }
 
