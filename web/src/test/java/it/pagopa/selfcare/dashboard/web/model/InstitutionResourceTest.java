@@ -9,7 +9,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,6 @@ class InstitutionResourceTest {
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("mailAddress", NotBlank.class);
         toCheckMap.put("fiscalCode", NotBlank.class);
-        toCheckMap.put("institutionType", NotNull.class);
         toCheckMap.put("userRole", NotBlank.class);
         toCheckMap.put("status", NotBlank.class);
         InstitutionResource institutionResource = new InstitutionResource();

@@ -6,7 +6,6 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 public class InstitutionResource {
@@ -32,8 +31,6 @@ public class InstitutionResource {
     private String origin;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
     private InstitutionType institutionType;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
