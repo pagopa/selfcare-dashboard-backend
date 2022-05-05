@@ -1635,7 +1635,8 @@
           },
           "id": {
             "type": "string",
-            "description": "User's unique identifier"
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
           "name": {
             "type": "string",
@@ -1650,16 +1651,19 @@
           },
           "role": {
             "type": "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
+          "status": {
+            "type": "string",
+            "description": "User's status"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
@@ -1673,8 +1677,9 @@
             "description" : "User's email"
           },
           "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
           "name" : {
             "type" : "string",
@@ -1708,8 +1713,9 @@
         "type" : "object",
         "properties" : {
           "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier"
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
           "name" : {
             "type" : "string",
@@ -1857,9 +1863,9 @@
             "type": "string",
             "description": "User's status"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
@@ -2051,14 +2057,14 @@
             "description": "Users group's institutionId"
           },
           "membersCount": {
-            "type" : "integer",
-            "description" : "Number all the members of the group",
-            "format" : "int32"
+            "type": "integer",
+            "description": "Number all the members of the group",
+            "format": "int32"
           },
-          "modifiedAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was modified",
-            "format" : "date-time"
+          "modifiedAt": {
+            "type": "string",
+            "description": "Date on which the group was modified",
+            "format": "date-time"
           },
           "modifiedBy" : {
             "type" : "string",
@@ -2103,14 +2109,14 @@
             "description" : "Users group's unique identifier"
           },
           "institutionId" : {
-            "type" : "string",
-            "description" : "Users group's institutionId"
+            "type": "string",
+            "description": "Users group's institutionId"
           },
-          "members" : {
-            "type" : "array",
-            "description" : "List of all the members of the group",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductUserResource"
+          "members": {
+            "type": "array",
+            "description": "List of all the members of the group",
+            "items": {
+              "$ref": "#/components/schemas/ProductUserResource"
             }
           },
           "modifiedAt": {

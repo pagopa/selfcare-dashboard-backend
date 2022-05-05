@@ -69,7 +69,7 @@ public class GroupMapper {
         return Optional.ofNullable(model)
                 .map(user -> {
                     PlainUserResource resource = new PlainUserResource();
-                    resource.setId(user.getId());
+                    resource.setId(UUID.fromString(user.getId()));
                     Optional.ofNullable(user.getName())
                             .map(CertifiedField::getValue)
                             .ifPresent(resource::setName);

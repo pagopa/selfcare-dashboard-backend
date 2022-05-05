@@ -37,15 +37,13 @@ class InstitutionUserResourceTest {
     void validateNullFields_InstitutionUserResource() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("id", NotBlank.class);
+        toCheckMap.put("id", NotNull.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("email", NotBlank.class);
         toCheckMap.put("role", NotNull.class);
         toCheckMap.put("status", NotBlank.class);
         toCheckMap.put("products", NotNull.class);
-
-
         InstitutionUserResource institutionResource = new InstitutionUserResource();
         institutionResource.setId(null);
         institutionResource.setName(null);
@@ -54,8 +52,6 @@ class InstitutionUserResourceTest {
         institutionResource.setRole(null);
         institutionResource.setStatus(null);
         institutionResource.setProducts(null);
-
-
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionResource);
         // then

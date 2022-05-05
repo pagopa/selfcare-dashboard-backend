@@ -19,6 +19,8 @@ import javax.validation.ValidationException;
 import java.time.Instant;
 import java.util.*;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GroupMapperTest {
@@ -36,12 +38,12 @@ class GroupMapperTest {
     @Test
     void fromDtoCreateUserGroup() {
         //given
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        UUID id3 = UUID.randomUUID();
-        UUID id4 = UUID.randomUUID();
+        UUID id1 = randomUUID();
+        UUID id2 = randomUUID();
+        UUID id3 = randomUUID();
+        UUID id4 = randomUUID();
         Set<UUID> userIds = Set.of(id1, id2, id3, id4);
-        CreateUserGroupDto dto = TestUtils.mockInstance(new CreateUserGroupDto());
+        CreateUserGroupDto dto = mockInstance(new CreateUserGroupDto());
         dto.setMembers(userIds);
         //when
         CreateUserGroup model = GroupMapper.fromDto(dto);
@@ -53,7 +55,7 @@ class GroupMapperTest {
     @Test
     void fromDtoCreateUserGroup_nullMembersList() {
         //given
-        CreateUserGroupDto dto = TestUtils.mockInstance(new CreateUserGroupDto());
+        CreateUserGroupDto dto = mockInstance(new CreateUserGroupDto());
         //when
         Executable executable = () -> GroupMapper.fromDto(dto);
         //then
@@ -74,12 +76,12 @@ class GroupMapperTest {
     @Test
     void fromDtoUpdateUserGroup() {
         //given
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        UUID id3 = UUID.randomUUID();
-        UUID id4 = UUID.randomUUID();
+        UUID id1 = randomUUID();
+        UUID id2 = randomUUID();
+        UUID id3 = randomUUID();
+        UUID id4 = randomUUID();
         Set<UUID> userIds = Set.of(id1, id2, id3, id4);
-        UpdateUserGroupDto dto = TestUtils.mockInstance(new UpdateUserGroupDto());
+        UpdateUserGroupDto dto = mockInstance(new UpdateUserGroupDto());
         dto.setMembers(userIds);
         //when
         UpdateUserGroup model = GroupMapper.fromDto(dto);
@@ -91,7 +93,7 @@ class GroupMapperTest {
     @Test
     void fromDtoUpdateUserGroup_nullMembersList() {
         //given
-        UpdateUserGroupDto dto = TestUtils.mockInstance(new UpdateUserGroupDto());
+        UpdateUserGroupDto dto = mockInstance(new UpdateUserGroupDto());
         //when
         Executable executable = () -> GroupMapper.fromDto(dto);
         //then
@@ -112,19 +114,22 @@ class GroupMapperTest {
     @Test
     void toResource() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
-        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
-        userInfoModel.setId(UUID.randomUUID().toString());
-        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        UserGroupInfo model = mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = mockInstance(new UserInfo());
+        userInfoModel.setId(randomUUID().toString());
+        ProductInfo productInfo = mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
-        model.setCreatedBy(userModel);
-        model.setModifiedBy(userModel);
+        User createdBy = mockInstance(new User(), "setId");
+        createdBy.setId(randomUUID().toString());
+        model.setCreatedBy(createdBy);
+        User modifiendBy = mockInstance(new User(), "setId");
+        modifiendBy.setId(randomUUID().toString());
+        model.setModifiedBy(modifiendBy);
         Instant now = Instant.now();
         model.setModifiedAt(now);
         model.setCreatedAt(now);
@@ -141,9 +146,9 @@ class GroupMapperTest {
         assertEquals(model.getCreatedAt(), resource.getCreatedAt());
         assertEquals(model.getCreatedBy().getName().getValue(), resource.getCreatedBy().getName());
         assertEquals(model.getCreatedBy().getFamilyName().getValue(), resource.getCreatedBy().getSurname());
-        assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().getId());
+        assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().getId().toString());
         assertEquals(model.getModifiedAt(), resource.getModifiedAt());
-        assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().getId());
+        assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().getId().toString());
         assertEquals(model.getModifiedBy().getName().getValue(), resource.getModifiedBy().getName());
         assertEquals(model.getModifiedBy().getFamilyName().getValue(), resource.getModifiedBy().getSurname());
     }
@@ -151,19 +156,22 @@ class GroupMapperTest {
     @Test
     void toResource_productInfo() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
-        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
-        userInfoModel.setId(UUID.randomUUID().toString());
-        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        UserGroupInfo model = mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = mockInstance(new UserInfo());
+        userInfoModel.setId(randomUUID().toString());
+        ProductInfo productInfo = mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
-        model.setCreatedBy(userModel);
-        model.setModifiedBy(userModel);
+        User createdBy = mockInstance(new User(), "setId");
+        createdBy.setId(randomUUID().toString());
+        model.setCreatedBy(createdBy);
+        User modifiendBy = mockInstance(new User(), "setId");
+        modifiendBy.setId(randomUUID().toString());
+        model.setModifiedBy(modifiendBy);
         Instant now = Instant.now();
         model.setModifiedAt(now);
         model.setCreatedAt(now);
@@ -182,19 +190,22 @@ class GroupMapperTest {
     @Test
     void toResource_members() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
-        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
-        userInfoModel.setId(UUID.randomUUID().toString());
-        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        UserGroupInfo model = mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = mockInstance(new UserInfo());
+        userInfoModel.setId(randomUUID().toString());
+        ProductInfo productInfo = mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
-        model.setCreatedBy(userModel);
-        model.setModifiedBy(userModel);
+        User createdBy = mockInstance(new User(), "setId");
+        createdBy.setId(randomUUID().toString());
+        model.setCreatedBy(createdBy);
+        User modifiendBy = mockInstance(new User(), "setId");
+        modifiendBy.setId(randomUUID().toString());
+        model.setModifiedBy(modifiendBy);
         Instant now = Instant.now();
         model.setModifiedAt(now);
         model.setCreatedAt(now);
@@ -212,11 +223,11 @@ class GroupMapperTest {
     @Test
     void toResource_nullPlainResource() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
-        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
-        userInfoModel.setId(UUID.randomUUID().toString());
-        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        UserGroupInfo model = mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = mockInstance(new UserInfo());
+        userInfoModel.setId(randomUUID().toString());
+        ProductInfo productInfo = mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
@@ -253,17 +264,17 @@ class GroupMapperTest {
     @Test
     void toPlainGroupResource_notNull() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
-        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
-        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        UserGroupInfo model = mockInstance(new UserGroupInfo());
+        UserInfo userInfoModel = mockInstance(new UserInfo());
+        ProductInfo productInfo = mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
-        userModel.setId(UUID.randomUUID().toString());
+        User userModel = mockInstance(new User());
+        userModel.setId(randomUUID().toString());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -288,17 +299,17 @@ class GroupMapperTest {
     @Test
     void toPlainGroupResource_nullModifiedBy() {
         //given
-        UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo(), "setModifiedBy");
-        UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
-        ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
-        List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
+        UserGroupInfo model = mockInstance(new UserGroupInfo(), "setModifiedBy");
+        UserInfo userInfoModel = mockInstance(new UserInfo());
+        ProductInfo productInfo = mockInstance(new ProductInfo());
+        List<RoleInfo> roleInfos = List.of(mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
-        userModel.setId(UUID.randomUUID().toString());
+        User userModel = mockInstance(new User());
+        userModel.setId(randomUUID().toString());
         model.setCreatedBy(userModel);
         Instant now = Instant.now();
         model.setCreatedAt(now);

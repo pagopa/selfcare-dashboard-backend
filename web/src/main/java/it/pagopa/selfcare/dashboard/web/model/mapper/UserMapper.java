@@ -144,7 +144,7 @@ public class UserMapper {
         return Optional.ofNullable(model)
                 .map(userInfo -> {
                     final T resource = supplier.get();
-                    resource.setId(userInfo.getId());
+                    resource.setId(UUID.fromString(userInfo.getId()));
                     resource.setRole(userInfo.getRole());
                     resource.setStatus(userInfo.getStatus());
                     Optional.ofNullable(userInfo.getUser()).ifPresent(userResource -> {

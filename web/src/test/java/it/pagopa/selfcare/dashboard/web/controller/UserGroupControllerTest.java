@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.Instant;
 import java.util.*;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(value = {UserGroupController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -158,9 +160,12 @@ class UserGroupControllerTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
-        model.setCreatedBy(userModel);
-        model.setModifiedBy(userModel);
+        User createdBy = mockInstance(new User(), "setId");
+        createdBy.setId(randomUUID().toString());
+        model.setCreatedBy(createdBy);
+        User modifiendBy = mockInstance(new User(), "setId");
+        modifiendBy.setId(randomUUID().toString());
+        model.setModifiedBy(modifiendBy);
         Instant now = Instant.now();
         model.setModifiedAt(now);
         model.setCreatedAt(now);
