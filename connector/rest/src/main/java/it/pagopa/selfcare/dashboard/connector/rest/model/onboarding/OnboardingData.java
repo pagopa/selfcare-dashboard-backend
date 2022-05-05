@@ -14,11 +14,12 @@ import java.util.List;
 public class OnboardingData {
 
     private String id;
-    private String institutionId;
+    private String externalId;
+    private String originId;
     private String description;
     private String taxCode;
-    private String address;
     private String digitalAddress;
+    private String address;
     private String zipCode;
     private RelationshipState state;
     private PartyRole role;

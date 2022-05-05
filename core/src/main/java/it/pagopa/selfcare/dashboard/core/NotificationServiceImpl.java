@@ -59,13 +59,13 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public void sendCreatedUserNotification(String institutionExternalId, String productTitle, String email) {
+    public void sendCreatedUserNotification(String institutionId, String productTitle, String email) {
         log.debug("sendCreatedUserNotification start");
-        log.debug("institutionExternalId = {}, productTitle = {}, email = {}", institutionExternalId, productTitle, email);
-        Assert.notNull(institutionExternalId, "Institution external id is required");
+        log.debug("institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
+        Assert.notNull(institutionId, "Institution id is required");
         Assert.notNull(email, "User email is required");
         Assert.notNull(productTitle, "A product Title is required");
-        Institution institution = partyConnector.getInstitutionByExternalId(institutionExternalId);
+        Institution institution = partyConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");
 
         Map<String, String> dataModel = new HashMap<>();

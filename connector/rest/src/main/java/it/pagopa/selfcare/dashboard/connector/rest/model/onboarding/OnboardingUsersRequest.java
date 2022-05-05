@@ -19,7 +19,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class OnboardingRequest {
+public class OnboardingUsersRequest {
 
     private List<User> users;
     private String institutionId;
