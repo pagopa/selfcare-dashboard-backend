@@ -6,8 +6,8 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
@@ -122,7 +122,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
+        User userModel = TestUtils.mockInstance(new User());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -161,7 +161,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
+        User userModel = TestUtils.mockInstance(new User());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -192,7 +192,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
+        User userModel = TestUtils.mockInstance(new User());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -222,7 +222,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = null;
+        User userModel = null;
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         //when
@@ -262,7 +262,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
+        User userModel = TestUtils.mockInstance(new User());
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
@@ -297,7 +297,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
+        User userModel = TestUtils.mockInstance(new User());
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
         Instant now = Instant.now();

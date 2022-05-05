@@ -10,27 +10,6 @@
         "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "from": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "to": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "name": "string",
-        "surname": "string",
-        "taxCode": "string",
-        "certification": "SPID",
-        "institutionContacts": {
-          "additionalProp1": [
-            {
-              "email": "string"
-            }
-          ],
-          "additionalProp2": [
-            {
-              "email": "string"
-            }
-          ],
-          "additionalProp3": [
-            {
-              "email": "string"
-            }
-          ]
-        },
         "role": "MANAGER",
         "product": {
           "id": "string",

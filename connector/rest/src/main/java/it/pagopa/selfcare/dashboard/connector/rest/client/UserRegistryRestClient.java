@@ -2,8 +2,8 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -17,8 +17,8 @@ public interface UserRegistryRestClient {
 
     @PostMapping(value = "${rest-client.user-registry.getUserByExternalId.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    UserResource search(@RequestParam(value = "fl", required = false) EnumSet<UserResource.Fields> fields,
-                        @RequestBody EmbeddedExternalId externalId);
+    User search(@RequestBody EmbeddedExternalId externalId,
+                @RequestParam(value = "fl") EnumSet<User.Fields> fields);
 
     @PatchMapping(value = "${rest-client.user-registry.patchUser.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -27,8 +27,8 @@ public interface UserRegistryRestClient {
 
     @GetMapping(value = "${rest-client.user-registry.getUserByInternalId.path}")
     @ResponseBody
-    UserResource getUserByInternalId(@PathVariable("id") UUID id,
-                                     @RequestParam(value = "fl", required = false) EnumSet<UserResource.Fields> fieldList);
+    User getUserByInternalId(@PathVariable("id") UUID id,
+                             @RequestParam(value = "fl") EnumSet<User.Fields> fieldList);
 
     @PatchMapping(value = "${rest-client.user-registry.saveUser.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

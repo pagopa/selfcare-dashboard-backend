@@ -135,7 +135,7 @@ class UserMapperTest {
     void toUserResource_null() {
         // given
         String institutionId = "institutionId";
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = null;
+        User model = null;
         // when
         UserResource resource = UserMapper.toUserResource(model, institutionId);
         // then
@@ -146,7 +146,7 @@ class UserMapperTest {
     void toUserResource_notNull() {
         //given
         String institutionId = "institutionId";
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
+        User model = TestUtils.mockInstance(new User(), "setId");
         model.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workcontact = TestUtils.mockInstance(new WorkContactResource());
@@ -166,7 +166,7 @@ class UserMapperTest {
     void toResource_nullWorkContact() {
         //given
         String institutionId = "institutionId";
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
+        User model = TestUtils.mockInstance(new User(), "setId");
         model.setId(UUID.randomUUID().toString());
         //when
         UserResource resource = UserMapper.toUserResource(model, institutionId);
@@ -181,7 +181,7 @@ class UserMapperTest {
     void toResource_differentInstitutionId() {
         //given
         String institutionId = "institutionId";
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
+        User model = TestUtils.mockInstance(new User(), "setId");
         model.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workcontact = TestUtils.mockInstance(new WorkContactResource());

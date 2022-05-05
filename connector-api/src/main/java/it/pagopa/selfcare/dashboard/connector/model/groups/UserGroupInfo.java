@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.model.groups;
 
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import lombok.Data;
 
 import java.time.Instant;
@@ -17,7 +17,7 @@ public class UserGroupInfo {
     private UserGroupStatus status;
     private List<UserInfo> members;
     private Instant createdAt;
-    private UserResource createdBy;
+    private User createdBy;
     private Instant modifiedAt;
-    private UserResource modifiedBy;
+    private User modifiedBy;
 }

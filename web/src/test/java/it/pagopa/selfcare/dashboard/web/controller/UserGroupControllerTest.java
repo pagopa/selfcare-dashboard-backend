@@ -6,8 +6,8 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
@@ -158,7 +158,7 @@ class UserGroupControllerTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO: use dummy
+        User userModel = TestUtils.mockInstance(new User());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -232,7 +232,7 @@ class UserGroupControllerTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
+        User userModel = TestUtils.mockInstance(new User());
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);

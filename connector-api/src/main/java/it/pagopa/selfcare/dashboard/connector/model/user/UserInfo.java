@@ -26,7 +26,7 @@ import java.util.Set;
 public class UserInfo {
 
     private String id;
-    private UserResource user;
+    private User user;
     private SelfCareAuthority role;
     private Map<String, ProductInfo> products;
     private String status;

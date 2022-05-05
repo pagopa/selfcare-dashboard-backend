@@ -12,8 +12,8 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailPreparationException;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.Assert;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -135,10 +136,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendRelationshipBasedNotification(String relationshipId, String templateName, String subject) {
         Assert.notNull(relationshipId, "A relationship Id is required");
-        UserInfo user = userService.findByRelationshipId(relationshipId);//FIXME: set user fields
+        UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
         Assert.notNull(Optional.ofNullable(user)
                 .map(UserInfo::getUser)
-                .map(UserResource::getEmail)
+                .map(User::getEmail)
                 .map(CertifiedField::getValue)
                 .orElse(null), "User email is required");
         Assert.notNull(user.getInstitutionId(), "An institution id is required");

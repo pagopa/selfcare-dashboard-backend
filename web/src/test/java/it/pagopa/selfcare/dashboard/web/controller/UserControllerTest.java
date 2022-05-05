@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
 
     private static final String BASE_URL = "/users";
-    private static final it.pagopa.selfcare.dashboard.connector.model.user.UserResource USER_RESOURCE;
+    private static final User USER_RESOURCE;
 
     static {
-        USER_RESOURCE = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource());
+        USER_RESOURCE = TestUtils.mockInstance(new User());
         USER_RESOURCE.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());

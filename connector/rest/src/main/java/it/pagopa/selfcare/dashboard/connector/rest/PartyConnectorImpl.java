@@ -228,7 +228,6 @@ class PartyConnectorImpl implements PartyConnector {
         return authInfos;
     }
 
-    //FIXME
     @Override
     public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");

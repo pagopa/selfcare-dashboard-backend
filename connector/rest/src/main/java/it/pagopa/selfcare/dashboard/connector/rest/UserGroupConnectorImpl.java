@@ -3,8 +3,8 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
@@ -48,12 +48,12 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         }
         groupInfo.setCreatedAt(groupResponse.getCreatedAt());
         groupInfo.setModifiedAt(groupResponse.getModifiedAt());
-        UserResource createdBy = new UserResource();
+        User createdBy = new User();
         createdBy.setId(groupResponse.getCreatedBy());
         groupInfo.setCreatedBy(createdBy);
 
         if (groupResponse.getModifiedBy() != null) {
-            UserResource userInfo = new UserResource();
+            User userInfo = new User();
             userInfo.setId(groupResponse.getModifiedBy());
             groupInfo.setModifiedBy(userInfo);
         }

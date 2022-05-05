@@ -9,8 +9,8 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +22,9 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.familyName;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.name;
 
 @Slf4j
 @Service
@@ -183,10 +186,11 @@ public class UserGroupServiceImpl implements UserGroupService {
                     return userInfos.get(index);
                 }).filter(Objects::nonNull)
                 .collect(Collectors.toList()));
-        UserResource createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());//FIXME set user fields
+        final EnumSet<User.Fields> fieldList = EnumSet.of(name, familyName);
+        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId(), fieldList);
         userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
-            UserResource modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());//FIXME set user fields
+            User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId(), fieldList);
             userGroupInfo.setModifiedBy(modifiedBy);
         }
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);
@@ -226,7 +230,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         Assert.notNull(institutionId, "An institution id is required");
         String userId = user.getId();
         Assert.notNull(userId, "A user id is required");
-        userInfoFilter.setProductId(Optional.ofNullable(productId));
+        userInfoFilter.setProductId(Optional.of(productId));
         userInfoFilter.setUserId(Optional.ofNullable(user.getId()));
         Collection<UserInfo> users = partyConnector.getUsers(user.getInstitutionId(), userInfoFilter);
         if (users.isEmpty()) {

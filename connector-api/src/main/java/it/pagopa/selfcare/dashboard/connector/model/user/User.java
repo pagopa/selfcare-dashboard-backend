@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Data
 @FieldNameConstants(asEnum = true)
-public class UserResource {
+public class User {
 
     @FieldNameConstants.Exclude
     private String id;
@@ -16,6 +16,5 @@ public class UserResource {
     private CertifiedField<String> familyName;
     private CertifiedField<String> email;
     private Map<String, WorkContactResource> workContacts;
-
 
 }

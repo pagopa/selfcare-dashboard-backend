@@ -1,7 +1,12 @@
 {
   "request": {
     "method": "POST",
-    "urlPathPattern": "/pdnd-interop-uservice-user-registry/0.0.1/users/search"
+    "urlPathPattern": "/pdnd-interop-uservice-user-registry/0.0.1/users/search",
+    "queryParameters": {
+      "fl": {
+        "matches": "^(?:name|familyName|email|fiscalCode|workContacts){0,1}(?:,(?:name|familyName|email|fiscalCode|workContacts))*$"
+      }
+    }
   },
   "response": {
     "status": "200",

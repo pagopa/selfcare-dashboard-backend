@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,10 +80,10 @@ public class UserMapper {
     }
 
 
-    public static it.pagopa.selfcare.dashboard.web.model.user.UserResource toUserResource(UserResource model, String institutionId) {
-        it.pagopa.selfcare.dashboard.web.model.user.UserResource resource = null;
+    public static UserResource toUserResource(User model, String institutionId) {
+        UserResource resource = null;
         if (model != null) {
-            resource = new it.pagopa.selfcare.dashboard.web.model.user.UserResource();
+            resource = new UserResource();
             resource.setId(UUID.fromString(model.getId()));
             resource.setFiscalCode(model.getFiscalCode());
             resource.setName(toCertifiedFieldResource(model.getName()));
@@ -132,7 +133,7 @@ public class UserMapper {
         if (resource != null) {
             Optional.ofNullable(model)
                     .map(UserInfo::getUser)
-                    .map(UserResource::getFiscalCode)
+                    .map(User::getFiscalCode)
                     .ifPresent(resource::setFiscalCode);
         }
         return resource;

@@ -37,11 +37,11 @@ class UserServiceImplTest {
     void getUser() {
         //given
         String externalId = "externalId";
-        UserResource expectedUser = TestUtils.mockInstance(new UserResource());
+        User expectedUser = TestUtils.mockInstance(new User());
         Mockito.when(userConnectorMock.search(Mockito.any()))
                 .thenReturn(expectedUser);
         //when
-        UserResource user = userRegistryService.search(externalId);
+        User user = userRegistryService.search(externalId);
         //then
         assertSame(expectedUser, user);
         Mockito.verify(userConnectorMock, Mockito.times(1))
@@ -77,13 +77,13 @@ class UserServiceImplTest {
     void getUserByInternalId() {
         //given
         UUID id = UUID.randomUUID();
-        UserResource userResource = TestUtils.mockInstance(new UserResource());
+        User userMock = TestUtils.mockInstance(new User());
         Mockito.when(userConnectorMock.getUserByInternalId(Mockito.anyString()))
-                .thenReturn(userResource);
+                .thenReturn(userMock);
         //when
-        UserResource user = userRegistryService.getUserByInternalId(id);
+        User user = userRegistryService.getUserByInternalId(id);
         //then
-        assertSame(userResource, user);
+        assertSame(userMock, user);
         Mockito.verify(userConnectorMock, Mockito.times(1))
                 .getUserByInternalId(id.toString());
         Mockito.verifyNoMoreInteractions(userConnectorMock);

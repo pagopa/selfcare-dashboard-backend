@@ -4,7 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 
 import javax.validation.ValidationException;
@@ -65,7 +65,7 @@ public class GroupMapper {
         return resource;
     }
 
-    public static PlainUserResource toPlainResource(UserResource model) {
+    public static PlainUserResource toPlainResource(User model) {
         return Optional.ofNullable(model)
                 .map(user -> {
                     PlainUserResource resource = new PlainUserResource();

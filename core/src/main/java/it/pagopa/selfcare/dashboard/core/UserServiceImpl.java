@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 
 @Slf4j
 @Service
@@ -30,11 +33,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResource search(String externalId) {
+    public User search(String externalId) {
         log.trace("getUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", externalId);
         Assert.hasText(externalId, "A TaxCode is required");
-        UserResource result = userConnector.search(externalId);
+        User result = userConnector.search(externalId,
+                EnumSet.of(name, familyName, email, fiscalCode, workContacts));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}", result);
         log.trace("getUser end");
         return result;
@@ -56,11 +60,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResource getUserByInternalId(UUID id) {
+    public User getUserByInternalId(UUID id) {
         log.trace("getUserByInternalId start");
         log.debug("getUserByInternalId id = {}", id);
         Assert.notNull(id, "UUID is required");
-        UserResource result = userConnector.getUserByInternalId(id.toString());
+        User result = userConnector.getUserByInternalId(id.toString(),
+                EnumSet.of(name, familyName, email, fiscalCode, workContacts));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId result = {}", result);
         log.trace("getUserByInternalId end");
         return result;
@@ -93,26 +98,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfo findByRelationshipId(String relationshipId) {
+    public UserInfo findByRelationshipId(String relationshipId, EnumSet<User.Fields> fieldList) {
         log.trace("findByRelationshipId start");
         log.debug("findByRelationshipId = {}", relationshipId);
         final UserInfo userInfo = partyConnector.getUser(relationshipId);
-        //FIXME: set user fields
-        userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId()));
+        userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId(), fieldList));
         log.debug("findByRelationshipId result = {}", userInfo);
         log.trace("findByRelationshipId end");
         return userInfo;
     }
 
     @Override
-    public Collection<UserInfo> findByInstitutionId(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
+    public Collection<UserInfo> findByInstitutionId(String institutionId, UserInfo.UserInfoFilter userInfoFilter, EnumSet<User.Fields> fieldList) {
         log.trace("findByInstitutionId start");
         log.debug("findByInstitutionId institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
         Assert.hasText(institutionId, "An Institution id is required");
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter).stream()
                 .peek(userInfo -> {
-                    //FIXME: set user fields
-                    userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId()));
+                    userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId(), fieldList));
                 }).collect(Collectors.toList());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "findByInstitutionId result = {}", userInfos);
         log.trace("findByInstitutionId end");

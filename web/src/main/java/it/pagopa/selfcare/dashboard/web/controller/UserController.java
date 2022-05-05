@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
@@ -45,7 +46,7 @@ public class UserController {
                                        String institutionId) {
         log.trace("getUserByExternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource user = userService.search(externalId.getExternalId());
+        User user = userService.search(externalId.getExternalId());
         UserResource result = UserMapper.toUserResource(user, institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
         log.trace("getUserByExternalId end");
@@ -98,8 +99,8 @@ public class UserController {
                                                     String institutionId) {
         log.trace("getUserByInternalId start");
         log.debug("getUserByInternalId id = {}, institutionId = {}", id, institutionId);
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource userResource = userService.getUserByInternalId(id);
-        UserResource result = UserMapper.toUserResource(userResource, institutionId);
+        User user = userService.getUserByInternalId(id);
+        UserResource result = UserMapper.toUserResource(user, institutionId);
         log.debug("getUserByInternalId result = {}", result);
         log.trace("getUserByInternalId end");
         return result;

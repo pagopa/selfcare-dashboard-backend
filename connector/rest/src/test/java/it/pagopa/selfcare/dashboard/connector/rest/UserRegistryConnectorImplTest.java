@@ -39,11 +39,12 @@ class UserRegistryConnectorImplTest {
     void search_nullInfo() {
         //given
         String externalId = "externalId";
-        UserResource userMock = new UserResource();
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = new User();
         Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.search(externalId);
+        User user = userConnector.search(externalId, fieldList);
         ///then
         assertNull(user.getName());
         assertNull(user.getFamilyName());
@@ -53,7 +54,7 @@ class UserRegistryConnectorImplTest {
         assertNull(user.getFiscalCode());
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -63,16 +64,17 @@ class UserRegistryConnectorImplTest {
     void search_nullInfo_nullUserResponse() {
         //given
         String externalId = "externalId";
-        UserResource userMock = null;
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = null;
         Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.search(externalId);
+        User user = userConnector.search(externalId, fieldList);
         ///then
         assertNull(user);
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -83,7 +85,8 @@ class UserRegistryConnectorImplTest {
     void search_certificationNone() {
         //given
         String externalId = "externalId";
-        UserResource userMock = TestUtils.mockInstance(new UserResource());
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = TestUtils.mockInstance(new User());
         userMock.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         workContacts.put("institutionId", TestUtils.mockInstance(new WorkContactResource()));
@@ -91,7 +94,7 @@ class UserRegistryConnectorImplTest {
         Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.search(externalId);
+        User user = userConnector.search(externalId, fieldList);
         ///then
         assertEquals(NONE, user.getName().getCertification());
         assertEquals(NONE, user.getEmail().getCertification());
@@ -101,7 +104,7 @@ class UserRegistryConnectorImplTest {
 
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -112,8 +115,9 @@ class UserRegistryConnectorImplTest {
     void search_nullExternalId() {
         //given
         String externalId = null;
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         //when
-        Executable executable = () -> userConnector.search(externalId);
+        Executable executable = () -> userConnector.search(externalId, fieldList);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
@@ -124,19 +128,20 @@ class UserRegistryConnectorImplTest {
     void search_certificationNotNone() {
         //given
         String externalId = "externalId";
-        UserResource userResourceMock = TestUtils.mockInstance(new UserResource());
-        userResourceMock.getEmail().setCertification(Certification.SPID);
-        userResourceMock.getFamilyName().setCertification(Certification.SPID);
-        userResourceMock.getName().setCertification(Certification.SPID);
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = TestUtils.mockInstance(new User());
+        userMock.getEmail().setCertification(Certification.SPID);
+        userMock.getFamilyName().setCertification(Certification.SPID);
+        userMock.getName().setCertification(Certification.SPID);
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
         workContact.getEmail().setCertification(Certification.SPID);
-        userResourceMock.setWorkContacts(workContacts);
+        userMock.setWorkContacts(workContacts);
         workContacts.put("institutionId", workContact);
         Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
-                .thenReturn(userResourceMock);
+                .thenReturn(userMock);
         //when
-        UserResource user = userConnector.search(externalId);
+        User user = userConnector.search(externalId, fieldList);
         //then
         assertEquals(SPID, user.getName().getCertification());
         assertEquals(SPID, user.getEmail().getCertification());
@@ -146,7 +151,7 @@ class UserRegistryConnectorImplTest {
 
         ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(Mockito.eq(EnumSet.allOf(UserResource.Fields.class)), embeddedCaptor.capture());
+                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
         EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
         assertEquals(externalId, externalIdCaptured.getFiscalCode());
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -156,11 +161,12 @@ class UserRegistryConnectorImplTest {
     void getUserByInternalId_nullInfo() {
         //given
         UUID userId = UUID.randomUUID();
-        UserResource userMock = new UserResource();
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = new User();
         Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.getUserByInternalId(userId.toString());
+        User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
         assertNull(user.getName());
         assertNull(user.getFamilyName());
@@ -169,7 +175,7 @@ class UserRegistryConnectorImplTest {
         assertNull(user.getWorkContacts());
         assertNull(user.getFiscalCode());
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
+                .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -177,16 +183,17 @@ class UserRegistryConnectorImplTest {
     void getUserByInternalId_nullInfo_nullUserResponse() {
         //given
         UUID userId = UUID.randomUUID();
-        UserResource userMock = null;
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = null;
         Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.getUserByInternalId(userId.toString());
+        User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
         assertNull(user);
 
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
+                .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -194,8 +201,8 @@ class UserRegistryConnectorImplTest {
     void getUserByInternalId_certificationNone() {
         //given
         UUID userId = UUID.randomUUID();
-
-        UserResource userMock = TestUtils.mockInstance(new UserResource());
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = TestUtils.mockInstance(new User());
         userMock.setId(userId.toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
@@ -205,7 +212,7 @@ class UserRegistryConnectorImplTest {
         Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.getUserByInternalId(userId.toString());
+        User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
         assertEquals(userId.toString(), user.getId());
         assertEquals(NONE, user.getName().getCertification());
@@ -215,7 +222,7 @@ class UserRegistryConnectorImplTest {
         assertNotNull(user.getFiscalCode());
 
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
+                .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
@@ -224,8 +231,9 @@ class UserRegistryConnectorImplTest {
     void getUserByInternalId_nullExternalId() {
         //given
         String userId = null;
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         //when
-        Executable executable = () -> userConnector.getUserByInternalId(userId);
+        Executable executable = () -> userConnector.getUserByInternalId(userId, fieldList);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
@@ -236,8 +244,8 @@ class UserRegistryConnectorImplTest {
     void getUserByInternalId_certificationNotNone() {
         //given
         UUID userId = UUID.randomUUID();
-
-        UserResource userMock = TestUtils.mockInstance(new UserResource());
+        final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
+        User userMock = TestUtils.mockInstance(new User());
         userMock.setId(userId.toString());
         userMock.getEmail().setCertification(Certification.SPID);
         userMock.getFamilyName().setCertification(Certification.SPID);
@@ -250,7 +258,7 @@ class UserRegistryConnectorImplTest {
         Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
         //when
-        UserResource user = userConnector.getUserByInternalId(userId.toString());
+        User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
         assertEquals(userId.toString(), user.getId());
         assertEquals(SPID, user.getName().getCertification());
@@ -260,7 +268,7 @@ class UserRegistryConnectorImplTest {
         assertNotNull(user.getFiscalCode());
 
         Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(userId, EnumSet.allOf(UserResource.Fields.class));
+                .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 

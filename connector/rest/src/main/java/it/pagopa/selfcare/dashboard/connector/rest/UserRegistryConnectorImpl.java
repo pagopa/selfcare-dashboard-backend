@@ -4,8 +4,8 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
 import lombok.extern.slf4j.Slf4j;
@@ -28,23 +28,25 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     }
 
     @Override
-    public UserResource search(String externalId) {
+    public User search(String externalId, EnumSet<User.Fields> fieldList) {
         log.trace("getUserByExternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
         Assert.hasText(externalId, "A TaxCode is required");
-        UserResource userResource = restClient.search(EnumSet.allOf(UserResource.Fields.class), new EmbeddedExternalId(externalId));
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", userResource);
+        Assert.notEmpty(fieldList, "At least one user fields is required");
+        User user = restClient.search(new EmbeddedExternalId(externalId), fieldList);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", user);
         log.trace("getUserByExternalId end");
 
-        return userResource;
+        return user;
     }
 
     @Override
-    public UserResource getUserByInternalId(String userId) {
+    public User getUserByInternalId(String userId, EnumSet<User.Fields> fieldList) {
         log.trace("getUserByInternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId userId = {}", userId);
         Assert.hasText(userId, "A userId is required");
-        UserResource result = restClient.getUserByInternalId(UUID.fromString(userId), EnumSet.allOf(UserResource.Fields.class));
+        Assert.notEmpty(fieldList, "At least one user fields is required");
+        User result = restClient.getUserByInternalId(UUID.fromString(userId), fieldList);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId result = {}", result);
         log.trace("getUserByInternalId end");
         return result;
