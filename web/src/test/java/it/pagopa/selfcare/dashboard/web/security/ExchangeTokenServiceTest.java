@@ -297,8 +297,6 @@ class ExchangeTokenServiceTest {
         assertEquals(institutionId, institution.getId());
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         assertNotNull(institution.getRoles());
-        assertEquals(productRole, institution.getRoles().get(0).getRole());
-        assertEquals(PartyRole.OPERATOR, institution.getRoles().get(0).getPartyRole());
         assertEquals(1, institution.getRoles().size());
         assertFalse(exchangedClaims.containsKey("groups"));
         Mockito.verify(jwtServiceMock, Mockito.times(1))
@@ -352,15 +350,16 @@ class ExchangeTokenServiceTest {
         ProductsConnector productsConnectorMock = Mockito.mock(ProductsConnector.class);
         Product product = TestUtils.mockInstance(new Product());
         ProductRoleInfo productRoleInfo = TestUtils.mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = TestUtils.mockInstance(new ProductRoleInfo.ProductRole());
-        ProductRoleInfo.ProductRole productRole2 = TestUtils.mockInstance(new ProductRoleInfo.ProductRole());
-        productRoleInfo.setRoles(List.of(productRole1, productRole2));
+        ProductRoleInfo.ProductRole productRole1 = TestUtils.mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        productRole1.setCode(productRole);
+        productRoleInfo.setRoles(List.of(productRole1));
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
 
         Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
+
 
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
@@ -394,7 +393,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenService.Institution institution = exchangedClaims.getInstitution();
         assertNotNull(institution);
         assertEquals(institutionId, institution.getId());
-//        assertEquals(productRole, institution.getRole());
+        assertEquals(1, institution.getRoles().size());
         List<String> groups = (List<String>) exchangedClaims.get("groups");
         assertEquals(groupInfo.getId(), groups.get(0));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
@@ -439,7 +438,7 @@ class ExchangeTokenServiceTest {
             LinkedHashMap<String, Object> o = (LinkedHashMap) get(INSTITUTION);
             ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
             institution.setId(o.get("id").toString());
-            institution.setRoles(o.get("role"));
+            institution.setRoles((List<ExchangeTokenService.Role>) o.get("roles"));
             institution.setTaxCode(o.get("fiscal_code").toString());
             return institution;
         }
