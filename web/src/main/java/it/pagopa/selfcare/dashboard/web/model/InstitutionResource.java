@@ -30,7 +30,7 @@ public class InstitutionResource {
     @NotBlank
     private String origin;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}")
     private InstitutionType institutionType;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
