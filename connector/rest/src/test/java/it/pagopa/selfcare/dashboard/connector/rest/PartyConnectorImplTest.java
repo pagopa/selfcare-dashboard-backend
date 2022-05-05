@@ -219,10 +219,10 @@ class PartyConnectorImplTest {
         OnboardingData onboardingData1 = TestUtils.mockInstance(new OnboardingData(), 1, "setState");
         onboardingData1.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData1.setState(ACTIVE);
-        OnboardingData onboardingData2 = TestUtils.mockInstance(new OnboardingData(), 2, "setState", "setInstitutionId");
+        OnboardingData onboardingData2 = TestUtils.mockInstance(new OnboardingData(), 2, "setState", "setId");
         onboardingData2.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData2.setState(RelationshipState.PENDING);
-        onboardingData2.setExternalId(onboardingData1.getExternalId());
+        onboardingData2.setId(onboardingData1.getId());
         OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setState");
         onboardingData3.setAttributes(List.of(TestUtils.mockInstance(new Attribute())));
         onboardingData3.setState(RelationshipState.PENDING);
@@ -409,8 +409,8 @@ class PartyConnectorImplTest {
         onboardingData1.setState(ACTIVE);
         OnboardingData onboardingData2 = TestUtils.mockInstance(new OnboardingData(), 2, "setProductInfo");
         onboardingData2.setState(ACTIVE);
-        OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setInstitutionId");
-        onboardingData3.setExternalId(onboardingData1.getExternalId());
+        OnboardingData onboardingData3 = TestUtils.mockInstance(new OnboardingData(), 3, "setId");
+        onboardingData3.setId(onboardingData1.getId());
         onboardingData3.setState(ACTIVE);
         onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3));
         Mockito.when(restClientMock.getOnBoardingInfo(Mockito.any(), Mockito.any(), Mockito.any()))

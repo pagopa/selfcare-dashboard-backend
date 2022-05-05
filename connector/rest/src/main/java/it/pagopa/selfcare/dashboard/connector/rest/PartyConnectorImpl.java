@@ -175,7 +175,7 @@ class PartyConnectorImpl implements PartyConnector {
             institutions = onBoardingInfo.getInstitutions().stream()
                     .map(ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION)
                     .collect(Collectors.collectingAndThen(
-                            Collectors.toMap(InstitutionInfo::getExternalId, Function.identity(), MERGE_FUNCTION),
+                            Collectors.toMap(InstitutionInfo::getId, Function.identity(), MERGE_FUNCTION),
                             Map::values
                     ));
         }
@@ -212,7 +212,7 @@ class PartyConnectorImpl implements PartyConnector {
             authInfos = onBoardingInfo.getInstitutions().stream()
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
                     .collect(Collectors.collectingAndThen(
-                            Collectors.groupingBy(OnboardingData::getExternalId,
+                            Collectors.groupingBy(OnboardingData::getId,
                                     Collectors.mapping(onboardingData -> {
                                         PartyProductRole productRole = new PartyProductRole();
                                         productRole.setProductId(onboardingData.getProductInfo().getId());
