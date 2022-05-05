@@ -12,17 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class UserRegistryServiceImpl implements UserRegistryService {
+public class UserServiceImpl implements UserService {
 
     private final UserRegistryConnector userConnector;
     private final PartyConnector partyConnector;
 
     @Autowired
-    public UserRegistryServiceImpl(UserRegistryConnector userConnector, PartyConnector partyConnector) {
+    public UserServiceImpl(UserRegistryConnector userConnector, PartyConnector partyConnector) {
         this.userConnector = userConnector;
         this.partyConnector = partyConnector;
     }
@@ -88,6 +90,33 @@ public class UserRegistryServiceImpl implements UserRegistryService {
         Assert.hasText(userId, "A UUID is required");
         userConnector.deleteById(userId);
         log.trace("deleteById end");
+    }
+
+    @Override
+    public UserInfo findByRelationshipId(String relationshipId) {
+        log.trace("findByRelationshipId start");
+        log.debug("findByRelationshipId = {}", relationshipId);
+        final UserInfo userInfo = partyConnector.getUser(relationshipId);
+        //FIXME: set user fields
+        userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId()));
+        log.debug("findByRelationshipId result = {}", userInfo);
+        log.trace("findByRelationshipId end");
+        return userInfo;
+    }
+
+    @Override
+    public Collection<UserInfo> findByInstitutionId(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
+        log.trace("findByInstitutionId start");
+        log.debug("findByInstitutionId institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
+        Assert.hasText(institutionId, "An Institution id is required");
+        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter).stream()
+                .peek(userInfo -> {
+                    //FIXME: set user fields
+                    userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId()));
+                }).collect(Collectors.toList());
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "findByInstitutionId result = {}", userInfos);
+        log.trace("findByInstitutionId end");
+        return userInfos;
     }
 
 }

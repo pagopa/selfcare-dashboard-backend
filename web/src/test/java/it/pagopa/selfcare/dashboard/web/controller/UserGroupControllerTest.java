@@ -6,8 +6,8 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
@@ -150,6 +150,7 @@ class UserGroupControllerTest {
         String groupId = "groupId";
         UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
         UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        userInfoModel.setId(UUID.randomUUID().toString());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
         List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
@@ -157,7 +158,7 @@ class UserGroupControllerTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO: use dummy
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -231,7 +232,7 @@ class UserGroupControllerTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);

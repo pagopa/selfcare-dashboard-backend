@@ -21,13 +21,13 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith({MockitoExtension.class})
-class UserRegistryServiceImplTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRegistryConnector userConnectorMock;
 
     @InjectMocks
-    private UserRegistryServiceImpl userRegistryService;
+    private UserServiceImpl userRegistryService;
 
     @Mock
     private PartyConnector partyConnector;

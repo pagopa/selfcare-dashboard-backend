@@ -36,10 +36,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -344,9 +341,10 @@ class InstitutionControllerTest {
         String institutionId = "institutionId";
         String productId = "productId";
         SelfCareAuthority role = SelfCareAuthority.ADMIN;
-        String[] productRole = {"api", "security"};
+        final UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        userInfoModel.setId(UUID.randomUUID().toString());
         Mockito.when(institutionServiceMock.getInstitutionProductUsers(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(Collections.singletonList(TestUtils.mockInstance(new UserInfo())));
+                .thenReturn(Collections.singletonList(userInfoModel));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)

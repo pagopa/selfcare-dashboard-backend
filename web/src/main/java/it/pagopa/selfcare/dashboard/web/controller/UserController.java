@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
-import it.pagopa.selfcare.dashboard.core.UserRegistryService;
+import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
@@ -27,11 +27,11 @@ import java.util.UUID;
 @Api(tags = "user")
 public class UserController {
 
-    private final UserRegistryService userRegistryService;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserRegistryService userRegistryService) {
-        this.userRegistryService = userRegistryService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping(value = "/search")
@@ -45,7 +45,7 @@ public class UserController {
                                        String institutionId) {
         log.trace("getUserByExternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource user = userRegistryService.search(externalId.getExternalId());
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource user = userService.search(externalId.getExternalId());
         UserResource result = UserMapper.toUserResource(user, institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
         log.trace("getUserByExternalId end");
@@ -66,7 +66,7 @@ public class UserController {
                                    UpdateUserDto updateUserDto) {
         log.trace("updateUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "id = {}, institutionId = {}, userDto = {}", id, institutionId, updateUserDto);
-        userRegistryService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto, institutionId));
+        userService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto, institutionId));
         log.trace("updateUser end");
     }
 
@@ -81,7 +81,7 @@ public class UserController {
                                            UserDto userDto) {
         log.trace("saveUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser userDto = {}", userDto);
-        UserId id = userRegistryService.saveUser(institutionId, UserMapper.map(userDto, institutionId));
+        UserId id = userService.saveUser(institutionId, UserMapper.map(userDto, institutionId));
         UserIdResource result = UserMapper.toIdResource(id);
         log.debug("saveUser result = {}", result);
         log.trace("saveUser end");
@@ -98,7 +98,7 @@ public class UserController {
                                                     String institutionId) {
         log.trace("getUserByInternalId start");
         log.debug("getUserByInternalId id = {}, institutionId = {}", id, institutionId);
-        it.pagopa.selfcare.dashboard.connector.model.user.UserResource userResource = userRegistryService.getUserByInternalId(id);
+        it.pagopa.selfcare.dashboard.connector.model.user.UserResource userResource = userService.getUserByInternalId(id);
         UserResource result = UserMapper.toUserResource(userResource, institutionId);
         log.debug("getUserByInternalId result = {}", result);
         log.trace("getUserByInternalId end");
@@ -113,7 +113,7 @@ public class UserController {
 
         log.trace("deleteUserById start");
         log.debug("deleteUserById id = {}", id);
-        userRegistryService.deleteById(id.toString());
+        userService.deleteById(id.toString());
         log.trace("deleteUserById end");
     }
 

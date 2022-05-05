@@ -10,7 +10,6 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
-import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -69,12 +68,7 @@ class PartyConnectorImpl implements PartyConnector {
     static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
         UserInfo userInfo = new UserInfo();
         userInfo.setId(relationshipInfo.getFrom());
-        userInfo.setName(relationshipInfo.getName());
-        userInfo.setSurname(relationshipInfo.getSurname());
-        userInfo.setEmail(relationshipInfo.getEmail());
         userInfo.setStatus(relationshipInfo.getState().toString());
-        userInfo.setCertified(Certification.isCertified(relationshipInfo.getCertification()));
-        userInfo.setTaxCode(relationshipInfo.getTaxCode());
         userInfo.setRole(relationshipInfo.getRole().getSelfCareAuthority());
         it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo productInfo
                 = new it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo();
@@ -138,7 +132,7 @@ class PartyConnectorImpl implements PartyConnector {
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitution result = {}", result);
+        log.debug("getOnBoardedInstitution result = {}", result);
         log.trace("getOnBoardedInstitution end");
         return result;
     }
@@ -161,7 +155,7 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("getOnBoardedInstitutions start");
         OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitutions result = {}", result);
+        log.debug("getOnBoardedInstitutions result = {}", result);
         log.trace("getOnBoardedInstitutions end");
         return result;
     }
@@ -169,7 +163,7 @@ class PartyConnectorImpl implements PartyConnector {
 
     private Collection<InstitutionInfo> parseOnBoardingInfo(OnBoardingInfo onBoardingInfo) {
         log.trace("parseOnBoardingInfo start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "parseOnBoardingInfo onBoardingInfo = {}", onBoardingInfo);
+        log.debug("parseOnBoardingInfo onBoardingInfo = {}", onBoardingInfo);
         Collection<InstitutionInfo> institutions = Collections.emptyList();
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             institutions = onBoardingInfo.getInstitutions().stream()
@@ -179,7 +173,7 @@ class PartyConnectorImpl implements PartyConnector {
                             Map::values
                     ));
         }
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "parseOnBoardingInfo result = {}", institutions);
+        log.debug("parseOnBoardingInfo result = {}", institutions);
         log.trace("parseOnBoardingInfo end");
         return institutions;
     }
@@ -234,6 +228,7 @@ class PartyConnectorImpl implements PartyConnector {
         return authInfos;
     }
 
+    //FIXME
     @Override
     public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");
@@ -254,7 +249,7 @@ class PartyConnectorImpl implements PartyConnector {
                             RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION,
                             USER_INFO_MERGE_FUNCTION)).values();
         }
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUsers result = {}", userInfos);
+        log.debug("getUsers result = {}", userInfos);
         log.trace("getUsers end");
         return userInfos;
     }

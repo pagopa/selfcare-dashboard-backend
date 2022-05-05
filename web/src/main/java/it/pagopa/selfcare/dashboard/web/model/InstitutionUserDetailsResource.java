@@ -17,7 +17,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 public class InstitutionUserDetailsResource extends InstitutionUserResource {
@@ -26,10 +25,5 @@ public class InstitutionUserDetailsResource extends InstitutionUserResource {
     @JsonProperty(required = true)
     @NotBlank
     private String fiscalCode;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.certified}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
-    private boolean certification;
 
 }

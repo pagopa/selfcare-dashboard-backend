@@ -44,9 +44,9 @@ class UserMapperTest {
         InstitutionUserResource resource = UserMapper.toInstitutionUser(model);
         // then
         assertEquals(model.getId(), resource.getId());
-        assertEquals(model.getName(), resource.getName());
-        assertEquals(model.getSurname(), resource.getSurname());
-        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getUser().getName().getValue(), resource.getName());
+        assertEquals(model.getUser().getFamilyName().getValue(), resource.getSurname());
+        assertEquals(model.getUser().getEmail().getValue(), resource.getEmail());
         assertEquals(model.getRole(), resource.getRole());
         assertEquals(model.getStatus(), resource.getStatus());
         ProductInfo prodInfo = model.getProducts().get(productInfo.getId());
@@ -69,16 +69,15 @@ class UserMapperTest {
         InstitutionUserDetailsResource resource = UserMapper.toInstitutionUserDetails(model);
         // then
         assertEquals(model.getId(), resource.getId());
-        assertEquals(model.getName(), resource.getName());
-        assertEquals(model.getSurname(), resource.getSurname());
-        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getUser().getName().getValue(), resource.getName());
+        assertEquals(model.getUser().getFamilyName().getValue(), resource.getSurname());
+        assertEquals(model.getUser().getEmail().getValue(), resource.getEmail());
         assertEquals(model.getRole(), resource.getRole());
         assertEquals(model.getStatus(), resource.getStatus());
         ProductInfo prodInfo = model.getProducts().get(productInfo.getId());
         assertEquals(productInfo.getId(), prodInfo.getId());
         assertEquals(productInfo.getTitle(), prodInfo.getTitle());
-        assertEquals(model.getTaxCode(), resource.getFiscalCode());
-        assertEquals(model.isCertified(), resource.isCertification());
+        assertEquals(model.getUser().getFiscalCode(), resource.getFiscalCode());
         TestUtils.reflectionEqualsByName(resource, model);
     }
 
@@ -107,6 +106,7 @@ class UserMapperTest {
     void toProductUser_notNull() {
         // given
         UserInfo model = TestUtils.mockInstance(new UserInfo());
+        model.setId(UUID.randomUUID().toString());
         ProductInfo productMock = TestUtils.mockInstance(new ProductInfo());
         productMock.setRoleInfos(List.of(TestUtils.mockInstance(new RoleInfo())));
         Map<String, ProductInfo> product = new HashMap<>();
@@ -117,19 +117,18 @@ class UserMapperTest {
         // when
         ProductUserResource resource = UserMapper.toProductUser(model);
         // then
-        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getId(), resource.getId().toString());
         assertEquals(productInfo.getId(), resource.getProduct().getId());
         assertEquals(productInfo.getTitle(), resource.getProduct().getTitle());
         assertEquals(productInfo.getRoleInfos().get(0).getRole(), resource.getProduct().getRoleInfos().get(0).getRole());
         assertEquals(productInfo.getRoleInfos().get(0).getSelcRole(), resource.getProduct().getRoleInfos().get(0).getSelcRole());
         assertEquals(productInfo.getRoleInfos().get(0).getRelationshipId(), resource.getProduct().getRoleInfos().get(0).getRelationshipId());
         assertEquals(productInfo.getRoleInfos().get(0).getStatus(), resource.getProduct().getRoleInfos().get(0).getStatus());
-        assertEquals(model.getName(), resource.getName());
-        assertEquals(model.getSurname(), resource.getSurname());
-        assertEquals(model.getEmail(), resource.getEmail());
+        assertEquals(model.getUser().getName().getValue(), resource.getName());
+        assertEquals(model.getUser().getFamilyName().getValue(), resource.getSurname());
+        assertEquals(model.getUser().getEmail().getValue(), resource.getEmail());
         assertEquals(model.getRole(), resource.getRole());
         assertEquals(model.getStatus(), resource.getStatus());
-        TestUtils.reflectionEqualsByName(resource, model);
     }
 
     @Test
@@ -148,7 +147,7 @@ class UserMapperTest {
         //given
         String institutionId = "institutionId";
         it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
-        model.setId(UUID.randomUUID());
+        model.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workcontact = TestUtils.mockInstance(new WorkContactResource());
         workContacts.put(institutionId, workcontact);
@@ -156,7 +155,7 @@ class UserMapperTest {
         //when
         UserResource resource = UserMapper.toUserResource(model, institutionId);
         //then
-        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getId(), resource.getId().toString());
         assertEquals(model.getEmail().getValue(), resource.getEmail().getValue());
         assertEquals(model.getName().getValue(), resource.getName().getValue());
         assertEquals(model.getWorkContacts().get(institutionId).getEmail().getValue(), resource.getEmail().getValue());
@@ -168,11 +167,11 @@ class UserMapperTest {
         //given
         String institutionId = "institutionId";
         it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
-        model.setId(UUID.randomUUID());
+        model.setId(UUID.randomUUID().toString());
         //when
         UserResource resource = UserMapper.toUserResource(model, institutionId);
         //then
-        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getId(), resource.getId().toString());
         assertEquals(model.getName().getValue(), resource.getName().getValue());
         assertNull(resource.getEmail());
         assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());
@@ -183,7 +182,7 @@ class UserMapperTest {
         //given
         String institutionId = "institutionId";
         it.pagopa.selfcare.dashboard.connector.model.user.UserResource model = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource(), "setId");
-        model.setId(UUID.randomUUID());
+        model.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workcontact = TestUtils.mockInstance(new WorkContactResource());
         workContacts.put("institution2", workcontact);
@@ -191,7 +190,7 @@ class UserMapperTest {
         //when
         UserResource resource = UserMapper.toUserResource(model, institutionId);
         //then
-        assertEquals(model.getId(), resource.getId());
+        assertEquals(model.getId(), resource.getId().toString());
         assertEquals(model.getName().getValue(), resource.getName().getValue());
         assertNull(resource.getEmail());
         assertEquals(model.getFamilyName().getValue(), resource.getFamilyName().getValue());

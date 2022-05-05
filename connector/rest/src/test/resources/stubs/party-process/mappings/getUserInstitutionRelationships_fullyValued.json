@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/external/institutions/institutionId1/relationships"
+    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/relationships"
   },
   "response": {
     "status": "200",

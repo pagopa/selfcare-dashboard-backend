@@ -84,7 +84,7 @@ class UserRegistryConnectorImplTest {
         //given
         String externalId = "externalId";
         UserResource userMock = TestUtils.mockInstance(new UserResource());
-        userMock.setId(UUID.randomUUID());
+        userMock.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         workContacts.put("institutionId", TestUtils.mockInstance(new WorkContactResource()));
         userMock.setWorkContacts(workContacts);
@@ -196,7 +196,7 @@ class UserRegistryConnectorImplTest {
         UUID userId = UUID.randomUUID();
 
         UserResource userMock = TestUtils.mockInstance(new UserResource());
-        userMock.setId(userId);
+        userMock.setId(userId.toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
         workContact.getEmail().setCertification(Certification.NONE);
@@ -207,7 +207,7 @@ class UserRegistryConnectorImplTest {
         //when
         UserResource user = userConnector.getUserByInternalId(userId.toString());
         ///then
-        assertEquals(userId, user.getId());
+        assertEquals(userId.toString(), user.getId());
         assertEquals(NONE, user.getName().getCertification());
         assertEquals(NONE, user.getEmail().getCertification());
         assertEquals(NONE, user.getFamilyName().getCertification());
@@ -238,7 +238,7 @@ class UserRegistryConnectorImplTest {
         UUID userId = UUID.randomUUID();
 
         UserResource userMock = TestUtils.mockInstance(new UserResource());
-        userMock.setId(userId);
+        userMock.setId(userId.toString());
         userMock.getEmail().setCertification(Certification.SPID);
         userMock.getFamilyName().setCertification(Certification.SPID);
         userMock.getName().setCertification(Certification.SPID);
@@ -252,7 +252,7 @@ class UserRegistryConnectorImplTest {
         //when
         UserResource user = userConnector.getUserByInternalId(userId.toString());
         ///then
-        assertEquals(userId, user.getId());
+        assertEquals(userId.toString(), user.getId());
         assertEquals(SPID, user.getName().getCertification());
         assertEquals(SPID, user.getEmail().getCertification());
         assertEquals(SPID, user.getFamilyName().getCertification());
@@ -269,7 +269,7 @@ class UserRegistryConnectorImplTest {
         //given
         String institutionId = "institutionId";
         UUID id = UUID.randomUUID();
-        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto());
+        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
         //when
         Executable executable = () -> userConnector.updateUser(id, userDto);
         //then
@@ -286,7 +286,7 @@ class UserRegistryConnectorImplTest {
     void updateUser_nullId() {
         //given
         UUID id = null;
-        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto());
+        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
 
         //when
         Executable executable = () -> userConnector.updateUser(id, userDto);
@@ -300,7 +300,7 @@ class UserRegistryConnectorImplTest {
     void saveUser() {
         //given
         UserId id = TestUtils.mockInstance(new UserId());
-        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto());
+        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto(), "setWorkContacts");
         Mockito.when(restClientMock.saveUser(Mockito.any()))
                 .thenReturn(id);
         //when
@@ -318,7 +318,7 @@ class UserRegistryConnectorImplTest {
     @Test
     void saveUser_nullInfo() {
         //given
-        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto());
+        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto(), "setWorkContacts");
         //when
         UserId id = userConnector.saveUser(saveUserDto);
         //then

@@ -3,7 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
-import it.pagopa.selfcare.dashboard.core.UserRegistryService;
+import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
@@ -40,7 +40,7 @@ class UserControllerTest {
 
     static {
         USER_RESOURCE = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.connector.model.user.UserResource());
-        USER_RESOURCE.setId(UUID.randomUUID());
+        USER_RESOURCE.setId(UUID.randomUUID().toString());
         Map<String, WorkContactResource> workContacts = new HashMap<>();
         WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
         workContact.getEmail().setCertification(Certification.SPID);
@@ -55,7 +55,7 @@ class UserControllerTest {
     protected ObjectMapper mapper;
 
     @MockBean
-    private UserRegistryService userRegistryServiceMock;
+    private UserService userServiceMock;
 
     @Captor
     private ArgumentCaptor<UserDto> userDtoCaptor;
@@ -71,7 +71,7 @@ class UserControllerTest {
         String institutionId = "institutionId";
         EmbeddedExternalIdDto externalIdDto = new EmbeddedExternalIdDto();
         externalIdDto.setExternalId(externalId);
-        Mockito.when(userRegistryServiceMock.search(Mockito.anyString()))
+        Mockito.when(userServiceMock.search(Mockito.anyString()))
                 .thenReturn(USER_RESOURCE);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -85,9 +85,9 @@ class UserControllerTest {
         //then
         UserResource userResponse = mapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
         assertNotNull(userResponse);
-        Mockito.verify(userRegistryServiceMock, Mockito.times(1))
+        Mockito.verify(userServiceMock, Mockito.times(1))
                 .search(externalId);
-        Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
+        Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
     @Test
@@ -107,7 +107,7 @@ class UserControllerTest {
                 .andReturn();
         //then
         assertEquals(0, result.getResponse().getContentLength());
-        Mockito.verify(userRegistryServiceMock, Mockito.times(1))
+        Mockito.verify(userServiceMock, Mockito.times(1))
                 .updateUser(uidCaptor.capture(), Mockito.anyString(), userDtoCaptor.capture());
         UserDto dto = userDtoCaptor.getValue();
         assertEquals(dto.getEmail(), updateUserDto.getEmail());
@@ -116,7 +116,7 @@ class UserControllerTest {
         assertEquals(dto.getName(), updateUserDto.getName());
         assertEquals(dto.getWorkContacts().get(institutionId).getEmail(), updateUserDto.getEmail());
 
-        Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
+        Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
     @Test
@@ -124,7 +124,7 @@ class UserControllerTest {
         //given
         UUID id = UUID.randomUUID();
         String institutionId = "institutionId";
-        Mockito.when(userRegistryServiceMock.getUserByInternalId(Mockito.any()))
+        Mockito.when(userServiceMock.getUserByInternalId(Mockito.any()))
                 .thenReturn(USER_RESOURCE);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -138,9 +138,9 @@ class UserControllerTest {
         UserResource userResponse = mapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
         assertNotNull(userResponse);
         assertEquals(USER_RESOURCE.getWorkContacts().get(institutionId).getEmail().getValue(), userResponse.getEmail().getValue());
-        Mockito.verify(userRegistryServiceMock, Mockito.times(1))
+        Mockito.verify(userServiceMock, Mockito.times(1))
                 .getUserByInternalId(id);
-        Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
+        Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
     @Test
@@ -149,7 +149,7 @@ class UserControllerTest {
         String institutionId = "institutionId";
         it.pagopa.selfcare.dashboard.web.model.user.UserDto dto = TestUtils.mockInstance(new it.pagopa.selfcare.dashboard.web.model.user.UserDto());
         UserId id = TestUtils.mockInstance(new UserId());
-        Mockito.when(userRegistryServiceMock.saveUser(Mockito.anyString(), Mockito.any()))
+        Mockito.when(userServiceMock.saveUser(Mockito.anyString(), Mockito.any()))
                 .thenReturn(id);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -164,7 +164,7 @@ class UserControllerTest {
         UserIdResource idResource = mapper.readValue(result.getResponse().getContentAsString(), UserIdResource.class);
         assertEquals(id.getId(), idResource.getId());
         ArgumentCaptor<SaveUser> captureSave = ArgumentCaptor.forClass(SaveUser.class);
-        Mockito.verify(userRegistryServiceMock, Mockito.times(1))
+        Mockito.verify(userServiceMock, Mockito.times(1))
                 .saveUser(Mockito.eq(institutionId), captureSave.capture());
         SaveUser saveUser = captureSave.getValue();
         assertEquals(dto.getEmail(), saveUser.getEmail());
@@ -173,7 +173,7 @@ class UserControllerTest {
         assertEquals(dto.getFiscalCode(), saveUser.getFiscalCode());
         assertTrue(saveUser.getWorkContacts().containsKey(institutionId));
         assertEquals(dto.getEmail(), saveUser.getWorkContacts().get(institutionId).getEmail());
-        Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
+        Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
 
@@ -190,9 +190,9 @@ class UserControllerTest {
                 .andReturn();
         //then
         assertEquals(0, result.getResponse().getContentLength());
-        Mockito.verify(userRegistryServiceMock, Mockito.times(1))
+        Mockito.verify(userServiceMock, Mockito.times(1))
                 .deleteById(id.toString());
-        Mockito.verifyNoMoreInteractions(userRegistryServiceMock);
+        Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
 }

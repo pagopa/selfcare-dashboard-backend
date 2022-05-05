@@ -36,10 +36,10 @@ public class UserMapper {
         return resource;
     }
 
-    public static CertifiableFieldResource<String> map(String certifiableField, Certification certification) {
-        CertifiableFieldResource<String> resource = null;
+    public static CertifiedField<String> map(String certifiableField, Certification certification) {
+        CertifiedField<String> resource = null;
         if (certifiableField != null) {
-            resource = new CertifiableFieldResource<>();
+            resource = new CertifiedField<>();
             resource.setValue(certifiableField);
             resource.setCertification(Certification.valueOf(certification.toString()));
         }
@@ -55,25 +55,12 @@ public class UserMapper {
         return workContactResource;
     }
 
-    public static CertifiableFieldResource<LocalDate> map(LocalDate date, Certification certification) {
-        CertifiableFieldResource<LocalDate> resource = null;
+    public static CertifiedField<LocalDate> map(LocalDate date, Certification certification) {
+        CertifiedField<LocalDate> resource = null;
         if (date != null) {
-            resource = new CertifiableFieldResource<>();
+            resource = new CertifiedField<>();
             resource.setValue(date);
             resource.setCertification(Certification.valueOf(certification.toString()));
-        }
-        return resource;
-    }
-
-    public static User toUser(UserResource model) {
-        User resource = null;
-        if (model != null) {
-            resource = new User();
-            resource.setId(model.getId().toString());
-            resource.setFiscalCode(model.getFiscalCode());
-            resource.setName(model.getName().getValue());
-            resource.setSurname(model.getFamilyName().getValue());
-            resource.setEmail(model.getEmail().getValue());
         }
         return resource;
     }

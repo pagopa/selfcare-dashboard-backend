@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class CertifiableField<T> {
+public class CertifiedField<T> {
 
     private Certification certification;
     private T value;

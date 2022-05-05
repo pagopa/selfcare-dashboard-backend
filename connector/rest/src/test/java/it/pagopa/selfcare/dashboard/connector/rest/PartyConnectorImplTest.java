@@ -567,14 +567,8 @@ class PartyConnectorImplTest {
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
-        //FIXME
-        InstitutionContact institutionContactMock = TestUtils.mockInstance(new InstitutionContact());
-        Map<String, List<InstitutionContact>> institutionContact = new HashMap<>();
-        institutionContact.put("institutionContact", List.of(institutionContactMock));
-        relationshipInfo1.setInstitutionContacts(institutionContact);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
-        relationshipInfo2.setInstitutionContacts(institutionContact);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
         relationshipsResponse.add(relationshipInfo1);
         relationshipsResponse.add(relationshipInfo2);
@@ -597,9 +591,7 @@ class PartyConnectorImplTest {
         Assertions.assertNotNull(product.getRoleInfos());
         Assertions.assertNotNull(product.getId());
         Assertions.assertNull(product.getTitle());
-        Assertions.assertNotNull(userInfo.getName());
-        Assertions.assertNotNull(userInfo.getSurname());
-        Assertions.assertNotNull(userInfo.getEmail());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertNotNull(userInfo.getStatus());
         Assertions.assertNotNull(userInfo.getRole());
         Assertions.assertEquals(1, userInfo.getProducts().size());
@@ -617,11 +609,6 @@ class PartyConnectorImplTest {
 
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo1.setFrom(relationshipId);
-        //FIXME
-        InstitutionContact institutionContactMock = TestUtils.mockInstance(new InstitutionContact());
-        Map<String, List<InstitutionContact>> institutionContact = new HashMap<>();
-        institutionContact.put("institutionContact", List.of(institutionContactMock));
-        relationshipInfo1.setInstitutionContacts(institutionContact);
         Mockito.when(restClientMock.getRelationship(Mockito.anyString()))
                 .thenReturn(relationshipInfo1);
         // when
@@ -629,9 +616,7 @@ class PartyConnectorImplTest {
         // then
         Assertions.assertNotNull(userInfo);
         Assertions.assertEquals(relationshipId, userInfo.getId());
-        Assertions.assertNotNull(userInfo.getName());
-        Assertions.assertNotNull(userInfo.getSurname());
-        Assertions.assertNotNull(userInfo.getEmail());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertNotNull(userInfo.getStatus());
         Assertions.assertNotNull(userInfo.getRole());
         String prodId = null;
@@ -658,12 +643,9 @@ class PartyConnectorImplTest {
         // when
         UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
         // then
-        Assertions.assertEquals(relationshipInfo.getName(), userInfo.getName());
-        Assertions.assertEquals(relationshipInfo.getSurname(), userInfo.getSurname());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
-        Assertions.assertEquals(relationshipInfo.getEmail(), userInfo.getEmail());
         Assertions.assertEquals(relationshipInfo.getFrom(), userInfo.getId());
-        Assertions.assertEquals(relationshipInfo.getTaxCode(), userInfo.getTaxCode());
         String prodId = null;
         Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
         for (String key :
@@ -718,7 +700,7 @@ class PartyConnectorImplTest {
         //Then
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
-        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(2, userInfo.getProducts().size());
@@ -742,7 +724,7 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
         Assertions.assertEquals(relationshipsResponse.size(), userInfo.getProducts().size());
-        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("PENDING", userInfo.getStatus());
 
@@ -764,7 +746,7 @@ class PartyConnectorImplTest {
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
-        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("PENDING", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());
@@ -784,7 +766,7 @@ class PartyConnectorImplTest {
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
-        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(LIMITED, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());
@@ -805,7 +787,7 @@ class PartyConnectorImplTest {
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
-        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());
@@ -820,12 +802,10 @@ class PartyConnectorImplTest {
         RelationshipInfo relationshipInfo1 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         String id = "id";
         relationshipInfo1.setFrom(id);
-        relationshipInfo1.setName("user1");
         relationshipInfo1.setRole(PartyRole.OPERATOR);
         relationshipInfo1.setState(PENDING);
         RelationshipInfo relationshipInfo2 = TestUtils.mockInstance(new RelationshipInfo(), "setFrom");
         relationshipInfo2.setFrom(id);
-        relationshipInfo2.setName("user1");
         relationshipInfo2.setRole(PartyRole.DELEGATE);
         relationshipInfo2.setState(ACTIVE);
         RelationshipsResponse relationshipsResponse = new RelationshipsResponse();
@@ -837,7 +817,7 @@ class PartyConnectorImplTest {
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
-        Assertions.assertEquals("user1", userInfo.getName());
+        Assertions.assertNull(userInfo.getUser());
         Assertions.assertEquals(ADMIN, userInfo.getRole());
         Assertions.assertEquals("ACTIVE", userInfo.getStatus());
         Assertions.assertEquals(1, userInfos.size());

@@ -7,7 +7,10 @@ import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
@@ -336,18 +339,18 @@ class UserGroupServiceImplTest {
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId.get());
-        User createdBy = new User();
+        UserResource createdBy = new UserResource();
         createdBy.setId("createdBy");
         foundGroup.setCreatedBy(createdBy);
-        User modifiedBy = new User();
+        UserResource modifiedBy = new UserResource();
         modifiedBy.setId("modifiedBy");
         foundGroup.setModifiedBy(modifiedBy);
 
 
         UserResource createdByMock = TestUtils.mockInstance(new UserResource(), "setId");
-        createdByMock.setId(UUID.randomUUID());
+        createdByMock.setId(UUID.randomUUID().toString());
         UserResource modifiedByMock = TestUtils.mockInstance(new UserResource(), "setId");
-        modifiedByMock.setId(UUID.randomUUID());
+        modifiedByMock.setId(UUID.randomUUID().toString());
 
         Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
                 .thenReturn(foundGroup);
@@ -416,13 +419,13 @@ class UserGroupServiceImplTest {
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId.get());
-        User createdBy = new User();
+        UserResource createdBy = new UserResource();
         createdBy.setId("createdBy");
         foundGroup.setCreatedBy(createdBy);
 
 
         UserResource createdByMock = TestUtils.mockInstance(new UserResource(), "setId");
-        createdByMock.setId(UUID.randomUUID());
+        createdByMock.setId(UUID.randomUUID().toString());
 
         Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
                 .thenReturn(foundGroup);
@@ -489,18 +492,18 @@ class UserGroupServiceImplTest {
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId.get());
-        User createdBy = new User();
+        UserResource createdBy = new UserResource();
         createdBy.setId("createdBy");
         foundGroup.setCreatedBy(createdBy);
-        User modifiedBy = new User();
+        UserResource modifiedBy = new UserResource();
         modifiedBy.setId("modifiedBy");
         foundGroup.setModifiedBy(modifiedBy);
 
 
         UserResource createdByMock = TestUtils.mockInstance(new UserResource(), "setId");
-        createdByMock.setId(UUID.randomUUID());
+        createdByMock.setId(UUID.randomUUID().toString());
         UserResource modifiedByMock = TestUtils.mockInstance(new UserResource(), "setId");
-        modifiedByMock.setId(UUID.randomUUID());
+        modifiedByMock.setId(UUID.randomUUID().toString());
 
         Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
                 .thenReturn(foundGroup);

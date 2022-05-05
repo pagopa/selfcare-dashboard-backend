@@ -67,7 +67,7 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     void userUpdate() {
         //given
         UUID id = UUID.randomUUID();
-        MutableUserFieldsDto mutableUserFieldsDto = TestUtils.mockInstance(new MutableUserFieldsDto());
+        MutableUserFieldsDto mutableUserFieldsDto = TestUtils.mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
         //when
         Executable executable = () -> restClient.patchUser(id, mutableUserFieldsDto);
         //then
@@ -113,7 +113,7 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     @Test
     void saveUser() {
         //given
-        SaveUserDto userDto = TestUtils.mockInstance(new SaveUserDto());
+        SaveUserDto userDto = TestUtils.mockInstance(new SaveUserDto(), "setWorkContacts");
         //when
         UserId id = restClient.saveUser(userDto);
         //then

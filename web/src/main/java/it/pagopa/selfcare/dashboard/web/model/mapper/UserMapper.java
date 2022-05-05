@@ -8,11 +8,13 @@ import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
-import it.pagopa.selfcare.dashboard.web.model.user.CertifiableFieldBooleanResource;
+import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,7 @@ public class UserMapper {
         return resource;
     }
 
+
     private static ProductRoleInfoResource toRoleInfoResource(RoleInfo model) {
         ProductRoleInfoResource resource = null;
         if (model != null) {
@@ -44,6 +47,7 @@ public class UserMapper {
         }
         return resource;
     }
+
 
     public static SaveUser map(it.pagopa.selfcare.dashboard.web.model.user.UserDto model, String institutionId) {
         SaveUser resource = null;
@@ -64,6 +68,7 @@ public class UserMapper {
         return resource;
     }
 
+
     public static UserIdResource toIdResource(UserId model) {
         UserIdResource resource = null;
         if (model != null) {
@@ -73,103 +78,124 @@ public class UserMapper {
         return resource;
     }
 
+
     public static it.pagopa.selfcare.dashboard.web.model.user.UserResource toUserResource(UserResource model, String institutionId) {
         it.pagopa.selfcare.dashboard.web.model.user.UserResource resource = null;
         if (model != null) {
             resource = new it.pagopa.selfcare.dashboard.web.model.user.UserResource();
-            resource.setId(model.getId());
+            resource.setId(UUID.fromString(model.getId()));
             resource.setFiscalCode(model.getFiscalCode());
-            resource.setName(toBoleanCertified(model.getName()));
-            resource.setFamilyName(toBoleanCertified(model.getFamilyName()));
+            resource.setName(toCertifiedFieldResource(model.getName()));
+            resource.setFamilyName(toCertifiedFieldResource(model.getFamilyName()));
             if (institutionId != null) {
                 if (model.getWorkContacts() != null)
                     resource.setEmail(model.getWorkContacts().entrySet().stream()
                             .filter(e -> e.getKey().equals(institutionId))
                             .findAny()
-                            .map(entry -> toBoleanCertified(entry.getValue().getEmail()))
+                            .map(entry -> toCertifiedFieldResource(entry.getValue().getEmail()))
                             .orElse(null));
             }
         }
         return resource;
     }
 
-    public static CertifiableFieldResource<String> map(String certifiableField, Certification certification) {
-        CertifiableFieldResource<String> resource = null;
+
+    public static CertifiedField<String> map(String certifiableField, Certification certification) {
+        CertifiedField<String> resource = null;
         if (certifiableField != null) {
-            resource = new CertifiableFieldResource<>();
+            resource = new CertifiedField<>();
             resource.setValue(certifiableField);
             resource.setCertification(certification);
         }
         return resource;
     }
 
-    public static CertifiableFieldBooleanResource<String> toBoleanCertified(CertifiableFieldResource<String> certifiableFieldResource) {
-        CertifiableFieldBooleanResource<String> resource = null;
-        if (certifiableFieldResource != null) {
-            resource = new CertifiableFieldBooleanResource<>();
-            resource.setCertified(Certification.isCertified(certifiableFieldResource.getCertification()));
-            resource.setValue(certifiableFieldResource.getValue());
+
+    public static <T> CertifiedFieldResource<T> toCertifiedFieldResource(CertifiedField<T> certifiedField) {
+        CertifiedFieldResource<T> resource = null;
+        if (certifiedField != null) {
+            resource = new CertifiedFieldResource<>();
+            resource.setCertified(Certification.isCertified(certifiedField.getCertification()));
+            resource.setValue(certifiedField.getValue());
         }
         return resource;
     }
+
 
     public static InstitutionUserResource toInstitutionUser(UserInfo model) {
         return toInstitutionUser(model, InstitutionUserResource::new);
     }
 
+
     public static InstitutionUserDetailsResource toInstitutionUserDetails(UserInfo model) {
         InstitutionUserDetailsResource resource = toInstitutionUser(model, InstitutionUserDetailsResource::new);
-        if (model != null) {
-            resource.setFiscalCode(model.getTaxCode());
-            resource.setCertification(model.isCertified());
+        if (resource != null) {
+            Optional.ofNullable(model)
+                    .map(UserInfo::getUser)
+                    .map(UserResource::getFiscalCode)
+                    .ifPresent(resource::setFiscalCode);
         }
-
         return resource;
     }
 
-    private static <T extends InstitutionUserResource> T toInstitutionUser(UserInfo model, Supplier<T> supplier) {
-        T resource = null;
-        if (model != null) {
-            resource = supplier.get();
-            resource.setId(model.getId());
-            resource.setName(model.getName());
-            resource.setSurname(model.getSurname());
-            resource.setEmail(model.getEmail());
-            resource.setRole(model.getRole());
-            resource.setStatus(model.getStatus());
-            if (model.getProducts() != null) {
-                resource.setProducts(model.getProducts().values()
-                        .stream()
-                        .map(UserMapper::toUserProductInfoResource)
-                        .collect(Collectors.toList()));
-            }
-        }
 
-        return resource;
+    private static <T extends InstitutionUserResource> T toInstitutionUser(UserInfo model, Supplier<T> supplier) {
+        return Optional.ofNullable(model)
+                .map(userInfo -> {
+                    final T resource = supplier.get();
+                    resource.setId(userInfo.getId());
+                    resource.setRole(userInfo.getRole());
+                    resource.setStatus(userInfo.getStatus());
+                    Optional.ofNullable(userInfo.getUser()).ifPresent(userResource -> {
+                        Optional.ofNullable(userResource.getName())
+                                .map(CertifiedField::getValue)
+                                .ifPresent(resource::setName);
+                        Optional.ofNullable(userResource.getFamilyName())
+                                .map(CertifiedField::getValue)
+                                .ifPresent(resource::setSurname);
+                        Optional.ofNullable(userResource.getEmail())
+                                .map(CertifiedField::getValue)
+                                .ifPresent(resource::setEmail);
+                    });
+                    Optional.ofNullable(userInfo.getProducts())
+                            .map(map -> map.values().stream()
+                                    .map(UserMapper::toUserProductInfoResource)
+                                    .collect(Collectors.toList()))
+                            .ifPresent(resource::setProducts);
+                    return resource;
+                }).orElse(null);
     }
 
 
     public static ProductUserResource toProductUser(UserInfo model) {
-        ProductUserResource resource = null;
-        if (model != null) {
-            resource = new ProductUserResource();
-            resource.setId(model.getId());
-            resource.setName(model.getName());
-            resource.setSurname(model.getSurname());
-            resource.setEmail(model.getEmail());
-            resource.setRole(model.getRole());
-            resource.setStatus(model.getStatus());
-            resource.setCertification(model.isCertified());
-            if (model.getProducts() != null) {
-                resource.setProduct(model.getProducts().values()
-                        .stream()
-                        .map(UserMapper::toUserProductInfoResource)
-                        .collect(Collectors.toList()).get(0));
-            }
-        }
-
-        return resource;
+        return Optional.ofNullable(model)
+                .map(userInfo -> {
+                    ProductUserResource resource = new ProductUserResource();
+                    resource.setId(UUID.fromString(userInfo.getId()));
+                    resource.setRole(userInfo.getRole());
+                    resource.setStatus(userInfo.getStatus());
+                    Optional.ofNullable(userInfo.getUser()).ifPresent(userResource -> {
+                        resource.setName(Optional.ofNullable(userResource.getName())
+                                .map(CertifiedField::getValue)
+                                .orElse(null));
+                        resource.setSurname(Optional.ofNullable(userResource.getFamilyName())
+                                .map(CertifiedField::getValue)
+                                .orElse(null));
+                        resource.setEmail(Optional.ofNullable(userResource.getEmail())
+                                .map(CertifiedField::getValue)
+                                .orElse(null));
+                    });
+                    Optional.ofNullable(userInfo.getProducts()).ifPresent(map ->
+                            resource.setProduct(map.values()
+                                    .stream()
+                                    .map(UserMapper::toUserProductInfoResource)
+                                    .collect(Collectors.toList())
+                                    .get(0)));
+                    return resource;
+                })
+                .orElse(null);
     }
+
 
     public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto) {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = null;
@@ -191,6 +217,7 @@ public class UserMapper {
 
         return model;
     }
+
 
     public static UserDto fromUpdateUser(UpdateUserDto userDto, String institutionId) {
         UserDto resource = null;

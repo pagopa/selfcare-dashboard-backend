@@ -15,7 +15,6 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUs
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -46,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(
         initializers = PartyProcessRestClientTest.RandomPortInitializer.class,
         classes = {PartyProcessRestClientTestConfig.class, HttpClientConfiguration.class})
-@Disabled
 class PartyProcessRestClientTest extends BaseFeignRestClientTest {
 
     @Order(1)
@@ -106,11 +104,6 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertFalse(response.isEmpty());
         response.forEach(relationshipInfo -> {
             TestUtils.checkNotNullFields(relationshipInfo);
-            relationshipInfo.getInstitutionContacts().values().forEach(institutionContacts -> {
-                assertNotNull(institutionContacts);
-                assertFalse(institutionContacts.isEmpty());
-                institutionContacts.forEach(TestUtils::checkNotNullFields);
-            });
             TestUtils.checkNotNullFields(relationshipInfo.getInstitutionUpdate());
             TestUtils.checkNotNullFields(relationshipInfo.getBilling());
         });

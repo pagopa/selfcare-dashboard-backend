@@ -1,13 +1,11 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.model.user.SaveUser;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 
+import java.util.Collection;
 import java.util.UUID;
 
-public interface UserRegistryService {
+public interface UserService {
 
     UserResource search(String externalId);
 
@@ -18,5 +16,9 @@ public interface UserRegistryService {
     UserId saveUser(String institutionId, SaveUser userDto);
 
     void deleteById(String userId);
+
+    UserInfo findByRelationshipId(String relationshipId);
+
+    Collection<UserInfo> findByInstitutionId(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 
 }

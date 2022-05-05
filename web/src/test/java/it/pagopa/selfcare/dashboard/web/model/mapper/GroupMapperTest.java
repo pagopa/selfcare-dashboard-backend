@@ -6,8 +6,8 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
@@ -114,6 +114,7 @@ class GroupMapperTest {
         //given
         UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
         UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        userInfoModel.setId(UUID.randomUUID().toString());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
         List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
@@ -121,7 +122,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -138,13 +139,13 @@ class GroupMapperTest {
         assertEquals(model.getProductId(), resource.getProductId());
         assertEquals(model.getStatus(), resource.getStatus());
         assertEquals(model.getCreatedAt(), resource.getCreatedAt());
-        assertEquals(model.getCreatedBy().getName(), resource.getCreatedBy().getName());
-        assertEquals(model.getCreatedBy().getSurname(), resource.getCreatedBy().getSurname());
+        assertEquals(model.getCreatedBy().getName().getValue(), resource.getCreatedBy().getName());
+        assertEquals(model.getCreatedBy().getFamilyName().getValue(), resource.getCreatedBy().getSurname());
         assertEquals(model.getCreatedBy().getId(), resource.getCreatedBy().getId());
         assertEquals(model.getModifiedAt(), resource.getModifiedAt());
         assertEquals(model.getModifiedBy().getId(), resource.getModifiedBy().getId());
-        assertEquals(model.getModifiedBy().getName(), resource.getModifiedBy().getName());
-        assertEquals(model.getModifiedBy().getSurname(), resource.getModifiedBy().getSurname());
+        assertEquals(model.getModifiedBy().getName().getValue(), resource.getModifiedBy().getName());
+        assertEquals(model.getModifiedBy().getFamilyName().getValue(), resource.getModifiedBy().getSurname());
     }
 
     @Test
@@ -152,6 +153,7 @@ class GroupMapperTest {
         //given
         UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
         UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        userInfoModel.setId(UUID.randomUUID().toString());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
         List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
@@ -159,7 +161,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -182,6 +184,7 @@ class GroupMapperTest {
         //given
         UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
         UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        userInfoModel.setId(UUID.randomUUID().toString());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
         List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
@@ -189,7 +192,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         Instant now = Instant.now();
@@ -198,11 +201,10 @@ class GroupMapperTest {
         //when
         UserGroupResource resource = GroupMapper.toResource(model);
         //then
-        assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId());
-        assertEquals(model.getMembers().get(0).getName(), resource.getMembers().get(0).getName());
-        assertEquals(model.getMembers().get(0).getSurname(), resource.getMembers().get(0).getSurname());
-        assertEquals(model.getMembers().get(0).isCertified(), resource.getMembers().get(0).isCertification());
-        assertEquals(model.getMembers().get(0).getEmail(), resource.getMembers().get(0).getEmail());
+        assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId().toString());
+        assertEquals(model.getMembers().get(0).getUser().getName().getValue(), resource.getMembers().get(0).getName());
+        assertEquals(model.getMembers().get(0).getUser().getFamilyName().getValue(), resource.getMembers().get(0).getSurname());
+        assertEquals(model.getMembers().get(0).getUser().getEmail().getValue(), resource.getMembers().get(0).getEmail());
         assertEquals(model.getMembers().get(0).getRole(), resource.getMembers().get(0).getRole());
         assertEquals(model.getMembers().get(0).getStatus(), resource.getMembers().get(0).getStatus());
     }
@@ -212,6 +214,7 @@ class GroupMapperTest {
         //given
         UserGroupInfo model = TestUtils.mockInstance(new UserGroupInfo());
         UserInfo userInfoModel = TestUtils.mockInstance(new UserInfo());
+        userInfoModel.setId(UUID.randomUUID().toString());
         ProductInfo productInfo = TestUtils.mockInstance(new ProductInfo());
         List<RoleInfo> roleInfos = List.of(TestUtils.mockInstance(new RoleInfo()));
         Map<String, ProductInfo> productInfoMap = new HashMap<>();
@@ -219,7 +222,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = null;
+        UserResource userModel = null;
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
         //when
@@ -259,7 +262,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
         model.setModifiedBy(userModel);
@@ -294,7 +297,7 @@ class GroupMapperTest {
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
         model.setMembers(List.of(userInfoModel));
-        User userModel = TestUtils.mockInstance(new User());
+        UserResource userModel = TestUtils.mockInstance(new UserResource());//TODO use dummy
         userModel.setId(UUID.randomUUID().toString());
         model.setCreatedBy(userModel);
         Instant now = Instant.now();

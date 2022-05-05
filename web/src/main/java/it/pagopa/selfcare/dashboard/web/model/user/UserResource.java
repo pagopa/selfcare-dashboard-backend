@@ -13,11 +13,11 @@ public class UserResource {
     @NotNull
     private UUID id;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
-    private CertifiableFieldBooleanResource<String> name;
+    private CertifiedFieldResource<String> name;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
-    private CertifiableFieldBooleanResource<String> familyName;
+    private CertifiedFieldResource<String> familyName;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionEmail}")
-    private CertifiableFieldBooleanResource<String> email;
+    private CertifiedFieldResource<String> email;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
     private String fiscalCode;
 }
