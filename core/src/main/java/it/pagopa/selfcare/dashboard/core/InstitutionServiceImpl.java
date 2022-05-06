@@ -8,10 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
@@ -243,11 +240,8 @@ class InstitutionServiceImpl implements InstitutionService {
 
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
-            Optional<PartyRole> partyRole = product.getRoleMappings().entrySet().stream()
-                    .filter(entry -> PARTY_ROLE_WHITE_LIST.contains(entry.getKey()))
-                    .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(role.getProductRole())))
-                    .map(Map.Entry::getKey)
-                    .findAny();
+            EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
