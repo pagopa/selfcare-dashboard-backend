@@ -23,11 +23,11 @@ public class InstitutionInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InstitutionInfo that = (InstitutionInfo) o;
-        return externalId.equals(that.externalId);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(externalId);
+        return Objects.hash(id);
     }
 }
