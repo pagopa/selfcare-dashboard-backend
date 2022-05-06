@@ -117,18 +117,18 @@ public class ExchangeTokenService {
             role.setRole(productRoleCode);
             roles.add(role);
         });
+        if (!groupInfos.isEmpty()) {
+            List<String> groupIds = groupInfos.stream()
+                    .map(UserGroupInfo::getId)
+                    .collect(Collectors.toList());
+            institution.setGroups(groupIds);
+        }
 
         institution.setRoles(roles);
         claims.setInstitution(institution);
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-        if (!groupInfos.isEmpty()) {
-            List<String> groupIds = groupInfos.stream()
-                    .map(UserGroupInfo::getId)
-                    .collect(Collectors.toList());
-            claims.setGroupIds(groupIds);
-        }
         String result = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
@@ -181,6 +181,7 @@ public class ExchangeTokenService {
         @JsonProperty("fiscal_code")
         private String taxCode;
         private List<Role> roles;
+        private List<String> groups;
     }
 
     @Data
@@ -192,7 +193,6 @@ public class ExchangeTokenService {
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
-        public static final String GROUP_IDS = "groups";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
@@ -208,10 +208,6 @@ public class ExchangeTokenService {
             return this;
         }
 
-        public Claims setGroupIds(List<String> groupIds) {
-            setValue(GROUP_IDS, groupIds);
-            return this;
-        }
     }
 
 }

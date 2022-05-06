@@ -294,6 +294,7 @@ class ExchangeTokenServiceTest {
         assertTrue(exchangedClaims.getExpiration().after(exchangedClaims.getIssuedAt()));
         ExchangeTokenService.Institution institution = exchangedClaims.getInstitution();
         assertNotNull(institution);
+        assertNull(institution.getGroups());
         assertEquals(institutionId, institution.getId());
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         assertNotNull(institution.getRoles());
@@ -394,7 +395,7 @@ class ExchangeTokenServiceTest {
         assertNotNull(institution);
         assertEquals(institutionId, institution.getId());
         assertEquals(1, institution.getRoles().size());
-        List<String> groups = (List<String>) exchangedClaims.get("groups");
+        List<String> groups = institution.getGroups();
         assertEquals(groupInfo.getId(), groups.get(0));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         Mockito.verify(jwtServiceMock, Mockito.times(1))
@@ -440,6 +441,7 @@ class ExchangeTokenServiceTest {
             institution.setId(o.get("id").toString());
             institution.setRoles((List<ExchangeTokenService.Role>) o.get("roles"));
             institution.setTaxCode(o.get("fiscal_code").toString());
+            institution.setGroups((List<String>) o.get("groups"));
             return institution;
         }
 
