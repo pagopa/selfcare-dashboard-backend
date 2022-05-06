@@ -16,7 +16,7 @@ public class UserResource {
     private CertifiedFieldResource<String> name;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
     private CertifiedFieldResource<String> familyName;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionEmail}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalEmail}")
     private CertifiedFieldResource<String> email;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
     private String fiscalCode;

@@ -374,7 +374,7 @@
           "institutions"
         ],
         "summary": "getInstitutionUsers",
-        "description": "Service to get all the users related to a specific pair of institution-product",
+        "description": "Service to get all the users related to a specific institution",
         "operationId": "getInstitutionUsersUsingGET",
         "parameters": [
           {
@@ -458,7 +458,7 @@
           "institutions"
         ],
         "summary": "getInstitutionUser",
-        "description": "${swagger.dashboard.institutions.api.getInstitutionUser}",
+        "description": "Service to get the users with the given user id related to a specific institution ",
         "operationId": "getInstitutionUserUsingGET",
         "parameters": [
           {
@@ -1436,8 +1436,8 @@
   },
   "components" : {
     "schemas" : {
-      "CertifiedFieldResource«string»": {
-        "title": "CertifiedFieldResource«string»",
+      "CertifiedFieldResourceÂ«stringÂ»": {
+        "title": "CertifiedFieldResourceÂ«stringÂ»",
         "required": [
           "certified",
           "value"
@@ -1446,12 +1446,12 @@
         "properties": {
           "certified": {
             "type": "boolean",
-            "description": "${swagger.model.certifiedField.certified}",
+            "description": "Indicates whether the value comes from a certified information source",
             "example": false
           },
           "value": {
             "type": "string",
-            "description": "${swagger.model.certifiedField.value}"
+            "description": "Field value"
           }
         }
       },
@@ -1468,7 +1468,7 @@
         "properties": {
           "email": {
             "type": "string",
-            "description": "User's email"
+            "description": "User's personal email"
           },
           "name": {
             "type": "string",
@@ -1627,7 +1627,7 @@
         "properties": {
           "email": {
             "type": "string",
-            "description": "User's email"
+            "description": "User's personal email"
           },
           "fiscalCode": {
             "type": "string",
@@ -1674,7 +1674,7 @@
         "properties" : {
           "email" : {
             "type" : "string",
-            "description" : "User's email"
+            "description": "User's personal email"
           },
           "id" : {
             "type": "string",
@@ -1836,7 +1836,7 @@
         "properties": {
           "email": {
             "type": "string",
-            "description": "User's email"
+            "description": "User's personal email"
           },
           "id": {
             "type": "string",
@@ -1953,7 +1953,7 @@
         "properties" : {
           "email" : {
             "type" : "string",
-            "description": "${swagger.dashboard.user.model.institutionalEmail}"
+            "description": "User's institutional email"
           },
           "fiscalCode" : {
             "type" : "string",
@@ -2005,7 +2005,7 @@
         "properties": {
           "email": {
             "type": "string",
-            "description": "User's institution email"
+            "description": "User's institutional email"
           },
           "fiscalCode": {
             "type": "string",
@@ -2066,14 +2066,14 @@
             "description": "Date on which the group was modified",
             "format": "date-time"
           },
-          "modifiedBy" : {
-            "type" : "string",
-            "description" : "User by which the group was modified",
-            "format" : "uuid"
+          "modifiedBy": {
+            "type": "string",
+            "description": "User by which the group was modified",
+            "format": "uuid"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Users group's name"
+          "name": {
+            "type": "string",
+            "description": "Users group's name"
           },
           "productId" : {
             "type" : "string",
@@ -2102,13 +2102,13 @@
           },
           "description" : {
             "type" : "string",
-            "description" : "Users group's description"
+            "description": "Users group's description"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Users group's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "Users group's unique identifier"
           },
-          "institutionId" : {
+          "institutionId": {
             "type": "string",
             "description": "Users group's institutionId"
           },
@@ -2168,12 +2168,12 @@
         "type": "object",
         "properties": {
           "email": {
-            "description": "User's institution email",
-            "$ref": "#/components/schemas/CertifiedFieldResource«string»"
+            "description": "User's institutional email",
+            "$ref": "#/components/schemas/CertifiedFieldResourceÂ«stringÂ»"
           },
           "familyName": {
             "description": "User's surname",
-            "$ref": "#/components/schemas/CertifiedFieldResource«string»"
+            "$ref": "#/components/schemas/CertifiedFieldResourceÂ«stringÂ»"
           },
           "fiscalCode": {
             "type": "string",
@@ -2186,7 +2186,7 @@
           },
           "name": {
             "description": "User's name",
-            "$ref": "#/components/schemas/CertifiedFieldResource«string»"
+            "$ref": "#/components/schemas/CertifiedFieldResourceÂ«stringÂ»"
           }
         }
       }

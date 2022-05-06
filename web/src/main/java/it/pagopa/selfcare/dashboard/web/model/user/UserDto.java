@@ -17,7 +17,7 @@ public class UserDto {
     @JsonProperty(required = true)
     @NotBlank
     private String surname;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionEmail}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalEmail}", required = true)
     @JsonProperty(required = true)
     @NotBlank
     private String email;
