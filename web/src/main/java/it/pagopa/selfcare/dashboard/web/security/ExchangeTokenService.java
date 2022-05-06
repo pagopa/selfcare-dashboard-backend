@@ -113,7 +113,7 @@ public class ExchangeTokenService {
         grantedAuthority.getRoleOnProducts().get(productId).getProductRoles().forEach(productRoleCode -> {
             Role role = new Role();
             role.setPartyRole(Product.getPartyRole(productRoleCode, roleMappings).orElse(null));
-            role.setRole(productRoleCode);
+            role.setProductRole(productRoleCode);
             roles.add(role);
         });
         if (!groupInfos.isEmpty()) {
@@ -186,7 +186,7 @@ public class ExchangeTokenService {
     @Data
     static class Role implements Serializable {
         private PartyRole partyRole;
-        private String role;
+        private String productRole;
     }
 
     static class TokenExchangeClaims extends DefaultClaims {
