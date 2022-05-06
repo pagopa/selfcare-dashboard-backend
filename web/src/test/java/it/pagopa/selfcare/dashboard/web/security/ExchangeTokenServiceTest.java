@@ -108,7 +108,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = Mockito.mock(JwtService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, jwtSigningKey, "PT5S", null, null);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null, null);
+        Executable executable = () -> exchangeTokenService.exchange(null, null);
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
@@ -126,7 +126,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null, null);
+        Executable executable = () -> exchangeTokenService.exchange(null, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
@@ -147,7 +147,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
@@ -170,7 +170,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
@@ -206,7 +206,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
@@ -221,7 +221,7 @@ class ExchangeTokenServiceTest {
     @EnumSource(PrivateKey.class)
     void exchange_nullGroupInfo(PrivateKey privateKey) throws Exception {
         // given
-        String realm = "realm";
+        String realm = "identityTokenAudienceFromProduct";
         String jti = "id";
         String sub = "subject";
         Date iat = Date.from(Instant.now().minusSeconds(1));
@@ -244,7 +244,7 @@ class ExchangeTokenServiceTest {
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
-
+        product.setIdentityTokenAudience(realm);
         Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
 
@@ -270,7 +270,7 @@ class ExchangeTokenServiceTest {
         String issuer = "https://dev.selfcare.pagopa.it";
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, jwtSigningKey, "PT5S", kid, issuer);
         // when
-        String token = exchangeTokenService.exchange(institutionId, productId, realm);
+        String token = exchangeTokenService.exchange(institutionId, productId);
         // then
         assertNotNull(token);
         Jws<Claims> claimsJws = Jwts.parser()
@@ -314,7 +314,7 @@ class ExchangeTokenServiceTest {
     @EnumSource(PrivateKey.class)
     void exchange_ok(PrivateKey privateKey) throws Exception {
         // given
-        String realm = "realm";
+        String realm = "identityTokenAudienceFromProduct";
 
         String jti = "id";
         String sub = "subject";
@@ -357,6 +357,7 @@ class ExchangeTokenServiceTest {
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
+        product.setIdentityTokenAudience(realm);
 
         Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
@@ -369,7 +370,7 @@ class ExchangeTokenServiceTest {
         String issuer = "https://dev.selfcare.pagopa.it";
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, jwtSigningKey, "PT5S", kid, issuer);
         // when
-        String token = exchangeTokenService.exchange(institutionId, productId, realm);
+        String token = exchangeTokenService.exchange(institutionId, productId);
         // then
         assertNotNull(token);
         Jws<Claims> claimsJws = Jwts.parser()

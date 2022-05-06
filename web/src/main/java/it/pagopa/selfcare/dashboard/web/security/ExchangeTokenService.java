@@ -78,9 +78,9 @@ public class ExchangeTokenService {
     }
 
 
-    public String exchange(String institutionId, String productId, String realm) {
+    public String exchange(String institutionId, String productId) {
         log.trace("exchange start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -101,7 +101,6 @@ public class ExchangeTokenService {
         Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(UUID.fromString(principal.getId())), Pageable.unpaged());
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
-        claims.setAudience(realm);
         claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
@@ -110,7 +109,7 @@ public class ExchangeTokenService {
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
 
         List<Role> roles = new ArrayList<>();
-
+        claims.setAudience(product.getIdentityTokenAudience());
         grantedAuthority.getRoleOnProducts().get(productId).getProductRoles().forEach(productRoleCode -> {
             Role role = new Role();
             role.setPartyRole(Product.getPartyRole(productRoleCode, roleMappings).orElse(null));

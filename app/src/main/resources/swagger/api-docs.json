@@ -645,15 +645,6 @@
           "schema" : {
             "type" : "string"
           }
-        }, {
-          "name" : "realm",
-          "in" : "query",
-          "description" : "The domain for which the requested token is valid",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
         } ],
         "responses" : {
           "200" : {
