@@ -18,11 +18,11 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -62,25 +62,21 @@ public class ExchangeTokenService {
                                 InstitutionService institutionService,
                                 UserGroupService groupService,
                                 ProductsConnector productConnector,
-                                @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
-                                @Value("${jwt.exchange.duration}") String duration,
-                                @Value("${jwt.exchange.kid}") String kid,
-                                @Value("${jwt.exchange.issuer}") String issuer
-    ) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                ExchangeTokenProperties properties) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.productsConnector = productConnector;
         this.institutionService = institutionService;
         this.groupService = groupService;
-        this.jwtSigningKey = getPrivateKey(jwtSigningKey);
-        this.issuer = issuer;
-        this.duration = Duration.parse(duration);
-        this.kid = kid;
+        this.jwtSigningKey = getPrivateKey(properties.getSigningKey());
+        this.issuer = properties.getIssuer();
+        this.duration = Duration.parse(properties.getDuration());
+        this.kid = properties.getKid();
     }
 
 
-    public String exchange(String institutionId, String productId, String realm) {
+    public String exchange(String institutionId, String productId) {
         log.trace("exchange start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -101,7 +97,6 @@ public class ExchangeTokenService {
         Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(UUID.fromString(principal.getId())), Pageable.unpaged());
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
-        claims.setAudience(realm);
         claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
@@ -110,11 +105,11 @@ public class ExchangeTokenService {
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
 
         List<Role> roles = new ArrayList<>();
-
+        claims.setAudience(product.getIdentityTokenAudience());
         grantedAuthority.getRoleOnProducts().get(productId).getProductRoles().forEach(productRoleCode -> {
             Role role = new Role();
             role.setPartyRole(Product.getPartyRole(productRoleCode, roleMappings).orElse(null));
-            role.setRole(productRoleCode);
+            role.setProductRole(productRoleCode);
             roles.add(role);
         });
         if (!groupInfos.isEmpty()) {
@@ -187,8 +182,9 @@ public class ExchangeTokenService {
     @Data
     static class Role implements Serializable {
         private PartyRole partyRole;
-        private String role;
+        private String productRole;
     }
+
 
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
