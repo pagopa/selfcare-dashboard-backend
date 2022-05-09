@@ -12,7 +12,6 @@ import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,20 +49,18 @@ public class UserMapper {
     }
 
 
-    public static SaveUser map(it.pagopa.selfcare.dashboard.web.model.user.UserDto model, String institutionId) {
-        SaveUser resource = null;
-        Map<String, WorkContact> workContact = new HashMap<>();
+    public static SaveUserDto map(it.pagopa.selfcare.dashboard.web.model.user.UserDto model, String institutionId) {
+        SaveUserDto resource = null;
         if (model != null) {
-            resource = new SaveUser();
-            resource.setName(model.getName());
-            resource.setEmail(model.getEmail());
-            resource.setFamilyName(model.getSurname());
+            resource = new SaveUserDto();
+            resource.setName(map(model.getName()));
+            resource.setEmail(map(model.getEmail()));
+            resource.setFamilyName(map(model.getSurname()));
             resource.setFiscalCode(model.getFiscalCode());
             if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(model.getEmail());
-                workContact.put(institutionId, contact);
-                resource.setWorkContacts(workContact);
+                WorkContactResource contact = new WorkContactResource();
+                contact.setEmail(map(model.getEmail()));
+                resource.setWorkContacts(Map.of(institutionId, contact));
             }
         }
         return resource;
@@ -101,12 +98,12 @@ public class UserMapper {
     }
 
 
-    public static CertifiedField<String> map(String certifiableField, Certification certification) {
+    public static CertifiedField<String> map(String certifiableField) {
         CertifiedField<String> resource = null;
         if (certifiableField != null) {
             resource = new CertifiedField<>();
             resource.setValue(certifiableField);
-            resource.setCertification(certification);
+            resource.setCertification(Certification.NONE);
         }
         return resource;
     }
@@ -220,19 +217,17 @@ public class UserMapper {
     }
 
 
-    public static UserDto fromUpdateUser(UpdateUserDto userDto, String institutionId) {
-        UserDto resource = null;
-        Map<String, WorkContact> workContact = new HashMap<>();
+    public static MutableUserFieldsDto fromUpdateUser(UpdateUserDto userDto, String institutionId) {
+        MutableUserFieldsDto resource = null;
         if (userDto != null) {
-            resource = new UserDto();
-            resource.setName(userDto.getName());
-            resource.setEmail(userDto.getEmail());
-            resource.setFamilyName(userDto.getSurname());
+            resource = new MutableUserFieldsDto();
+            resource.setName(map(userDto.getName()));
+            resource.setEmail(map(userDto.getEmail()));
+            resource.setFamilyName(map(userDto.getSurname()));
             if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(userDto.getEmail());
-                workContact.put(institutionId, contact);
-                resource.setWorkContacts(workContact);
+                WorkContactResource contact = new WorkContactResource();
+                contact.setEmail(map(userDto.getEmail()));
+                resource.setWorkContacts(Map.of(institutionId, contact));
             }
         }
         return resource;

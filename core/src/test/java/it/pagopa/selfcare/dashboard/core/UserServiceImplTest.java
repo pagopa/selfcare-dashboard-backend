@@ -8,7 +8,6 @@ import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -100,8 +99,8 @@ class UserServiceImplTest {
         //given
         String institutionId = "institutionId";
         UUID id = randomUUID();
-        UserDto user = mockInstance(new UserDto());
-        WorkContact workContact = mockInstance(new WorkContact());
+        MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
+        WorkContactResource workContact = mockInstance(new WorkContactResource());
         user.setWorkContacts(Map.of(institutionId, workContact));
         Institution institutionMock = mockInstance(new Institution());
         when(partyConnector.getInstitution(Mockito.anyString()))
@@ -112,14 +111,8 @@ class UserServiceImplTest {
         assertDoesNotThrow(executable);
         verify(partyConnector, times(1))
                 .getInstitution(institutionId);
-        ArgumentCaptor<MutableUserFieldsDto> mutableFieldsCaptor = ArgumentCaptor.forClass(MutableUserFieldsDto.class);
         verify(userConnectorMock, times(1))
-                .updateUser(any(), mutableFieldsCaptor.capture());
-        MutableUserFieldsDto capturedFields = mutableFieldsCaptor.getValue();
-        assertTrue(capturedFields.getWorkContacts().containsKey(institutionId));
-        assertEquals(user.getWorkContacts().get(institutionId).getEmail(), capturedFields.getWorkContacts().get(institutionId).getEmail().getValue());
-        assertEquals(user.getFamilyName(), capturedFields.getFamilyName().getValue());
-        assertEquals(user.getEmail(), capturedFields.getWorkContacts().get(institutionId).getEmail().getValue());
+                .updateUser(id, user);
         verifyNoMoreInteractions(userConnectorMock, partyConnector);
     }
 
@@ -128,7 +121,7 @@ class UserServiceImplTest {
         //given
         String institutionId = "institutionId";
         UUID id = randomUUID();
-        UserDto user = mockInstance(new UserDto());
+        MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
@@ -142,7 +135,7 @@ class UserServiceImplTest {
         //given
         String institutionId = null;
         UUID id = randomUUID();
-        UserDto user = mockInstance(new UserDto());
+        MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
@@ -156,7 +149,7 @@ class UserServiceImplTest {
         //given
         String institutionId = "institutionId";
         UUID id = null;
-        UserDto user = mockInstance(new UserDto());
+        MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
@@ -170,7 +163,7 @@ class UserServiceImplTest {
         //given
         String institutionId = "institutionId";
         UUID id = randomUUID();
-        UserDto user = null;
+        MutableUserFieldsDto user = null;
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
@@ -183,7 +176,7 @@ class UserServiceImplTest {
     void saveUser_nullInstitutionId() {
         //given
         String institutionId = null;
-        SaveUser user = mockInstance(new SaveUser());
+        SaveUserDto user = mockInstance(new SaveUserDto(), "setWorkContacts");
         //when
         Executable executable = () -> userRegistryService.saveUser(institutionId, user);
         //then
@@ -196,7 +189,7 @@ class UserServiceImplTest {
     void saveUser_nullDto() {
         //given
         String institutionId = "institutionId";
-        SaveUser user = null;
+        SaveUserDto user = null;
         //when
         Executable executable = () -> userRegistryService.saveUser(institutionId, user);
         //then
@@ -209,7 +202,7 @@ class UserServiceImplTest {
     void saveUser_institutionNotFound() {
         //given
         String institutionId = "institutionId";
-        SaveUser user = mockInstance(new SaveUser());
+        SaveUserDto user = mockInstance(new SaveUserDto(), "setWorkContacts");
         //when
         Executable executable = () -> userRegistryService.saveUser(institutionId, user);
         //then
@@ -223,8 +216,8 @@ class UserServiceImplTest {
         //given
         String institutionId = "institutionId";
         UserId userId = mockInstance(new UserId());
-        SaveUser user = mockInstance(new SaveUser());
-        WorkContact workContact = mockInstance(new WorkContact());
+        SaveUserDto user = mockInstance(new SaveUserDto(), "setWorkContacts");
+        WorkContactResource workContact = mockInstance(new WorkContactResource());
         user.setWorkContacts(Map.of(institutionId, workContact));
         when(userConnectorMock.saveUser(any()))
                 .thenReturn(userId);
@@ -237,15 +230,8 @@ class UserServiceImplTest {
         assertEquals(userId, id);
         verify(partyConnector, times(1))
                 .getInstitution(institutionId);
-        ArgumentCaptor<SaveUserDto> saveCaptor = ArgumentCaptor.forClass(SaveUserDto.class);
         verify(userConnectorMock, times(1))
-                .saveUser(saveCaptor.capture());
-        SaveUserDto capturedSave = saveCaptor.getValue();
-        assertEquals(user.getEmail(), capturedSave.getEmail().getValue());
-        assertEquals(user.getFamilyName(), capturedSave.getFamilyName().getValue());
-        assertEquals(user.getName(), capturedSave.getName().getValue());
-        assertTrue(capturedSave.getWorkContacts().containsKey(institutionId));
-        assertEquals(user.getFiscalCode(), capturedSave.getFiscalCode());
+                .saveUser(user);
         verifyNoMoreInteractions(userConnectorMock, partyConnector);
     }
 

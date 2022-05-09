@@ -6,7 +6,6 @@ import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.core.model.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(UUID id, String institutionId, UserDto userDto) {
+    public void updateUser(UUID id, String institutionId, MutableUserFieldsDto userDto) {
         log.trace("updateUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "updateUser id = {}, institutionId = {}, userDto = {}", id, institutionId, userDto);
         Assert.notNull(id, "UUID is required");
@@ -55,7 +54,7 @@ public class UserServiceImpl implements UserService {
         if (institution == null) {
             throw new ResourceNotFoundException("There are no institution for given institutionId");
         }
-        userConnector.updateUser(id, UserMapper.map(userDto));
+        userConnector.updateUser(id, userDto);
         log.trace("updateUser end");
     }
 
@@ -72,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserId saveUser(String institutionId, SaveUser userDto) {
+    public UserId saveUser(String institutionId, SaveUserDto userDto) {
         log.trace("saveUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser institutionId = {}, userDto = {}", institutionId, userDto);
         Assert.hasText(institutionId, "An institutionId is required");
@@ -81,8 +80,7 @@ public class UserServiceImpl implements UserService {
         if (institution == null) {
             throw new ResourceNotFoundException("There are no institution for given institutionId");
         }
-        SaveUserDto dto = UserMapper.map(userDto);
-        UserId result = userConnector.saveUser(dto);
+        UserId result = userConnector.saveUser(userDto);
         log.debug("saveUser result = {}", result);
         log.trace("saveUser end");
         return result;

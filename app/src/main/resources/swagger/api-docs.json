@@ -2094,9 +2094,9 @@
         "required" : [ "description", "id", "institutionId", "members", "name", "productId", "status" ],
         "type" : "object",
         "properties" : {
-          "createdAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was created",
+          "createdAt": {
+            "type": "string",
+            "description": "Date on which the group was created",
             "format": "date-time"
           },
           "createdBy": {

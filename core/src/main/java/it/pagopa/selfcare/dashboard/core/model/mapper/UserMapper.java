@@ -1,40 +1,13 @@
 package it.pagopa.selfcare.dashboard.core.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
+import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
+import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
+import it.pagopa.selfcare.dashboard.connector.model.user.WorkContactResource;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class UserMapper {
-    public static MutableUserFieldsDto map(UserDto model) {
-        MutableUserFieldsDto resource = null;
-        if (model != null) {
-            resource = new MutableUserFieldsDto();
-            resource.setEmail(map(model.getEmail(), Certification.NONE));
-            resource.setFamilyName(map(model.getFamilyName(), Certification.NONE));
-            resource.setName(map(model.getName(), Certification.NONE));
-            resource.setWorkContacts(model.getWorkContacts().entrySet().stream()
-                    .map(entry -> Map.entry(entry.getKey(), map(entry.getValue())))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-        }
-        return resource;
-    }
-
-    public static SaveUserDto map(SaveUser model) {
-        SaveUserDto resource = null;
-        if (model != null) {
-            resource = new SaveUserDto();
-            resource.setEmail(map(model.getEmail(), Certification.NONE));
-            resource.setFamilyName(map(model.getFamilyName(), Certification.NONE));
-            resource.setName(map(model.getName(), Certification.NONE));
-            resource.setFiscalCode(model.getFiscalCode());
-            resource.setWorkContacts(model.getWorkContacts().entrySet().stream()
-                    .map(entry -> Map.entry(entry.getKey(), map(entry.getValue())))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-        }
-        return resource;
-    }
 
     public static CertifiedField<String> map(String certifiableField, Certification certification) {
         CertifiedField<String> resource = null;

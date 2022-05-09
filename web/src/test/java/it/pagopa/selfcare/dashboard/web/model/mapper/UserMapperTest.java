@@ -225,7 +225,7 @@ class UserMapperTest {
         UpdateUserDto dto = null;
         String institutionId = "institutionId";
         //when
-        UserDto model = UserMapper.fromUpdateUser(dto, institutionId);
+        MutableUserFieldsDto model = UserMapper.fromUpdateUser(dto, institutionId);
         //then
         assertNull(model);
     }
@@ -236,15 +236,21 @@ class UserMapperTest {
         UpdateUserDto dto = mockInstance(new UpdateUserDto());
         String institutionId = "institutionId";
         //when
-        UserDto model = UserMapper.fromUpdateUser(dto, institutionId);
+        MutableUserFieldsDto model = UserMapper.fromUpdateUser(dto, institutionId);
         //then
         assertNotNull(model);
         assertNotNull(model.getWorkContacts());
-        assertEquals(dto.getEmail(), model.getWorkContacts().get(institutionId).getEmail());
-        assertEquals(dto.getEmail(), model.getEmail());
-        assertEquals(dto.getName(), model.getName());
-        assertEquals(dto.getSurname(), model.getFamilyName());
-        reflectionEqualsByName(dto, model);
+        assertEquals(1, model.getWorkContacts().size());
+        assertTrue(model.getWorkContacts().containsKey(institutionId));
+        assertCertifiedEquals(dto.getEmail(), model.getWorkContacts().get(institutionId).getEmail());
+        assertCertifiedEquals(dto.getEmail(), model.getEmail());
+        assertCertifiedEquals(dto.getName(), model.getName());
+        assertCertifiedEquals(dto.getSurname(), model.getFamilyName());
+    }
+
+    private static void assertCertifiedEquals(String expected, CertifiedField<String> actual) {
+        assertEquals(expected, actual.getValue());
+        assertEquals(Certification.NONE, actual.getCertification());
     }
 
     @Test
@@ -252,7 +258,7 @@ class UserMapperTest {
         //given
         UpdateUserDto dto = mockInstance(new UpdateUserDto());
         //when
-        UserDto model = UserMapper.fromUpdateUser(dto, null);
+        MutableUserFieldsDto model = UserMapper.fromUpdateUser(dto, null);
         //then
         assertNull(model.getWorkContacts());
     }

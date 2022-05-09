@@ -11,7 +11,6 @@ import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -29,6 +28,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 @WebMvcTest(value = {UserController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -57,12 +59,6 @@ class UserControllerTest {
     @MockBean
     private UserService userServiceMock;
 
-    @Captor
-    private ArgumentCaptor<UserDto> userDtoCaptor;
-
-    @Captor
-    private ArgumentCaptor<UUID> uidCaptor;
-
 
     @Test
     void search_notNull() throws Exception {
@@ -75,11 +71,11 @@ class UserControllerTest {
                 .thenReturn(USER_RESOURCE);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .post(BASE_URL + "/search")
-                        .queryParam("institutionId", institutionId)
-                        .content(mapper.writeValueAsString(externalIdDto))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .post(BASE_URL + "/search")
+                .queryParam("institutionId", institutionId)
+                .content(mapper.writeValueAsString(externalIdDto))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         //then
@@ -98,26 +94,27 @@ class UserControllerTest {
         UpdateUserDto updateUserDto = TestUtils.mockInstance(new UpdateUserDto());
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .put(BASE_URL + "/{id}", id)
-                        .queryParam("institutionId", institutionId)
-                        .content(mapper.writeValueAsString(updateUserDto))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .put(BASE_URL + "/{id}", id)
+                .queryParam("institutionId", institutionId)
+                .content(mapper.writeValueAsString(updateUserDto))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andReturn();
         //then
         assertEquals(0, result.getResponse().getContentLength());
-        Mockito.verify(userServiceMock, Mockito.times(1))
-                .updateUser(uidCaptor.capture(), Mockito.anyString(), userDtoCaptor.capture());
-        UserDto dto = userDtoCaptor.getValue();
-        assertEquals(dto.getEmail(), updateUserDto.getEmail());
-        assertTrue(dto.getWorkContacts().containsKey(institutionId));
-        assertEquals(dto.getFamilyName(), updateUserDto.getSurname());
-        assertEquals(dto.getName(), updateUserDto.getName());
-        assertEquals(dto.getWorkContacts().get(institutionId).getEmail(), updateUserDto.getEmail());
-
+        ArgumentCaptor<MutableUserFieldsDto> mutableFieldsCaptor = ArgumentCaptor.forClass(MutableUserFieldsDto.class);
+        verify(userServiceMock, times(1))
+                .updateUser(eq(id), eq(institutionId), mutableFieldsCaptor.capture());
+        MutableUserFieldsDto capturedFields = mutableFieldsCaptor.getValue();
+        assertEquals(updateUserDto.getName(), capturedFields.getName().getValue());
+        assertEquals(updateUserDto.getSurname(), capturedFields.getFamilyName().getValue());
+        assertEquals(updateUserDto.getEmail(), capturedFields.getWorkContacts().get(institutionId).getEmail().getValue());
+        assertTrue(capturedFields.getWorkContacts().containsKey(institutionId));
+        assertEquals(updateUserDto.getEmail(), capturedFields.getWorkContacts().get(institutionId).getEmail().getValue());
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
+
 
     @Test
     void getUserByInternalId() throws Exception {
@@ -128,10 +125,10 @@ class UserControllerTest {
                 .thenReturn(USER_RESOURCE);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{id}", id)
-                        .queryParam("institutionId", institutionId)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .get(BASE_URL + "/{id}", id)
+                .queryParam("institutionId", institutionId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
         //then
@@ -153,26 +150,25 @@ class UserControllerTest {
                 .thenReturn(id);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .post(BASE_URL + "/save-user")
-                        .content(mapper.writeValueAsString(dto))
-                        .queryParam("institutionId", institutionId)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .post(BASE_URL + "/save-user")
+                .content(mapper.writeValueAsString(dto))
+                .queryParam("institutionId", institutionId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
         //then
         UserIdResource idResource = mapper.readValue(result.getResponse().getContentAsString(), UserIdResource.class);
         assertEquals(id.getId(), idResource.getId());
-        ArgumentCaptor<SaveUser> captureSave = ArgumentCaptor.forClass(SaveUser.class);
-        Mockito.verify(userServiceMock, Mockito.times(1))
-                .saveUser(Mockito.eq(institutionId), captureSave.capture());
-        SaveUser saveUser = captureSave.getValue();
-        assertEquals(dto.getEmail(), saveUser.getEmail());
-        assertEquals(dto.getName(), saveUser.getName());
-        assertEquals(dto.getSurname(), saveUser.getFamilyName());
-        assertEquals(dto.getFiscalCode(), saveUser.getFiscalCode());
-        assertTrue(saveUser.getWorkContacts().containsKey(institutionId));
-        assertEquals(dto.getEmail(), saveUser.getWorkContacts().get(institutionId).getEmail());
+        ArgumentCaptor<SaveUserDto> saveCaptor = ArgumentCaptor.forClass(SaveUserDto.class);
+        verify(userServiceMock, times(1))
+                .saveUser(eq(institutionId), saveCaptor.capture());
+        SaveUserDto capturedSave = saveCaptor.getValue();
+        assertEquals(dto.getEmail(), capturedSave.getEmail().getValue());
+        assertEquals(dto.getSurname(), capturedSave.getFamilyName().getValue());
+        assertEquals(dto.getName(), capturedSave.getName().getValue());
+        assertTrue(capturedSave.getWorkContacts().containsKey(institutionId));
+        assertEquals(dto.getFiscalCode(), capturedSave.getFiscalCode());
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -183,9 +179,9 @@ class UserControllerTest {
         UUID id = UUID.randomUUID();
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .delete(BASE_URL + "/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .delete(BASE_URL + "/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andReturn();
         //then

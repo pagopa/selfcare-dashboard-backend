@@ -10,11 +10,11 @@ public interface UserService {
 
     User search(String externalId);
 
-    void updateUser(UUID id, String institutionId, UserDto userDto);
+    void updateUser(UUID id, String institutionId, MutableUserFieldsDto userDto);
 
     User getUserByInternalId(UUID id);
 
-    UserId saveUser(String institutionId, SaveUser userDto);
+    UserId saveUser(String institutionId, SaveUserDto userDto);
 
     void deleteById(String userId);
 
