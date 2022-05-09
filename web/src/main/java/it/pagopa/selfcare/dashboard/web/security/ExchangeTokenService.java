@@ -18,11 +18,11 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,23 +58,20 @@ public class ExchangeTokenService {
     private final ProductsConnector productsConnector;
     private final String issuer;
 
+    //    @Autowired
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
                                 UserGroupService groupService,
                                 ProductsConnector productConnector,
-                                @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
-                                @Value("${jwt.exchange.duration}") String duration,
-                                @Value("${jwt.exchange.kid}") String kid,
-                                @Value("${jwt.exchange.issuer}") String issuer
-    ) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                ExchangeTokenProperties properties) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.productsConnector = productConnector;
         this.institutionService = institutionService;
         this.groupService = groupService;
-        this.jwtSigningKey = getPrivateKey(jwtSigningKey);
-        this.issuer = issuer;
-        this.duration = Duration.parse(duration);
-        this.kid = kid;
+        this.jwtSigningKey = getPrivateKey(properties.getSigningKey());
+        this.issuer = properties.getIssuer();
+        this.duration = Duration.parse(properties.getDuration());
+        this.kid = properties.getKid();
     }
 
 
@@ -188,6 +185,7 @@ public class ExchangeTokenService {
         private PartyRole partyRole;
         private String productRole;
     }
+
 
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
