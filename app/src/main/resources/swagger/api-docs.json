@@ -1436,8 +1436,8 @@
   },
   "components" : {
     "schemas" : {
-      "CertifiedFieldResourceÂ«stringÂ»": {
-        "title": "CertifiedFieldResourceÂ«stringÂ»",
+      "CertifiedFieldResourceOfstring": {
+        "title": "CertifiedFieldResourceOfstring",
         "required": [
           "certified",
           "value"
@@ -2075,14 +2075,17 @@
             "type": "string",
             "description": "Users group's name"
           },
-          "productId" : {
-            "type" : "string",
-            "description" : "Users group's productId"
+          "productId": {
+            "type": "string",
+            "description": "Users group's productId"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Users group's status",
-            "enum" : [ "ACTIVE", "SUSPENDED" ]
+          "status": {
+            "type": "string",
+            "description": "Users group's status",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ]
           }
         }
       },
@@ -2094,14 +2097,14 @@
           "createdAt" : {
             "type" : "string",
             "description" : "Date on which the group was created",
-            "format" : "date-time"
+            "format": "date-time"
           },
-          "createdBy" : {
-            "description" : "User by which the group was created",
-            "$ref" : "#/components/schemas/PlainUserResource"
+          "createdBy": {
+            "description": "User by which the group was created",
+            "$ref": "#/components/schemas/PlainUserResource"
           },
-          "description" : {
-            "type" : "string",
+          "description": {
+            "type": "string",
             "description": "Users group's description"
           },
           "id": {
@@ -2169,11 +2172,11 @@
         "properties": {
           "email": {
             "description": "User's institutional email",
-            "$ref": "#/components/schemas/CertifiedFieldResourceÂ«stringÂ»"
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           },
           "familyName": {
             "description": "User's surname",
-            "$ref": "#/components/schemas/CertifiedFieldResourceÂ«stringÂ»"
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           },
           "fiscalCode": {
             "type": "string",
@@ -2186,7 +2189,7 @@
           },
           "name": {
             "description": "User's name",
-            "$ref": "#/components/schemas/CertifiedFieldResourceÂ«stringÂ»"
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           }
         }
       }

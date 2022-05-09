@@ -72,6 +72,7 @@ class SwaggerConfig {
                         new Tag("user-groups", environment.getProperty("swagger.dashboard.user-groups.api.description")))
                 .directModelSubstitute(LocalTime.class, String.class)
                 .ignoredParameterTypes(Pageable.class)
+                .forCodeGeneration(true)
                 .securityContexts(Collections.singletonList(SecurityContext.builder()
                         .securityReferences(defaultAuth())
                         .build()))
