@@ -58,7 +58,6 @@ public class ExchangeTokenService {
     private final ProductsConnector productsConnector;
     private final String issuer;
 
-    //    @Autowired
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
                                 UserGroupService groupService,
