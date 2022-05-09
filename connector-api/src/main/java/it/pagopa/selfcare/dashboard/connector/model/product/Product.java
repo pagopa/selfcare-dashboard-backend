@@ -22,6 +22,7 @@ public class Product {
     private boolean authorized;
     private String userRole;
     private ProductStatus status;
+    private String identityTokenAudience;
     private EnumMap<PartyRole, ProductRoleInfo> roleMappings;
 
 
