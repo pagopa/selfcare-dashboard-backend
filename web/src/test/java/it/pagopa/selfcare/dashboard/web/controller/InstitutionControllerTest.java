@@ -100,7 +100,7 @@ class InstitutionControllerTest {
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
                     InstitutionInfo institutionInfo = new InstitutionInfo();
-                    institutionInfo.setInstitutionId(id);
+                    institutionInfo.setExternalId(id);
                     return institutionInfo;
                 });
         // when

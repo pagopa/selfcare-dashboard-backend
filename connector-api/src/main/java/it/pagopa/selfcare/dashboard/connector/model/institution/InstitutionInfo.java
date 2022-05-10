@@ -7,7 +7,11 @@ import java.util.Objects;
 @Data
 public class InstitutionInfo {
 
-    private String institutionId;
+    private String id;
+    private String origin;
+    private String originId;
+    private InstitutionType institutionType;
+    private String externalId;
     private String description;
     private String taxCode;
     private String digitalAddress;
@@ -19,11 +23,11 @@ public class InstitutionInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InstitutionInfo that = (InstitutionInfo) o;
-        return institutionId.equals(that.institutionId);
+        return externalId.equals(that.externalId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(institutionId);
+        return Objects.hash(externalId);
     }
 }

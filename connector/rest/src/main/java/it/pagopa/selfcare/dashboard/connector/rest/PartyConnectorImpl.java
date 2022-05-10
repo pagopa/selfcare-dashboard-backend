@@ -20,7 +20,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingRequest;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
@@ -52,7 +52,11 @@ class PartyConnectorImpl implements PartyConnector {
             (inst1, inst2) -> ACTIVE.name().equals(inst1.getStatus()) ? inst1 : inst2;
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setInstitutionId(onboardingData.getInstitutionId());
+        institutionInfo.setOriginId(onboardingData.getOriginId());
+        institutionInfo.setId(onboardingData.getId());
+        institutionInfo.setOrigin(onboardingData.getOrigin());
+        institutionInfo.setInstitutionType(onboardingData.getInstitutionType());
+        institutionInfo.setExternalId(onboardingData.getExternalId());
         institutionInfo.setDescription(onboardingData.getDescription());
         institutionInfo.setTaxCode(onboardingData.getTaxCode());
         institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
@@ -131,7 +135,7 @@ class PartyConnectorImpl implements PartyConnector {
     public InstitutionInfo getOnBoardedInstitution(String institutionId) {
         log.trace("getOnBoardedInstitution start");
         log.debug("getOnBoardedInstitution institutionId = {}", institutionId);
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
                 .findAny().orElse(null);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitution result = {}", result);
@@ -155,7 +159,7 @@ class PartyConnectorImpl implements PartyConnector {
     @Override
     public Collection<InstitutionInfo> getOnBoardedInstitutions() {
         log.trace("getOnBoardedInstitutions start");
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, EnumSet.of(ACTIVE, PENDING));
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnBoardedInstitutions result = {}", result);
         log.trace("getOnBoardedInstitutions end");
@@ -171,7 +175,7 @@ class PartyConnectorImpl implements PartyConnector {
             institutions = onBoardingInfo.getInstitutions().stream()
                     .map(ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION)
                     .collect(Collectors.collectingAndThen(
-                            Collectors.toMap(InstitutionInfo::getInstitutionId, Function.identity(), MERGE_FUNCTION),
+                            Collectors.toMap(InstitutionInfo::getId, Function.identity(), MERGE_FUNCTION),
                             Map::values
                     ));
         }
@@ -203,12 +207,12 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("getAuthInfo start");
         log.debug("getAuthInfo institutionId = {}", institutionId);
         Collection<AuthInfo> authInfos = Collections.emptyList();
-        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, EnumSet.of(ACTIVE));
+        OnBoardingInfo onBoardingInfo = restClient.getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         if (onBoardingInfo != null && onBoardingInfo.getInstitutions() != null) {
             authInfos = onBoardingInfo.getInstitutions().stream()
                     .filter(onboardingData -> onboardingData.getProductInfo() != null)
                     .collect(Collectors.collectingAndThen(
-                            Collectors.groupingBy(OnboardingData::getInstitutionId,
+                            Collectors.groupingBy(OnboardingData::getId,
                                     Collectors.mapping(onboardingData -> {
                                         PartyProductRole productRole = new PartyProductRole();
                                         productRole.setProductId(onboardingData.getProductInfo().getId());
@@ -264,8 +268,8 @@ class PartyConnectorImpl implements PartyConnector {
         Assert.hasText(productId, "A Product id is required");
         Assert.notNull(createUserDto, "An User is required");
 
-        OnboardingRequest onboardingRequest = new OnboardingRequest();
-        onboardingRequest.setInstitutionId(institutionId);
+        OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
+        onboardingUsersRequest.setInstitutionId(institutionId);
         Map<PartyRole, List<User>> partyRoleToUsersMap = createUserDto.getRoles().stream()
                 .map(role -> {
                     User user = new User();
@@ -284,13 +288,13 @@ class PartyConnectorImpl implements PartyConnector {
         }
 
         partyRoleToUsersMap.forEach((key, value) -> {
-            onboardingRequest.setUsers(value);
+            onboardingUsersRequest.setUsers(value);
             switch (key) {
                 case SUB_DELEGATE:
-                    restClient.onboardingSubdelegates(onboardingRequest);
+                    restClient.onboardingSubdelegates(onboardingUsersRequest);
                     break;
                 case OPERATOR:
-                    restClient.onboardingOperators(onboardingRequest);
+                    restClient.onboardingOperators(onboardingUsersRequest);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid Party role");

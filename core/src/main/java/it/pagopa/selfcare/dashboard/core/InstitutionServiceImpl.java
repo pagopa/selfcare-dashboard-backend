@@ -107,17 +107,15 @@ class InstitutionServiceImpl implements InstitutionService {
                             .peek(product -> product.getNode().setUserRole(LIMITED.name()))
                             .peek(product -> product.getNode().setStatus(institutionsProductsMap.get(product.getNode().getId()).getStatus()))
                             .collect(Collectors.toList());
-                    for (ProductTree productTree : productTrees) {
-                        if (null != productTree.getChildren()) {
-                            productTree.setChildren(productTree.getChildren().stream()
+                    productTrees.stream()
+                            .filter(productTree -> productTree.getChildren() != null)
+                            .forEach(productTree -> productTree.setChildren(productTree.getChildren().stream()
                                     .filter(product -> institutionsProductsMap.containsKey(product.getId()))
                                     .filter(product -> userAuthProducts.containsKey(product.getId()))
                                     .peek(product -> product.setAuthorized(true))
                                     .peek(product -> product.setUserRole(LIMITED.name()))
                                     .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
-                                    .collect(Collectors.toList()));
-                        }
-                    }
+                                    .collect(Collectors.toList())));
                 } else {
                     productTrees.forEach(product -> {
                         product.getNode().setAuthorized(userAuthProducts.containsKey(product.getNode().getId()));
@@ -127,15 +125,14 @@ class InstitutionServiceImpl implements InstitutionService {
                         Optional.ofNullable(userAuthProducts.get(product.getNode().getId()))
                                 .ifPresentOrElse(authority -> product.getNode().setUserRole(authority.getAuthority()), () -> product.getNode().setUserRole(null));
                     });
-                    productTrees.forEach(productTree -> {
-                        if (productTree.getChildren() != null) {
-                            productTree.getChildren().forEach(product ->
+                    productTrees.stream()
+                            .map(ProductTree::getChildren)
+                            .filter(Objects::nonNull)
+                            .flatMap(Collection::stream)
+                            .forEach(product ->
                                     product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
                                             .map(PartyProduct::getStatus)
                                             .orElse(ProductStatus.INACTIVE)));
-                        }
-                    });
-
                 }
             }
         }
@@ -175,13 +172,24 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
-        Map<String, Product> idToProductMap = productsConnector.getProducts().stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
+        Map<String, ProductTree> idToProductMap = productsConnector.getProductsTree().stream()
+                .collect(Collectors.toMap(productTree -> productTree.getNode().getId(), Function.identity()));
 
         userInfos.forEach(userInfo -> {
             for (String key : userInfo.getProducts().keySet()) {
                 ProductInfo prod = userInfo.getProducts().get(key);
-                userInfo.getProducts().get(key).setTitle(idToProductMap.get(prod.getId()).getTitle());
+                if (idToProductMap.containsKey(prod.getId())) {
+                    userInfo.getProducts().get(key).setTitle(idToProductMap.get(prod.getId()).getNode().getTitle());
+                } else if (idToProductMap.values().stream()
+                        .map(ProductTree::getChildren)
+                        .filter(Objects::nonNull)
+                        .flatMap(Collection::stream)
+                        .map(Product::getId)
+                        .anyMatch(key::equals)) {
+                    userInfo.getProducts().remove(key);
+                } else {
+                    throw new IllegalArgumentException(String.format("No matching product found with id %s", key));
+                }
             }
         });
 
@@ -194,7 +202,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public UserInfo getInstitutionUser(String institutionId, String userId) {
         log.trace("getInstitutionUser start");
-        log.debug("institutionId = {}, userId = {}", institutionId, userId);
+        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(userId, REQUIRED_USER_ID);

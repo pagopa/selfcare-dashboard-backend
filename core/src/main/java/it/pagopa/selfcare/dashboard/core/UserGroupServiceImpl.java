@@ -78,9 +78,9 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.trace("activate end");
     }
 
-    private List<String> retrievedIds(String groupInstitution, UserInfo.UserInfoFilter userInfoFilter) {
+    private List<String> retrievedIds(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         Collection<UserInfo> retrievedUsers = partyConnector.getUsers(
-                groupInstitution,
+                institutionId,
                 userInfoFilter);
         return retrievedUsers.stream()
                 .map(UserInfo::getId)
