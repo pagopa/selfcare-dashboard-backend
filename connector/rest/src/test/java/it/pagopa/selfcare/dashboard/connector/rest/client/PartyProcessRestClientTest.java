@@ -297,7 +297,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Institution response = restClient.getInstitution(id);
         assertNotNull(response);
         TestUtils.checkNotNullFields(response);
-        response.getAttributes().forEach(attribute -> TestUtils.checkNotNullFields(attribute));
+        response.getAttributes().forEach(TestUtils::checkNotNullFields);
 
     }
 
@@ -327,7 +327,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         Institution response = restClient.getInstitutionByExternalId(externalId);
         assertNotNull(response);
         TestUtils.checkNotNullFields(response);
-        response.getAttributes().forEach(attribute -> TestUtils.checkNotNullFields(attribute));
+        response.getAttributes().forEach(TestUtils::checkNotNullFields);
     }
 
 
