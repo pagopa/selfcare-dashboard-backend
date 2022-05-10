@@ -172,13 +172,24 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
-        Map<String, Product> idToProductMap = productsConnector.getProducts().stream()
-                .collect(Collectors.toMap(Product::getId, Function.identity()));
+        Map<String, ProductTree> idToProductMap = productsConnector.getProductsTree().stream()
+                .collect(Collectors.toMap(productTree -> productTree.getNode().getId(), Function.identity()));
 
         userInfos.forEach(userInfo -> {
             for (String key : userInfo.getProducts().keySet()) {
                 ProductInfo prod = userInfo.getProducts().get(key);
-                userInfo.getProducts().get(key).setTitle(idToProductMap.get(prod.getId()).getTitle());
+                if (idToProductMap.containsKey(prod.getId())) {
+                    userInfo.getProducts().get(key).setTitle(idToProductMap.get(prod.getId()).getNode().getTitle());
+                } else if (idToProductMap.values().stream()
+                        .map(ProductTree::getChildren)
+                        .filter(Objects::nonNull)
+                        .flatMap(Collection::stream)
+                        .map(Product::getId)
+                        .anyMatch(key::equals)) {
+                    userInfo.getProducts().remove(key);
+                } else {
+                    throw new IllegalArgumentException(String.format("No matching product found with id %s", key));
+                }
             }
         });
 
@@ -191,7 +202,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public UserInfo getInstitutionUser(String institutionId, String userId) {
         log.trace("getInstitutionUser start");
-        log.debug("institutionId = {}, userId = {}", institutionId, userId);
+        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(userId, REQUIRED_USER_ID);
