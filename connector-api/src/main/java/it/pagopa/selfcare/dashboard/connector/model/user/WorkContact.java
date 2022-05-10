@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class WorkContact {
-    private String email;
+    private CertifiedField<String> email;
 }

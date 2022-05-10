@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 
@@ -49,7 +50,7 @@ public class UserMapper {
     }
 
 
-    public static SaveUserDto map(it.pagopa.selfcare.dashboard.web.model.user.UserDto model, String institutionId) {
+    public static SaveUserDto map(UserDto model, String institutionId) {
         SaveUserDto resource = null;
         if (model != null) {
             resource = new SaveUserDto();
@@ -58,7 +59,7 @@ public class UserMapper {
             resource.setFamilyName(map(model.getSurname()));
             resource.setFiscalCode(model.getFiscalCode());
             if (institutionId != null) {
-                WorkContactResource contact = new WorkContactResource();
+                WorkContact contact = new WorkContact();
                 contact.setEmail(map(model.getEmail()));
                 resource.setWorkContacts(Map.of(institutionId, contact));
             }
@@ -225,7 +226,7 @@ public class UserMapper {
             resource.setEmail(map(userDto.getEmail()));
             resource.setFamilyName(map(userDto.getSurname()));
             if (institutionId != null) {
-                WorkContactResource contact = new WorkContactResource();
+                WorkContact contact = new WorkContact();
                 contact.setEmail(map(userDto.getEmail()));
                 resource.setWorkContacts(Map.of(institutionId, contact));
             }

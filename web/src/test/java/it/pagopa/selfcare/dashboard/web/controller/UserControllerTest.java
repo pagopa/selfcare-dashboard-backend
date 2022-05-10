@@ -43,8 +43,8 @@ class UserControllerTest {
     static {
         USER_RESOURCE = TestUtils.mockInstance(new User());
         USER_RESOURCE.setId(UUID.randomUUID().toString());
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
         workContact.getEmail().setCertification(Certification.SPID);
         workContacts.put("institutionId", workContact);
         USER_RESOURCE.setWorkContacts(workContacts);

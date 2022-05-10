@@ -149,8 +149,8 @@ class UserMapperTest {
         String institutionId = "institutionId";
         User model = mockInstance(new User(), "setId");
         model.setId(randomUUID().toString());
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        WorkContactResource workcontact = mockInstance(new WorkContactResource());
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        WorkContact workcontact = mockInstance(new WorkContact());
         workContacts.put(institutionId, workcontact);
         model.setWorkContacts(workContacts);
         //when
@@ -184,8 +184,8 @@ class UserMapperTest {
         String institutionId = "institutionId";
         User model = mockInstance(new User(), "setId");
         model.setId(randomUUID().toString());
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        WorkContactResource workcontact = mockInstance(new WorkContactResource());
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        WorkContact workcontact = mockInstance(new WorkContact());
         workContacts.put("institution2", workcontact);
         model.setWorkContacts(workContacts);
         //when

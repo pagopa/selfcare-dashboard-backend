@@ -88,8 +88,8 @@ class UserRegistryConnectorImplTest {
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         User userMock = TestUtils.mockInstance(new User());
         userMock.setId(UUID.randomUUID().toString());
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        workContacts.put("institutionId", TestUtils.mockInstance(new WorkContactResource()));
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        workContacts.put("institutionId", TestUtils.mockInstance(new WorkContact()));
         userMock.setWorkContacts(workContacts);
         Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
                 .thenReturn(userMock);
@@ -133,8 +133,8 @@ class UserRegistryConnectorImplTest {
         userMock.getEmail().setCertification(Certification.SPID);
         userMock.getFamilyName().setCertification(Certification.SPID);
         userMock.getName().setCertification(Certification.SPID);
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
         workContact.getEmail().setCertification(Certification.SPID);
         userMock.setWorkContacts(workContacts);
         workContacts.put("institutionId", workContact);
@@ -204,8 +204,8 @@ class UserRegistryConnectorImplTest {
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         User userMock = TestUtils.mockInstance(new User());
         userMock.setId(userId.toString());
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
         workContact.getEmail().setCertification(Certification.NONE);
         userMock.setWorkContacts(workContacts);
         workContacts.put("institutionId", workContact);
@@ -250,8 +250,8 @@ class UserRegistryConnectorImplTest {
         userMock.getEmail().setCertification(Certification.SPID);
         userMock.getFamilyName().setCertification(Certification.SPID);
         userMock.getName().setCertification(Certification.SPID);
-        Map<String, WorkContactResource> workContacts = new HashMap<>();
-        WorkContactResource workContact = TestUtils.mockInstance(new WorkContactResource());
+        Map<String, WorkContact> workContacts = new HashMap<>();
+        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
         workContact.getEmail().setCertification(Certification.SPID);
         userMock.setWorkContacts(workContacts);
         workContacts.put("institutionId", workContact);

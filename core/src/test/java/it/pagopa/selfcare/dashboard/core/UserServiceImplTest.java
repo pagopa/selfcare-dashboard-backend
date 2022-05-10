@@ -100,7 +100,7 @@ class UserServiceImplTest {
         String institutionId = "institutionId";
         UUID id = randomUUID();
         MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
-        WorkContactResource workContact = mockInstance(new WorkContactResource());
+        WorkContact workContact = mockInstance(new WorkContact());
         user.setWorkContacts(Map.of(institutionId, workContact));
         Institution institutionMock = mockInstance(new Institution());
         when(partyConnector.getInstitution(Mockito.anyString()))
@@ -217,7 +217,7 @@ class UserServiceImplTest {
         String institutionId = "institutionId";
         UserId userId = mockInstance(new UserId());
         SaveUserDto user = mockInstance(new SaveUserDto(), "setWorkContacts");
-        WorkContactResource workContact = mockInstance(new WorkContactResource());
+        WorkContact workContact = mockInstance(new WorkContact());
         user.setWorkContacts(Map.of(institutionId, workContact));
         when(userConnectorMock.saveUser(any()))
                 .thenReturn(userId);
