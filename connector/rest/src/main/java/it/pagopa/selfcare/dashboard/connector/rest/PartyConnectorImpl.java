@@ -255,23 +255,25 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public void createUsers(String institutionId, String productId, CreateUserDto createUserDto) {
+    public void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto) {
         log.trace("createUsers start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, createUserDto);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, userId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
-        Assert.notNull(createUserDto, "An User is required");
+        Assert.hasText(userId, "An User Id is required");
+        Assert.notNull(userDto, "A User is required");
 
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId(institutionId);
-        Map<PartyRole, List<User>> partyRoleToUsersMap = createUserDto.getRoles().stream()
+        Map<PartyRole, List<User>> partyRoleToUsersMap = userDto.getRoles().stream()
                 .map(role -> {
                     User user = new User();
                     user.setProduct(productId);
-                    user.setName(createUserDto.getName());
-                    user.setSurname(createUserDto.getSurname());
-                    user.setTaxCode(createUserDto.getTaxCode());
-                    user.setEmail(createUserDto.getEmail());
+                    user.setName(userDto.getName());
+                    user.setSurname(userDto.getSurname());
+                    user.setTaxCode(userDto.getTaxCode());
+                    user.setEmail(userDto.getEmail());
+                    user.setId(UUID.fromString(userId));
                     user.setProductRole(role.getProductRole());
                     user.setRole(role.getPartyRole());
                     return user;

@@ -828,10 +828,11 @@ class PartyConnectorImplTest {
         // given
         String institutionId = null;
         String productId = "productId";
+        String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -844,10 +845,11 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = null;
+        String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -860,14 +862,32 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = null;
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("An User is required", e.getMessage());
+        Assertions.assertEquals("A User is required", e.getMessage());
+        Mockito.verifyNoInteractions(restClientMock);
+    }
+
+    @Test
+    void createUsers_nullUserId() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String userId = null;
+        CreateUserDto createUserDto = new CreateUserDto();
+        // when
+        Executable executable = () -> {
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+        };
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        Assertions.assertEquals("An User Id is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
 
@@ -878,26 +898,27 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRoles = "Operator Api";
+        String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRoles");
         CreateUserDto.Role roleMock = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
         roleMock.setProductRole(productRoles);
         roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
         // when
-        Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
+        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto);
         // then
         switch (partyRole) {
             case SUB_DELEGATE:
                 Assertions.assertDoesNotThrow(executable);
                 Mockito.verify(restClientMock, Mockito.times(1))
                         .onboardingSubdelegates(onboardingRequestCaptor.capture());
-                verifyRequest(institutionId, productId, createUserDto, onboardingRequestCaptor);
+                verifyRequest(institutionId, productId, createUserDto, onboardingRequestCaptor, userId);
                 break;
             case OPERATOR:
                 Assertions.assertDoesNotThrow(executable);
                 Mockito.verify(restClientMock, Mockito.times(1))
                         .onboardingOperators(onboardingRequestCaptor.capture());
-                verifyRequest(institutionId, productId, createUserDto, onboardingRequestCaptor);
+                verifyRequest(institutionId, productId, createUserDto, onboardingRequestCaptor, userId);
                 break;
             default:
                 IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -915,6 +936,7 @@ class PartyConnectorImplTest {
         String productRoles2 = "Operator Security";
         PartyRole partyRole1 = PartyRole.OPERATOR;
         PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
+        String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = TestUtils.mockInstance(new CreateUserDto(), "setRoles");
         CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
         CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
@@ -925,14 +947,14 @@ class PartyConnectorImplTest {
         roleMock2.setPartyRole(partyRole2);
         createUserDto.setRoles(Set.of(roleMock1, roleMock2));
         // when
-        Executable executable = () -> partyConnector.createUsers(institutionId, productId, createUserDto);
+        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto);
         // then
         ValidationException e = assertThrows(ValidationException.class, executable);
         Assertions.assertEquals("Is not allowed to create both SUB_DELEGATE and OPERATOR users", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
 
-    private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor) {
+    private void verifyRequest(String institutionId, String productId, CreateUserDto createUserDto, ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor, String userId) {
         OnboardingUsersRequest request = onboardingRequestCaptor.getValue();
         Assertions.assertNotNull(request);
         Assertions.assertEquals(institutionId, request.getInstitutionId());
@@ -943,7 +965,7 @@ class PartyConnectorImplTest {
         Assertions.assertEquals(createUserDto.getTaxCode(), request.getUsers().get(0).getTaxCode());
         Assertions.assertEquals(createUserDto.getEmail(), request.getUsers().get(0).getEmail());
         Assertions.assertEquals(productId, request.getUsers().get(0).getProduct());
-
+        Assertions.assertEquals(userId, request.getUsers().get(0).getId().toString());
         createUserDto.getRoles().forEach(role -> request.getUsers().forEach(user -> {
             Assertions.assertEquals(role.getProductRole(), user.getProductRole());
             Assertions.assertEquals(role.getPartyRole(), user.getRole());
