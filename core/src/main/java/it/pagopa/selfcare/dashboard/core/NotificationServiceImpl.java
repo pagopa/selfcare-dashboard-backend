@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,8 @@ import org.springframework.util.Assert;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -59,19 +62,23 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public void sendCreatedUserNotification(String institutionId, String productTitle, String email) {
+    public void sendCreatedUserNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreatedUserNotification start");
         log.debug("institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
         Assert.notNull(institutionId, "Institution id is required");
         Assert.notNull(email, "User email is required");
         Assert.notNull(productTitle, "A product Title is required");
+        Assert.notEmpty(productRoles, "ProductRoles are required");
         Institution institution = partyConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");
 
+        String roleLabel = productRoles.stream()
+                .map(CreateUserDto.Role::getProductRole)
+                .collect(Collectors.joining(", "));
         Map<String, String> dataModel = new HashMap<>();
         dataModel.put("productName", productTitle);
         dataModel.put("institutionName", institution.getDescription());
-
+        dataModel.put("productRole", roleLabel);
         sendNotification(email, CREATE_TEMPLATE, CREATE_SUBJECT, dataModel);
         log.debug("sendCreatedUserNotification end");
     }

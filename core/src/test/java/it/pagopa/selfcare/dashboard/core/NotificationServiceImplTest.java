@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
@@ -97,9 +99,21 @@ class NotificationServiceImplTest {
         String institutionId = null;
         String email = "email";
         String productTitle = "productTitle";
+        String productRoles1 = "Operator Api";
+        String productRoles2 = "Operator Security";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        roleMock2.setProductRole(productRoles2);
+        roleMock2.setPartyRole(partyRole2);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -120,9 +134,16 @@ class NotificationServiceImplTest {
         String institutionId = "institutionId";
         String email = null;
         String productTitle = "productTitle";
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -144,9 +165,16 @@ class NotificationServiceImplTest {
         String institutionId = "institutionId";
         String email = "email";
         String productTitle = null;
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -160,6 +188,30 @@ class NotificationServiceImplTest {
         Mockito.verifyNoInteractions(partyConnector, freemarkerConfig, notificationConnector);
     }
 
+    @Test
+    void sendCreatedUserNotification_emptyProductRoles() {
+        //given
+        String institutionId = "institutionId";
+        String email = "email";
+        String productTitle = "productTitle";
+
+        Set<CreateUserDto.Role> roles = Set.of();
+        //when
+        Executable executable = () -> {
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
+                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        Throwable e = throwableCaptor.getValue();
+        Assertions.assertNotNull(e);
+        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
+        Assertions.assertEquals("ProductRoles are required", e.getMessage());
+        Mockito.verifyNoInteractions(partyConnector, freemarkerConfig, notificationConnector);
+    }
+
 
     @Test
     void sendCreatedUserNotification_nullInstitutionDescription() {
@@ -168,11 +220,18 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution(), "setDescription");
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -196,11 +255,18 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productId";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -224,12 +290,19 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productId";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
-        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -253,8 +326,6 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
-                .thenReturn(institutionMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
                 .name("name")
@@ -264,9 +335,18 @@ class NotificationServiceImplTest {
         Mockito.doThrow(RuntimeException.class)
                 .when(notificationConnector)
                 .sendNotificationToUser(Mockito.any());
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+                .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -292,17 +372,30 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
-                .thenReturn(institutionMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
                 .name("name")
                 .surname("surname")
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
+        String productRoles1 = "Operator Api";
+        String productRoles2 = "Operator security";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPArtyRole");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        roleMock2.setProductRole(productRoles2);
+        roleMock2.setPartyRole(partyRole2);
+
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2);
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+                .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
-            notificationService.sendCreatedUserNotification(institutionId, productTitle, email);
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
             Thread.sleep(500);
         };
         //then
@@ -319,6 +412,7 @@ class NotificationServiceImplTest {
         assertEquals("A new user has been added", messageRequest.getSubject());
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productTitle));
+        assertTrue(messageRequest.getContent().contains(roles.toString()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));

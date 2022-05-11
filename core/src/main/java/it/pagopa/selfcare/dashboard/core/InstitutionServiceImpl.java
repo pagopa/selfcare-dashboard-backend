@@ -258,7 +258,7 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
         partyConnector.createUsers(institutionId, productId, user);
-        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
+        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
 
         log.trace("createUsers end");
     }
