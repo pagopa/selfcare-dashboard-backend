@@ -90,7 +90,6 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         Assertions.assertEquals(2, response.get(0).getChildren().size());
     }
 
-    //TODO need to create a new Model for the restClient, currently a global model is used.
     @Test
     void getProduct_fullyValued() {
         //given
