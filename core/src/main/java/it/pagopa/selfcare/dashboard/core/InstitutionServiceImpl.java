@@ -176,8 +176,11 @@ class InstitutionServiceImpl implements InstitutionService {
                 .collect(Collectors.toMap(productTree -> productTree.getNode().getId(), Function.identity()));
 
         userInfos.forEach(userInfo -> {
-            for (String key : userInfo.getProducts().keySet()) {
-                ProductInfo prod = userInfo.getProducts().get(key);
+            Iterator<Map.Entry<String, ProductInfo>> productsIterator = userInfo.getProducts().entrySet().iterator();
+            while (productsIterator.hasNext()) {
+                Map.Entry<String, ProductInfo> next = productsIterator.next();
+                String key = next.getKey();
+                ProductInfo prod = next.getValue();
                 if (idToProductMap.containsKey(prod.getId())) {
                     userInfo.getProducts().get(key).setTitle(idToProductMap.get(prod.getId()).getNode().getTitle());
                 } else if (idToProductMap.values().stream()
@@ -186,7 +189,7 @@ class InstitutionServiceImpl implements InstitutionService {
                         .flatMap(Collection::stream)
                         .map(Product::getId)
                         .anyMatch(key::equals)) {
-                    userInfo.getProducts().remove(key);
+                    productsIterator.remove();
                 } else {
                     throw new IllegalArgumentException(String.format("No matching product found with id %s", key));
                 }
