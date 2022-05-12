@@ -4,10 +4,7 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
@@ -199,6 +196,7 @@ class GroupMapperTest {
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
+        userInfoModel.getUser().setWorkContacts(Map.of(userInfoModel.getInstitutionId(), mockInstance(new WorkContact())));
         model.setMembers(List.of(userInfoModel));
         User createdBy = mockInstance(new User(), "setId");
         createdBy.setId(randomUUID().toString());
@@ -215,7 +213,7 @@ class GroupMapperTest {
         assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId().toString());
         assertEquals(model.getMembers().get(0).getUser().getName().getValue(), resource.getMembers().get(0).getName());
         assertEquals(model.getMembers().get(0).getUser().getFamilyName().getValue(), resource.getMembers().get(0).getSurname());
-        assertEquals(model.getMembers().get(0).getUser().getEmail().getValue(), resource.getMembers().get(0).getEmail());
+        assertEquals(model.getMembers().get(0).getUser().getWorkContacts().get(model.getInstitutionId()).getEmail().getValue(), resource.getMembers().get(0).getEmail());
         assertEquals(model.getMembers().get(0).getRole(), resource.getMembers().get(0).getRole());
         assertEquals(model.getMembers().get(0).getStatus(), resource.getMembers().get(0).getStatus());
     }

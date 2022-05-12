@@ -164,7 +164,7 @@ class UserControllerTest {
         verify(userServiceMock, times(1))
                 .saveUser(eq(institutionId), saveCaptor.capture());
         SaveUserDto capturedSave = saveCaptor.getValue();
-        assertEquals(dto.getEmail(), capturedSave.getEmail().getValue());
+        assertNull(capturedSave.getEmail());
         assertEquals(dto.getSurname(), capturedSave.getFamilyName().getValue());
         assertEquals(dto.getName(), capturedSave.getName().getValue());
         assertTrue(capturedSave.getWorkContacts().containsKey(institutionId));

@@ -8,10 +8,11 @@ import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
-import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
 
     private static ProductInfoResource toUserProductInfoResource(ProductInfo model) {
@@ -50,24 +52,6 @@ public class UserMapper {
     }
 
 
-    public static SaveUserDto map(UserDto model, String institutionId) {
-        SaveUserDto resource = null;
-        if (model != null) {
-            resource = new SaveUserDto();
-            resource.setName(map(model.getName()));
-            resource.setEmail(map(model.getEmail()));
-            resource.setFamilyName(map(model.getSurname()));
-            resource.setFiscalCode(model.getFiscalCode());
-            if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(map(model.getEmail()));
-                resource.setWorkContacts(Map.of(institutionId, contact));
-            }
-        }
-        return resource;
-    }
-
-
     public static UserIdResource toIdResource(UserId model) {
         UserIdResource resource = null;
         if (model != null) {
@@ -84,38 +68,12 @@ public class UserMapper {
             resource = new UserResource();
             resource.setId(UUID.fromString(model.getId()));
             resource.setFiscalCode(model.getFiscalCode());
-            resource.setName(toCertifiedFieldResource(model.getName()));
-            resource.setFamilyName(toCertifiedFieldResource(model.getFamilyName()));
-            if (institutionId != null) {
-                if (model.getWorkContacts() != null)
-                    resource.setEmail(model.getWorkContacts().entrySet().stream()
-                            .filter(e -> e.getKey().equals(institutionId))
-                            .findAny()
-                            .map(entry -> toCertifiedFieldResource(entry.getValue().getEmail()))
-                            .orElse(null));
-            }
-        }
-        return resource;
-    }
-
-
-    public static CertifiedField<String> map(String certifiableField) {
-        CertifiedField<String> resource = null;
-        if (certifiableField != null) {
-            resource = new CertifiedField<>();
-            resource.setValue(certifiableField);
-            resource.setCertification(Certification.NONE);
-        }
-        return resource;
-    }
-
-
-    public static <T> CertifiedFieldResource<T> toCertifiedFieldResource(CertifiedField<T> certifiedField) {
-        CertifiedFieldResource<T> resource = null;
-        if (certifiedField != null) {
-            resource = new CertifiedFieldResource<>();
-            resource.setCertified(Certification.isCertified(certifiedField.getCertification()));
-            resource.setValue(certifiedField.getValue());
+            resource.setName(CertifiedFieldMapper.map(model.getName()));
+            resource.setFamilyName(CertifiedFieldMapper.map(model.getFamilyName()));
+            Optional.ofNullable(model.getWorkContact(institutionId))
+                    .map(WorkContact::getEmail)
+                    .map(CertifiedFieldMapper::map)
+                    .ifPresent(resource::setEmail);
         }
         return resource;
     }
@@ -139,60 +97,55 @@ public class UserMapper {
 
 
     private static <T extends InstitutionUserResource> T toInstitutionUser(UserInfo model, Supplier<T> supplier) {
-        return Optional.ofNullable(model)
-                .map(userInfo -> {
-                    final T resource = supplier.get();
-                    resource.setId(UUID.fromString(userInfo.getId()));
-                    resource.setRole(userInfo.getRole());
-                    resource.setStatus(userInfo.getStatus());
-                    Optional.ofNullable(userInfo.getUser()).ifPresent(userResource -> {
-                        Optional.ofNullable(userResource.getName())
-                                .map(CertifiedField::getValue)
-                                .ifPresent(resource::setName);
-                        Optional.ofNullable(userResource.getFamilyName())
-                                .map(CertifiedField::getValue)
-                                .ifPresent(resource::setSurname);
-                        Optional.ofNullable(userResource.getEmail())
-                                .map(CertifiedField::getValue)
-                                .ifPresent(resource::setEmail);
-                    });
-                    Optional.ofNullable(userInfo.getProducts())
-                            .map(map -> map.values().stream()
-                                    .map(UserMapper::toUserProductInfoResource)
-                                    .collect(Collectors.toList()))
-                            .ifPresent(resource::setProducts);
-                    return resource;
-                }).orElse(null);
+        T resource = null;
+        if (model != null) {
+            resource = supplier.get();
+            resource.setId(UUID.fromString(model.getId()));
+            resource.setRole(model.getRole());
+            resource.setStatus(model.getStatus());
+            if (model.getUser() != null) {
+                resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
+                resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
+                resource.setEmail(CertifiedFieldMapper.toValue(model.getUser().getEmail()));
+                Optional.ofNullable(model.getUser().getWorkContact(model.getInstitutionId()))
+                        .map(WorkContact::getEmail)
+                        .map(CertifiedFieldMapper::toValue)
+                        .ifPresent(resource::setEmail);
+            }
+            if (model.getProducts() != null) {
+                resource.setProducts(model.getProducts().values().stream()
+                        .map(UserMapper::toUserProductInfoResource)
+                        .collect(Collectors.toList()));
+            }
+        }
+        return resource;
     }
 
 
     public static ProductUserResource toProductUser(UserInfo model) {
-        return Optional.ofNullable(model)
-                .map(userInfo -> {
-                    ProductUserResource resource = new ProductUserResource();
-                    resource.setId(UUID.fromString(userInfo.getId()));
-                    resource.setRole(userInfo.getRole());
-                    resource.setStatus(userInfo.getStatus());
-                    Optional.ofNullable(userInfo.getUser()).ifPresent(userResource -> {
-                        resource.setName(Optional.ofNullable(userResource.getName())
-                                .map(CertifiedField::getValue)
-                                .orElse(null));
-                        resource.setSurname(Optional.ofNullable(userResource.getFamilyName())
-                                .map(CertifiedField::getValue)
-                                .orElse(null));
-                        resource.setEmail(Optional.ofNullable(userResource.getEmail())
-                                .map(CertifiedField::getValue)
-                                .orElse(null));
-                    });
-                    Optional.ofNullable(userInfo.getProducts()).ifPresent(map ->
-                            resource.setProduct(map.values()
-                                    .stream()
-                                    .map(UserMapper::toUserProductInfoResource)
-                                    .collect(Collectors.toList())
-                                    .get(0)));
-                    return resource;
-                })
-                .orElse(null);
+        ProductUserResource resource = null;
+        if (model != null) {
+            resource = new ProductUserResource();
+            resource.setId(UUID.fromString(model.getId()));
+            resource.setRole(model.getRole());
+            resource.setStatus(model.getStatus());
+            if (model.getUser() != null) {
+                resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
+                resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
+                Optional.ofNullable(model.getUser().getWorkContacts())
+                        .map(map -> map.get(model.getInstitutionId()))
+                        .map(WorkContact::getEmail)
+                        .map(CertifiedFieldMapper::toValue)
+                        .ifPresent(resource::setEmail);
+            }
+            if (model.getProducts() != null) {
+                resource.setProduct(model.getProducts().values().stream()
+                        .map(UserMapper::toUserProductInfoResource)
+                        .collect(Collectors.toList())
+                        .get(0));
+            }
+        }
+        return resource;
     }
 
 
@@ -222,12 +175,28 @@ public class UserMapper {
         MutableUserFieldsDto resource = null;
         if (userDto != null) {
             resource = new MutableUserFieldsDto();
-            resource.setName(map(userDto.getName()));
-            resource.setEmail(map(userDto.getEmail()));
-            resource.setFamilyName(map(userDto.getSurname()));
+            resource.setName(CertifiedFieldMapper.map(userDto.getName()));
+            resource.setFamilyName(CertifiedFieldMapper.map(userDto.getSurname()));
             if (institutionId != null) {
                 WorkContact contact = new WorkContact();
-                contact.setEmail(map(userDto.getEmail()));
+                contact.setEmail(CertifiedFieldMapper.map(userDto.getEmail()));
+                resource.setWorkContacts(Map.of(institutionId, contact));
+            }
+        }
+        return resource;
+    }
+
+
+    public static SaveUserDto map(UserDto model, String institutionId) {
+        SaveUserDto resource = null;
+        if (model != null) {
+            resource = new SaveUserDto();
+            resource.setName(CertifiedFieldMapper.map(model.getName()));
+            resource.setFamilyName(CertifiedFieldMapper.map(model.getSurname()));
+            resource.setFiscalCode(model.getFiscalCode());
+            if (institutionId != null) {
+                WorkContact contact = new WorkContact();
+                contact.setEmail(CertifiedFieldMapper.map(model.getEmail()));
                 resource.setWorkContacts(Map.of(institutionId, contact));
             }
         }

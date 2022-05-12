@@ -12,7 +12,7 @@ public class UpdateUserDto {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
     @JsonProperty(required = true)
     @NotBlank
-    private String fiscalCode;
+    private String fiscalCode;//FIXME
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
     @JsonProperty(required = true)
     @NotBlank

@@ -17,4 +17,9 @@ public class User {
     private CertifiedField<String> email;
     private Map<String, WorkContact> workContacts;
 
+
+    public WorkContact getWorkContact(String key) {
+        return workContacts != null ? workContacts.get(key) : null;
+    }
+
 }
