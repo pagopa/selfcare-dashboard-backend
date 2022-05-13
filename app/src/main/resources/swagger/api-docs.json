@@ -786,7 +786,7 @@
           "user"
         ],
         "summary": "search",
-        "description": "Retrieve the user for a given external id",
+        "description": "Retrieve the user for a given fiscal code",
         "operationId": "searchUsingPOST",
         "parameters": [
           {
@@ -804,7 +804,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmbeddedExternalIdDto"
+                "$ref": "#/components/schemas/SearchUserDto"
               }
             }
           }
@@ -1524,15 +1524,6 @@
           }
         }
       },
-      "EmbeddedExternalIdDto" : {
-        "title" : "EmbeddedExternalIdDto",
-        "type" : "object",
-        "properties" : {
-          "externalId" : {
-            "type" : "string"
-          }
-        }
-      },
       "IdentityTokenResource" : {
         "title" : "IdentityTokenResource",
         "required" : [ "token" ],
@@ -1906,43 +1897,68 @@
           "status" : {
             "type" : "string",
             "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "title": {
+            "type": "string",
+            "description": "Product's title"
           },
-          "urlBO" : {
-            "type" : "string",
-            "description" : "URL that redirects to the back-office section, where is possible to manage the product"
+          "urlBO": {
+            "type": "string",
+            "description": "URL that redirects to the back-office section, where is possible to manage the product"
           },
-          "urlPublic" : {
-            "type" : "string",
-            "description" : "URL that redirects to the public information webpage of the product"
+          "urlPublic": {
+            "type": "string",
+            "description": "URL that redirects to the public information webpage of the product"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
-      "SubProductResource" : {
-        "title" : "SubProductResource",
-        "required" : [ "id", "status", "title" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+      "SearchUserDto": {
+        "title": "SearchUserDto",
+        "required": [
+          "fiscalCode"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
+          }
+        }
+      },
+      "SubProductResource": {
+        "title": "SubProductResource",
+        "required": [
+          "id",
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "status": {
+            "type": "string",
+            "description": "Product's status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "title": {
+            "type": "string",
+            "description": "Product's title"
           }
         }
       },
@@ -1963,9 +1979,9 @@
             "type": "string",
             "description": "User's name"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
@@ -2166,6 +2182,7 @@
       "UserResource": {
         "title": "UserResource",
         "required": [
+          "fiscalCode",
           "id"
         ],
         "type": "object",

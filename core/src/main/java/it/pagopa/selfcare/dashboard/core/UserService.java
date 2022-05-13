@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    User search(String externalId);
+    User search(String fiscalCode);
 
     void updateUser(UUID id, String institutionId, MutableUserFieldsDto userDto);
 

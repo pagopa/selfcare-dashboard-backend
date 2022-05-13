@@ -38,28 +38,29 @@ class UserServiceImplTest {
 
 
     @Test
-    void getUser() {
+    void search() {
         //given
-        String externalId = "externalId";
+        String fiscalCode = "fiscalCode";
         User expectedUser = mockInstance(new User());
         when(userConnectorMock.search(any(), any()))
                 .thenReturn(expectedUser);
         //when
-        User user = userRegistryService.search(externalId);
+        User user = userRegistryService.search(fiscalCode);
         //then
         assertSame(expectedUser, user);
         verify(userConnectorMock, times(1))
-                .search(externalId, EnumSet.of(name, familyName, email, fiscalCode, workContacts));
+                .search(fiscalCode, EnumSet.of(name, familyName, email, workContacts));
+        assertEquals(fiscalCode, user.getFiscalCode());
         verifyNoMoreInteractions(userConnectorMock);
     }
 
 
     @Test
-    void getUser_nullExternalId() {
+    void search_nullFiscalCode() {
         //given
-        String externalId = null;
+        String fiscalCode = null;
         //when
-        Executable executable = () -> userRegistryService.search(externalId);
+        Executable executable = () -> userRegistryService.search(fiscalCode);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());

@@ -28,12 +28,12 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     }
 
     @Override
-    public User search(String externalId, EnumSet<User.Fields> fieldList) {
+    public User search(String fiscalCode, EnumSet<User.Fields> fieldList) {
         log.trace("getUserByExternalId start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-        Assert.hasText(externalId, "A TaxCode is required");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", fiscalCode);
+        Assert.hasText(fiscalCode, "A TaxCode is required");
         Assert.notEmpty(fieldList, "At least one user fields is required");
-        User user = restClient.search(new EmbeddedExternalId(externalId), fieldList);
+        User user = restClient.search(new EmbeddedExternalId(fiscalCode), fieldList);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", user);
         log.trace("getUserByExternalId end");
 

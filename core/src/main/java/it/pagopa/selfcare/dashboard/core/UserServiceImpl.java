@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,12 +33,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User search(String externalId) {
+    public User search(String fiscalCode) {
         log.trace("getUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", externalId);
-        Assert.hasText(externalId, "A TaxCode is required");
-        User result = userConnector.search(externalId,
-                EnumSet.of(name, familyName, email, fiscalCode, workContacts));
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser externalId = {}", fiscalCode);
+        Assert.hasText(fiscalCode, "A TaxCode is required");
+        User result = userConnector.search(fiscalCode,
+                EnumSet.of(name, familyName, email, workContacts));
+        Optional.ofNullable(result)
+                .ifPresent(user -> user.setFiscalCode(fiscalCode));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUser result = {}", result);
         log.trace("getUser end");
         return result;

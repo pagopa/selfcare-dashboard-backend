@@ -5,7 +5,7 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
+import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
@@ -65,8 +65,8 @@ class UserControllerTest {
         //given
         String externalId = "externalId";
         String institutionId = "institutionId";
-        EmbeddedExternalIdDto externalIdDto = new EmbeddedExternalIdDto();
-        externalIdDto.setExternalId(externalId);
+        SearchUserDto externalIdDto = new SearchUserDto();
+        externalIdDto.setFiscalCode(externalId);
         Mockito.when(userServiceMock.search(Mockito.anyString()))
                 .thenReturn(USER_RESOURCE);
         //when

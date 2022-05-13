@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface UserRegistryConnector {
 
-    User search(String externalId, EnumSet<User.Fields> fieldList);
+    User search(String fiscalCode, EnumSet<User.Fields> fieldList);
 
     User getUserByInternalId(String userId, EnumSet<User.Fields> fieldList);
 

@@ -7,7 +7,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.core.UserService;
-import it.pagopa.selfcare.dashboard.web.model.EmbeddedExternalIdDto;
+import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.user.UserDto;
@@ -38,15 +38,16 @@ public class UserController {
     @PostMapping(value = "/search")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}")
-    public UserResource search(@ApiParam("${swagger.dashboard.user.model.externalId}")
+    public UserResource search(@ApiParam("${swagger.dashboard.user.model.searchUserDto}")
                                @RequestBody
-                                       EmbeddedExternalIdDto externalId,
+                               @Valid
+                                       SearchUserDto searchUserDto,
                                @ApiParam("${swagger.dashboard.institutions.model.id}")
                                @RequestParam(value = "institutionId")
                                        String institutionId) {
         log.trace("getUserByExternalId start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-        User user = userService.search(externalId.getExternalId());
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId searchUserDto = {}", searchUserDto);
+        User user = userService.search(searchUserDto.getFiscalCode());
         UserResource result = UserMapper.toUserResource(user, institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
         log.trace("getUserByExternalId end");
