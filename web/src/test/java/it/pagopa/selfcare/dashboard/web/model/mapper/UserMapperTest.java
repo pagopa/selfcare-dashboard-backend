@@ -202,8 +202,9 @@ class UserMapperTest {
     void fromCreateUserDto_null() {
         // given
         CreateUserDto dto = null;
+        final String institutionId = "institutionId";
         // when
-        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto);
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto, institutionId);
         // then
         assertNull(model);
     }
@@ -213,11 +214,17 @@ class UserMapperTest {
     void fromCreateUserDto_notNull() {
         // given
         CreateUserDto dto = mockInstance(new CreateUserDto());
+        final String institutionId = "institutionId";
         // when
-        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto);
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto, institutionId);
         // then
         assertNotNull(model);
         reflectionEqualsByName(model, dto, "partyRole");
+        assertNotNull(model.getUser());
+        assertEquals(dto.getTaxCode(), model.getUser().getFiscalCode());
+        assertEquals(dto.getName(), model.getUser().getName().getValue());
+        assertEquals(dto.getSurname(), model.getUser().getFamilyName().getValue());
+        assertEquals(dto.getEmail(), model.getUser().getWorkContacts().get(institutionId).getEmail().getValue());
     }
 
     @Test

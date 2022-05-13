@@ -149,7 +149,7 @@ public class UserMapper {
     }
 
 
-    public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto) {
+    public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto, String institutionId) {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = null;
         if (dto != null) {
             model = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto();
@@ -165,9 +165,27 @@ public class UserMapper {
                             return role;
                         }).collect(Collectors.toSet()));
             }
+            model.setUser(toSaveUserDto(dto, institutionId));
         }
 
         return model;
+    }
+
+
+    private static SaveUserDto toSaveUserDto(CreateUserDto model, String institutionId) {
+        SaveUserDto resource = null;
+        if (model != null) {
+            resource = new SaveUserDto();
+            resource.setFiscalCode(model.getTaxCode());
+            resource.setName(CertifiedFieldMapper.map(model.getName()));
+            resource.setFamilyName(CertifiedFieldMapper.map(model.getSurname()));
+            if (institutionId != null) {
+                WorkContact contact = new WorkContact();
+                contact.setEmail(CertifiedFieldMapper.map(model.getEmail()));
+                resource.setWorkContacts(Map.of(institutionId, contact));
+            }
+        }
+        return resource;
     }
 
 

@@ -13,6 +13,7 @@ public class CreateUserDto {
     private String taxCode;
     private String email;
     private Set<Role> roles;
+    private SaveUserDto user;
 
     @Data
     public static class Role {

@@ -10,7 +10,10 @@ import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -261,38 +264,11 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
 
-        String userId = userRegistryConnector.saveUser(map(user, institutionId)).getId().toString();
+        String userId = userRegistryConnector.saveUser(user.getUser()).getId().toString();
         partyConnector.createUsers(institutionId, productId, userId, user);
         notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
 
         log.trace("createUsers end");
-    }
-
-    static SaveUserDto map(CreateUserDto model, String institutionId) {
-        SaveUserDto resource = null;
-        if (model != null) {
-            resource = new SaveUserDto();
-            resource.setName(map(model.getName()));
-            resource.setEmail(map(model.getEmail()));
-            resource.setFamilyName(map(model.getSurname()));
-            resource.setFiscalCode(model.getTaxCode());
-            if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(map(model.getEmail()));
-                resource.setWorkContacts(Map.of(institutionId, contact));
-            }
-        }
-        return resource;
-    }
-
-    private static CertifiedField<String> map(String certifiableField) {
-        CertifiedField<String> resource = null;
-        if (certifiableField != null) {
-            resource = new CertifiedField<>();
-            resource.setValue(certifiableField);
-            resource.setCertification(Certification.NONE);
-        }
-        return resource;
     }
 
 }

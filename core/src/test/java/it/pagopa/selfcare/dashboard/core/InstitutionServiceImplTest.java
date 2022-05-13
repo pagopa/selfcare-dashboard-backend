@@ -877,14 +877,8 @@ class InstitutionServiceImplTest {
         // then
         if (PartyRole.SUB_DELEGATE.equals(partyRole) || PartyRole.OPERATOR.equals(partyRole)) {
             assertDoesNotThrow(executable);
-            ArgumentCaptor<SaveUserDto> saveUserCaptor = ArgumentCaptor.forClass(SaveUserDto.class);
             Mockito.verify(userRegistryConnector, Mockito.times(1))
-                    .saveUser(saveUserCaptor.capture());
-            SaveUserDto saveUserDto = saveUserCaptor.getValue();
-            assertEquals(createUserDto.getTaxCode(), saveUserDto.getFiscalCode());
-            assertEquals(createUserDto.getName(), saveUserDto.getName().getValue());
-            assertEquals(createUserDto.getSurname(), saveUserDto.getFamilyName().getValue());
-            assertEquals(createUserDto.getEmail(), saveUserDto.getEmail().getValue());
+                    .saveUser(createUserDto.getUser());
             Mockito.verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(id.toString()), createUserDtoCaptor.capture());
             Mockito.verify(notificationServiceMock, Mockito.times(1)).
