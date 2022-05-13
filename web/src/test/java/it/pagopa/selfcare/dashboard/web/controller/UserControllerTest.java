@@ -150,7 +150,7 @@ class UserControllerTest {
                 .thenReturn(id);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .post(BASE_URL + "/save-user")
+                .post(BASE_URL + "/")
                 .content(mapper.writeValueAsString(dto))
                 .queryParam("institutionId", institutionId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

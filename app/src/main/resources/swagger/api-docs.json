@@ -721,7 +721,7 @@
         ]
       }
     },
-    "/users/save-user": {
+    "/users": {
       "post": {
         "tags": [
           "user"
@@ -1947,21 +1947,21 @@
         }
       },
       "UpdateUserDto" : {
-        "title" : "UpdateUserDto",
-        "required" : [ "email", "fiscalCode", "name", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
+        "title": "UpdateUserDto",
+        "required": [
+          "email",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
             "description": "User's institutional email"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
-          },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
           "surname" : {
             "type" : "string",

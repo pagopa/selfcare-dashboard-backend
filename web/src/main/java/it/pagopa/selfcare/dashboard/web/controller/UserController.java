@@ -71,7 +71,7 @@ public class UserController {
         log.trace("updateUser end");
     }
 
-    @PostMapping(value = "/save-user")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.saveUser}")
     public UserIdResource saveUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
