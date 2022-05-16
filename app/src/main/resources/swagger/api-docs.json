@@ -1556,7 +1556,7 @@
           },
           "externalId": {
             "type": "string",
-            "description": "Institution's unique external identifier (i.e.: IPA code)"
+            "description": "Institution's unique external identifier"
           },
           "fiscalCode": {
             "type": "string",
@@ -1586,11 +1586,11 @@
           },
           "origin": {
             "type": "string",
-            "description": "Institution's details origin"
+            "description": "Institution's data origin"
           },
           "originId": {
             "type": "string",
-            "description": "Institution's details origin Id"
+            "description": "Institution's identifier related to origin"
           },
           "status": {
             "type": "string",
@@ -1890,13 +1890,13 @@
             "type" : "string",
             "description" : "Product's unique identifier"
           },
-          "logo" : {
-            "type" : "string",
-            "description" : "Product's logo"
+          "logo": {
+            "type": "string",
+            "description": "Product's logo"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
+          "status": {
+            "type": "string",
+            "description": "Product's status",
             "enum": [
               "ACTIVE",
               "INACTIVE",
