@@ -60,6 +60,7 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setTaxCode(onboardingData.getTaxCode());
         institutionInfo.setDigitalAddress(onboardingData.getDigitalAddress());
         institutionInfo.setStatus(onboardingData.getState().toString());
+        institutionInfo.setAddress(onboardingData.getAddress());
         if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
             institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
         }
