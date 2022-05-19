@@ -223,7 +223,7 @@
                   
       <div
          style="font-family:Titillium Web, Arial;font-size:16px;font-weight:400;line-height:24px;text-align:left;color:#17324D;"
-      ><p><b>${requesterName} ${requesterSurname}</b> ti ha aggiunto come Referente con ruolo ${productRole} per il prodotto ${productName} dell ente ${institutionName}.</p></div>
+      ><p><b>${requesterName} ${requesterSurname}</b> ti ha assegnato il ruolo di ${productRole} per il prodotto ${productName} nell'Area Riservata di ${institutionName}.</p></div>
     
                 </td>
               </tr>

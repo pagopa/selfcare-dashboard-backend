@@ -359,14 +359,14 @@ class NotificationServiceImplTest {
         Mockito.verify(partyConnector, Mockito.times(1))
                 .getInstitution(institutionId);
         Mockito.verify(freemarkerConfig, Mockito.times(1))
-                .getTemplate("user_added.ftlh");
+                .getTemplate("user_added_single_role.ftlh");
         Mockito.verify(notificationConnector, Mockito.times(1))
                 .sendNotificationToUser(Mockito.any());
     }
 
 
     @Test
-    void sendCreatedUserNotification() throws IOException {
+    void sendCreatedUserNotification_singleRole() throws IOException {
         //given
         String institutionId = "institutionId";
         String email = "email";
@@ -379,18 +379,13 @@ class NotificationServiceImplTest {
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
         String productRoles1 = "Operator Api";
-        String productRoles2 = "Operator security";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
         CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
-        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPArtyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
-        roleMock2.setProductRole(productRoles2);
-        roleMock2.setPartyRole(partyRole2);
 
-        Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         Mockito.when(partyConnector.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         //when
@@ -403,7 +398,7 @@ class NotificationServiceImplTest {
         Mockito.verify(partyConnector, Mockito.times(1))
                 .getInstitution(institutionId);
         Mockito.verify(freemarkerConfig, Mockito.times(1))
-                .getTemplate("user_added.ftlh");
+                .getTemplate("user_added_single_role.ftlh");
         Mockito.verify(notificationConnector, Mockito.times(1))
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
@@ -412,12 +407,73 @@ class NotificationServiceImplTest {
         assertEquals("A new user has been added", messageRequest.getSubject());
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productTitle));
-        assertTrue(messageRequest.getContent().contains(roles.toString()));
+        roles.forEach(role -> {
+            assertTrue(messageRequest.getContent().contains(role.getProductRole()));
+        });
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
     }
 
+    @Test
+    void sendCreateUserNotification_multipleRoles() throws IOException {
+        //given
+        String institutionId = "institutionId";
+        String email = "email";
+        String productTitle = "productTitle";
+        Institution institutionMock = TestUtils.mockInstance(new Institution());
+        SelfCareUser selfCareUser = SelfCareUser.builder("id")
+                .email("test@example.com")
+                .name("name")
+                .surname("surname")
+                .build();
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        String productRole2 = "Operator Security";
+        PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
+        String productRole3 = "Administrator";
+        PartyRole partyRole3 = PartyRole.DELEGATE;
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        CreateUserDto.Role roleMock3 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        roleMock2.setProductRole(productRole2);
+        roleMock2.setPartyRole(partyRole2);
+        roleMock3.setProductRole(productRole3);
+        roleMock3.setPartyRole(partyRole3);
+
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2, roleMock3);
+        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+                .thenReturn(institutionMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendCreatedUserNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        Mockito.verify(partyConnector, Mockito.times(1))
+                .getInstitution(institutionId);
+        Mockito.verify(freemarkerConfig, Mockito.times(1))
+                .getTemplate("user_added_multi_role.ftlh");
+        Mockito.verify(notificationConnector, Mockito.times(1))
+                .sendNotificationToUser(messageRequestCaptor.capture());
+        MessageRequest messageRequest = messageRequestCaptor.getValue();
+        assertNotNull(messageRequest);
+        assertEquals(email, messageRequest.getReceiverEmail());
+        assertEquals("A new user has been added", messageRequest.getSubject());
+        assertNotNull(messageRequest.getContent());
+        assertTrue(messageRequest.getContent().contains(productTitle));
+        roles.forEach(role -> {
+            assertTrue(messageRequest.getContent().contains(role.getProductRole()));
+        });
+        assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
+        assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
+        assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
+    }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getRelationshipBasedNotificationArgumentsProvider")
