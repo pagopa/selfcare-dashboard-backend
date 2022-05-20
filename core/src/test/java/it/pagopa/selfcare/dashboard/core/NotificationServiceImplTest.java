@@ -103,8 +103,8 @@ class NotificationServiceImplTest {
         String productRoles2 = "Operator Security";
         PartyRole partyRole1 = PartyRole.OPERATOR;
         PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
-        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        CreateUserDto.Role roleMock2 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -136,7 +136,7 @@ class NotificationServiceImplTest {
         String productTitle = "productTitle";
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -167,7 +167,7 @@ class NotificationServiceImplTest {
         String productTitle = null;
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -222,7 +222,7 @@ class NotificationServiceImplTest {
         Institution institutionMock = TestUtils.mockInstance(new Institution(), "setDescription");
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -257,7 +257,7 @@ class NotificationServiceImplTest {
         Institution institutionMock = TestUtils.mockInstance(new Institution());
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -293,7 +293,7 @@ class NotificationServiceImplTest {
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -337,7 +337,7 @@ class NotificationServiceImplTest {
                 .sendNotificationToUser(Mockito.any());
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
-        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
