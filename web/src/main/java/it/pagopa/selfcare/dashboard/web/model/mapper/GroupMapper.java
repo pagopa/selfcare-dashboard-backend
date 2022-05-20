@@ -3,14 +3,17 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 
 import javax.validation.ValidationException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class GroupMapper {
+
     public static CreateUserGroup fromDto(CreateUserGroupDto dto) {
         CreateUserGroup model = null;
         if (dto != null) {
@@ -23,9 +26,8 @@ public class GroupMapper {
                 throw new ValidationException("Members list must not be null");
             }
             model.setMembers(dto.getMembers().stream().map(UUID::toString).collect(Collectors.toList()));
-            return model;
         }
-        return null;
+        return model;
     }
 
     public static UpdateUserGroup fromDto(UpdateUserGroupDto dto) {
@@ -38,9 +40,8 @@ public class GroupMapper {
                 throw new ValidationException("Members list must not be null");
             }
             model.setMembers(dto.getMembers().stream().map(UUID::toString).collect(Collectors.toList()));
-            return model;
         }
-        return null;
+        return model;
     }
 
     public static UserGroupResource toResource(UserGroupInfo model) {
@@ -60,21 +61,23 @@ public class GroupMapper {
             resource.setModifiedBy(toPlainResource(model.getModifiedBy()));
             resource.setInstitutionId(model.getInstitutionId());
             resource.setProductId(model.getProductId());
-            return resource;
         }
-        return null;
+        return resource;
     }
 
     public static PlainUserResource toPlainResource(User model) {
-        PlainUserResource resource = null;
-        if (model != null) {
-            resource = new PlainUserResource();
-            resource.setId(model.getId());
-            resource.setName(model.getName());
-            resource.setSurname(model.getSurname());
-            return resource;
-        }
-        return null;
+        return Optional.ofNullable(model)
+                .map(user -> {
+                    PlainUserResource resource = new PlainUserResource();
+                    resource.setId(UUID.fromString(user.getId()));
+                    Optional.ofNullable(user.getName())
+                            .map(CertifiedField::getValue)
+                            .ifPresent(resource::setName);
+                    Optional.ofNullable(user.getFamilyName())
+                            .map(CertifiedField::getValue)
+                            .ifPresent(resource::setSurname);
+                    return resource;
+                }).orElse(null);
     }
 
     public static UserGroupPlainResource toPlainGroupResource(UserGroupInfo model) {
@@ -94,8 +97,8 @@ public class GroupMapper {
                 resource.setModifiedAt(model.getModifiedAt());
             }
             resource.setMembersCount(model.getMembers().size());
-            return resource;
         }
-        return null;
+        return resource;
     }
+
 }

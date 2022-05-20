@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/external/institutions/institutionId1/relationships"
+    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId1/relationships"
   },
   "response": {
     "status": "200",
@@ -10,27 +10,6 @@
         "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "from": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "to": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "name": "string",
-        "surname": "string",
-        "taxCode": "string",
-        "certification": "SPID",
-        "institutionContacts": {
-          "additionalProp1": [
-            {
-              "email": "string"
-            }
-          ],
-          "additionalProp2": [
-            {
-              "email": "string"
-            }
-          ],
-          "additionalProp3": [
-            {
-              "email": "string"
-            }
-          ]
-        },
         "role": "MANAGER",
         "product": {
           "id": "string",

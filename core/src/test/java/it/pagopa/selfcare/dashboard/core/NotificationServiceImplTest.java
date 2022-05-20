@@ -14,9 +14,9 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +40,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +48,8 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {NotificationServiceImpl.class, CoreTestConfig.class})
@@ -61,16 +64,19 @@ class NotificationServiceImplTest {
     }
 
     @MockBean
-    private NotificationServiceConnector notificationConnector;
+    private NotificationServiceConnector notificationConnectorMock;
 
     @MockBean
-    private ProductsConnector productsConnector;
+    private ProductsConnector productsConnectorMock;
 
     @SpyBean
-    private Configuration freemarkerConfig;
+    private Configuration freemarkerConfigSpy;
 
     @MockBean
-    private PartyConnector partyConnector;
+    private PartyConnector partyConnectorMock;
+
+    @MockBean
+    private UserService userServiceMock;
 
     @Autowired
     private NotificationService notificationService;
@@ -118,14 +124,14 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("Institution id is required", e.getMessage());
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("Institution id is required", e.getMessage());
 
-        Mockito.verifyNoInteractions(partyConnector, freemarkerConfig, notificationConnector);
+        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
     @Test
@@ -148,14 +154,14 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("User email is required", e.getMessage());
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("User email is required", e.getMessage());
 
-        Mockito.verifyNoInteractions(partyConnector, freemarkerConfig, notificationConnector);
+        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
 
@@ -179,13 +185,13 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("A product Title is required", e.getMessage());
-        Mockito.verifyNoInteractions(partyConnector, freemarkerConfig, notificationConnector);
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("A product Title is required", e.getMessage());
+        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
     @Test
@@ -227,7 +233,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -236,15 +242,16 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("An institution description is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("An institution description is required", e.getMessage());
+        verify(partyConnectorMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
 
@@ -262,7 +269,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -271,15 +278,16 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalStateException.class, e.getClass());
-        Assertions.assertEquals("Authentication is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalStateException.class, e.getClass());
+        assertEquals("Authentication is required", e.getMessage());
+        verify(partyConnectorMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, userServiceMock);
     }
 
 
@@ -298,7 +306,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -307,15 +315,16 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalStateException.class, e.getClass());
-        Assertions.assertEquals("Not SelfCareUser principal", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalStateException.class, e.getClass());
+        assertEquals("Not SelfCareUser principal", e.getMessage());
+        verify(partyConnectorMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
 
@@ -326,6 +335,8 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
                 .name("name")
@@ -333,8 +344,8 @@ class NotificationServiceImplTest {
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
         Mockito.doThrow(RuntimeException.class)
-                .when(notificationConnector)
-                .sendNotificationToUser(Mockito.any());
+                .when(notificationConnectorMock)
+                .sendNotificationToUser(any());
         String productRoles1 = "Operator Api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
         CreateUserDto.Role roleMock1 = TestUtils.mockInstance(new CreateUserDto.Role(), "setPartyRole");
@@ -351,17 +362,19 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(MailPreparationException.class, e.getClass());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(MailPreparationException.class, e.getClass());
+        verify(partyConnectorMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verify(freemarkerConfig, Mockito.times(1))
+        verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_single_role.ftlh");
-        Mockito.verify(notificationConnector, Mockito.times(1))
-                .sendNotificationToUser(Mockito.any());
+        verify(notificationConnectorMock, times(1))
+                .sendNotificationToUser(any());
+        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
 
 
@@ -446,7 +459,7 @@ class NotificationServiceImplTest {
         roleMock3.setPartyRole(partyRole3);
 
         Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2, roleMock3);
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        Mockito.when(partyConnectorMock.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -455,11 +468,11 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnectorMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verify(freemarkerConfig, Mockito.times(1))
+        verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_multi_role.ftlh");
-        Mockito.verify(notificationConnector, Mockito.times(1))
+        verify(notificationConnectorMock, times(1))
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
         assertNotNull(messageRequest);
@@ -473,6 +486,8 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
+        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
 
     @ParameterizedTest(name = "{0}")
@@ -487,13 +502,13 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("A relationship Id is required", e.getMessage());
-        Mockito.verifyNoInteractions(partyConnector, productsConnector, freemarkerConfig, notificationConnector);
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("A relationship Id is required", e.getMessage());
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock, userServiceMock);
     }
 
 
@@ -502,8 +517,9 @@ class NotificationServiceImplTest {
     void sendRelationshipBasedNotification_nullEmail(String argType, String templateName, String subject, BiConsumer<NotificationService, String> consumer) {
         //given
         String relationshipId = "relationshipId";
-        UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts", "setEmail");
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
+        userInfo.getUser().setEmail(null);
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
         Executable executable = () -> {
@@ -512,15 +528,16 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("User email is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verifyNoInteractions(productsConnector, freemarkerConfig, notificationConnector);
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("User email is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock);
     }
 
 
@@ -530,7 +547,7 @@ class NotificationServiceImplTest {
         //given
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts", "setInstitutionId");
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
         Executable executable = () -> {
@@ -539,15 +556,16 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("An institution id is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verifyNoInteractions(productsConnector, freemarkerConfig, notificationConnector);
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("An institution id is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock);
     }
 
 
@@ -558,7 +576,7 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         userInfo.setProducts(Map.of("1", TestUtils.mockInstance(new ProductInfo(), "setId")));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
         Executable executable = () -> {
@@ -567,15 +585,16 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("A product Id is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verifyNoInteractions(productsConnector, freemarkerConfig, notificationConnector);
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("A product Id is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock);
     }
 
 
@@ -586,10 +605,10 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         userInfo.setProducts(Map.of("1", TestUtils.mockInstance(new ProductInfo())));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution(), "setDescription");
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -598,17 +617,18 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("An institution description is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("An institution description is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
-        Mockito.verifyNoInteractions(productsConnector, freemarkerConfig, notificationConnector);
+        verifyNoInteractions(productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, partyConnectorMock);
     }
 
 
@@ -620,13 +640,13 @@ class NotificationServiceImplTest {
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = TestUtils.mockInstance(new Product(), "setRoleMappings", "setTitle");
-        Mockito.when(productsConnector.getProduct(Mockito.any()))
+        when(productsConnectorMock.getProduct(any()))
                 .thenReturn(productMock);
         //when
         Executable executable = () -> {
@@ -635,19 +655,20 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalArgumentException.class, e.getClass());
-        Assertions.assertEquals("A product Title is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("A product Title is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
-        Mockito.verify(productsConnector, Mockito.times(1))
+        verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
-        Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock);
     }
 
 
@@ -659,14 +680,14 @@ class NotificationServiceImplTest {
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = TestUtils.mockInstance(new Product(), "setRoleMappings");
         productMock.setRoleMappings(new EnumMap<>(PartyRole.class));
-        Mockito.when(productsConnector.getProduct(Mockito.any()))
+        when(productsConnectorMock.getProduct(any()))
                 .thenReturn(productMock);
         //when
         Executable executable = () -> {
@@ -675,19 +696,20 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalStateException.class, e.getClass());
-        Assertions.assertEquals("Authentication is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalStateException.class, e.getClass());
+        assertEquals("Authentication is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
-        Mockito.verify(productsConnector, Mockito.times(1))
+        verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
-        Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock);
     }
 
 
@@ -699,14 +721,14 @@ class NotificationServiceImplTest {
         UserInfo userInfo = TestUtils.mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = TestUtils.mockInstance(new Product(), "setRoleMappings");
         productMock.setRoleMappings(new EnumMap<>(PartyRole.class));
-        Mockito.when(productsConnector.getProduct(Mockito.any()))
+        when(productsConnectorMock.getProduct(any()))
                 .thenReturn(productMock);
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
         //when
@@ -716,19 +738,20 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
-        Assertions.assertNotNull(e);
-        Assertions.assertEquals(IllegalStateException.class, e.getClass());
-        Assertions.assertEquals("Not SelfCareUser principal", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        assertNotNull(e);
+        assertEquals(IllegalStateException.class, e.getClass());
+        assertEquals("Not SelfCareUser principal", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
-        Mockito.verify(productsConnector, Mockito.times(1))
+        verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
-        Mockito.verifyNoInteractions(freemarkerConfig, notificationConnector);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock);
     }
 
 
@@ -741,10 +764,10 @@ class NotificationServiceImplTest {
         ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo(), "setRoleInfos");
         productInfoMock.setRoleInfos(List.of(TestUtils.mockInstance(new RoleInfo())));
         userInfo.setProducts(Map.of("1", productInfoMock));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = TestUtils.mockInstance(new Product(), "setRoleMappings");
         ProductRoleInfo productRoleInfo1 = TestUtils.mockInstance(new ProductRoleInfo(), 1, "setRoles");
@@ -757,7 +780,7 @@ class NotificationServiceImplTest {
             put(PartyRole.OPERATOR, productRoleInfo2);
         }};
         productMock.setRoleMappings(roleMappings);
-        Mockito.when(productsConnector.getProduct(Mockito.any()))
+        when(productsConnectorMock.getProduct(any()))
                 .thenReturn(productMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
@@ -772,19 +795,19 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
-        Mockito.verify(productsConnector, Mockito.times(1))
+        verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
-        Mockito.verify(freemarkerConfig, Mockito.times(1))
+        verify(freemarkerConfigSpy, times(1))
                 .getTemplate(templateName);
-        Mockito.verify(notificationConnector, Mockito.times(1))
+        verify(notificationConnectorMock, times(1))
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
         assertNotNull(messageRequest);
-        assertEquals(userInfo.getEmail(), messageRequest.getReceiverEmail());
+        assertEquals(userInfo.getUser().getEmail().getValue(), messageRequest.getReceiverEmail());
         assertEquals(subject, messageRequest.getSubject());
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productMock.getTitle()));
@@ -792,7 +815,8 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains("no_role_found"));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
-        Mockito.verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
+        verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
+        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock, notificationConnectorMock);
     }
 
 
@@ -808,10 +832,10 @@ class NotificationServiceImplTest {
         roleInfo.setRole(productRole);
         productInfoMock.setRoleInfos(List.of(roleInfo));
         userInfo.setProducts(Map.of("1", productInfoMock));
-        Mockito.when(partyConnector.getUser(Mockito.any()))
+        when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         Institution institutionMock = TestUtils.mockInstance(new Institution());
-        Mockito.when(partyConnector.getInstitution(Mockito.any()))
+        when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = TestUtils.mockInstance(new Product(), "setRoleMappings");
         ProductRoleInfo productRoleInfo1 = TestUtils.mockInstance(new ProductRoleInfo(), 1, "setRoles");
@@ -826,7 +850,7 @@ class NotificationServiceImplTest {
             put(PartyRole.OPERATOR, productRoleInfo2);
         }};
         productMock.setRoleMappings(roleMappings);
-        Mockito.when(productsConnector.getProduct(Mockito.any()))
+        when(productsConnectorMock.getProduct(any()))
                 .thenReturn(productMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
@@ -841,19 +865,19 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUser(relationshipId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
-        Mockito.verify(productsConnector, Mockito.times(1))
+        verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
-        Mockito.verify(freemarkerConfig, Mockito.times(1))
+        verify(freemarkerConfigSpy, times(1))
                 .getTemplate(templateName);
-        Mockito.verify(notificationConnector, Mockito.times(1))
+        verify(notificationConnectorMock, times(1))
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
         assertNotNull(messageRequest);
-        assertEquals(userInfo.getEmail(), messageRequest.getReceiverEmail());
+        assertEquals(userInfo.getUser().getEmail().getValue(), messageRequest.getReceiverEmail());
         assertEquals(subject, messageRequest.getSubject());
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productMock.getTitle()));
@@ -861,7 +885,8 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains(role2.getLabel()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
-        Mockito.verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
+        verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
+        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock, notificationConnectorMock);
     }
 
 }

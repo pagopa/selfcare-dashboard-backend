@@ -2,41 +2,24 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
-import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
+import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumSet;
 import java.util.UUID;
-import java.util.function.Function;
 
 @Slf4j
 @Service
 public class UserRegistryConnectorImpl implements UserRegistryConnector {
 
-    private static final Function<UserResponse, User> USER_RESPONSE_TO_USER_FUNCTION = userResponse -> {
-        User user = new User();
-        if (userResponse != null) {
-            user.setId(userResponse.getId());
-            user.setName(userResponse.getName());
-            user.setSurname(userResponse.getSurname());
-            user.setFiscalCode(userResponse.getExternalId());
-            user.setCertification(Certification.isCertified(userResponse.getCertification()));
-            if (userResponse.getExtras() != null) {
-                user.setEmail(userResponse.getExtras().getEmail());
-            }
-        }
-        return user;
-    };
     private final UserRegistryRestClient restClient;
 
     @Autowired
@@ -45,48 +28,57 @@ public class UserRegistryConnectorImpl implements UserRegistryConnector {
     }
 
     @Override
-    public User getUserByExternalId(String externalId) {
+    public User search(String fiscalCode, EnumSet<User.Fields> fieldList) {
         log.trace("getUserByExternalId start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", externalId);
-
-        Assert.hasText(externalId, "A TaxCode is required");
-
-        UserResponse userResponse = restClient.getUserByExternalId(new EmbeddedExternalId(externalId));
-        User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId externalId = {}", fiscalCode);
+        Assert.hasText(fiscalCode, "A TaxCode is required");
+        Assert.notEmpty(fieldList, "At least one user fields is required");
+        User user = restClient.search(new EmbeddedExternalId(fiscalCode), fieldList);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByExternalId result = {}", user);
         log.trace("getUserByExternalId end");
 
-        return result;
+        return user;
     }
 
     @Override
-    public User getUserByInternalId(String userId) {
+    public User getUserByInternalId(String userId, EnumSet<User.Fields> fieldList) {
         log.trace("getUserByInternalId start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId userId = {}", userId);
-
         Assert.hasText(userId, "A userId is required");
-
-        UserResponse userResponse = restClient.getUserByInternalId(userId);
-        User result = USER_RESPONSE_TO_USER_FUNCTION.apply(userResponse);
+        Assert.notEmpty(fieldList, "At least one user fields is required");
+        User result = restClient.getUserByInternalId(UUID.fromString(userId), fieldList);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserByInternalId result = {}", result);
         log.trace("getUserByInternalId end");
         return result;
     }
 
     @Override
-    public void saveUser(UUID id, String institutionId, UserDto userDto) {
-        log.trace("saveUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser id = {}, institutionId = {}, userDto = {}}", id, institutionId, userDto);
+    public void updateUser(UUID id, MutableUserFieldsDto userDto) {
+        log.trace("update start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "update id = {}, userDto = {}}", id, userDto);
         Assert.notNull(id, "A UUID is required");
-        Assert.hasText(institutionId, "An institutionId is required");
-        Map<String, Object> cFields = new HashMap<>();
-        String institutionContactsKey = String.format("institutionContacts.%s.email", institutionId);
-        cFields.put(institutionContactsKey, userDto.getEmail());
-        cFields.put("name", userDto.getName());
-        cFields.put("surname", userDto.getSurname());
-        UserRequestDto requestDto = new UserRequestDto();
-        requestDto.setCFields(cFields);
-        restClient.patchUser(id, requestDto);
-        log.trace("saveUser end");
+        restClient.patchUser(id, userDto);
+        log.trace("update end");
     }
+
+    @Override
+    public UserId saveUser(SaveUserDto dto) {
+        log.trace("saveUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser dto = {}}", dto);
+        UserId userId = restClient.saveUser(dto);
+        log.debug("saveUser result = {}", userId);
+        log.trace("saveUser end");
+        return userId;
+    }
+
+    @Override
+    public void deleteById(String userId) {
+        log.trace("deleteById start");
+        log.debug("deleteById id = {}", userId);
+        Assert.hasText(userId, "A UUID is required");
+        restClient.deleteById(UUID.fromString(userId));
+        log.trace("deleteById end");
+    }
+
+
 }

@@ -3,9 +3,8 @@ package it.pagopa.selfcare.dashboard.connector.model.user;
 import lombok.Data;
 
 @Data
-public class UserDto {
-    private String name;
-    private String surname;
-    private String email;
+public class SaveUserDto extends MutableUserFieldsDto {
+
     private String fiscalCode;
+
 }

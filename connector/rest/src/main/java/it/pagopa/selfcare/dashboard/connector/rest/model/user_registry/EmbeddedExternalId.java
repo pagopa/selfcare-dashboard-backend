@@ -8,5 +8,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class EmbeddedExternalId {
 
-    private String externalId;
+    private String fiscalCode;
 }

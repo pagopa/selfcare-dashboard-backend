@@ -26,12 +26,8 @@ import java.util.Set;
 public class UserInfo {
 
     private String id;
-    private String name;
-    private String surname;
-    private String email;
-    private String taxCode;
+    private User user;
     private SelfCareAuthority role;
-    private boolean certified;
     private Map<String, ProductInfo> products;
     private String status;
     private String institutionId;

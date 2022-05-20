@@ -111,7 +111,7 @@ public class InstitutionController {
 
     @GetMapping(value = "/{institutionId}/users")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public List<InstitutionUserResource> getInstitutionUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
@@ -230,7 +230,7 @@ public class InstitutionController {
 
         log.trace("createInstitutionProductUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
-        institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user));
+        institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user, institutionId));
         log.trace("createInstitutionProductUser end");
     }
 

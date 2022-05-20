@@ -11,7 +11,9 @@ import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,17 +46,19 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationServiceConnector notificationConnector;
     private final ProductsConnector productsConnector;
     private final PartyConnector partyConnector;
+    private final UserService userService;
 
 
     @Autowired
     public NotificationServiceImpl(Configuration freemarkerConfig,
                                    NotificationServiceConnector notificationConnector,
                                    ProductsConnector productsConnector,
-                                   PartyConnector partyConnector) {
+                                   PartyConnector partyConnector, UserService userService) {
         this.freemarkerConfig = freemarkerConfig;
         this.notificationConnector = notificationConnector;
         this.productsConnector = productsConnector;
         this.partyConnector = partyConnector;
+        this.userService = userService;
     }
 
 
@@ -146,8 +150,12 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendRelationshipBasedNotification(String relationshipId, String templateName, String subject) {
         Assert.notNull(relationshipId, "A relationship Id is required");
-        UserInfo user = partyConnector.getUser(relationshipId);
-        Assert.notNull(user.getEmail(), "User email is required");
+        UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        Assert.notNull(Optional.ofNullable(user)
+                .map(UserInfo::getUser)
+                .map(User::getEmail)
+                .map(CertifiedField::getValue)
+                .orElse(null), "User email is required");
         Assert.notNull(user.getInstitutionId(), "An institution id is required");
         ProductInfo productInfo = user.getProducts().values().iterator().next();
         Assert.notNull(productInfo.getId(), "A product Id is required");
@@ -166,7 +174,7 @@ public class NotificationServiceImpl implements NotificationService {
         dataModel.put("productRole", roleLabel.orElse("no_role_found"));
         dataModel.put("institutionName", institution.getDescription());
 
-        sendNotification(user.getEmail(), templateName, subject, dataModel);
+        sendNotification(user.getUser().getEmail().getValue(), templateName, subject, dataModel);
     }
 
 }

@@ -9,10 +9,6 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UpdateUserDto {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
-    private String fiscalCode;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
     @JsonProperty(required = true)
     @NotBlank
