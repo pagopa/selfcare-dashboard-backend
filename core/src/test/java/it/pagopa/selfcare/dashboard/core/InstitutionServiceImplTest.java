@@ -977,7 +977,7 @@ class InstitutionServiceImplTest {
             Mockito.verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(id.toString()), createUserDtoCaptor.capture());
             Mockito.verify(notificationServiceMock, Mockito.times(1)).
-                    sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail());
+                    sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
             createUserDtoCaptor.getValue().getRoles().forEach(role1 -> Assertions.assertEquals(partyRole, role1.getPartyRole()));
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
             Mockito.verifyNoMoreInteractions(partyConnectorMock);

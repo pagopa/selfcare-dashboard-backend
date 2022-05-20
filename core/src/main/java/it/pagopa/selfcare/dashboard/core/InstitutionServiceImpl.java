@@ -267,10 +267,9 @@ class InstitutionServiceImpl implements InstitutionService {
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
 
-
         String userId = userRegistryConnector.saveUser(user.getUser()).getId().toString();
         partyConnector.createUsers(institutionId, productId, userId, user);
-        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
+        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
 
         log.trace("createUsers end");
     }

@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -24,10 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.Assert;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,7 +39,8 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String ACTIVATE_TEMPLATE = "user_activated.ftlh";
     private static final String DELETE_TEMPLATE = "user_deleted.ftlh";
     private static final String SUSPEND_TEMPLATE = "user_suspended.ftlh";
-    private static final String CREATE_TEMPLATE = "user_added.ftlh";
+    private static final String CREATE_TEMPLATE_SINGLE_ROLE = "user_added_single_role.ftlh";
+    private static final String CREATE_TEMPLATE_MULTIPLE_ROLE = "user_added_multi_role.ftlh";
 
     private final Configuration freemarkerConfig;
     private final NotificationServiceConnector notificationConnector;
@@ -64,20 +64,34 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public void sendCreatedUserNotification(String institutionId, String productTitle, String email) {
+    public void sendCreatedUserNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreatedUserNotification start");
         log.debug("institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
         Assert.notNull(institutionId, "Institution id is required");
         Assert.notNull(email, "User email is required");
         Assert.notNull(productTitle, "A product Title is required");
+        Assert.notEmpty(productRoles, "ProductRoles are required");
         Institution institution = partyConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");
-
+        List<String> roles = productRoles.stream()
+                .map(CreateUserDto.Role::getProductRole)
+                .collect(Collectors.toList());
         Map<String, String> dataModel = new HashMap<>();
         dataModel.put("productName", productTitle);
         dataModel.put("institutionName", institution.getDescription());
+        if (roles.size() > 1) {
+            String roleLabel = roles.stream()
+                    .limit(productRoles.size() - 1)
+                    .collect(Collectors.joining(", "));
 
-        sendNotification(email, CREATE_TEMPLATE, CREATE_SUBJECT, dataModel);
+            dataModel.put("productRoles", roleLabel);
+            dataModel.put("lastProductRole", roles.get(roles.size() - 1));
+            sendNotification(email, CREATE_TEMPLATE_MULTIPLE_ROLE, CREATE_SUBJECT, dataModel);
+        } else {
+            String roleLabel = roles.get(0);
+            dataModel.put("productRole", roleLabel);
+            sendNotification(email, CREATE_TEMPLATE_SINGLE_ROLE, CREATE_SUBJECT, dataModel);
+        }
         log.debug("sendCreatedUserNotification end");
     }
 
