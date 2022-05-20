@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 
 @Slf4j
 @Service
@@ -158,7 +159,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
         userInfos.forEach(userInfo -> {
-            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(User.Fields.name, User.Fields.familyName, User.Fields.email)));
+            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts)));
         });
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
@@ -221,7 +222,7 @@ class InstitutionServiceImpl implements InstitutionService {
             throw new ResourceNotFoundException("No User found for the given userId");
         }
         UserInfo result = userInfos.iterator().next();
-        User user = userRegistryConnector.getUserByInternalId(result.getId(), EnumSet.of(User.Fields.fiscalCode, User.Fields.name, User.Fields.familyName, User.Fields.email));
+        User user = userRegistryConnector.getUserByInternalId(result.getId(), EnumSet.of(fiscalCode, name, familyName, workContacts));
         result.setUser(user);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
         log.trace("getInstitutionUser end");
@@ -243,7 +244,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
         result.forEach(userInfo -> {
-            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(User.Fields.name, User.Fields.familyName, User.Fields.email)));
+            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts)));
         });
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
