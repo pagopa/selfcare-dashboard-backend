@@ -1,15 +1,25 @@
 package it.pagopa.selfcare.dashboard.connector.model.user;
 
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
+
+import java.util.Map;
 
 @Data
+@FieldNameConstants(asEnum = true)
 public class User {
 
+    @FieldNameConstants.Exclude
     private String id;
-    private String name;
-    private String surname;
-    private String email;
     private String fiscalCode;
-    private boolean certification;
+    private CertifiedField<String> name;
+    private CertifiedField<String> familyName;
+    private CertifiedField<String> email;
+    private Map<String, WorkContact> workContacts;
+
+
+    public WorkContact getWorkContact(String key) {
+        return workContacts != null ? workContacts.get(key) : null;
+    }
 
 }

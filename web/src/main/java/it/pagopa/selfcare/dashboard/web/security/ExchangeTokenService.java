@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
@@ -176,12 +177,14 @@ public class ExchangeTokenService {
         @JsonProperty("fiscal_code")
         private String taxCode;
         private List<Role> roles;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private List<String> groups;
     }
 
     @Data
     static class Role implements Serializable {
         private PartyRole partyRole;
+        @JsonProperty("role")
         private String productRole;
     }
 

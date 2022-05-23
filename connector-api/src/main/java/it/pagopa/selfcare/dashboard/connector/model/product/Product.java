@@ -38,5 +38,16 @@ public class Product {
                 .findAny();
     }
 
+    public static Optional<String> getLabel(String productRoleCode, EnumMap<PartyRole, ProductRoleInfo> roleMappings, EnumSet<PartyRole> partyRoleWhiteList) {
+        return roleMappings.entrySet().stream()
+                .filter(entry -> partyRoleWhiteList.contains(entry.getKey()))
+                .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(productRoleCode)))
+                .map(productInfo -> productInfo.getValue().getRoles().get(0))
+                .map(ProductRoleInfo.ProductRole::getLabel)
+                .findAny();
+
+
+    }
+
 
 }

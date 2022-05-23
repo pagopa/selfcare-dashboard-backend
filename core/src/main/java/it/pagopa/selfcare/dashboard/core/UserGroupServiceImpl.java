@@ -23,6 +23,9 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.familyName;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.name;
+
 @Slf4j
 @Service
 public class UserGroupServiceImpl implements UserGroupService {
@@ -183,10 +186,11 @@ public class UserGroupServiceImpl implements UserGroupService {
                     return userInfos.get(index);
                 }).filter(Objects::nonNull)
                 .collect(Collectors.toList()));
-        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId());
+        final EnumSet<User.Fields> fieldList = EnumSet.of(name, familyName);
+        User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId(), fieldList);
         userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
-            User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId());
+            User modifiedBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getModifiedBy().getId(), fieldList);
             userGroupInfo.setModifiedBy(modifiedBy);
         }
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);
@@ -226,7 +230,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         Assert.notNull(institutionId, "An institution id is required");
         String userId = user.getId();
         Assert.notNull(userId, "A user id is required");
-        userInfoFilter.setProductId(Optional.ofNullable(productId));
+        userInfoFilter.setProductId(Optional.of(productId));
         userInfoFilter.setUserId(Optional.ofNullable(user.getId()));
         Collection<UserInfo> users = partyConnector.getUsers(user.getInstitutionId(), userInfoFilter);
         if (users.isEmpty()) {

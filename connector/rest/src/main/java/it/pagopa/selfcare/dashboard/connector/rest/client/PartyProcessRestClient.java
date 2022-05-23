@@ -76,6 +76,6 @@ public interface PartyProcessRestClient {
 
     @GetMapping(value = "${rest-client.party-process.getInstitutionByExternalId.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    Institution getInstitutionByExternalId(@PathVariable(value = "externalId") String institutionId);
+    Institution getInstitutionByExternalId(@PathVariable(value = "externalId") String externalId);
 
 }

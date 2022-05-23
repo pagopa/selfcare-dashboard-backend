@@ -6,13 +6,11 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
-import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 
 @Slf4j
 @Service
@@ -39,6 +38,7 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
+    private final UserRegistryConnector userRegistryConnector;
     private final PartyConnector partyConnector;
     private final ProductsConnector productsConnector;
     private final NotificationService notificationService;
@@ -46,7 +46,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
     @Autowired
     public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
-                                  PartyConnector partyConnector,
+                                  UserRegistryConnector userRegistryConnector, PartyConnector partyConnector,
                                   ProductsConnector productsConnector,
                                   NotificationService notificationService) {
         this.allowedStates = allowedStates == null || allowedStates.length == 0
@@ -54,6 +54,7 @@ class InstitutionServiceImpl implements InstitutionService {
                 : Optional.of(EnumSet.copyOf(Arrays.stream(allowedStates)
                 .map(RelationshipState::valueOf)
                 .collect(Collectors.toList())));
+        this.userRegistryConnector = userRegistryConnector;
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
         this.notificationService = notificationService;
@@ -157,6 +158,9 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
+        userInfos.forEach(userInfo -> {
+            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts)));
+        });
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
         return userInfos;
@@ -218,6 +222,8 @@ class InstitutionServiceImpl implements InstitutionService {
             throw new ResourceNotFoundException("No User found for the given userId");
         }
         UserInfo result = userInfos.iterator().next();
+        User user = userRegistryConnector.getUserByInternalId(result.getId(), EnumSet.of(fiscalCode, name, familyName, workContacts));
+        result.setUser(user);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
         log.trace("getInstitutionUser end");
         return result;
@@ -237,7 +243,9 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
-
+        result.forEach(userInfo -> {
+            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts)));
+        });
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
         return result;
@@ -255,16 +263,17 @@ class InstitutionServiceImpl implements InstitutionService {
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
             EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST).orElse(null));
             Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
 
-        partyConnector.createUsers(institutionId, productId, user);
-        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail());
+        String userId = userRegistryConnector.saveUser(user.getUser()).getId().toString();
+        partyConnector.createUsers(institutionId, productId, userId, user);
+        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
 
         log.trace("createUsers end");
     }
-
 
 }
