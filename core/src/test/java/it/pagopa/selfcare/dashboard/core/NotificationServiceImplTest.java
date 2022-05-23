@@ -383,10 +383,12 @@ class NotificationServiceImplTest {
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
         String productRoles1 = "Operator Api";
+        String productLabel = "operator";
         PartyRole partyRole1 = PartyRole.OPERATOR;
         CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
 
         roleMock1.setProductRole(productRoles1);
+        roleMock1.setLabel(productLabel);
         roleMock1.setPartyRole(partyRole1);
 
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
@@ -412,7 +414,7 @@ class NotificationServiceImplTest {
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productTitle));
         roles.forEach(role -> {
-            assertTrue(messageRequest.getContent().contains(role.getProductRole()));
+            assertTrue(messageRequest.getContent().contains(role.getLabel()));
         });
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
@@ -433,10 +435,13 @@ class NotificationServiceImplTest {
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
         String productRoles1 = "Operator Api";
+        String productLabel1 = "operator api";
         PartyRole partyRole1 = PartyRole.OPERATOR;
         String productRole2 = "Operator Security";
+        String productLabel2 = "operator security";
         PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
         String productRole3 = "Administrator";
+        String productLabel3 = "administrator";
         PartyRole partyRole3 = PartyRole.DELEGATE;
         CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
         CreateUserDto.Role roleMock2 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
@@ -444,10 +449,13 @@ class NotificationServiceImplTest {
 
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
+        roleMock1.setLabel(productLabel1);
         roleMock2.setProductRole(productRole2);
         roleMock2.setPartyRole(partyRole2);
+        roleMock2.setLabel(productLabel2);
         roleMock3.setProductRole(productRole3);
         roleMock3.setPartyRole(partyRole3);
+        roleMock3.setLabel(productLabel3);
 
         Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2, roleMock3);
         when(partyConnectorMock.getInstitution(any()))
@@ -472,7 +480,7 @@ class NotificationServiceImplTest {
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productTitle));
         roles.forEach(role -> {
-            assertTrue(messageRequest.getContent().contains(role.getProductRole()));
+            assertTrue(messageRequest.getContent().contains(role.getLabel()));
         });
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
