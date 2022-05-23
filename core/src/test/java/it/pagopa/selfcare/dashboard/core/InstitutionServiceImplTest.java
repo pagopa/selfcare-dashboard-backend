@@ -968,6 +968,7 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRoleCode = "productRoleCode";
+        String productRoleLable = "productRoleLable";
         UUID id = UUID.randomUUID();
         UserId userId = new UserId();
         userId.setId(id);
@@ -980,6 +981,7 @@ class InstitutionServiceImplTest {
         ProductRoleInfo.ProductRole productRole = new ProductRoleInfo.ProductRole();
         product.setId(productId);
         productRole.setCode(productRoleCode);
+        productRole.setLabel(productRoleLable);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
         productRoleInfo.setRoles(List.of(productRole));
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
@@ -1000,7 +1002,10 @@ class InstitutionServiceImplTest {
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(id.toString()), createUserDtoCaptor.capture());
             Mockito.verify(notificationServiceMock, Mockito.times(1)).
                     sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
-            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> Assertions.assertEquals(partyRole, role1.getPartyRole()));
+            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
+                Assertions.assertEquals(partyRole, role1.getPartyRole());
+                Assertions.assertEquals(productRoleLable, role1.getLabel());
+            });
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
             Mockito.verifyNoMoreInteractions(partyConnectorMock);
         } else {

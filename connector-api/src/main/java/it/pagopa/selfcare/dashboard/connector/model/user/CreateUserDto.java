@@ -18,6 +18,7 @@ public class CreateUserDto {
     @Data
     public static class Role {
         private String productRole;
+        private String label;
         private PartyRole partyRole;
     }
 }

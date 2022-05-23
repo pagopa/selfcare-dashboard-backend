@@ -263,6 +263,7 @@ class InstitutionServiceImpl implements InstitutionService {
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
             EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST).orElse(null));
             Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
