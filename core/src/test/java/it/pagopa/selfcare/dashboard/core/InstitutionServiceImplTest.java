@@ -967,23 +967,45 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        String productRoleCode = "productRoleCode";
-        String productRoleLable = "productRoleLable";
+        String productRoleCode1 = "productRoleCode";
+        String productRoleLabel1 = "productRoleLabel";
+        String productRoleCode2 = "productRoleCode2";
+        String productRoleLabel2 = "productRoleLabel2";
+        String productRoleCode3 = "productRoleCode3";
+        String productRoleLabel3 = "productRoleLabel3";
         UUID id = UUID.randomUUID();
         UserId userId = new UserId();
         userId.setId(id);
         CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
-        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setProductRole");
-        roleMock.setPartyRole(partyRole);
-        roleMock.setProductRole(productRoleCode);
-        createUserDto.setRoles(Set.of(roleMock));
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        CreateUserDto.Role roleMock2 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        CreateUserDto.Role roleMock3 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        if (PartyRole.MANAGER.equals(partyRole) || PartyRole.DELEGATE.equals(partyRole)) {
+            roleMock1.setPartyRole(partyRole);
+            roleMock1.setProductRole(productRoleCode1);
+            createUserDto.setRoles(Set.of(roleMock1));
+        } else {
+            roleMock1.setPartyRole(partyRole);
+            roleMock1.setProductRole(productRoleCode1);
+            roleMock2.setPartyRole(partyRole);
+            roleMock2.setProductRole(productRoleCode2);
+            roleMock3.setPartyRole(partyRole);
+            roleMock3.setProductRole(productRoleCode3);
+            createUserDto.setRoles(Set.of(roleMock1, roleMock2, roleMock3));
+        }
         Product product = mockInstance(new Product());
-        ProductRoleInfo.ProductRole productRole = new ProductRoleInfo.ProductRole();
         product.setId(productId);
-        productRole.setCode(productRoleCode);
-        productRole.setLabel(productRoleLable);
+        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        productRole1.setCode(productRoleCode1);
+        productRole1.setLabel(productRoleLabel1);
+        ProductRoleInfo.ProductRole productRole2 = new ProductRoleInfo.ProductRole();
+        productRole2.setCode(productRoleCode2);
+        productRole2.setLabel(productRoleLabel2);
+        ProductRoleInfo.ProductRole productRole3 = new ProductRoleInfo.ProductRole();
+        productRole3.setCode(productRoleCode3);
+        productRole3.setLabel(productRoleLabel3);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
-        productRoleInfo.setRoles(List.of(productRole));
+        productRoleInfo.setRoles(List.of(productRole1, productRole2, productRole3));
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
         map.put(partyRole, productRoleInfo);
         product.setRoleMappings(map);
@@ -1003,8 +1025,14 @@ class InstitutionServiceImplTest {
             Mockito.verify(notificationServiceMock, Mockito.times(1)).
                     sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
             createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
-                Assertions.assertEquals(partyRole, role1.getPartyRole());
-                Assertions.assertEquals(productRoleLable, role1.getLabel());
+                createUserDto.getRoles().forEach(role -> {
+                    if (role.getLabel().equals(role1.getLabel())) {
+                        Assertions.assertEquals(role.getPartyRole(), role1.getPartyRole());
+                        Assertions.assertEquals(role.getLabel(), role1.getLabel());
+                    }
+                });
+                {
+                }
             });
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
             Mockito.verifyNoMoreInteractions(partyConnectorMock);
