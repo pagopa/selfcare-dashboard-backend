@@ -38,15 +38,12 @@ public class Product {
                 .findAny();
     }
 
-    public static Optional<String> getLabel(String productRoleCode, EnumMap<PartyRole, ProductRoleInfo> roleMappings, EnumSet<PartyRole> partyRoleWhiteList) {
-        return roleMappings.entrySet().stream()
-                .filter(entry -> partyRoleWhiteList.contains(entry.getKey()))
-                .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(productRoleCode)))
-                .map(productInfo -> productInfo.getValue().getRoles().get(0))
-                .map(ProductRoleInfo.ProductRole::getLabel)
-                .findAny();
-
-
+    public static Optional<String> getLabel(String productRoleCode, EnumMap<PartyRole, ProductRoleInfo> roleMappings) {
+        return roleMappings.values().stream()
+                .flatMap(productRoleInfo -> productRoleInfo.getRoles().stream())
+                .filter(productRole -> productRole.getCode().equals(productRoleCode))
+                .findAny()
+                .map(ProductRoleInfo.ProductRole::getLabel);
     }
 
 
