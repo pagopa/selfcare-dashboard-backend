@@ -1366,17 +1366,20 @@
         }
       },
       "CreateUserDto" : {
-        "title" : "CreateUserDto",
-        "required" : [ "email", "name", "productRoles", "surname", "taxCode" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's personal email"
+        "title": "CreateUserDto",
+        "required": [
+          "productRoles",
+          "taxCode"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's personal email"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
           "productRoles" : {
             "uniqueItems" : true,
@@ -1816,7 +1819,6 @@
       },
       "UpdateUserDto" : {
         "title" : "UpdateUserDto",
-        "required" : [ "email", "name", "surname" ],
         "type" : "object",
         "properties" : {
           "email" : {

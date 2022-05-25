@@ -34,10 +34,7 @@ class CreateUserDtoTest {
     void validateNullFields() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("name", NotBlank.class);
-        toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("taxCode", NotBlank.class);
-        toCheckMap.put("email", NotBlank.class);
         toCheckMap.put("productRoles", NotEmpty.class);
         CreateUserDto resource = new CreateUserDto();
         // when
