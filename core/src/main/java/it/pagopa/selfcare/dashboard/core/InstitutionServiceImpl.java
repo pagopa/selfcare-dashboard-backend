@@ -158,9 +158,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
-        userInfos.forEach(userInfo -> {
-            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts)));
-        });
+        userInfos.forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts))));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
         return userInfos;
@@ -243,9 +241,8 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
-        result.forEach(userInfo -> {
-            userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts)));
-        });
+        result.forEach(userInfo ->
+                userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts))));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
         return result;
@@ -263,7 +260,7 @@ class InstitutionServiceImpl implements InstitutionService {
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
             EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
-            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST).orElse(null));
+            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings).orElse(null));
             Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
