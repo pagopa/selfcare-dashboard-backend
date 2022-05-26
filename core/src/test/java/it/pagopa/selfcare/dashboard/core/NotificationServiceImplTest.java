@@ -533,7 +533,7 @@ class NotificationServiceImplTest {
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
-        assertEquals("User email is required", e.getMessage());
+        assertEquals("User workContact is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
@@ -547,8 +547,16 @@ class NotificationServiceImplTest {
         //given
         String relationshipId = "relationshipId";
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts", "setInstitutionId");
+        Institution institutionMock = mockInstance(new Institution(), "setDescription");
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
@@ -576,8 +584,17 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
         userInfo.setProducts(Map.of("1", mockInstance(new ProductInfo(), "setId")));
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(UUID.randomUUID().toString());
+        userInfo.setInstitutionId(institutionMock.getId());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
             consumer.accept(notificationService, relationshipId);
@@ -607,6 +624,7 @@ class NotificationServiceImplTest {
         userInfo.setProducts(Map.of("1", mockInstance(new ProductInfo())));
         Institution institutionMock = mockInstance(new Institution(), "setDescription");
         institutionMock.setId(UUID.randomUUID().toString());
+        userInfo.setInstitutionId(institutionMock.getId());
         WorkContact workContact = mockInstance(new WorkContact());
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
@@ -647,6 +665,7 @@ class NotificationServiceImplTest {
         userInfo.setProducts(Map.of("1", productInfoMock));
         Institution institutionMock = mockInstance(new Institution());
         institutionMock.setId(UUID.randomUUID().toString());
+        userInfo.setInstitutionId(institutionMock.getId());
         WorkContact workContact = mockInstance(new WorkContact());
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
@@ -696,6 +715,7 @@ class NotificationServiceImplTest {
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
         userInfo.getUser().setWorkContacts(workContactsMap);
+        userInfo.setInstitutionId(institutionMock.getId());
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         when(partyConnectorMock.getInstitution(any()))
@@ -741,6 +761,7 @@ class NotificationServiceImplTest {
         WorkContact workContact = mockInstance(new WorkContact());
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.setInstitutionId(institutionMock.getId());
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
@@ -789,6 +810,7 @@ class NotificationServiceImplTest {
         WorkContact workContact = mockInstance(new WorkContact());
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.setInstitutionId(institutionMock.getId());
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
@@ -859,6 +881,7 @@ class NotificationServiceImplTest {
         userInfo.setProducts(Map.of("1", productInfoMock));
         Institution institutionMock = mockInstance(new Institution());
         institutionMock.setId(UUID.randomUUID().toString());
+        userInfo.setInstitutionId(institutionMock.getId());
         WorkContact workContact = mockInstance(new WorkContact());
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
