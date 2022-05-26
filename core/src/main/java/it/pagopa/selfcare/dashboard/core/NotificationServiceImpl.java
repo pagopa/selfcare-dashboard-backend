@@ -146,7 +146,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendRelationshipBasedNotification(String relationshipId, String templateName, String subject) {
         Assert.notNull(relationshipId, "A relationship Id is required");
-        UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+        UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.workContacts));
         Assert.notNull(Optional.ofNullable(user)
                 .map(UserInfo::getUser)
                 .map(User::getEmail)
@@ -170,7 +170,7 @@ public class NotificationServiceImpl implements NotificationService {
         dataModel.put("productRole", roleLabel.orElse("no_role_found"));
         dataModel.put("institutionName", institution.getDescription());
 
-        sendNotification(user.getUser().getEmail().getValue(), templateName, subject, dataModel);
+        sendNotification(user.getUser().getWorkContact(institution.getId()).getEmail().getValue(), templateName, subject, dataModel);
     }
 
 }

@@ -38,6 +38,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.workContacts;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -534,7 +535,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("User email is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
@@ -562,7 +563,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution id is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
@@ -591,7 +592,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Id is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
@@ -604,9 +605,14 @@ class NotificationServiceImplTest {
         String relationshipId = "relationshipId";
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
         userInfo.setProducts(Map.of("1", mockInstance(new ProductInfo())));
+        Institution institutionMock = mockInstance(new Institution(), "setDescription");
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        Institution institutionMock = mockInstance(new Institution(), "setDescription");
         when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
@@ -623,7 +629,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution description is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verifyNoInteractions(productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
@@ -639,9 +645,14 @@ class NotificationServiceImplTest {
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        Institution institutionMock = mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings", "setTitle");
@@ -661,7 +672,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Title is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -679,9 +690,14 @@ class NotificationServiceImplTest {
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        Institution institutionMock = mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
@@ -702,7 +718,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Authentication is required", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -720,9 +736,14 @@ class NotificationServiceImplTest {
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
         ProductInfo productInfoMock = mockInstance(new ProductInfo());
         userInfo.setProducts(Map.of("1", productInfoMock));
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        Institution institutionMock = mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
@@ -744,7 +765,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Not SelfCareUser principal", e.getMessage());
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -763,9 +784,14 @@ class NotificationServiceImplTest {
         ProductInfo productInfoMock = mockInstance(new ProductInfo(), "setRoleInfos");
         productInfoMock.setRoleInfos(List.of(mockInstance(new RoleInfo())));
         userInfo.setProducts(Map.of("1", productInfoMock));
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        Institution institutionMock = mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
@@ -795,7 +821,7 @@ class NotificationServiceImplTest {
         //then
         assertDoesNotThrow(executable);
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -806,7 +832,7 @@ class NotificationServiceImplTest {
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
         assertNotNull(messageRequest);
-        assertEquals(userInfo.getUser().getEmail().getValue(), messageRequest.getReceiverEmail());
+        assertEquals(userInfo.getUser().getWorkContact(institutionMock.getId()).getEmail().getValue(), messageRequest.getReceiverEmail());
         assertEquals(subject, messageRequest.getSubject());
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productMock.getTitle()));
@@ -831,9 +857,14 @@ class NotificationServiceImplTest {
         roleInfo.setRole(productRole);
         productInfoMock.setRoleInfos(List.of(roleInfo));
         userInfo.setProducts(Map.of("1", productInfoMock));
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(UUID.randomUUID().toString());
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        Institution institutionMock = mockInstance(new Institution());
         when(partyConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
@@ -865,7 +896,7 @@ class NotificationServiceImplTest {
         //then
         assertDoesNotThrow(executable);
         verify(userServiceMock, times(1))
-                .findByRelationshipId(relationshipId, EnumSet.of(User.Fields.email));
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
         verify(partyConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
@@ -876,7 +907,7 @@ class NotificationServiceImplTest {
                 .sendNotificationToUser(messageRequestCaptor.capture());
         MessageRequest messageRequest = messageRequestCaptor.getValue();
         assertNotNull(messageRequest);
-        assertEquals(userInfo.getUser().getEmail().getValue(), messageRequest.getReceiverEmail());
+        assertEquals(userInfo.getUser().getWorkContact(institutionMock.getId()).getEmail().getValue(), messageRequest.getReceiverEmail());
         assertEquals(subject, messageRequest.getSubject());
         assertNotNull(messageRequest.getContent());
         assertTrue(messageRequest.getContent().contains(productMock.getTitle()));
