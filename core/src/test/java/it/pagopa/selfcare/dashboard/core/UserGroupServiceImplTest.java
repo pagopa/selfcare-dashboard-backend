@@ -34,8 +34,7 @@ import java.util.*;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.SUSPENDED;
-import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.familyName;
-import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.name;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 import static it.pagopa.selfcare.dashboard.core.UserGroupServiceImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -357,6 +356,12 @@ class UserGroupServiceImplTest {
 
         when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
+        when(userRegistryConnector.getUserByInternalId(anyString(), any()))
+                .thenAnswer(invocation -> {
+                    User userMock = new User();
+                    userMock.setId(invocation.getArgument(0, String.class));
+                    return userMock;
+                });
         when(userRegistryConnector.getUserByInternalId(eq(createdBy.getId()), any()))
                 .thenAnswer(invocation -> {
                     createdByMock.setId(invocation.getArgument(0, String.class));
@@ -383,6 +388,8 @@ class UserGroupServiceImplTest {
         assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
         verify(groupConnector, times(1))
                 .getUserGroupById(anyString());
+        verify(userRegistryConnector, times(groupInfo.getMembers().size()))
+                .getUserByInternalId(anyString(), eq(EnumSet.of(name, familyName, workContacts)));
         verify(userRegistryConnector, times(1))
                 .getUserByInternalId(foundGroup.getCreatedBy().getId(), EnumSet.of(name, familyName));
         verify(userRegistryConnector, times(1))
@@ -438,6 +445,12 @@ class UserGroupServiceImplTest {
 
         when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
+        when(userRegistryConnector.getUserByInternalId(anyString(), any()))
+                .thenAnswer(invocation -> {
+                    User userMock = new User();
+                    userMock.setId(invocation.getArgument(0, String.class));
+                    return userMock;
+                });
         when(userRegistryConnector.getUserByInternalId(any(), any()))
                 .thenAnswer(invocation -> {
                     createdByMock.setId(invocation.getArgument(0, String.class));
@@ -459,6 +472,8 @@ class UserGroupServiceImplTest {
         assertNull(groupInfo.getModifiedBy());
         verify(groupConnector, times(1))
                 .getUserGroupById(anyString());
+        verify(userRegistryConnector, times(groupInfo.getMembers().size()))
+                .getUserByInternalId(anyString(), eq(EnumSet.of(name, familyName, workContacts)));
         verify(userRegistryConnector, times(1))
                 .getUserByInternalId(foundGroup.getCreatedBy().getId(), EnumSet.of(name, familyName));
 
@@ -499,6 +514,12 @@ class UserGroupServiceImplTest {
 
         when(partyConnector.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock4));
+        when(userRegistryConnector.getUserByInternalId(anyString(), any()))
+                .thenAnswer(invocation -> {
+                    User userMock = new User();
+                    userMock.setId(invocation.getArgument(0, String.class));
+                    return userMock;
+                });
 
         foundGroup.setMembers(members);
         foundGroup.setCreatedAt(Instant.now());
@@ -540,6 +561,8 @@ class UserGroupServiceImplTest {
         assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
         verify(groupConnector, times(1))
                 .getUserGroupById(groupId);
+        verify(userRegistryConnector, times(groupInfo.getMembers().size()))
+                .getUserByInternalId(anyString(), eq(EnumSet.of(name, familyName, workContacts)));
         verify(userRegistryConnector, times(1))
                 .getUserByInternalId(foundGroup.getCreatedBy().getId(), EnumSet.of(name, familyName));
         verify(userRegistryConnector, times(1))
