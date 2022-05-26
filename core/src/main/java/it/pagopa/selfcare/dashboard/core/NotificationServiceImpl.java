@@ -147,12 +147,18 @@ public class NotificationServiceImpl implements NotificationService {
     private void sendRelationshipBasedNotification(String relationshipId, String templateName, String subject) {
         Assert.notNull(relationshipId, "A relationship Id is required");
         UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.workContacts));
+        Assert.notNull(user.getInstitutionId(), "An institution id is required");
         Assert.notNull(Optional.ofNullable(user)
                 .map(UserInfo::getUser)
-                .map(User::getEmail)
+                .map(User::getWorkContacts)
+                .map(Map::entrySet)
+                .stream()
+                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(user.getInstitutionId())))
+                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
+                .findAny()
+                .map(WorkContact::getEmail)
                 .map(CertifiedField::getValue)
-                .orElse(null), "User email is required");
-        Assert.notNull(user.getInstitutionId(), "An institution id is required");
+                .orElse(null), "User workContact is required");
         ProductInfo productInfo = user.getProducts().values().iterator().next();
         Assert.notNull(productInfo.getId(), "A product Id is required");
         Institution institution = partyConnector.getInstitution(user.getInstitutionId());
