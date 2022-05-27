@@ -153,10 +153,10 @@ public class UserMapper {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = null;
         if (dto != null) {
             model = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto();
-            model.setName(dto.getName());
-            model.setSurname(dto.getSurname());
-            model.setTaxCode(dto.getTaxCode());
-            model.setEmail(dto.getEmail());
+            model.setName(dto.getName() == null ? "" : dto.getName());//TODO: remove after Party API changes
+            model.setSurname(dto.getSurname() == null ? "" : dto.getSurname());//TODO: remove after Party API changes
+            model.setTaxCode(dto.getTaxCode() == null ? "" : dto.getTaxCode());//TODO: remove after Party API changes
+            model.setEmail(dto.getEmail() == null ? "" : dto.getEmail());//TODO: remove after Party API changes
             if (dto.getProductRoles() != null) {
                 model.setRoles(dto.getProductRoles().stream()
                         .map(productRole -> {

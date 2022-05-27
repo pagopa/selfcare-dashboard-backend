@@ -219,7 +219,7 @@ class UserMapperTest {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.fromCreateUserDto(dto, institutionId);
         // then
         assertNotNull(model);
-        reflectionEqualsByName(model, dto, "partyRole");
+        reflectionEqualsByName(model, dto, "partyRole", "name", "surname", "taxCode", "email");//TODO: fix excluded fields after Party API changes
         assertNotNull(model.getUser());
         assertEquals(dto.getTaxCode(), model.getUser().getFiscalCode());
         assertEquals(dto.getName(), model.getUser().getName().getValue());
