@@ -62,11 +62,11 @@ class CoreConfig implements AsyncConfigurer {
     }
 
 
-    @Override
+    @Bean("treadPoolTaskExecutor")
     public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor delegate = taskExecutorBuilder.build();
+        ThreadPoolTaskExecutor delegate = new ThreadPoolTaskExecutor();
+        delegate.setTaskDecorator(new MdcTaskDecorator());
         delegate.initialize();
         return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
     }
-
 }
