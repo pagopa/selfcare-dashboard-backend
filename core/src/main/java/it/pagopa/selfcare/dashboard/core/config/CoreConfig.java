@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
+import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.task.TaskExecutorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,7 @@ import java.util.concurrent.Executor;
 @PropertySource("classpath:config/core-config.properties")
 @EnableAsync
 @EnableAutoConfiguration(exclude = FreeMarkerAutoConfiguration.class)
+@EnableConfigurationProperties(TaskExecutionProperties.class)
 class CoreConfig implements AsyncConfigurer {
 
     private final URL rootTemplateUrl;
@@ -63,9 +66,18 @@ class CoreConfig implements AsyncConfigurer {
 
 
     @Bean("treadPoolTaskExecutor")
-    public Executor getAsyncExecutor() {
+    public Executor getAsyncExecutor(TaskExecutionProperties properties) {
+        TaskExecutionProperties.Pool pool = properties.getPool();
         ThreadPoolTaskExecutor delegate = new ThreadPoolTaskExecutor();
         delegate.setTaskDecorator(new MdcTaskDecorator());
+        delegate.setQueueCapacity(pool.getQueueCapacity());
+        delegate.setAllowCoreThreadTimeOut(pool.isAllowCoreThreadTimeout());
+        delegate.setKeepAliveSeconds(pool.getKeepAlive().toSecondsPart());
+        delegate.setMaxPoolSize(pool.getMaxSize());
+        delegate.setThreadNamePrefix(properties.getThreadNamePrefix());
+        delegate.setCorePoolSize(pool.getCoreSize());
+        TaskExecutionProperties.Shutdown shutdown = properties.getShutdown();
+        delegate.setAwaitTerminationMillis(shutdown.getAwaitTerminationPeriod().toMillis());
         delegate.initialize();
         return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
     }
