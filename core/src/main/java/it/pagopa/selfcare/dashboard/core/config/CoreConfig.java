@@ -1,14 +1,13 @@
 package it.pagopa.selfcare.dashboard.core.config;
 
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
-import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.task.TaskExecutorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,24 +19,21 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 
 import java.net.URL;
 import java.util.Properties;
-import java.util.concurrent.Executor;
 
+@Slf4j
 @Configuration
 @PropertySource("classpath:config/core-config.properties")
 @EnableAsync
 @EnableAutoConfiguration(exclude = FreeMarkerAutoConfiguration.class)
-@EnableConfigurationProperties(TaskExecutionProperties.class)
 class CoreConfig implements AsyncConfigurer {
 
     private final URL rootTemplateUrl;
-    private final TaskExecutorBuilder taskExecutorBuilder;
 
 
     @Autowired
-    public CoreConfig(@Value("${dashboard.notification.template.default-url}") URL rootTemplateUrl,
-                      TaskExecutorBuilder taskExecutorBuilder) {
+    public CoreConfig(@Value("${dashboard.notification.template.default-url}") URL rootTemplateUrl) {
+        log.trace("Initializing {}", CoreConfig.class.getSimpleName());
         this.rootTemplateUrl = rootTemplateUrl;
-        this.taskExecutorBuilder = taskExecutorBuilder;
     }
 
 
@@ -65,20 +61,11 @@ class CoreConfig implements AsyncConfigurer {
     }
 
 
-    @Bean("treadPoolTaskExecutor")
-    public Executor getAsyncExecutor(TaskExecutionProperties properties) {
-        TaskExecutionProperties.Pool pool = properties.getPool();
-        ThreadPoolTaskExecutor delegate = new ThreadPoolTaskExecutor();
-        delegate.setTaskDecorator(new MdcTaskDecorator());
-        delegate.setQueueCapacity(pool.getQueueCapacity());
-        delegate.setAllowCoreThreadTimeOut(pool.isAllowCoreThreadTimeout());
-        delegate.setKeepAliveSeconds(pool.getKeepAlive().toSecondsPart());
-        delegate.setMaxPoolSize(pool.getMaxSize());
-        delegate.setThreadNamePrefix(properties.getThreadNamePrefix());
-        delegate.setCorePoolSize(pool.getCoreSize());
-        TaskExecutionProperties.Shutdown shutdown = properties.getShutdown();
-        delegate.setAwaitTerminationMillis(shutdown.getAwaitTerminationPeriod().toMillis());
+    @Bean
+    public DelegatingSecurityContextAsyncTaskExecutor taskExecutor(TaskExecutorBuilder taskExecutorBuilder) {
+        final ThreadPoolTaskExecutor delegate = taskExecutorBuilder.build();
         delegate.initialize();
         return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
     }
+
 }
