@@ -8,7 +8,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotBlank;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -32,9 +31,6 @@ class UpdateUserDtoTest {
     void validateNullFields() {
         //given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("name", NotBlank.class);
-        toCheckMap.put("surname", NotBlank.class);
-        toCheckMap.put("email", NotBlank.class);
 
         UpdateUserDto userDto = new UpdateUserDto();
         userDto.setEmail(null);
