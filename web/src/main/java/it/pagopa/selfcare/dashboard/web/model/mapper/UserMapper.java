@@ -175,17 +175,18 @@ public class UserMapper {
     //TODO create temp mapper that sets fields to "" string
     public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto toCreateUserDto(UserProductRoles roles) {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto resource = null;
-        if (roles.getProductRoles() != null) {
+        if (roles != null) {
             resource = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto();
             resource.setName("");
             resource.setSurname("");
             resource.setEmail("");
             resource.setTaxCode("");
-            resource.setRoles(roles.getProductRoles().stream().map(productRole -> {
-                it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role();
-                role.setProductRole(productRole);
-                return role;
-            }).collect(Collectors.toSet()));
+            if (roles.getProductRoles() != null)
+                resource.setRoles(roles.getProductRoles().stream().map(productRole -> {
+                    it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role();
+                    role.setProductRole(productRole);
+                    return role;
+                }).collect(Collectors.toSet()));
         }
         return resource;
     }

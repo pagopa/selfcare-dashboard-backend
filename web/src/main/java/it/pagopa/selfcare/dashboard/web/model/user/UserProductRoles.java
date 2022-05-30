@@ -7,6 +7,6 @@ import java.util.Set;
 
 @Data
 public class UserProductRoles {
-    @NotEmpty()
+    @NotEmpty
     Set<String> productRoles;
 }

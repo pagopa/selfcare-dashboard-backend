@@ -36,6 +36,8 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
     private static final String REQUIRED_USER_ID = "A user id is required";
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
+    private static final EnumSet<User.Fields> USER_FIELD_LIST = EnumSet.of(name, familyName, workContacts);
+    private static final EnumSet<User.Fields> USER_FIELD_LIST_ENHANCED = EnumSet.of(fiscalCode, name, familyName, workContacts);
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
@@ -158,7 +160,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> userInfos = getInstitutionUsers(institutionId, userInfoFilter);
-        userInfos.forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts))));
+        userInfos.forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST)));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUsers result = {}", userInfos);
         log.trace("getInstitutionUsers end");
         return userInfos;
@@ -220,7 +222,7 @@ class InstitutionServiceImpl implements InstitutionService {
             throw new ResourceNotFoundException("No User found for the given userId");
         }
         UserInfo result = userInfos.iterator().next();
-        User user = userRegistryConnector.getUserByInternalId(result.getId(), EnumSet.of(fiscalCode, name, familyName, workContacts));
+        User user = userRegistryConnector.getUserByInternalId(result.getId(), USER_FIELD_LIST_ENHANCED);
         result.setUser(user);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
         log.trace("getInstitutionUser end");
@@ -242,7 +244,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setAllowedState(allowedStates);
         Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
         result.forEach(userInfo ->
-                userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), EnumSet.of(name, familyName, workContacts))));
+                userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST)));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
         log.trace("getInstitutionProductUsers end");
         return result;
@@ -268,9 +270,32 @@ class InstitutionServiceImpl implements InstitutionService {
 
         String userId = userRegistryConnector.saveUser(user.getUser()).getId().toString();
         partyConnector.createUsers(institutionId, productId, userId, user);
-        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
+        notificationService.sendCreatedUserNotification(institutionId, "product.getTitle()", user.getEmail(), user.getRoles());
 
         log.trace("createUsers end");
+    }
+
+    @Override
+    public void addUserProductRoles(String institutionId, String productId, String userId, CreateUserDto user) {
+        log.trace("addProductUser start");
+        log.debug("addProductUser institutionId = {}, productId = {}, userId = {}, user = {}", institutionId, productId, userId, user);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.hasText(productId, "A Product id is required");
+        Assert.notNull(user, "An User is required");
+
+        Product product = productsConnector.getProduct(productId);
+        user.getRoles().forEach(role -> {
+            EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
+            role.setPartyRole(partyRole.orElseThrow(() ->
+                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
+        });
+
+        partyConnector.createUsers(institutionId, productId, userId, user);
+        notificationService.sendAddedProductRoleNotification(institutionId, productId, userId, user.getRoles());
+
+
     }
 
 }

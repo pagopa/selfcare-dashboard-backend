@@ -6,15 +6,16 @@ import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.commons.utils.TestUtils.reflectionEqualsByName;
+import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -236,6 +237,40 @@ class UserMapperTest {
         MutableUserFieldsDto model = UserMapper.fromUpdateUser(dto, institutionId);
         //then
         assertNull(model);
+    }
+
+    @Test
+    void toCreateUserDto_notNull() {
+        //given
+        UserProductRoles productRoles = mockInstance(new UserProductRoles());
+        productRoles.setProductRoles(Set.of("productRoles"));
+        //then
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.toCreateUserDto(productRoles);
+        //then
+        assertNotNull(model);
+        checkNotNullFields(model, "user");
+        model.getRoles().forEach(role -> checkNotNullFields(role, "label", "partyRole"));
+    }
+
+    @Test
+    void toCreateUserDto_null() {
+        //given
+        UserProductRoles productRoles = null;
+        //when
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.toCreateUserDto(productRoles);
+        //then
+        assertNull(model);
+    }
+
+    @Test
+    void toCreateUserDto_nullRoles() {
+        //given
+        UserProductRoles productRoles = new UserProductRoles();
+        //when
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = UserMapper.toCreateUserDto(productRoles);
+        //then
+        assertNotNull(model);
+        assertNull(model.getRoles());
     }
 
     @Test

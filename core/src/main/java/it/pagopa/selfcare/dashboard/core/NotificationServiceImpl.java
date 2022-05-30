@@ -6,6 +6,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
@@ -37,31 +38,62 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String SUSPEND_TEMPLATE = "user_suspended.ftlh";
     private static final String CREATE_TEMPLATE_SINGLE_ROLE = "user_added_single_role.ftlh";
     private static final String CREATE_TEMPLATE_MULTIPLE_ROLE = "user_added_multi_role.ftlh";
+    private static final EnumSet<User.Fields> EMAIL_FIELD_LIST = EnumSet.of(User.Fields.workContacts);
 
     private final Configuration freemarkerConfig;
     private final NotificationServiceConnector notificationConnector;
     private final ProductsConnector productsConnector;
     private final PartyConnector partyConnector;
     private final UserService userService;
+    private final UserRegistryConnector userConnector;
 
 
     @Autowired
     public NotificationServiceImpl(Configuration freemarkerConfig,
                                    NotificationServiceConnector notificationConnector,
                                    ProductsConnector productsConnector,
-                                   PartyConnector partyConnector, UserService userService) {
+                                   PartyConnector partyConnector, UserService userService, UserRegistryConnector userConnector) {
         this.freemarkerConfig = freemarkerConfig;
         this.notificationConnector = notificationConnector;
         this.productsConnector = productsConnector;
         this.partyConnector = partyConnector;
         this.userService = userService;
+        this.userConnector = userConnector;
     }
 
 
     @Override
     @Async
+    public void sendAddedProductRoleNotification(String institutionId, String productTitle, String userId, Set<CreateUserDto.Role> productRoles) {
+        log.trace("sendAddedProductRoleNotification start");
+        log.debug("institutionId = {}, productTitle = {}, userId = {}, productRoles = {}", institutionId, productTitle, userId, productRoles);
+        User user = userConnector.getUserByInternalId(userId, EMAIL_FIELD_LIST);//TODO retrieved from user registry
+        Optional<String> email = Optional.ofNullable(user)
+                .map(User::getWorkContacts)
+                .map(Map::entrySet)
+                .stream()
+                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(institutionId)))
+                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
+                .findAny()
+                .map(WorkContact::getEmail)
+                .map(CertifiedField::getValue);
+        Assert.isTrue(email.isPresent(), "User workContact is required");
+
+        sendCreateNotification(institutionId, productTitle, email.get(), productRoles);
+        log.trace("sendAddedProductRoleNotification start");
+    }
+
+    @Override
+    @Async
     public void sendCreatedUserNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreatedUserNotification start");
+        log.debug("institutionId = {}, productTitle = {}, email = {}, productRoles = {}", institutionId, productTitle, email, productRoles);
+        sendCreateNotification(institutionId, productTitle, email, productRoles);
+        log.debug("sendCreatedUserNotification end");
+    }
+
+    private void sendCreateNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
+        log.debug("sendCreateNotification start");
         log.debug("institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
         Assert.notNull(institutionId, "Institution id is required");
         Assert.notNull(email, "User email is required");
@@ -88,7 +120,7 @@ public class NotificationServiceImpl implements NotificationService {
             dataModel.put("productRole", roleLabel);
             sendNotification(email, CREATE_TEMPLATE_SINGLE_ROLE, CREATE_SUBJECT, dataModel);
         }
-        log.debug("sendCreatedUserNotification end");
+        log.debug("sendCreateNotification end");
     }
 
 
@@ -148,7 +180,7 @@ public class NotificationServiceImpl implements NotificationService {
         Assert.notNull(relationshipId, "A relationship Id is required");
         UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.workContacts));
         Assert.notNull(user.getInstitutionId(), "An institution id is required");
-        Assert.notNull(Optional.ofNullable(user)
+        Optional<String> email = Optional.ofNullable(user)
                 .map(UserInfo::getUser)
                 .map(User::getWorkContacts)
                 .map(Map::entrySet)
@@ -157,8 +189,9 @@ public class NotificationServiceImpl implements NotificationService {
                 .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
                 .findAny()
                 .map(WorkContact::getEmail)
-                .map(CertifiedField::getValue)
-                .orElse(null), "User workContact is required");
+                .map(CertifiedField::getValue);
+        Assert.isTrue(email.isPresent(), "User workContact is required");
+
         ProductInfo productInfo = user.getProducts().values().iterator().next();
         Assert.notNull(productInfo.getId(), "A product Id is required");
         Institution institution = partyConnector.getInstitution(user.getInstitutionId());
@@ -176,7 +209,7 @@ public class NotificationServiceImpl implements NotificationService {
         dataModel.put("productRole", roleLabel.orElse("no_role_found"));
         dataModel.put("institutionName", institution.getDescription());
 
-        sendNotification(user.getUser().getWorkContact(institution.getId()).getEmail().getValue(), templateName, subject, dataModel);
+        sendNotification(email.get(), templateName, subject, dataModel);
     }
 
 }
