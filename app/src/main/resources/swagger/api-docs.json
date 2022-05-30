@@ -325,8 +325,8 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "201": {
+            "description": "Created"
           },
           "401": {
             "description": "Unauthorized"
@@ -352,9 +352,9 @@
         "tags": [
           "institutions"
         ],
-        "summary": "addProductUser",
+        "summary": "addUserProductRoles",
         "description": "${swagger.dashboard.institutions.api.addProductUser}",
-        "operationId": "addProductUserUsingPUT",
+        "operationId": "addUserProductRolesUsingPUT",
         "parameters": [
           {
             "name": "institutionId",
@@ -370,6 +370,16 @@
             "name": "productId",
             "in": "path",
             "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
             "required": true,
             "style": "simple",
             "schema": {
@@ -416,16 +426,17 @@
         ],
         "summary": "getInstitutionUsers",
         "description": "Service to get all the users related to a specific institution",
-        "operationId" : "getInstitutionUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique internal identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
+        "operationId": "getInstitutionUsersUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
         }, {
           "name" : "productId",
           "in" : "query",
@@ -1458,12 +1469,12 @@
             }
           },
           "surname": {
-            "type" : "string",
-            "description" : "User's surname"
+            "type": "string",
+            "description": "User's surname"
           },
-          "taxCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "taxCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           }
         }
       },
@@ -2065,7 +2076,7 @@
         }
       },
       "UserIdResource" : {
-        "title" : "UserIdResource",
+        "title": "UserIdResource",
         "required": [
           "id"
         ],
@@ -2104,14 +2115,14 @@
             "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           },
           "familyName": {
-            "description" : "User's surname",
-            "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
+            "description": "User's surname",
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "id" : {
+          "id": {
             "type" : "string",
             "description" : "User's unique identifier",
             "format" : "uuid"

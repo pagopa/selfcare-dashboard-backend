@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -171,6 +172,23 @@ public class UserMapper {
         return model;
     }
 
+    //TODO create temp mapper that sets fields to "" string
+    public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto toCreateUserDto(UserProductRoles roles) {
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto resource = null;
+        if (roles.getProductRoles() != null) {
+            resource = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto();
+            resource.setName("");
+            resource.setSurname("");
+            resource.setEmail("");
+            resource.setTaxCode("");
+            resource.setRoles(roles.getProductRoles().stream().map(productRole -> {
+                it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role = new it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role();
+                role.setProductRole(productRole);
+                return role;
+            }).collect(Collectors.toSet()));
+        }
+        return resource;
+    }
 
     private static SaveUserDto toSaveUserDto(CreateUserDto model, String institutionId) {
         SaveUserDto resource = null;

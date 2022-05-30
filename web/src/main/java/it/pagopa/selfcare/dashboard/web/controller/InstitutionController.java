@@ -19,6 +19,7 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -234,5 +235,27 @@ public class InstitutionController {
         log.trace("createInstitutionProductUser end");
     }
 
+    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")//TODO
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addProductUser}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    public void addUserProductRoles(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                    @PathVariable("institutionId")
+                                            String institutionId,
+                                    @ApiParam("${swagger.dashboard.products.model.id}")
+                                    @PathVariable("productId")
+                                            String productId,
+                                    @ApiParam("${swagger.dashboard.user.model.id}")
+                                    @PathVariable("userId")
+                                            String userId,
+                                    @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                    @RequestBody
+                                    @Valid
+                                            UserProductRoles userProductRoles) {
+        log.trace("addProductUser start");
+        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
+        institutionService.addUserProductRoles(institutionId, productId, userId, UserMapper.toCreateUserDto(userProductRoles));
+        log.trace("addProductUser end");
+    }
 
 }
