@@ -270,7 +270,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
         String userId = userRegistryConnector.saveUser(user.getUser()).getId().toString();
         partyConnector.createUsers(institutionId, productId, userId, user);
-        notificationService.sendCreatedUserNotification(institutionId, "product.getTitle()", user.getEmail(), user.getRoles());
+        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
 
         log.trace("createUsers end");
     }
@@ -281,6 +281,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug("addProductUser institutionId = {}, productId = {}, userId = {}, user = {}", institutionId, productId, userId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(productId, "A Product id is required");
+        Assert.hasText(userId, "A User id is required");
         Assert.notNull(user, "An User is required");
 
         Product product = productsConnector.getProduct(productId);
@@ -293,7 +294,7 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
         partyConnector.createUsers(institutionId, productId, userId, user);
-        notificationService.sendAddedProductRoleNotification(institutionId, productId, userId, user.getRoles());
+        notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
 
 
     }
