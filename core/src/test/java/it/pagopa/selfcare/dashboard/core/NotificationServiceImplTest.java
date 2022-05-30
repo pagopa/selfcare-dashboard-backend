@@ -5,6 +5,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
@@ -21,6 +22,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -72,6 +74,9 @@ class NotificationServiceImplTest {
 
     @Autowired
     private NotificationService notificationService;
+
+    @MockBean
+    private UserRegistryConnector userConnectorMock;
 
     @Captor
     private ArgumentCaptor<MessageRequest> messageRequestCaptor;
@@ -489,6 +494,58 @@ class NotificationServiceImplTest {
         verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
         verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
+
+    @Test
+    void addUserProductRoleNotification_nullWorkContact(){
+        //given
+        String institutionId = "institutionId";
+        String productTitle = "productId";
+        String userId = "userId";
+        Set<CreateUserDto.Role> roles = null;
+
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("User workContact is required", e.getMessage());
+        verify(userConnectorMock, times(1))
+                .getUserByInternalId(userId, EnumSet.of(workContacts));
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userConnectorMock);
+    }
+
+    @Test
+    void addUserProductRoleNotification_nullInstitutionId(){
+        //given
+        String institutionId = null;
+        String productTitle = "productId";
+        String userId = "userId";
+        Set<CreateUserDto.Role> roles = null;
+
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("Institution id is required", e.getMessage());
+        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+    }
+
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getRelationshipBasedNotificationArgumentsProvider")

@@ -67,6 +67,9 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendAddedProductRoleNotification(String institutionId, String productTitle, String userId, Set<CreateUserDto.Role> productRoles) {
         log.trace("sendAddedProductRoleNotification start");
         log.debug("institutionId = {}, productTitle = {}, userId = {}, productRoles = {}", institutionId, productTitle, userId, productRoles);
+        Assert.notNull(institutionId, "Institution id is required");
+        Assert.notNull(productTitle, "A product Title is required");
+        Assert.notEmpty(productRoles, "ProductRoles are required");
         User user = userConnector.getUserByInternalId(userId, EMAIL_FIELD_LIST);//TODO retrieved from user registry
         Optional<String> email = Optional.ofNullable(user)
                 .map(User::getWorkContacts)
@@ -88,6 +91,11 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendCreatedUserNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreatedUserNotification start");
         log.debug("institutionId = {}, productTitle = {}, email = {}, productRoles = {}", institutionId, productTitle, email, productRoles);
+
+        Assert.notNull(institutionId, "Institution id is required");
+        Assert.notNull(email, "User email is required");
+        Assert.notNull(productTitle, "A product Title is required");
+        Assert.notEmpty(productRoles, "ProductRoles are required");
         sendCreateNotification(institutionId, productTitle, email, productRoles);
         log.debug("sendCreatedUserNotification end");
     }
@@ -95,10 +103,7 @@ public class NotificationServiceImpl implements NotificationService {
     private void sendCreateNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreateNotification start");
         log.debug("institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
-        Assert.notNull(institutionId, "Institution id is required");
-        Assert.notNull(email, "User email is required");
-        Assert.notNull(productTitle, "A product Title is required");
-        Assert.notEmpty(productRoles, "ProductRoles are required");
+
         Institution institution = partyConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");
         List<String> role_labels = productRoles.stream()
