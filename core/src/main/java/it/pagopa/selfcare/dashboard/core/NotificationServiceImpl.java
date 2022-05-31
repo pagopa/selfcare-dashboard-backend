@@ -109,22 +109,22 @@ public class NotificationServiceImpl implements NotificationService {
 
         Institution institution = partyConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");
-        List<String> role_labels = productRoles.stream()
+        List<String> roleLabels = productRoles.stream()
                 .map(CreateUserDto.Role::getLabel)
                 .collect(Collectors.toList());
         Map<String, String> dataModel = new HashMap<>();
         dataModel.put("productName", productTitle);
         dataModel.put("institutionName", institution.getDescription());
-        if (role_labels.size() > 1) {
-            String roleLabel = role_labels.stream()
+        if (roleLabels.size() > 1) {
+            String roleLabel = roleLabels.stream()
                     .limit(productRoles.size() - 1)
                     .collect(Collectors.joining(", "));
 
             dataModel.put("productRoles", roleLabel);
-            dataModel.put("lastProductRole", role_labels.get(role_labels.size() - 1));
+            dataModel.put("lastProductRole", roleLabels.get(roleLabels.size() - 1));
             sendNotification(email, CREATE_TEMPLATE_MULTIPLE_ROLE, CREATE_SUBJECT, dataModel);
         } else {
-            String roleLabel = role_labels.get(0);
+            String roleLabel = roleLabels.get(0);
             dataModel.put("productRole", roleLabel);
             sendNotification(email, CREATE_TEMPLATE_SINGLE_ROLE, CREATE_SUBJECT, dataModel);
         }
