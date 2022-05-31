@@ -38,6 +38,12 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
     private static final EnumSet<User.Fields> USER_FIELD_LIST = EnumSet.of(name, familyName, workContacts);
     private static final EnumSet<User.Fields> USER_FIELD_LIST_ENHANCED = EnumSet.of(fiscalCode, name, familyName, workContacts);
+    private static final String A_PRODUCT_ID_IS_REQUIRED = "A Product id is required";
+    private static final String A_USER_ID_IS_REQUIRED = "A User id is required";
+    private static final String AN_USER_IS_REQUIRED = "An User is required";
+    private static final String AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED = "An Optional role object is required";
+    private static final String AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED = "An Optional product role object is required";
+    private static final String A_USER_INFO_FILTER_OBJECT_IS_REQUIRED = "A UserInfoFilter object is required";
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
@@ -151,8 +157,8 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}, productRoles = {}", institutionId, productId, role, productRoles);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(productId, "An Optional Product id object is required");
-        Assert.notNull(role, "An Optional role object is required");
-        Assert.notNull(productRoles, "An Optional product role object is required");
+        Assert.notNull(role, AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED);
+        Assert.notNull(productRoles, AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED);
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setRole(role);
@@ -172,7 +178,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}, productRoles = {}",
                 institutionId, userInfoFilter.getProductId(), userInfoFilter.getRole(), userInfoFilter.getProductRoles());
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Assert.notNull(userInfoFilter, "A UserInfoFilter object is required");
+        Assert.notNull(userInfoFilter, A_USER_INFO_FILTER_OBJECT_IS_REQUIRED);
 
 
         Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
@@ -234,9 +240,9 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getInstitutionProductUsers start");
         log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}, productRoles = {}", institutionId, productId, role, productRoles);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Assert.hasText(productId, "A Product id is required");
-        Assert.notNull(role, "An Optional role object is required");
-        Assert.notNull(productRoles, "An Optional product role object is required");
+        Assert.hasText(productId, A_PRODUCT_ID_IS_REQUIRED);
+        Assert.notNull(role, AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED);
+        Assert.notNull(productRoles, AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setRole(role);
         userInfoFilter.setProductId(Optional.of(productId));
@@ -256,8 +262,8 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("createUsers start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Assert.hasText(productId, "A Product id is required");
-        Assert.notNull(user, "An User is required");
+        Assert.hasText(productId, A_PRODUCT_ID_IS_REQUIRED);
+        Assert.notNull(user, AN_USER_IS_REQUIRED);
 
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
@@ -280,9 +286,9 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("addProductUser start");
         log.debug("addProductUser institutionId = {}, productId = {}, userId = {}, user = {}", institutionId, productId, userId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Assert.hasText(productId, "A Product id is required");
-        Assert.hasText(userId, "A User id is required");
-        Assert.notNull(user, "An User is required");
+        Assert.hasText(productId, A_PRODUCT_ID_IS_REQUIRED);
+        Assert.hasText(userId, A_USER_ID_IS_REQUIRED);
+        Assert.notNull(user, AN_USER_IS_REQUIRED);
 
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {

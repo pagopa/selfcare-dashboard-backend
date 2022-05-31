@@ -39,6 +39,9 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String CREATE_TEMPLATE_SINGLE_ROLE = "user_added_single_role.ftlh";
     private static final String CREATE_TEMPLATE_MULTIPLE_ROLE = "user_added_multi_role.ftlh";
     private static final EnumSet<User.Fields> EMAIL_FIELD_LIST = EnumSet.of(User.Fields.workContacts);
+    private static final String A_PRODUCT_TITLE_IS_REQUIRED = "A product Title is required";
+    private static final String INSTITUTION_ID_IS_REQUIRED = "Institution id is required";
+    private static final String PRODUCT_ROLES_ARE_REQUIRED = "ProductRoles are required";
 
     private final Configuration freemarkerConfig;
     private final NotificationServiceConnector notificationConnector;
@@ -67,10 +70,10 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendAddedProductRoleNotification(String institutionId, String productTitle, String userId, Set<CreateUserDto.Role> productRoles) {
         log.trace("sendAddedProductRoleNotification start");
         log.debug("institutionId = {}, productTitle = {}, userId = {}, productRoles = {}", institutionId, productTitle, userId, productRoles);
-        Assert.notNull(institutionId, "Institution id is required");
-        Assert.notNull(productTitle, "A product Title is required");
-        Assert.notEmpty(productRoles, "ProductRoles are required");
-        User user = userConnector.getUserByInternalId(userId, EMAIL_FIELD_LIST);//TODO retrieved from user registry
+        Assert.notNull(institutionId, INSTITUTION_ID_IS_REQUIRED);
+        Assert.notNull(productTitle, A_PRODUCT_TITLE_IS_REQUIRED);
+        Assert.notEmpty(productRoles, PRODUCT_ROLES_ARE_REQUIRED);
+        User user = userConnector.getUserByInternalId(userId, EMAIL_FIELD_LIST);
         Optional<String> email = Optional.ofNullable(user)
                 .map(User::getWorkContacts)
                 .map(Map::entrySet)
@@ -92,10 +95,10 @@ public class NotificationServiceImpl implements NotificationService {
         log.debug("sendCreatedUserNotification start");
         log.debug("institutionId = {}, productTitle = {}, email = {}, productRoles = {}", institutionId, productTitle, email, productRoles);
 
-        Assert.notNull(institutionId, "Institution id is required");
+        Assert.notNull(institutionId, INSTITUTION_ID_IS_REQUIRED);
         Assert.notNull(email, "User email is required");
-        Assert.notNull(productTitle, "A product Title is required");
-        Assert.notEmpty(productRoles, "ProductRoles are required");
+        Assert.notNull(productTitle, A_PRODUCT_TITLE_IS_REQUIRED);
+        Assert.notEmpty(productRoles, PRODUCT_ROLES_ARE_REQUIRED);
         sendCreateNotification(institutionId, productTitle, email, productRoles);
         log.debug("sendCreatedUserNotification end");
     }
@@ -184,7 +187,7 @@ public class NotificationServiceImpl implements NotificationService {
     private void sendRelationshipBasedNotification(String relationshipId, String templateName, String subject) {
         Assert.notNull(relationshipId, "A relationship Id is required");
         UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.workContacts));
-        Assert.notNull(user.getInstitutionId(), "An institution id is required");
+        Assert.notNull(user.getInstitutionId(), INSTITUTION_ID_IS_REQUIRED);
         Optional<String> email = Optional.ofNullable(user)
                 .map(UserInfo::getUser)
                 .map(User::getWorkContacts)
@@ -202,7 +205,7 @@ public class NotificationServiceImpl implements NotificationService {
         Institution institution = partyConnector.getInstitution(user.getInstitutionId());
         Assert.notNull(institution.getDescription(), "An institution description is required");
         Product product = productsConnector.getProduct(productInfo.getId());
-        Assert.notNull(product.getTitle(), "A product Title is required");
+        Assert.notNull(product.getTitle(), A_PRODUCT_TITLE_IS_REQUIRED);
         Optional<String> roleLabel = product.getRoleMappings().values().stream()
                 .flatMap(productRoleInfo -> productRoleInfo.getRoles().stream())
                 .filter(productRole -> productRole.getCode().equals(productInfo.getRoleInfos().get(0).getRole()))

@@ -235,9 +235,9 @@ public class InstitutionController {
         log.trace("createInstitutionProductUser end");
     }
 
-    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")//TODO
+    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addProductUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void addUserProductRoles(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                     @PathVariable("institutionId")
@@ -252,10 +252,10 @@ public class InstitutionController {
                                     @RequestBody
                                     @Valid
                                             UserProductRoles userProductRoles) {
-        log.trace("addProductUser start");
+        log.trace("addUserProductRoles start");
         log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
         institutionService.addUserProductRoles(institutionId, productId, userId, UserMapper.toCreateUserDto(userProductRoles));
-        log.trace("addProductUser end");
+        log.trace("addUserProductRoles end");
     }
 
 }
