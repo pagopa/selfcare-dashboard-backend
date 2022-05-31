@@ -11,10 +11,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +52,21 @@ class UserGroupControllerTest {
         CreateUserGroupDto dto = TestUtils.mockInstance(new CreateUserGroupDto());
         Set<UUID> mockMembers = Set.of(UUID.randomUUID());
         dto.setMembers(mockMembers);
+        String groupId = "groupId";
+        Mockito.when(groupServiceMock.createUserGroup(Mockito.any())).
+                thenReturn(groupId);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .post(BASE_URL + "/")
-                .content(mapper.writeValueAsString(dto))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+                        .post(BASE_URL + "/")
+                        .content(mapper.writeValueAsString(dto))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andReturn();
         //then
+        UserGroupIdResource resource = mapper.readValue(result.getResponse().getContentAsString(), UserGroupIdResource.class);
+        assertNotNull(resource);
+        assertEquals(groupId, resource.getId());
         assertEquals(0, result.getResponse().getContentLength());
         Mockito.verify(groupServiceMock, Mockito.times(1))
                 .createUserGroup(Mockito.notNull());

@@ -40,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static final String CREATE_TEMPLATE_MULTIPLE_ROLE = "user_added_multi_role.ftlh";
     private static final EnumSet<User.Fields> EMAIL_FIELD_LIST = EnumSet.of(User.Fields.workContacts);
     private static final String A_PRODUCT_TITLE_IS_REQUIRED = "A product Title is required";
-    private static final String INSTITUTION_ID_IS_REQUIRED = "Institution id is required";
+    private static final String INSTITUTION_ID_IS_REQUIRED = "An institution id is required";
     private static final String PRODUCT_ROLES_ARE_REQUIRED = "ProductRoles are required";
 
     private final Configuration freemarkerConfig;

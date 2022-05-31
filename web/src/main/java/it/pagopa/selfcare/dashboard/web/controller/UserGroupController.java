@@ -5,10 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapper;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -43,15 +40,17 @@ public class UserGroupController {
     @ApiResponses({
             @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
     })
-    public void createUserGroup(@RequestBody
-                                @Valid
-                                        CreateUserGroupDto group) {
+    public UserGroupIdResource createUserGroup(@RequestBody
+                                               @Valid
+                                                       CreateUserGroupDto group) {
         log.trace("createGroup start");
         log.debug("createGroup group = {}", group);
         CreateUserGroup userGroup = GroupMapper.fromDto(group);
-        groupService.createUserGroup(userGroup);
-        log.debug("createGroup result = {}", group);
+        String groupId = groupService.createUserGroup(userGroup);
+        UserGroupIdResource result = GroupMapper.toIdResource(groupId);
+        log.debug("createGroup result = {}", result);
         log.trace("createGroup end");
+        return result;
     }
 
     @DeleteMapping(value = "/{id}")

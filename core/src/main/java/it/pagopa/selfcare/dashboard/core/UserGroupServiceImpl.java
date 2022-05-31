@@ -48,7 +48,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public void createUserGroup(CreateUserGroup group) {
+    public String createUserGroup(CreateUserGroup group) {
         log.trace("createUserGroup start");
         log.debug("createUserGroup group = {}", group);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -62,9 +62,10 @@ public class UserGroupServiceImpl implements UserGroupService {
                 .count() != group.getMembers().size()) {
             throw new InvalidMemberListException("Some members in the list aren't allowed for this institution");
         }
-        groupConnector.createUserGroup(group);
+        String groupId = groupConnector.createUserGroup(group);
+        log.debug("result = {}", groupId);
         log.trace("createUserGroup end");
-
+        return groupId;
     }
 
     @Override
