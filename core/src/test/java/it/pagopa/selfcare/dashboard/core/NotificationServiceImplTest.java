@@ -5,6 +5,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
@@ -72,6 +73,9 @@ class NotificationServiceImplTest {
 
     @Autowired
     private NotificationService notificationService;
+
+    @MockBean
+    private UserRegistryConnector userConnectorMock;
 
     @Captor
     private ArgumentCaptor<MessageRequest> messageRequestCaptor;
@@ -489,6 +493,439 @@ class NotificationServiceImplTest {
         verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
         verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
+
+    @Test
+    void sendAddedProductRoleNotification_nullWorkContact() {
+        //given
+        String institutionId = "institutionId";
+        String productTitle = "productId";
+        String userId = "userId";
+        Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
+
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("User workContact is required", e.getMessage());
+        verify(userConnectorMock, times(1))
+                .getUserByInternalId(userId, EnumSet.of(workContacts));
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userConnectorMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_nullInstitutionId() {
+        //given
+        String institutionId = null;
+        String productTitle = "productId";
+        String userId = "userId";
+        Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
+
+
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("Institution id is required", e.getMessage());
+        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_nullProductTitle() {
+        //given
+        String institutionId = "institutionId";
+        String productTitle = null;
+        String userId = "userId";
+        Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
+
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("A product Title is required", e.getMessage());
+        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_emptyRoles() {
+        //given
+        String institutionId = "institutionId";
+        String productTitle = "productTitle";
+        String userId = "userId";
+        Set<CreateUserDto.Role> roles = null;
+
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("ProductRoles are required", e.getMessage());
+        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_nullInstitutionDescription() {
+        //given
+        String institutionId = UUID.randomUUID().toString();
+        String email = "email";
+        String productTitle = "productTitle";
+        String userId = UUID.randomUUID().toString();
+        Institution institutionMock = mockInstance(new Institution(), "setDescription");
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        User userMock = mockInstance(new User());
+        userMock.setId(userId);
+        institutionMock.setId(institutionId);
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userMock.setWorkContacts(workContactsMap);
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(userMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("An institution description is required", e.getMessage());
+        verify(partyConnectorMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
+
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_nullAuth() {
+        //given
+        String institutionId = UUID.randomUUID().toString();
+        String email = "email";
+        String productTitle = "productTitle";
+        String userId = UUID.randomUUID().toString();
+        Institution institutionMock = mockInstance(new Institution());
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        User userMock = mockInstance(new User());
+        userMock.setId(userId);
+        institutionMock.setId(institutionId);
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userMock.setWorkContacts(workContactsMap);
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(userMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalStateException.class, e.getClass());
+        assertEquals("Authentication is required", e.getMessage());
+        verify(partyConnectorMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_nullPrincipal() {
+        //given
+        String institutionId = UUID.randomUUID().toString();
+        String email = "email";
+        String productTitle = "productTitle";
+        String userId = UUID.randomUUID().toString();
+        Institution institutionMock = mockInstance(new Institution());
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        User userMock = mockInstance(new User());
+        userMock.setId(userId);
+        institutionMock.setId(institutionId);
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userMock.setWorkContacts(workContactsMap);
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(userMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalStateException.class, e.getClass());
+        assertEquals("Not SelfCareUser principal", e.getMessage());
+        verify(partyConnectorMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_mailPrepNotification() throws IOException {
+        //given
+        String institutionId = UUID.randomUUID().toString();
+        String email = "email";
+        String productTitle = "productTitle";
+        String userId = UUID.randomUUID().toString();
+        Institution institutionMock = mockInstance(new Institution());
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        User userMock = mockInstance(new User());
+        userMock.setId(userId);
+        institutionMock.setId(institutionId);
+        WorkContact workContact = mockInstance(new WorkContact());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userMock.setWorkContacts(workContactsMap);
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
+        SelfCareUser selfCareUser = SelfCareUser.builder("id")
+                .email("test@example.com")
+                .name("name")
+                .surname("surname")
+                .build();
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
+        doThrow(RuntimeException.class)
+                .when(notificationConnectorMock)
+                .sendNotificationToUser(any());
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(userMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(MailPreparationException.class, e.getClass());
+        verify(partyConnectorMock, times(1))
+                .getInstitution(institutionId);
+        verify(freemarkerConfigSpy, times(1))
+                .getTemplate("user_added_single_role.ftlh");
+        verify(notificationConnectorMock, times(1))
+                .sendNotificationToUser(any());
+        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoInteractions(productsConnectorMock, userServiceMock);
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_singleRole() throws IOException {
+        //given
+        String institutionId = UUID.randomUUID().toString();
+        String email = "email";
+        String productTitle = "productTitle";
+        String userId = UUID.randomUUID().toString();
+        Institution institutionMock = mockInstance(new Institution());
+        String productRoles1 = "Operator Api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        User userMock = mockInstance(new User());
+        userMock.setId(userId);
+        institutionMock.setId(institutionId);
+        WorkContact workContact = mockInstance(new WorkContact());
+        CertifiedField<String> certifiedFieldEmail = new CertifiedField<>();
+        certifiedFieldEmail.setValue(email);
+        workContact.setEmail(certifiedFieldEmail);
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userMock.setWorkContacts(workContactsMap);
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1);
+        SelfCareUser selfCareUser = SelfCareUser.builder("id")
+                .email("test@example.com")
+                .name("name")
+                .surname("surname")
+                .build();
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(userMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(partyConnectorMock, times(1))
+                .getInstitution(institutionId);
+        verify(freemarkerConfigSpy, times(1))
+                .getTemplate("user_added_single_role.ftlh");
+        verify(notificationConnectorMock, times(1))
+                .sendNotificationToUser(messageRequestCaptor.capture());
+        MessageRequest messageRequest = messageRequestCaptor.getValue();
+        assertNotNull(messageRequest);
+        assertEquals(email, messageRequest.getReceiverEmail());
+        assertEquals("A new user has been added", messageRequest.getSubject());
+        assertNotNull(messageRequest.getContent());
+        assertTrue(messageRequest.getContent().contains(productTitle));
+        roles.forEach(role -> {
+            assertTrue(messageRequest.getContent().contains(role.getLabel()));
+        });
+        assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
+        assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
+        assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
+    }
+
+    @Test
+    void sendAddedProductRoleNotification_multiRole() throws IOException {
+        //given
+        String institutionId = UUID.randomUUID().toString();
+        String email = "email";
+        String productTitle = "productTitle";
+        String userId = UUID.randomUUID().toString();
+        Institution institutionMock = mockInstance(new Institution());
+        String productRoles1 = "Operator Api";
+        String productLabel1 = "operator api";
+        PartyRole partyRole1 = PartyRole.OPERATOR;
+        String productRole2 = "Operator Security";
+        String productLabel2 = "operator security";
+        PartyRole partyRole2 = PartyRole.SUB_DELEGATE;
+        String productRole3 = "Administrator";
+        String productLabel3 = "administrator";
+        PartyRole partyRole3 = PartyRole.DELEGATE;
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        CreateUserDto.Role roleMock2 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        CreateUserDto.Role roleMock3 = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+
+        roleMock1.setProductRole(productRoles1);
+        roleMock1.setPartyRole(partyRole1);
+        roleMock1.setLabel(productLabel1);
+        roleMock2.setProductRole(productRole2);
+        roleMock2.setPartyRole(partyRole2);
+        roleMock2.setLabel(productLabel2);
+        roleMock3.setProductRole(productRole3);
+        roleMock3.setPartyRole(partyRole3);
+        roleMock3.setLabel(productLabel3);
+
+        Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2, roleMock3);
+        User userMock = mockInstance(new User());
+        userMock.setId(userId);
+        institutionMock.setId(institutionId);
+        WorkContact workContact = mockInstance(new WorkContact());
+        CertifiedField<String> certifiedFieldEmail = new CertifiedField<>();
+        certifiedFieldEmail.setValue(email);
+        workContact.setEmail(certifiedFieldEmail);
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        workContactsMap.put(institutionMock.getId(), workContact);
+        userMock.setWorkContacts(workContactsMap);
+        SelfCareUser selfCareUser = SelfCareUser.builder("id")
+                .email("test@example.com")
+                .name("name")
+                .surname("surname")
+                .build();
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
+        when(partyConnectorMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(userMock);
+        //when
+        Executable executable = () -> {
+            notificationService.sendAddedProductRoleNotification(institutionId, productTitle, email, roles);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(partyConnectorMock, times(1))
+                .getInstitution(institutionId);
+        verify(freemarkerConfigSpy, times(1))
+                .getTemplate("user_added_multi_role.ftlh");
+        verify(notificationConnectorMock, times(1))
+                .sendNotificationToUser(messageRequestCaptor.capture());
+        MessageRequest messageRequest = messageRequestCaptor.getValue();
+        assertNotNull(messageRequest);
+        assertEquals(email, messageRequest.getReceiverEmail());
+        assertEquals("A new user has been added", messageRequest.getSubject());
+        assertNotNull(messageRequest.getContent());
+        assertTrue(messageRequest.getContent().contains(productTitle));
+        roles.forEach(role -> {
+            assertTrue(messageRequest.getContent().contains(role.getLabel()));
+        });
+        assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
+        assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
+        assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
+        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoInteractions(productsConnectorMock, userServiceMock);
+    }
+
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("getRelationshipBasedNotificationArgumentsProvider")

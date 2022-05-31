@@ -16,8 +16,10 @@ import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -33,10 +35,7 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.MimeTypeUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.Collections.singletonList;
@@ -109,9 +108,9 @@ class InstitutionControllerTest {
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -130,9 +129,9 @@ class InstitutionControllerTest {
                 .thenReturn(null);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -149,9 +148,9 @@ class InstitutionControllerTest {
                 .thenAnswer(invocationOnMock -> List.of(mockInstance(new InstitutionInfo())));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/")
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -173,9 +172,9 @@ class InstitutionControllerTest {
                 .thenReturn(singletonList(PRODUCT));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/products", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -199,9 +198,9 @@ class InstitutionControllerTest {
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/products", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -224,9 +223,9 @@ class InstitutionControllerTest {
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/users", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -254,12 +253,12 @@ class InstitutionControllerTest {
                 .thenReturn(singletonList(userInfo));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users", institutionId)
-                .queryParam("role", role.toString())
-                .queryParam("productId", productId)
-                .queryParam("productRoles", productRole)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/users", institutionId)
+                        .queryParam("role", role.toString())
+                        .queryParam("productId", productId)
+                        .queryParam("productRoles", productRole)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -283,9 +282,9 @@ class InstitutionControllerTest {
                 .thenThrow(ResourceNotFoundException.class);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andReturn();
         //then
@@ -305,9 +304,9 @@ class InstitutionControllerTest {
                 .thenReturn(userInfo);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         //then
@@ -328,9 +327,9 @@ class InstitutionControllerTest {
                 .thenReturn(Collections.emptyList());
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -357,10 +356,10 @@ class InstitutionControllerTest {
                 .thenReturn(singletonList(userInfoModel));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
-                .queryParam("role", role.toString())
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
+                        .queryParam("role", role.toString())
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
@@ -385,10 +384,10 @@ class InstitutionControllerTest {
         user.setProductRoles(productRoles);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
-                .content(objectMapper.writeValueAsString(user))
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+                        .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isCreated())
                 .andReturn();
         // then
@@ -396,6 +395,38 @@ class InstitutionControllerTest {
         verify(institutionServiceMock, times(1))
                 .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.notNull());
         verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+    @Test
+    void addProductUserRole() throws Exception {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String userId = UUID.randomUUID().toString();
+        UserProductRoles productRoles = new UserProductRoles();
+        productRoles.setProductRoles(Set.of("productRole"));
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/{institutionId}/products/{productId}/users/{userId}", institutionId, productId, userId)
+                        .content(objectMapper.writeValueAsString(productRoles))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andReturn();
+        //then
+        assertEquals(0, result.getResponse().getContentLength());
+        ArgumentCaptor<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto> userCaptor = ArgumentCaptor.forClass(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.class);
+        verify(institutionServiceMock, times(1))
+                .addUserProductRoles(eq(institutionId), eq(productId), eq(userId), userCaptor.capture());
+        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto capturedUser = userCaptor.getValue();
+        assertNull(capturedUser.getUser());
+        assertEquals("", capturedUser.getEmail());
+        assertEquals("", capturedUser.getName());
+        assertEquals("", capturedUser.getSurname());
+        assertEquals("", capturedUser.getTaxCode());
+        capturedUser.getRoles().forEach(role -> {
+            assertTrue(productRoles.getProductRoles().contains(role.getProductRole()));
+        });
     }
 
 }

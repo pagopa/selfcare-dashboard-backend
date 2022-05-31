@@ -27,5 +27,7 @@ public interface InstitutionService {
 
     void createUsers(String institutionId, String productId, CreateUserDto user);
 
+    void addUserProductRoles(String institutionId, String productId, String userId, CreateUserDto dto);
+
 
 }
