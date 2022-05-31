@@ -456,16 +456,20 @@
             }
           },
           {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          }
-        }, {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
           "name" : "productRoles",
           "in" : "query",
           "description" : "User's roles in product",
@@ -1959,13 +1963,13 @@
         "required" : [ "email", "fiscalCode", "name", "surname" ],
         "type" : "object",
         "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's institutional email"
+          "email": {
+            "type": "string",
+            "description": "User's institutional email"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
           "name": {
             "type": "string",
@@ -1979,10 +1983,14 @@
       },
       "UserGroupIdResource": {
         "title": "UserGroupIdResource",
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Users group's unique identifier"
           }
         }
       },
@@ -2004,14 +2012,14 @@
             "description": "Date on which the group was created",
             "format": "date-time"
           },
-          "createdBy" : {
-            "type" : "string",
-            "description" : "User by which the group was created",
-            "format" : "uuid"
+          "createdBy": {
+            "type": "string",
+            "description": "User by which the group was created",
+            "format": "uuid"
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Users group's description"
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
           },
           "id" : {
             "type" : "string",
