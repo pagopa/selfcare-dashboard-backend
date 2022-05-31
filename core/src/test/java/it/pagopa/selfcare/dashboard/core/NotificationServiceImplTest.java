@@ -527,7 +527,8 @@ class NotificationServiceImplTest {
         String institutionId = null;
         String productTitle = "productId";
         String userId = "userId";
-        Set<CreateUserDto.Role> roles = null;
+        Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
+
 
         //when
         Executable executable = () -> {
@@ -551,7 +552,7 @@ class NotificationServiceImplTest {
         String institutionId = "institutionId";
         String productTitle = null;
         String userId = "userId";
-        Set<CreateUserDto.Role> roles = null;
+        Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
 
         //when
         Executable executable = () -> {
