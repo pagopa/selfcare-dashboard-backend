@@ -6,6 +6,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
@@ -16,6 +17,7 @@ import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -382,6 +384,9 @@ class InstitutionControllerTest {
         CreateUserDto user = mockInstance(new CreateUserDto(), "setProductRoles");
         Set<String> productRoles = Set.of("productRole");
         user.setProductRoles(productRoles);
+        UserId userId = mockInstance(new UserId());
+        when(institutionServiceMock.createUsers(any(), any(), any()))
+                .thenReturn(userId);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
@@ -391,7 +396,8 @@ class InstitutionControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
         // then
-        assertEquals(0, result.getResponse().getContentLength());
+        UserIdResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), UserIdResource.class);
+        assertNotNull(resource);
         verify(institutionServiceMock, times(1))
                 .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.notNull());
         verifyNoMoreInteractions(institutionServiceMock);
