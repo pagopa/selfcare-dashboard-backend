@@ -277,6 +277,7 @@ class InstitutionServiceImpl implements InstitutionService {
         UserId userId = userRegistryConnector.saveUser(user.getUser());
         partyConnector.createUsers(institutionId, productId, userId.getId().toString(), user);
         notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
+        log.debug("createUsers result = {}", userId);
         log.trace("createUsers end");
         return userId;
     }
@@ -301,7 +302,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
         partyConnector.createUsers(institutionId, productId, userId, user);
         notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
-
+        log.trace("addProductUser end");
     }
 
 }

@@ -69,7 +69,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Async
     public void sendAddedProductRoleNotification(String institutionId, String productTitle, String userId, Set<CreateUserDto.Role> productRoles) {
         log.trace("sendAddedProductRoleNotification start");
-        log.debug("institutionId = {}, productTitle = {}, userId = {}, productRoles = {}", institutionId, productTitle, userId, productRoles);
+        log.debug("sendAddedProductRoleNotification institutionId = {}, productTitle = {}, userId = {}, productRoles = {}", institutionId, productTitle, userId, productRoles);
         Assert.notNull(institutionId, INSTITUTION_ID_IS_REQUIRED);
         Assert.notNull(productTitle, A_PRODUCT_TITLE_IS_REQUIRED);
         Assert.notEmpty(productRoles, PRODUCT_ROLES_ARE_REQUIRED);
@@ -93,7 +93,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Async
     public void sendCreatedUserNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreatedUserNotification start");
-        log.debug("institutionId = {}, productTitle = {}, email = {}, productRoles = {}", institutionId, productTitle, email, productRoles);
+        log.debug("sendCreatedUserNotification institutionId = {}, productTitle = {}, email = {}, productRoles = {}", institutionId, productTitle, email, productRoles);
 
         Assert.notNull(institutionId, INSTITUTION_ID_IS_REQUIRED);
         Assert.notNull(email, "User email is required");
@@ -105,7 +105,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendCreateNotification(String institutionId, String productTitle, String email, Set<CreateUserDto.Role> productRoles) {
         log.debug("sendCreateNotification start");
-        log.debug("institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
+        log.debug("sendCreateNotification institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
 
         Institution institution = partyConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");

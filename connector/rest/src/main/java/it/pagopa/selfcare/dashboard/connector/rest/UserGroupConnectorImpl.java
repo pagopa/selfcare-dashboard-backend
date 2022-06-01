@@ -79,7 +79,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         userGroupRequest.setName(userGroup.getName());
         userGroupRequest.setStatus(UserGroupStatus.ACTIVE);
         String groupId = restClient.createUserGroup(userGroupRequest).getId();
-        log.debug("result = {}", groupId);
+        log.debug("createUserGroup result = {}", groupId);
         log.trace("createUserGroup end");
         return groupId;
     }

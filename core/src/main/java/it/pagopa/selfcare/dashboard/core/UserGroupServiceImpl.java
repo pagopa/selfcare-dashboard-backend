@@ -63,7 +63,7 @@ public class UserGroupServiceImpl implements UserGroupService {
             throw new InvalidMemberListException("Some members in the list aren't allowed for this institution");
         }
         String groupId = groupConnector.createUserGroup(group);
-        log.debug("result = {}", groupId);
+        log.debug("createUserGroup result = {}", groupId);
         log.trace("createUserGroup end");
         return groupId;
     }
