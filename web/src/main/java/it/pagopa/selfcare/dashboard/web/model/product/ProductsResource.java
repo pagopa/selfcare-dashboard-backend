@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.web.model;
+package it.pagopa.selfcare.dashboard.web.model.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,6 +8,7 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Data
 public class ProductsResource {
@@ -53,4 +54,8 @@ public class ProductsResource {
     @JsonProperty(required = true)
     @NotNull
     private ProductStatus status;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.children}")
+    private List<SubProductResource> children;
+
 }

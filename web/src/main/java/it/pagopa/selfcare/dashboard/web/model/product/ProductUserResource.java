@@ -10,7 +10,7 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.web.model;
+package it.pagopa.selfcare.dashboard.web.model.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,19 +20,15 @@ import lombok.Data;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Data
 public class ProductUserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
     @JsonProperty(required = true)
-    @NotBlank
-    private String id;
-
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.certified}", required = true)
-    @JsonProperty(required = true)
     @NotNull
-    private boolean certification;
+    private UUID id;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
     @JsonProperty(required = true)

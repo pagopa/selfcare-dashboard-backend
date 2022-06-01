@@ -11,14 +11,10 @@ import java.util.Set;
 @Data
 public class CreateUserDto {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
     private String name;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
     private String surname;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
@@ -26,9 +22,7 @@ public class CreateUserDto {
     @NotBlank
     private String taxCode;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.email}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.email}")
     private String email;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.productRoles}", required = true)

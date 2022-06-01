@@ -1,14 +1,15 @@
 package it.pagopa.selfcare.dashboard.connector.model.product;
 
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.OffsetDateTime;
 import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
 
-@Setter
-@Getter
+@Data
 public class Product {
 
     private String id;
@@ -21,6 +22,29 @@ public class Product {
     private boolean authorized;
     private String userRole;
     private ProductStatus status;
+    private String identityTokenAudience;
     private EnumMap<PartyRole, ProductRoleInfo> roleMappings;
+
+
+    public static Optional<PartyRole> getPartyRole(String productRoleCode, EnumMap<PartyRole, ProductRoleInfo> roleMappings) {
+        return getPartyRole(productRoleCode, roleMappings, EnumSet.allOf(PartyRole.class));
+    }
+
+    public static Optional<PartyRole> getPartyRole(String productRoleCode, EnumMap<PartyRole, ProductRoleInfo> roleMappings, EnumSet<PartyRole> partyRoleWhiteList) {
+        return roleMappings.entrySet().stream()
+                .filter(entry -> partyRoleWhiteList.contains(entry.getKey()))
+                .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(productRoleCode)))
+                .map(Map.Entry::getKey)
+                .findAny();
+    }
+
+    public static Optional<String> getLabel(String productRoleCode, EnumMap<PartyRole, ProductRoleInfo> roleMappings) {
+        return roleMappings.values().stream()
+                .flatMap(productRoleInfo -> productRoleInfo.getRoles().stream())
+                .filter(productRole -> productRole.getCode().equals(productRoleCode))
+                .findAny()
+                .map(ProductRoleInfo.ProductRole::getLabel);
+    }
+
 
 }

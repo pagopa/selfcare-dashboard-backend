@@ -37,20 +37,17 @@ public class TokenController {
                                                   String institutionId,
                                           @ApiParam("${swagger.dashboard.products.model.id}")
                                           @RequestParam("productId")
-                                                  String productId,
-                                          @ApiParam(value = "${swagger.dashboard.token.model.realm}", example = "io.selfcare.pagopa.it", defaultValue = "defVal")
-                                          @RequestParam("realm")
-                                                  String realm) {
+                                                  String productId) {
 
         log.trace("exchange start");
-        log.debug("exchange institutionId = {}, productId = {}, realm = {}" , institutionId, productId, realm);
+        log.debug("exchange institutionId = {}, productId = {}", institutionId, productId);
 
-        String token = exchangeTokenService.exchange(institutionId, productId, realm);
+        String token = exchangeTokenService.exchange(institutionId, productId);
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
 
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange result = {}" , identityToken);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange result = {}", identityToken);
         log.trace("exchange end");
 
         return identityToken;

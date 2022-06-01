@@ -51,7 +51,7 @@ class SwaggerConfigTest {
     private RelationshipService relationshipServiceMock;
 
     @MockBean
-    private UserRegistryService userRegistryServiceMock;
+    private UserService userServiceMock;
 
     @MockBean
     private UserGroupService userGroupServiceMock;

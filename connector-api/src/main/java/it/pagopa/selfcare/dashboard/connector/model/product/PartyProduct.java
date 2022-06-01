@@ -1,10 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.model.product;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class PartyProduct {
     private ProductStatus status;
     private String id;

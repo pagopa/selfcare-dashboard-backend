@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,18 +36,15 @@ class ProductUserResourceTest {
     void validateNullFields() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("id", NotBlank.class);
-        toCheckMap.put("certification", NotNull.class);
+        toCheckMap.put("id", NotNull.class);
         toCheckMap.put("product", NotNull.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("email", NotBlank.class);
         toCheckMap.put("role", NotNull.class);
         toCheckMap.put("status", NotBlank.class);
-        toCheckMap.put("fiscalCode", NotBlank.class);
         ProductUserResource resource = new ProductUserResource();
         resource.setId(null);
-        resource.setCertification(false);
         resource.setProduct(null);
         resource.setName(null);
         resource.setSurname(null);

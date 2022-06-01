@@ -15,20 +15,22 @@ package it.pagopa.selfcare.dashboard.web.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import lombok.Data;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class InstitutionUserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
     @JsonProperty(required = true)
-    @NotBlank
-    private String id;
+    @NotNull
+    private UUID id;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
     @JsonProperty(required = true)

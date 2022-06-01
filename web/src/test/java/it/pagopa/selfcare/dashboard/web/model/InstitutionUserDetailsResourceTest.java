@@ -35,7 +35,7 @@ class InstitutionUserDetailsResourceTest {
     void validateNullFields_InstitutionUserResource() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("id", NotBlank.class);
+        toCheckMap.put("id", NotNull.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("email", NotBlank.class);

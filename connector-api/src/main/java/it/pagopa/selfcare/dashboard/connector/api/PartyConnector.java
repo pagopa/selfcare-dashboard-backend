@@ -24,7 +24,7 @@ public interface PartyConnector {
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 
-    void createUsers(String institutionId, String productId, CreateUserDto createUserDto);
+    void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto);
 
     void suspend(String relationshipId);
 
