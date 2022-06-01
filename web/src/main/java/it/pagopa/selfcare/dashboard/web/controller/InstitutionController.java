@@ -235,6 +235,7 @@ public class InstitutionController {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         UserId userId = institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user, institutionId));
         UserIdResource result = UserMapper.toIdResource(userId);
+        log.debug("createInstitutionProductUser result = {}", result);
         log.trace("createInstitutionProductUser end");
         return result;
     }
