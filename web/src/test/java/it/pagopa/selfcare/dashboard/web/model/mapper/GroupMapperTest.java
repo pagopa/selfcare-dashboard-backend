@@ -5,10 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupPlainResource;
-import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -85,6 +82,27 @@ class GroupMapperTest {
         //then
         assertNotNull(model);
         TestUtils.reflectionEqualsByName(dto, model);
+    }
+
+    @Test
+    void toIdResource() {
+        //given
+        String groupId = "groupId";
+        //when
+        UserGroupIdResource resource = GroupMapper.toIdResource(groupId);
+        //then
+        assertNotNull(resource);
+        assertEquals(groupId, resource.getId());
+    }
+
+    @Test
+    void toIdResource_null() {
+        //given
+        String groupId = null;
+        //when
+        UserGroupIdResource resource = GroupMapper.toIdResource(groupId);
+        //then
+        assertNull(resource);
     }
 
     @Test

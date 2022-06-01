@@ -7,6 +7,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
@@ -19,6 +20,7 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,21 +220,24 @@ public class InstitutionController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
-    public void createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                             @PathVariable("institutionId")
-                                                     String institutionId,
-                                             @ApiParam("${swagger.dashboard.products.model.id}")
-                                             @PathVariable("productId")
-                                                     String productId,
-                                             @ApiParam("${swagger.dashboard.user.model.role}")
-                                             @RequestBody
-                                             @Valid
-                                                     CreateUserDto user) {
+    public UserIdResource createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                       @PathVariable("institutionId")
+                                                               String institutionId,
+                                                       @ApiParam("${swagger.dashboard.products.model.id}")
+                                                       @PathVariable("productId")
+                                                               String productId,
+                                                       @ApiParam("${swagger.dashboard.user.model.role}")
+                                                       @RequestBody
+                                                       @Valid
+                                                               CreateUserDto user) {
 
         log.trace("createInstitutionProductUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
-        institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user, institutionId));
+        UserId userId = institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user, institutionId));
+        UserIdResource result = UserMapper.toIdResource(userId);
+        log.debug("createInstitutionProductUser result = {}", result);
         log.trace("createInstitutionProductUser end");
+        return result;
     }
 
     @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")

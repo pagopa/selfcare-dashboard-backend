@@ -1050,6 +1050,50 @@ class InstitutionServiceImplTest {
     }
 
     @Test
+    void createUsers() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoleCode1 = "productRoleCode";
+        String productRoleLabel1 = "productRoleLabel";
+        UUID id = UUID.randomUUID();
+        UserId userId = new UserId();
+        userId.setId(id);
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        roleMock1.setPartyRole(PartyRole.OPERATOR);
+        roleMock1.setProductRole(productRoleCode1);
+        createUserDto.setRoles(Set.of(roleMock1));
+        Product product = mockInstance(new Product());
+        product.setId(productId);
+        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        productRole1.setCode(productRoleCode1);
+        productRole1.setLabel(productRoleLabel1);
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        productRoleInfo.setRoles(List.of(productRole1));
+        EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+        map.put(PartyRole.OPERATOR, productRoleInfo);
+        product.setRoleMappings(map);
+        when(userRegistryConnector.saveUser(Mockito.any()))
+                .thenReturn(userId);
+        when(productsConnectorMock.getProduct(Mockito.anyString()))
+                .thenReturn(product);
+        //when
+        UserId result = institutionService.createUsers(institutionId, productId, createUserDto);
+        //then
+        assertEquals(userId.getId(), result.getId());
+        verify(userRegistryConnector, times(1))
+                .saveUser(createUserDto.getUser());
+        verify(partyConnectorMock, times(1))
+                .createUsers(institutionId, productId, userId.getId().toString(), createUserDto);
+        verify(notificationServiceMock, Mockito.times(1)).
+                sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
+        verify(productsConnectorMock, times(1))
+                .getProduct(productId);
+        verifyNoMoreInteractions(userRegistryConnector, partyConnectorMock, notificationServiceMock);
+    }
+
+    @Test
     void addUserProductRoles_nullInstitutionId() {
         //given
         String institutionId = null;

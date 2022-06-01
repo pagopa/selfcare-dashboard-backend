@@ -77,18 +77,20 @@ class UserGroupServiceImplTest {
         UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
         UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
         UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
-
+        String groupIdMock = "groupId";
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
+        when(groupConnector.createUserGroup(any()))
+                .thenReturn(groupIdMock);
 
         when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
-        Executable executable = () -> groupService.createUserGroup(userGroup);
+        String groupId = groupService.createUserGroup(userGroup);
         //then
-        assertDoesNotThrow(executable);
+        assertEquals(groupIdMock, groupId);
         verify(groupConnector, times(1))
                 .createUserGroup(any());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);

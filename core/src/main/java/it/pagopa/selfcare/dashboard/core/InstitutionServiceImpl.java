@@ -258,7 +258,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
 
     @Override
-    public void createUsers(String institutionId, String productId, CreateUserDto user) {
+    public UserId createUsers(String institutionId, String productId, CreateUserDto user) {
         log.trace("createUsers start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
@@ -274,11 +274,12 @@ class InstitutionServiceImpl implements InstitutionService {
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
 
-        String userId = userRegistryConnector.saveUser(user.getUser()).getId().toString();
-        partyConnector.createUsers(institutionId, productId, userId, user);
+        UserId userId = userRegistryConnector.saveUser(user.getUser());
+        partyConnector.createUsers(institutionId, productId, userId.getId().toString(), user);
         notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
-
+        log.debug("createUsers result = {}", userId);
         log.trace("createUsers end");
+        return userId;
     }
 
     @Override
@@ -301,8 +302,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
         partyConnector.createUsers(institutionId, productId, userId, user);
         notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
-
-
+        log.trace("addProductUser end");
     }
 
 }

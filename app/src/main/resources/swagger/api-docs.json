@@ -326,7 +326,14 @@
         },
         "responses" : {
           "201": {
-            "description": "Created"
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIdResource"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -353,7 +360,7 @@
           "institutions"
         ],
         "summary": "addUserProductRoles",
-        "description": "${swagger.dashboard.institutions.api.addProductUser}",
+        "description": "Service to add a new role/product to a specific user",
         "operationId": "addUserProductRolesUsingPUT",
         "parameters": [
           {
@@ -437,26 +444,32 @@
             "schema": {
               "type": "string"
             }
-        }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
-          }
-        }, {
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
           "name" : "productRoles",
           "in" : "query",
           "description" : "User's roles in product",
@@ -1110,7 +1123,14 @@
         },
         "responses" : {
           "201" : {
-            "description" : "Created"
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupIdResource"
+                }
+              }
+            }
           },
           "401" : {
             "description" : "Unauthorized"
@@ -1943,42 +1963,63 @@
         "required" : [ "email", "fiscalCode", "name", "surname" ],
         "type" : "object",
         "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's institutional email"
+          "email": {
+            "type": "string",
+            "description": "User's institutional email"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
-      "UserGroupPlainResource" : {
-        "title" : "UserGroupPlainResource",
-        "required" : [ "description", "id", "institutionId", "membersCount", "name", "productId", "status" ],
-        "type" : "object",
-        "properties" : {
-          "createdAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was created",
-            "format" : "date-time"
+      "UserGroupIdResource": {
+        "title": "UserGroupIdResource",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Users group's unique identifier"
+          }
+        }
+      },
+      "UserGroupPlainResource": {
+        "title": "UserGroupPlainResource",
+        "required": [
+          "description",
+          "id",
+          "institutionId",
+          "membersCount",
+          "name",
+          "productId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Date on which the group was created",
+            "format": "date-time"
           },
-          "createdBy" : {
-            "type" : "string",
-            "description" : "User by which the group was created",
-            "format" : "uuid"
+          "createdBy": {
+            "type": "string",
+            "description": "User by which the group was created",
+            "format": "uuid"
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Users group's description"
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
           },
           "id" : {
             "type" : "string",
@@ -2123,13 +2164,13 @@
             "description": "User's fiscal code"
           },
           "id": {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "name" : {
-            "description" : "User's name",
-            "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
+          "name": {
+            "description": "User's name",
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           }
         }
       }

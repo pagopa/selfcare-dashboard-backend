@@ -125,7 +125,7 @@ class NotificationServiceImplTest {
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
-        assertEquals("Institution id is required", e.getMessage());
+        assertEquals("An institution id is required", e.getMessage());
 
         verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
@@ -542,7 +542,7 @@ class NotificationServiceImplTest {
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
-        assertEquals("Institution id is required", e.getMessage());
+        assertEquals("An institution id is required", e.getMessage());
         verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
     }
 
