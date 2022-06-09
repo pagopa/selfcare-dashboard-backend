@@ -1440,30 +1440,51 @@
         }
       },
       "InstitutionResource" : {
-        "title" : "InstitutionResource",
-        "required" : [ "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
-        "type" : "object",
-        "properties" : {
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
+        "title": "InstitutionResource",
+        "required": [
+          "address",
+          "externalId",
+          "fiscalCode",
+          "id",
+          "institutionType",
+          "mailAddress",
+          "name",
+          "origin",
+          "originId",
+          "status",
+          "userRole"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
           },
-          "externalId" : {
-            "type" : "string",
-            "description" : "Institution's unique external identifier"
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Institution's unique internal identifier"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "institutionType" : {
-            "type" : "string",
-            "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PT", "SCP" ]
+          "id": {
+            "type": "string",
+            "description": "Institution's unique internal identifier"
+          },
+          "institutionType": {
+            "type": "string",
+            "description": "Institution's type",
+            "enum": [
+              "GSP",
+              "PA",
+              "PT",
+              "SCP"
+            ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -1738,42 +1759,50 @@
           },
           "authorized" : {
             "type" : "boolean",
-            "description" : "flag indicating whether the logged user has the authorization to manage the product",
-            "example" : false
+            "description": "flag indicating whether the logged user has the authorization to manage the product",
+            "example": false
           },
-          "children" : {
-            "type" : "array",
-            "description" : "Product's sub products list",
-            "items" : {
-              "$ref" : "#/components/schemas/SubProductResource"
+          "children": {
+            "type": "array",
+            "description": "Product's sub products list",
+            "items": {
+              "$ref": "#/components/schemas/SubProductResource"
             }
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Product's description"
+          "description": {
+            "type": "string",
+            "description": "Product's description"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "logo" : {
-            "type" : "string",
-            "description" : "Product's logo"
+          "imageUrl": {
+            "type": "string",
+            "description": "Product's depict image"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "logo": {
+            "type": "string",
+            "description": "Product's logo"
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "status": {
+            "type": "string",
+            "description": "Product's status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           },
-          "urlBO" : {
-            "type" : "string",
-            "description" : "URL that redirects to the back-office section, where is possible to manage the product"
+          "title": {
+            "type": "string",
+            "description": "Product's title"
           },
-          "urlPublic" : {
+          "urlBO": {
+            "type": "string",
+            "description": "URL that redirects to the back-office section, where is possible to manage the product"
+          },
+          "urlPublic": {
             "type" : "string",
             "description" : "URL that redirects to the public information webpage of the product"
           },

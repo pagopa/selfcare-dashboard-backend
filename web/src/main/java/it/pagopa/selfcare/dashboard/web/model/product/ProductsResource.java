@@ -22,6 +22,9 @@ public class ProductsResource {
     @NotBlank
     private String logo;
 
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.imageUrl}")
+    private String imageUrl;
+
     @ApiModelProperty(value = "${swagger.dashboard.products.model.title}", required = true)
     @JsonProperty(required = true)
     @NotBlank
