@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Email;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -19,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class UpdateUserDtoTest {
 
     private Validator validator;
-    private static final UpdateUserDto USER_DTO = TestUtils.mockInstance(new UpdateUserDto());
+
 
     @BeforeEach
     void setUp() {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+
 
     @Test
     void validateNullFields() {
@@ -48,13 +50,35 @@ class UpdateUserDtoTest {
         assertTrue(filteredViolations.isEmpty());
     }
 
+
     @Test
     void validateNotNullFields() {
         // given
+        UpdateUserDto model = TestUtils.mockInstance(new UpdateUserDto());
+        model.setEmail("email@example.com");
         // when
-        Set<ConstraintViolation<Object>> violations = validator.validate(USER_DTO);
+        Set<ConstraintViolation<Object>> violations = validator.validate(model);
         // then
         assertTrue(violations.isEmpty());
+    }
+
+
+    @Test
+    void validate_emailFieldsNotValid() {
+        // given
+        HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
+        toCheckMap.put("email", Email.class);
+        UpdateUserDto model = TestUtils.mockInstance(new UpdateUserDto());
+        // when
+        Set<ConstraintViolation<Object>> violations = validator.validate(model);
+        // then
+        List<ConstraintViolation<Object>> filteredViolations = violations.stream()
+                .filter(violation -> {
+                    Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
+                    return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
+                })
+                .collect(Collectors.toList());
+        assertTrue(filteredViolations.isEmpty());
     }
 
 }
