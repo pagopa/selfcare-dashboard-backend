@@ -1486,15 +1486,15 @@
               "SCP"
             ]
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
-          "origin" : {
+          "origin": {
             "type" : "string",
             "description" : "Institution's data origin"
           },
@@ -1748,17 +1748,26 @@
         }
       },
       "ProductsResource" : {
-        "title" : "ProductsResource",
-        "required" : [ "authorized", "description", "id", "logo", "status", "title", "urlBO" ],
-        "type" : "object",
-        "properties" : {
-          "activatedAt" : {
-            "type" : "string",
-            "description" : "Date the products was activated",
-            "format" : "date-time"
+        "title": "ProductsResource",
+        "required": [
+          "authorized",
+          "description",
+          "id",
+          "imageUrl",
+          "logo",
+          "status",
+          "title",
+          "urlBO"
+        ],
+        "type": "object",
+        "properties": {
+          "activatedAt": {
+            "type": "string",
+            "description": "Date the products was activated",
+            "format": "date-time"
           },
-          "authorized" : {
-            "type" : "boolean",
+          "authorized": {
+            "type": "boolean",
             "description": "flag indicating whether the logged user has the authorization to manage the product",
             "example": false
           },
@@ -1803,12 +1812,12 @@
             "description": "URL that redirects to the back-office section, where is possible to manage the product"
           },
           "urlPublic": {
-            "type" : "string",
-            "description" : "URL that redirects to the public information webpage of the product"
+            "type": "string",
+            "description": "URL that redirects to the public information webpage of the product"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
