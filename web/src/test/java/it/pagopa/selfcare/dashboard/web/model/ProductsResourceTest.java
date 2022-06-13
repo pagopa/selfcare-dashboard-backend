@@ -36,6 +36,7 @@ class ProductsResourceTest {
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("id", NotBlank.class);
         toCheckMap.put("logo", NotBlank.class);
+        toCheckMap.put("imageUrl", NotBlank.class);
         toCheckMap.put("title", NotBlank.class);
         toCheckMap.put("description", NotBlank.class);
         toCheckMap.put("urlBO", NotBlank.class);
@@ -43,6 +44,7 @@ class ProductsResourceTest {
         ProductsResource productsResource = new ProductsResource();
         productsResource.setId(null);
         productsResource.setLogo(null);
+        productsResource.setImageUrl(null);
         productsResource.setTitle(null);
         productsResource.setDescription(null);
         productsResource.setUrlBO(null);
