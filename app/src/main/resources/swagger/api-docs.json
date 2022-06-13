@@ -1511,15 +1511,15 @@
             "type" : "string"
           }
         }, {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Results page you want to retrieve (0..N)",
-          "required" : false,
-          "style" : "form",
-          "allowReserved" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
+          "name": "page",
+          "in": "query",
+          "description": "Results page you want to retrieve (0..N)",
+          "required": false,
+          "style": "form",
+          "allowReserved": true,
+          "schema": {
+            "type": "integer",
+            "format": "int32"
           }
         },
           {
@@ -1533,17 +1533,18 @@
               "type": "integer",
               "format": "int32"
             }
-          }, {
-          "name" : "sort",
-          "in" : "query",
-          "description" : "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-          "required" : false,
-          "style" : "form",
-          "allowReserved" : true,
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
             }
           }
         }, {
@@ -2242,7 +2243,6 @@
           "externalId",
           "fiscalCode",
           "id",
-          "institutionType",
           "mailAddress",
           "name",
           "origin",
@@ -2299,12 +2299,12 @@
             "description": "Institution's identifier related to origin"
           },
           "status": {
-            "type" : "string",
-            "description" : "Institution's status"
+            "type": "string",
+            "description": "Institution's status"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
           }
         }
       },
@@ -2365,12 +2365,12 @@
             "format": "email",
             "example": "email@example.com"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "name" : {
+          "name": {
             "type": "string",
             "description": "User's name"
           },
@@ -2858,14 +2858,17 @@
             "type": "string",
             "description": "Users group's name"
           },
-          "productId" : {
-            "type" : "string",
-            "description" : "Users group's productId"
+          "productId": {
+            "type": "string",
+            "description": "Users group's productId"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Users group's status",
-            "enum" : [ "ACTIVE", "SUSPENDED" ]
+          "status": {
+            "type": "string",
+            "description": "Users group's status",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ]
           }
         }
       },
