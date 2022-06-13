@@ -212,8 +212,8 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
+              "application/json": {
+                "schema": {
                   "type": "object"
                 }
               },
@@ -672,10 +672,10 @@
             }
           }
         ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
@@ -2354,15 +2354,18 @@
           },
           "products" : {
             "type" : "array",
-            "description" : "Authorized user products",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductInfoResource"
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
             }
           },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
           "status": {
             "type": "string",
@@ -2469,14 +2472,14 @@
             "description": "Product's unique identifier"
           },
           "roleInfos": {
-            "type" : "array",
-            "description" : "User's role infos in product",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductRoleInfoResource"
+            "type": "array",
+            "description": "User's role infos in product",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleInfoResource"
             }
           },
-          "title" : {
-            "type" : "string",
+          "title": {
+            "type": "string",
             "description" : "Product's title"
           }
         }
@@ -2798,14 +2801,14 @@
             "description": "Users group's institutionId"
           },
           "membersCount": {
-            "type" : "integer",
-            "description" : "Number all the members of the group",
-            "format" : "int32"
+            "type": "integer",
+            "description": "Number all the members of the group",
+            "format": "int32"
           },
-          "modifiedAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was modified",
-            "format" : "date-time"
+          "modifiedAt": {
+            "type": "string",
+            "description": "Date on which the group was modified",
+            "format": "date-time"
           },
           "modifiedBy" : {
             "type" : "string",
