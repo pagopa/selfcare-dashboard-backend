@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserGroupService {
-    void createUserGroup(CreateUserGroup group);
+    String createUserGroup(CreateUserGroup group);
 
     void delete(String groupId);
 

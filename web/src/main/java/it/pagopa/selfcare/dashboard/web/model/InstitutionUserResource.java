@@ -19,6 +19,7 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import lombok.Data;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -45,6 +46,7 @@ public class InstitutionUserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.email}", required = true)
     @JsonProperty(required = true)
     @NotBlank
+    @Email
     private String email;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.role}", required = true)

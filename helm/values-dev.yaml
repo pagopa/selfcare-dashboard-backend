@@ -1,6 +1,10 @@
 image:
   repository: selcdacr.azurecr.io/selfcaredashboardbackend
 
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://dev.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002"
+
 autoscaling:
   enabled: false
   minReplicas: 1

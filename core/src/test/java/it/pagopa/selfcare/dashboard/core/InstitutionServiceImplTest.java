@@ -41,6 +41,7 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -81,22 +82,22 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        Mockito.when(partyConnectorMock.getOnBoardedInstitution(Mockito.any()))
+        when(partyConnectorMock.getOnBoardedInstitution(Mockito.any()))
                 .thenReturn(expectedInstitutionInfo);
         // when
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         // then
         assertSame(expectedInstitutionInfo, institutionInfo);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getOnBoardedInstitution(institutionId);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock);
     }
 
     @Test
     void getInstitutions() {
         // given
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        Mockito.when(partyConnectorMock.getOnBoardedInstitutions())
+        when(partyConnectorMock.getOnBoardedInstitutions())
                 .thenReturn(List.of(expectedInstitutionInfo));
         // when
         Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
@@ -104,25 +105,25 @@ class InstitutionServiceImplTest {
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
         assertSame(expectedInstitutionInfo, institutions.iterator().next());
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getOnBoardedInstitutions();
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock);
     }
 
     @Test
     void getInstitutionProducts_emptyProducts() {
         //given
         String institutionId = "institutionId";
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(Collections.emptyList());
         //when
         List<ProductTree> products = institutionService.getInstitutionProducts(institutionId);
         //then
         Assertions.assertNotNull(products);
         Assertions.assertTrue(products.isEmpty());
-        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
-        Mockito.verifyNoMoreInteractions(productsConnectorMock);
-        Mockito.verifyNoInteractions(partyConnectorMock);
+        verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
     }
 
     @Test
@@ -131,7 +132,7 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         ProductTree product = mockInstance(new ProductTree());
         List<ProductTree> productList = List.of(product);
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(productList);
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(LIMITED, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -143,9 +144,9 @@ class InstitutionServiceImplTest {
         //then
         Assertions.assertNotNull(products);
         Assertions.assertIterableEquals(productList, products);
-        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
-        Mockito.verifyNoMoreInteractions(productsConnectorMock);
-        Mockito.verifyNoInteractions(partyConnectorMock);
+        verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
     }
 
     @Test
@@ -153,9 +154,9 @@ class InstitutionServiceImplTest {
         //given
         String institutionId = "institutionId";
         ProductTree product = mockInstance(new ProductTree());
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(product));
-        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+        when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(Collections.emptyList());
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(LIMITED, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -167,9 +168,9 @@ class InstitutionServiceImplTest {
         //then
         Assertions.assertNotNull(products);
         Assertions.assertTrue(products.isEmpty());
-        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
+        verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -179,9 +180,9 @@ class InstitutionServiceImplTest {
         ProductTree product = mockInstance(new ProductTree());
         Product children = mockInstance(new Product());
         product.setChildren(List.of(children));
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(product));
-        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+        when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(Collections.emptyList());
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(ADMIN, "productRole", product.getNode().getId());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -195,9 +196,9 @@ class InstitutionServiceImplTest {
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(1, products.size());
         Assertions.assertEquals(ProductStatus.INACTIVE, products.get(0).getNode().getStatus());
-        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
+        verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -208,7 +209,7 @@ class InstitutionServiceImplTest {
         ProductTree p2 = mockInstance(new ProductTree(), 2);
         ProductTree p3 = mockInstance(new ProductTree(), 3);
         ProductTree p4 = mockInstance(new ProductTree(), 4);
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(p1, p2, p3, p4));
         PartyProduct pp1 = new PartyProduct();
         pp1.setId(p1.getNode().getId());
@@ -219,7 +220,7 @@ class InstitutionServiceImplTest {
         PartyProduct pp4 = new PartyProduct();
         pp4.setId(p4.getNode().getId());
         pp4.setStatus(ProductStatus.PENDING);
-        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+        when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(LIMITED, "productRole2", p2.getNode().getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(LIMITED, "productRole3", p3.getNode().getId());
@@ -244,9 +245,9 @@ class InstitutionServiceImplTest {
             Assertions.assertEquals(LIMITED.name(), product.getNode().getUserRole());
         });
 
-        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
-        Mockito.verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
+        verify(partyConnectorMock, Mockito.times(1)).getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -257,7 +258,7 @@ class InstitutionServiceImplTest {
         ProductTree p2 = mockInstance(new ProductTree(), 2);
         ProductTree p3 = mockInstance(new ProductTree(), 3);
         ProductTree p4 = mockInstance(new ProductTree(), 4);
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(p1, p2, p3));
         PartyProduct pp1 = new PartyProduct();
         pp1.setId(p1.getNode().getId());
@@ -268,7 +269,7 @@ class InstitutionServiceImplTest {
         PartyProduct pp4 = new PartyProduct();
         pp4.setId(p4.getNode().getId());
         pp4.setStatus(ProductStatus.PENDING);
-        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+        when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(ADMIN, "productRole2", p2.getNode().getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(ADMIN, "productRole3", p3.getNode().getId());
@@ -299,11 +300,11 @@ class InstitutionServiceImplTest {
                 Assertions.assertNull(product.getNode().getUserRole());
             }
         });
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getInstitutionProducts(institutionId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -315,7 +316,7 @@ class InstitutionServiceImplTest {
         Product children1 = mockInstance(new Product(), 1);
         Product children2 = mockInstance(new Product(), 2);
         p1.setChildren(List.of(children1, children2));
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(p1, p2));
         PartyProduct pp1 = new PartyProduct();
         pp1.setId(p1.getNode().getId());
@@ -323,7 +324,7 @@ class InstitutionServiceImplTest {
         PartyProduct pp2 = new PartyProduct();
         pp2.setId(p2.getNode().getId());
         pp2.setStatus(ProductStatus.ACTIVE);
-        Mockito.when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
+        when(partyConnectorMock.getInstitutionProducts(Mockito.any()))
                 .thenReturn(List.of(pp1, pp2));
         ProductGrantedAuthority productGrantedAuthority1 = new ProductGrantedAuthority(LIMITED, "productRole1", p1.getNode().getId());
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(LIMITED, "productRole2", p2.getNode().getId());
@@ -354,11 +355,11 @@ class InstitutionServiceImplTest {
                 Assertions.assertNull(product.getNode().getUserRole());
             }
         });
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getInstitutionProducts(institutionId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -373,7 +374,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -388,7 +389,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Product id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -403,7 +404,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional product role object is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -418,7 +419,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional role object is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -440,9 +441,9 @@ class InstitutionServiceImplTest {
         Map<String, WorkContact> workContact = new HashMap<>();
         workContact.put(institutionId, contact);
         user.setWorkContacts(workContact);
-        Mockito.when(partyConnectorMock.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(Collections.singletonList(userInfo));
-        Mockito.when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
+        when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
                 .thenReturn(user);
         // when
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
@@ -453,7 +454,7 @@ class InstitutionServiceImplTest {
             TestUtils.checkNotNullFields(userInfo1.getUser());
         });
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(role, capturedFilter.getRole());
@@ -462,14 +463,14 @@ class InstitutionServiceImplTest {
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
         ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
-        Mockito.verify(userRegistryConnector, Mockito.times(1))
+        verify(userRegistryConnector, Mockito.times(1))
                 .getUserByInternalId(Mockito.eq(userId), filedsCaptor.capture());
         EnumSet<Fields> capturedFields = filedsCaptor.getValue();
         assertTrue(capturedFields.contains(name));
         assertTrue(capturedFields.contains(familyName));
         assertTrue(capturedFields.contains(workContacts));
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, userRegistryConnector);
-        Mockito.verifyNoInteractions(productsConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock);
     }
 
     @Test
@@ -491,9 +492,9 @@ class InstitutionServiceImplTest {
         Map<String, WorkContact> workContact = new HashMap<>();
         workContact.put(institutionId, contact);
         user.setWorkContacts(workContact);
-        Mockito.when(partyConnectorMock.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.anyString(), Mockito.any()))
                 .thenReturn(Collections.singletonList(userInfo));
-        Mockito.when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
+        when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
                 .thenReturn(user);
         //when
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
@@ -504,7 +505,7 @@ class InstitutionServiceImplTest {
             TestUtils.checkNotNullFields(userInfo1.getUser());
         });
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(role, capturedFilter.getRole());
@@ -513,14 +514,14 @@ class InstitutionServiceImplTest {
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getAllowedStates());
         ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
-        Mockito.verify(userRegistryConnector, Mockito.times(1))
+        verify(userRegistryConnector, Mockito.times(1))
                 .getUserByInternalId(Mockito.eq(userId), filedsCaptor.capture());
         EnumSet<Fields> capturedFields = filedsCaptor.getValue();
         assertTrue(capturedFields.contains(name));
         assertTrue(capturedFields.contains(familyName));
         assertTrue(capturedFields.contains(workContacts));
         assertFalse(capturedFields.contains(fiscalCode));
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, userRegistryConnector);
+        verifyNoMoreInteractions(partyConnectorMock, userRegistryConnector);
     }
 
     @Test
@@ -537,10 +538,10 @@ class InstitutionServiceImplTest {
         Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
         // then
         Assertions.assertNotNull(userInfos);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(institutionId, userInfoFilter);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
-        Mockito.verifyNoInteractions(productsConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock);
     }
 
     @Test
@@ -556,7 +557,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -572,7 +573,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional Product id object is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -588,7 +589,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional product role object is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -603,7 +604,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional role object is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
     }
 
     @Test
@@ -631,16 +632,16 @@ class InstitutionServiceImplTest {
         Map<String, WorkContact> workContact = new HashMap<>();
         workContact.put(institutionId, contact);
         userMock.setWorkContacts(workContact);
-        Mockito.when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
+        when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
                 .thenReturn(userMock);
 
-        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1));
         Product product1 = mockInstance(new Product(), "setId");
         product1.setId(productId1);
 
         Map<String, Product> idToProductMap = Map.of(productId1, product1);
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(idToProductMap.values().stream()
                         .map(product -> {
                             final ProductTree productTree = new ProductTree();
@@ -660,7 +661,7 @@ class InstitutionServiceImplTest {
             Assertions.assertEquals(idToProductMap.get(productInfo.getId()).getTitle(), productInfo.getTitle());
         }
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getRole());
@@ -668,17 +669,17 @@ class InstitutionServiceImplTest {
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(userId, capturedFilter.getUserId());
         assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
         ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
-        Mockito.verify(userRegistryConnector, Mockito.times(1))
+        verify(userRegistryConnector, Mockito.times(1))
                 .getUserByInternalId(Mockito.eq("userId1"), filedsCaptor.capture());
         EnumSet<Fields> capturedFields = filedsCaptor.getValue();
         assertTrue(capturedFields.contains(name));
         assertTrue(capturedFields.contains(familyName));
         assertTrue(capturedFields.contains(workContacts));
         assertTrue(capturedFields.contains(fiscalCode));
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
     }
 
     @Test
@@ -692,7 +693,7 @@ class InstitutionServiceImplTest {
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A user id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
 
     }
 
@@ -703,7 +704,7 @@ class InstitutionServiceImplTest {
         Optional<String> userId = Optional.of("userId1");
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setUserId(userId);
-        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
                 .thenReturn(Collections.emptyList());
         // when
         Executable executable = () -> institutionService.getInstitutionUser(institutionId, userId.get());
@@ -711,7 +712,7 @@ class InstitutionServiceImplTest {
         ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
         Assertions.assertEquals("No User found for the given userId", e.getMessage());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getRole());
@@ -719,9 +720,9 @@ class InstitutionServiceImplTest {
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(userId, capturedFilter.getUserId());
         assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock, userRegistryConnector);
+        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock, userRegistryConnector);
     }
 
 
@@ -735,11 +736,11 @@ class InstitutionServiceImplTest {
         UserInfo userInfoMock = mockInstance(new UserInfo(), "setProducts");
         final ProductInfo productInfoMock = mockInstance(new ProductInfo(), 1, "setRoleInfos");
         userInfoMock.setProducts(Map.of(productInfoMock.getId(), productInfoMock));
-        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock));
         final ProductTree productTree = mockInstance(new ProductTree(), 2, "setChildren");
         productTree.setChildren(Collections.emptyList());
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(productTree));
         // when
         Executable executable = () -> institutionService.getInstitutionUser(institutionId, userId.get());
@@ -747,7 +748,7 @@ class InstitutionServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("No matching product found with id " + productInfoMock.getId(), e.getMessage());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getRole());
@@ -755,9 +756,9 @@ class InstitutionServiceImplTest {
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(userId, capturedFilter.getUserId());
         assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock, userRegistryConnector);
+        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock, userRegistryConnector);
     }
 
 
@@ -782,15 +783,15 @@ class InstitutionServiceImplTest {
         Map<String, WorkContact> workContact = new HashMap<>();
         workContact.put(institutionId, contact);
         userMock.setWorkContacts(workContact);
-        Mockito.when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
+        when(userRegistryConnector.getUserByInternalId(Mockito.anyString(), Mockito.any()))
                 .thenReturn(userMock);
 
-        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock));
         final ProductTree productTreeMock = mockInstance(new ProductTree(), 1, "setChildren");
         final Product productChildMock = mockInstance(new Product(), 2);
         productTreeMock.setChildren(List.of(productChildMock));
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(productTreeMock));
         // when
         UserInfo userInfo = institutionService.getInstitutionUser(institutionId, userId.get());
@@ -800,19 +801,19 @@ class InstitutionServiceImplTest {
         TestUtils.checkNotNullFields(userInfo);
         TestUtils.checkNotNullFields(userInfo.getUser());
         Assertions.assertFalse(userInfo.getProducts().containsKey(productInfoMock2.getId()));
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), Mockito.any(UserInfo.UserInfoFilter.class));
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
         ArgumentCaptor<EnumSet<Fields>> fieldsCaptor = ArgumentCaptor.forClass(EnumSet.class);
-        Mockito.verify(userRegistryConnector, Mockito.times(1))
+        verify(userRegistryConnector, Mockito.times(1))
                 .getUserByInternalId(Mockito.eq("userId1"), fieldsCaptor.capture());
         EnumSet<Fields> capturedFields = fieldsCaptor.getValue();
         assertTrue(capturedFields.contains(name));
         assertTrue(capturedFields.contains(familyName));
         assertTrue(capturedFields.contains(workContacts));
         assertTrue(capturedFields.contains(fiscalCode));
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
     }
 
     @Test
@@ -856,7 +857,7 @@ class InstitutionServiceImplTest {
         HashMap<String, ProductInfo> products2 = new HashMap<>();
         products2.put(productId3, productInfo3);
         userInfoMock2.setProducts(products2);
-        Mockito.when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
+        when(partyConnectorMock.getUsers(Mockito.any(), Mockito.any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2));
         Product product1 = mockInstance(new Product(), 1, "setId");
         product1.setId(productId1);
@@ -865,16 +866,16 @@ class InstitutionServiceImplTest {
         Product product3 = mockInstance(new Product(), 3, "setId");
         product3.setId(productId3);
         Map<String, Product> idToProductMap = Map.of(productId1, product1, productId2, product2, productId3, product3);
-        Mockito.when(productsConnectorMock.getProductsTree())
+        when(productsConnectorMock.getProductsTree())
                 .thenReturn(idToProductMap.values().stream()
                         .map(product -> {
                             final ProductTree productTree = new ProductTree();
                             productTree.setNode(product);
                             return productTree;
                         }).collect(Collectors.toList()));
-        Mockito.when(userRegistryConnector.getUserByInternalId(Mockito.eq(userId1), Mockito.any()))
+        when(userRegistryConnector.getUserByInternalId(Mockito.eq(userId1), Mockito.any()))
                 .thenReturn(userMock1);
-        Mockito.when(userRegistryConnector.getUserByInternalId(Mockito.eq(userId2), Mockito.any()))
+        when(userRegistryConnector.getUserByInternalId(Mockito.eq(userId2), Mockito.any()))
                 .thenReturn(userMock2);
         // when
         Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
@@ -895,7 +896,7 @@ class InstitutionServiceImplTest {
         }
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        verify(partyConnectorMock, Mockito.times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(role, capturedFilter.getRole());
@@ -905,7 +906,7 @@ class InstitutionServiceImplTest {
         assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
         ArgumentCaptor<String> userIdCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
-        Mockito.verify(userRegistryConnector, Mockito.times(2))
+        verify(userRegistryConnector, Mockito.times(2))
                 .getUserByInternalId(userIdCaptor.capture(), filedsCaptor.capture());
         EnumSet<Fields> capturedFields = filedsCaptor.getValue();
         List<String> userIds = userIdCaptor.getAllValues();
@@ -914,9 +915,9 @@ class InstitutionServiceImplTest {
         assertTrue(capturedFields.contains(familyName));
         assertTrue(capturedFields.contains(workContacts));
         assertFalse(capturedFields.contains(fiscalCode));
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProductsTree();
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
+        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
     }
 
     @Test
@@ -930,7 +931,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
     }
 
     @Test
@@ -944,7 +945,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Product id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
     }
 
     @Test
@@ -958,7 +959,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An User is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
     }
 
     @ParameterizedTest
@@ -1009,20 +1010,20 @@ class InstitutionServiceImplTest {
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
         map.put(partyRole, productRoleInfo);
         product.setRoleMappings(map);
-        Mockito.when(userRegistryConnector.saveUser(Mockito.any()))
+        when(userRegistryConnector.saveUser(Mockito.any()))
                 .thenReturn(userId);
-        Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
+        when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
         // when
         Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
         // then
         if (PartyRole.SUB_DELEGATE.equals(partyRole) || PartyRole.OPERATOR.equals(partyRole)) {
             assertDoesNotThrow(executable);
-            Mockito.verify(userRegistryConnector, Mockito.times(1))
+            verify(userRegistryConnector, Mockito.times(1))
                     .saveUser(createUserDto.getUser());
-            Mockito.verify(partyConnectorMock, Mockito.times(1))
+            verify(partyConnectorMock, Mockito.times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(id.toString()), createUserDtoCaptor.capture());
-            Mockito.verify(notificationServiceMock, Mockito.times(1)).
+            verify(notificationServiceMock, Mockito.times(1)).
                     sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
             createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
                 createUserDto.getRoles().forEach(role -> {
@@ -1035,17 +1036,202 @@ class InstitutionServiceImplTest {
                 }
             });
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
-            Mockito.verifyNoMoreInteractions(partyConnectorMock);
+            verifyNoMoreInteractions(partyConnectorMock);
         } else {
             InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
             createUserDto.getRoles().forEach(role -> {
                 Assertions.assertEquals(String.format("Product role '%s' is not valid", role.getProductRole()), e.getMessage());
             });
-            Mockito.verifyNoInteractions(partyConnectorMock);
+            verifyNoInteractions(partyConnectorMock);
         }
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
+        verify(productsConnectorMock, Mockito.times(1))
                 .getProduct(productId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoMoreInteractions(productsConnectorMock);
     }
 
+    @Test
+    void createUsers() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoleCode1 = "productRoleCode";
+        String productRoleLabel1 = "productRoleLabel";
+        UUID id = UUID.randomUUID();
+        UserId userId = new UserId();
+        userId.setId(id);
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        roleMock1.setPartyRole(PartyRole.OPERATOR);
+        roleMock1.setProductRole(productRoleCode1);
+        createUserDto.setRoles(Set.of(roleMock1));
+        Product product = mockInstance(new Product());
+        product.setId(productId);
+        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        productRole1.setCode(productRoleCode1);
+        productRole1.setLabel(productRoleLabel1);
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        productRoleInfo.setRoles(List.of(productRole1));
+        EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+        map.put(PartyRole.OPERATOR, productRoleInfo);
+        product.setRoleMappings(map);
+        when(userRegistryConnector.saveUser(Mockito.any()))
+                .thenReturn(userId);
+        when(productsConnectorMock.getProduct(Mockito.anyString()))
+                .thenReturn(product);
+        //when
+        UserId result = institutionService.createUsers(institutionId, productId, createUserDto);
+        //then
+        assertEquals(userId.getId(), result.getId());
+        verify(userRegistryConnector, times(1))
+                .saveUser(createUserDto.getUser());
+        verify(partyConnectorMock, times(1))
+                .createUsers(institutionId, productId, userId.getId().toString(), createUserDto);
+        verify(notificationServiceMock, Mockito.times(1)).
+                sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
+        verify(productsConnectorMock, times(1))
+                .getProduct(productId);
+        verifyNoMoreInteractions(userRegistryConnector, partyConnectorMock, notificationServiceMock);
+    }
+
+    @Test
+    void addUserProductRoles_nullInstitutionId() {
+        //given
+        String institutionId = null;
+        String productId = null;
+        String userId = null;
+        CreateUserDto createUserDto = null;
+        //when
+        Executable executable = () -> institutionService.addUserProductRoles(institutionId, productId, userId, createUserDto);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+    }
+
+    @Test
+    void addUserProductRoles_nullProductId() {
+        //given
+        String institutionId = "institutionId";
+        String productId = null;
+        String userId = null;
+        CreateUserDto createUserDto = null;
+        //when
+        Executable executable = () -> institutionService.addUserProductRoles(institutionId, productId, userId, createUserDto);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A Product id is required", e.getMessage());
+        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+    }
+
+    @Test
+    void addUserProductRoles_nullUserId() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String userId = null;
+        CreateUserDto createUserDto = null;
+        //when
+        Executable executable = () -> institutionService.addUserProductRoles(institutionId, productId, userId, createUserDto);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A User id is required", e.getMessage());
+        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+    }
+
+    @Test
+    void addUserProductRoles_nullUser() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String userId = "userId";
+        CreateUserDto createUserDto = null;
+        //when
+        Executable executable = () -> institutionService.addUserProductRoles(institutionId, productId, userId, createUserDto);
+        //then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An User is required", e.getMessage());
+        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PartyRole.class)
+    void addUserProductRoles(PartyRole partyRole) {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoleCode1 = "productRoleCode";
+        String productRoleLabel1 = "productRoleLabel";
+        String productRoleCode2 = "productRoleCode2";
+        String productRoleLabel2 = "productRoleLabel2";
+        String productRoleCode3 = "productRoleCode3";
+        String productRoleLabel3 = "productRoleLabel3";
+        String userId = UUID.randomUUID().toString();
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
+        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        CreateUserDto.Role roleMock2 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        CreateUserDto.Role roleMock3 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        if (PartyRole.MANAGER.equals(partyRole) || PartyRole.DELEGATE.equals(partyRole)) {
+            roleMock1.setPartyRole(partyRole);
+            roleMock1.setProductRole(productRoleCode1);
+            createUserDto.setRoles(Set.of(roleMock1));
+        } else {
+            roleMock1.setPartyRole(partyRole);
+            roleMock1.setProductRole(productRoleCode1);
+            roleMock2.setPartyRole(partyRole);
+            roleMock2.setProductRole(productRoleCode2);
+            roleMock3.setPartyRole(partyRole);
+            roleMock3.setProductRole(productRoleCode3);
+            createUserDto.setRoles(Set.of(roleMock1, roleMock2, roleMock3));
+        }
+        Product product = mockInstance(new Product());
+        product.setId(productId);
+        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        productRole1.setCode(productRoleCode1);
+        productRole1.setLabel(productRoleLabel1);
+        ProductRoleInfo.ProductRole productRole2 = new ProductRoleInfo.ProductRole();
+        productRole2.setCode(productRoleCode2);
+        productRole2.setLabel(productRoleLabel2);
+        ProductRoleInfo.ProductRole productRole3 = new ProductRoleInfo.ProductRole();
+        productRole3.setCode(productRoleCode3);
+        productRole3.setLabel(productRoleLabel3);
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        productRoleInfo.setRoles(List.of(productRole1, productRole2, productRole3));
+        EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+        map.put(partyRole, productRoleInfo);
+        product.setRoleMappings(map);
+        when(productsConnectorMock.getProduct(Mockito.anyString()))
+                .thenReturn(product);
+        // when
+        Executable executable = () -> institutionService.addUserProductRoles(institutionId, productId, userId, createUserDto);
+        // then
+        if (PartyRole.SUB_DELEGATE.equals(partyRole) || PartyRole.OPERATOR.equals(partyRole)) {
+            assertDoesNotThrow(executable);
+            verify(partyConnectorMock, Mockito.times(1))
+                    .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(userId), createUserDtoCaptor.capture());
+            verify(notificationServiceMock, Mockito.times(1)).
+                    sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, createUserDto.getRoles());
+            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
+                createUserDto.getRoles().forEach(role -> {
+                    if (role.getLabel().equals(role1.getLabel())) {
+                        Assertions.assertEquals(role.getPartyRole(), role1.getPartyRole());
+                        Assertions.assertEquals(role.getLabel(), role1.getLabel());
+                    }
+                });
+                {
+                }
+            });
+            TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
+            verifyNoMoreInteractions(partyConnectorMock);
+        } else {
+            InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
+            createUserDto.getRoles().forEach(role -> {
+                Assertions.assertEquals(String.format("Product role '%s' is not valid", role.getProductRole()), e.getMessage());
+            });
+            verifyNoInteractions(partyConnectorMock);
+        }
+        verify(productsConnectorMock, Mockito.times(1))
+                .getProduct(productId);
+        verifyNoInteractions(userRegistryConnector);
+        verifyNoMoreInteractions(productsConnectorMock);
+    }
 }

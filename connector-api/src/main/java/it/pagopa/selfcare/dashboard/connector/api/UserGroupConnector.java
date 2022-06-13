@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 public interface UserGroupConnector {
-    void createUserGroup(CreateUserGroup userGroupDto);
+    String createUserGroup(CreateUserGroup userGroupDto);
 
     void delete(String groupId);
 

@@ -67,7 +67,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     }
 
     @Override
-    public void createUserGroup(CreateUserGroup userGroup) {
+    public String createUserGroup(CreateUserGroup userGroup) {
         log.trace("createUserGroup start");
         log.debug("createUserGroup userGroup = {}", userGroup);
         Assert.notNull(userGroup, "A User Group is required");
@@ -78,9 +78,10 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         userGroupRequest.setProductId(userGroup.getProductId());
         userGroupRequest.setName(userGroup.getName());
         userGroupRequest.setStatus(UserGroupStatus.ACTIVE);
-        restClient.createUserGroup(userGroupRequest);
-        log.debug("userGroupRequest = {}", userGroupRequest);
+        String groupId = restClient.createUserGroup(userGroupRequest).getId();
+        log.debug("createUserGroup result = {}", groupId);
         log.trace("createUserGroup end");
+        return groupId;
     }
 
     @Override

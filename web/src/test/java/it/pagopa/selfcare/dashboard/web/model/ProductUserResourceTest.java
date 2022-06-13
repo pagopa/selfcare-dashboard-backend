@@ -10,6 +10,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
@@ -69,11 +70,32 @@ class ProductUserResourceTest {
     void validateNotNullFields() {
         // given
         ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource(), "setRoleInfos");
+        resource.setEmail("email@example.com");
         resource.getProduct().setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then
         assertTrue(violations.isEmpty());
+    }
+
+
+    @Test
+    void validate_emailFieldsNotValid() {
+        // given
+        HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
+        toCheckMap.put("email", Email.class);
+        ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource(), "setRoleInfos");
+        resource.getProduct().setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
+        // when
+        Set<ConstraintViolation<Object>> violations = validator.validate(resource);
+        // then
+        List<ConstraintViolation<Object>> filteredViolations = violations.stream()
+                .filter(violation -> {
+                    Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
+                    return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
+                })
+                .collect(Collectors.toList());
+        assertTrue(filteredViolations.isEmpty());
     }
 
 }

@@ -14,5 +14,7 @@ public interface NotificationService {
 
     void sendSuspendedUserNotification(String relationshipId);
 
+    void sendAddedProductRoleNotification(String institutionId, String productTitle, String userId, Set<CreateUserDto.Role> productRoles);
+
 
 }

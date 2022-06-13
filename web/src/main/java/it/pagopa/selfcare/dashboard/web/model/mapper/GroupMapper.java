@@ -65,6 +65,15 @@ public class GroupMapper {
         return resource;
     }
 
+    public static UserGroupIdResource toIdResource(String groupId) {
+        UserGroupIdResource resource = null;
+        if (groupId != null) {
+            resource = new UserGroupIdResource();
+            resource.setId(groupId);
+        }
+        return resource;
+    }
+
     public static PlainUserResource toPlainResource(User model) {
         return Optional.ofNullable(model)
                 .map(user -> {

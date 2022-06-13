@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.core.config;
 
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,8 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 
 import java.net.URL;
 import java.util.Properties;
-import java.util.concurrent.Executor;
 
+@Slf4j
 @Configuration
 @PropertySource("classpath:config/core-config.properties")
 @EnableAsync
@@ -27,14 +28,12 @@ import java.util.concurrent.Executor;
 class CoreConfig implements AsyncConfigurer {
 
     private final URL rootTemplateUrl;
-    private final TaskExecutorBuilder taskExecutorBuilder;
 
 
     @Autowired
-    public CoreConfig(@Value("${dashboard.notification.template.default-url}") URL rootTemplateUrl,
-                      TaskExecutorBuilder taskExecutorBuilder) {
+    public CoreConfig(@Value("${dashboard.notification.template.default-url}") URL rootTemplateUrl) {
+        log.trace("Initializing {}", CoreConfig.class.getSimpleName());
         this.rootTemplateUrl = rootTemplateUrl;
-        this.taskExecutorBuilder = taskExecutorBuilder;
     }
 
 
@@ -62,9 +61,9 @@ class CoreConfig implements AsyncConfigurer {
     }
 
 
-    @Override
-    public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor delegate = taskExecutorBuilder.build();
+    @Bean
+    public DelegatingSecurityContextAsyncTaskExecutor taskExecutor(TaskExecutorBuilder taskExecutorBuilder) {
+        final ThreadPoolTaskExecutor delegate = taskExecutorBuilder.build();
         delegate.initialize();
         return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
     }
