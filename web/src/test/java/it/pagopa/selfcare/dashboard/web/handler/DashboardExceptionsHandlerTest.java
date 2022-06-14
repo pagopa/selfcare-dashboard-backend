@@ -1,15 +1,19 @@
 package it.pagopa.selfcare.dashboard.web.handler;
 
-import it.pagopa.selfcare.commons.web.model.ErrorResource;
+import it.pagopa.selfcare.commons.web.model.Problem;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
+import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 class DashboardExceptionsHandlerTest {
 
@@ -23,57 +27,45 @@ class DashboardExceptionsHandlerTest {
     }
 
 
-    @Test
-    void handleFileValidationException() {
+    @ParameterizedTest
+    @ValueSource(classes = {
+            FileValidationException.class,
+            InvalidProductRoleException.class
+    })
+    void handleBadRequestException(Class<?> clazz) {
         // given
-        FileValidationException exceptionMock = Mockito.mock(FileValidationException.class);
+        Exception exceptionMock = (Exception) Mockito.mock(clazz);
         Mockito.when(exceptionMock.getMessage())
                 .thenReturn(DETAIL_MESSAGE);
         // when
-        ErrorResource resource = handler.handleFileValidationException(exceptionMock);
+        ResponseEntity<Problem> responseEntity = handler.handleBadRequestException(exceptionMock);
         // then
-        assertNotNull(resource);
-        assertEquals(DETAIL_MESSAGE, resource.getMessage());
+        assertNotNull(responseEntity);
+        assertEquals(BAD_REQUEST, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
+        assertEquals(BAD_REQUEST.value(), responseEntity.getBody().getStatus());
     }
 
 
-    @Test
-    void handleInvalidProductRoleException() {
+    @ParameterizedTest
+    @ValueSource(classes = {
+            ResourceNotFoundException.class,
+            InvalidUserGroupException.class
+    })
+    void handleNotFoundException(Class<?> clazz) {
         // given
-        InvalidProductRoleException exceptionMock = Mockito.mock(InvalidProductRoleException.class);
+        Exception exceptionMock = (Exception) Mockito.mock(clazz);
         Mockito.when(exceptionMock.getMessage())
                 .thenReturn(DETAIL_MESSAGE);
         // when
-        ErrorResource resource = handler.handleInvalidProductRoleException(exceptionMock);
+        ResponseEntity<Problem> responseEntity = handler.handleNotFoundException(exceptionMock);
         // then
-        assertNotNull(resource);
-        assertEquals(DETAIL_MESSAGE, resource.getMessage());
-    }
-
-    @Test
-    void handleResourceNotFoundException() {
-        //given
-        ResourceNotFoundException exceptionMock = Mockito.mock(ResourceNotFoundException.class);
-        Mockito.when(exceptionMock.getMessage())
-                .thenReturn(DETAIL_MESSAGE);
-        //when
-        ErrorResource resource = handler.handleResourceNotFoundException(exceptionMock);
-        //then
-        assertNotNull(resource);
-        assertEquals(DETAIL_MESSAGE, resource.getMessage());
-    }
-
-    @Test
-    void handleInvalidUserGroupException() {
-        //given
-        InvalidUserGroupException exceptionMock = Mockito.mock(InvalidUserGroupException.class);
-        Mockito.when(exceptionMock.getMessage())
-                .thenReturn(DETAIL_MESSAGE);
-        //when
-        ErrorResource resource = handler.handleInvalidUserGroupException(exceptionMock);
-        //then
-        assertNotNull(resource);
-        assertEquals(DETAIL_MESSAGE, resource.getMessage());
+        assertNotNull(responseEntity);
+        assertEquals(NOT_FOUND, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
+        assertEquals(NOT_FOUND.value(), responseEntity.getBody().getStatus());
     }
 
 }

@@ -6,8 +6,15 @@
     "version" : "0.0.1-SNAPSHOT"
   },
   "servers" : [ {
-    "url" : "http://localhost:80",
-    "description" : "Inferred Url"
+    "url": "{basePath}:{port}",
+    "variables": {
+      "basePath": {
+        "default": "http://localhost"
+      },
+      "port": {
+        "default": "8080"
+      }
+    }
   } ],
   "tags" : [ {
     "name" : "institutions",
@@ -39,24 +46,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -81,24 +119,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -143,29 +212,47 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               },
-              "multipart/form-data" : {
-                "schema" : {
-                  "type" : "object"
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
           },
-          "201" : {
-            "description" : "Created"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -193,24 +280,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductsResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductsResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -267,24 +385,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductUserResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductUserResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -335,14 +484,35 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -407,14 +577,35 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -470,38 +661,70 @@
             }
           },
           {
-          "name" : "productRoles",
-          "in" : "query",
-          "description" : "User's roles in product",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string"
+            "name": "productRoles",
+            "in": "query",
+            "description": "User's roles in product",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionUserResource"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionUserResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -535,24 +758,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionUserDetailsResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionUserDetailsResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -580,24 +834,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductRoleMappingsResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductRoleMappingsResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -622,14 +907,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -654,20 +963,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -692,20 +1019,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -739,24 +1084,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/IdentityTokenResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityTokenResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -790,24 +1166,45 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserIdResource"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIdResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -841,27 +1238,45 @@
           }
         },
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
                 }
               }
             }
           },
-          "201" : {
-            "description" : "Created"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -896,24 +1311,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -955,20 +1401,38 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -992,14 +1456,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1081,24 +1569,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/UserGroupPlainResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserGroupPlainResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1122,7 +1641,7 @@
           }
         },
         "responses" : {
-          "201" : {
+          "201": {
             "description": "Created",
             "content": {
               "application/json": {
@@ -1132,17 +1651,38 @@
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "409": {
+            "description": "Conflict"
           },
-          "409" : {
-            "description" : "Conflict"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1176,24 +1716,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserGroupResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1225,23 +1796,41 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "409": {
+            "description": "Conflict"
           },
-          "404" : {
-            "description" : "Not Found"
-          },
-          "409" : {
-            "description" : "Conflict"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1264,14 +1853,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1296,20 +1909,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1344,20 +1975,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1382,20 +2031,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1430,14 +2097,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1474,7 +2165,9 @@
         "properties": {
           "email": {
             "type": "string",
-            "description": "User's personal email"
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "name": {
             "type": "string",
@@ -1599,8 +2292,10 @@
         "type" : "object",
         "properties" : {
           "email" : {
-            "type" : "string",
-            "description" : "User's personal email"
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "fiscalCode" : {
             "type" : "string",
@@ -1643,8 +2338,10 @@
         "type" : "object",
         "properties" : {
           "email" : {
-            "type" : "string",
-            "description" : "User's personal email"
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "id" : {
             "type" : "string",
@@ -1657,64 +2354,132 @@
           },
           "products" : {
             "type" : "array",
-            "description" : "Authorized user products",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductInfoResource"
+            "description": "Authorized user products",
+            "items": {
+              "$ref": "#/components/schemas/ProductInfoResource"
             }
           },
-          "role" : {
-            "type" : "string",
-            "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+          "role": {
+            "type": "string",
+            "description": "User's role",
+            "enum": [
+              "ADMIN",
+              "LIMITED"
+            ]
           },
-          "status" : {
-            "type" : "string",
-            "description" : "User's status"
+          "status": {
+            "type": "string",
+            "description": "User's status"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
-      "PlainUserResource" : {
-        "title" : "PlainUserResource",
-        "required" : [ "id", "name", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+      "InvalidParam": {
+        "title": "InvalidParam",
+        "required": [
+          "name",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Invalid parameter name."
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
-          },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "reason": {
+            "type": "string",
+            "description": "Invalid parameter reason."
           }
         }
       },
-      "ProductInfoResource" : {
-        "title" : "ProductInfoResource",
-        "required" : [ "id", "roleInfos" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+      "PlainUserResource": {
+        "title": "PlainUserResource",
+        "required": [
+          "id",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "roleInfos" : {
-            "type" : "array",
-            "description" : "User's role infos in product",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductRoleInfoResource"
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
+      "Problem": {
+        "title": "Problem",
+        "required": [
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "Human-readable description of this specific problem."
+          },
+          "instance": {
+            "type": "string",
+            "description": "A URI that describes where the problem occurred."
+          },
+          "invalidParams": {
+            "type": "array",
+            "description": "A list of invalid parameters details.",
+            "items": {
+              "$ref": "#/components/schemas/InvalidParam"
             }
           },
-          "title" : {
-            "type" : "string",
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code.",
+            "format": "int32",
+            "example": 500
+          },
+          "title": {
+            "type": "string",
+            "description": "Short human-readable summary of the problem."
+          },
+          "type": {
+            "type": "string",
+            "description": "A URL to a page with more details regarding the problem."
+          }
+        },
+        "description": "A \"problem detail\" as a way to carry machine-readable details of errors (https://datatracker.ietf.org/doc/html/rfc7807)"
+      },
+      "ProductInfoResource": {
+        "title": "ProductInfoResource",
+        "required": [
+          "id",
+          "roleInfos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
+          },
+          "roleInfos": {
+            "type": "array",
+            "description": "User's role infos in product",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleInfoResource"
+            }
+          },
+          "title": {
+            "type": "string",
             "description" : "Product's title"
           }
         }
@@ -1797,8 +2562,10 @@
         "type" : "object",
         "properties" : {
           "email" : {
-            "type" : "string",
-            "description" : "User's personal email"
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "id" : {
             "type" : "string",
@@ -1921,8 +2688,10 @@
         "type" : "object",
         "properties" : {
           "email" : {
-            "type" : "string",
-            "description" : "User's institutional email"
+            "type": "string",
+            "description": "User's institutional email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "name" : {
             "type" : "string",
@@ -1965,7 +2734,9 @@
         "properties" : {
           "email": {
             "type": "string",
-            "description": "User's institutional email"
+            "description": "User's institutional email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "fiscalCode": {
             "type": "string",
@@ -2021,23 +2792,23 @@
             "type": "string",
             "description": "Users group's description"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Users group's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "Users group's unique identifier"
           },
-          "institutionId" : {
-            "type" : "string",
-            "description" : "Users group's institutionId"
+          "institutionId": {
+            "type": "string",
+            "description": "Users group's institutionId"
           },
-          "membersCount" : {
-            "type" : "integer",
-            "description" : "Number all the members of the group",
-            "format" : "int32"
+          "membersCount": {
+            "type": "integer",
+            "description": "Number all the members of the group",
+            "format": "int32"
           },
-          "modifiedAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was modified",
-            "format" : "date-time"
+          "modifiedAt": {
+            "type": "string",
+            "description": "Date on which the group was modified",
+            "format": "date-time"
           },
           "modifiedBy" : {
             "type" : "string",

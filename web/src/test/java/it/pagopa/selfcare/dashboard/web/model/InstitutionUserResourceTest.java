@@ -10,6 +10,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
@@ -70,10 +71,31 @@ class InstitutionUserResourceTest {
         // given
         InstitutionUserResource institutionUserResource = TestUtils.mockInstance(new InstitutionUserResource());
         institutionUserResource.setProducts(Collections.emptyList());
+        institutionUserResource.setEmail("email@example.com");
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionUserResource);
         // then
         assertTrue(violations.isEmpty());
+    }
+
+
+    @Test
+    void validate_emailFieldsNotValid_InstitutionUserResource() {
+        // given
+        HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
+        toCheckMap.put("email", Email.class);
+        InstitutionUserResource institutionUserResource = TestUtils.mockInstance(new InstitutionUserResource());
+        institutionUserResource.setProducts(Collections.emptyList());
+        // when
+        Set<ConstraintViolation<Object>> violations = validator.validate(institutionUserResource);
+        // then
+        List<ConstraintViolation<Object>> filteredViolations = violations.stream()
+                .filter(violation -> {
+                    Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
+                    return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
+                })
+                .collect(Collectors.toList());
+        assertTrue(filteredViolations.isEmpty());
     }
 
 
