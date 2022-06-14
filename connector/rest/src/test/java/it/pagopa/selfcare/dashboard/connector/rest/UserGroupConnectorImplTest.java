@@ -60,10 +60,12 @@ class UserGroupConnectorImplTest {
         //given
         CreateUserGroup userGroup = TestUtils.mockInstance(new CreateUserGroup());
         userGroup.setMembers(List.of("string1", "string2"));
+        UserGroupResponse response = TestUtils.mockInstance(new UserGroupResponse());
+        Mockito.when(restClientMock.createUserGroup(Mockito.any()))
+                .thenReturn(response);
         //when
-        Executable executable = () -> groupConnector.createUserGroup(userGroup);
+        String groupId = groupConnector.createUserGroup(userGroup);
         //then
-        assertDoesNotThrow(executable);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .createUserGroup(requestDtoArgumentCaptor.capture());
         CreateUserGroupRequestDto request = requestDtoArgumentCaptor.getValue();
@@ -73,6 +75,7 @@ class UserGroupConnectorImplTest {
         assertEquals(userGroup.getInstitutionId(), request.getInstitutionId());
         assertEquals(userGroup.getProductId(), request.getProductId());
         assertEquals(UserGroupStatus.ACTIVE, request.getStatus());
+        assertEquals(response.getId(), groupId);
 
         Mockito.verifyNoMoreInteractions(restClientMock);
     }

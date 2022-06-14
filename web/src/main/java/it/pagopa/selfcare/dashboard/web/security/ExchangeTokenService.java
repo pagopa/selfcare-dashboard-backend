@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
@@ -10,16 +11,19 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
+import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
-import lombok.Getter;
-import lombok.Setter;
+import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
+import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -52,29 +56,28 @@ public class ExchangeTokenService {
     private final String kid;
     private final InstitutionService institutionService;
     private final UserGroupService groupService;
+    private final ProductsConnector productsConnector;
     private final String issuer;
 
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
                                 UserGroupService groupService,
-                                @Value("${jwt.exchange.signingKey}") String jwtSigningKey,
-                                @Value("${jwt.exchange.duration}") String duration,
-                                @Value("${jwt.exchange.kid}") String kid,
-                                @Value("${jwt.exchange.issuer}") String issuer
-    ) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                ProductsConnector productConnector,
+                                ExchangeTokenProperties properties) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
+        this.productsConnector = productConnector;
         this.institutionService = institutionService;
         this.groupService = groupService;
-        this.jwtSigningKey = getPrivateKey(jwtSigningKey);
-        this.issuer = issuer;
-        this.duration = Duration.parse(duration);
-        this.kid = kid;
+        this.jwtSigningKey = getPrivateKey(properties.getSigningKey());
+        this.issuer = properties.getIssuer();
+        this.duration = Duration.parse(properties.getDuration());
+        this.kid = properties.getKid();
     }
 
 
-    public String exchange(String institutionId, String productId, String realm) {
+    public String exchange(String institutionId, String productId) {
         log.trace("exchange start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}, realm = {}", institutionId, productId, realm);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
@@ -95,22 +98,33 @@ public class ExchangeTokenService {
         Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(UUID.fromString(principal.getId())), Pageable.unpaged());
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
-        claims.setAudience(realm);
         claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setTaxCode(institutionInfo.getTaxCode());
-        institution.setRole(grantedAuthority.getRoleOnProducts().get(productId).getProductRole());
-        claims.setInstitution(institution);
-        claims.setDesiredExpiration(claims.getExpiration());
-        claims.setIssuedAt(new Date());
-        claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
+        Product product = productsConnector.getProduct(productId);
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+
+        List<Role> roles = new ArrayList<>();
+        claims.setAudience(product.getIdentityTokenAudience());
+        grantedAuthority.getRoleOnProducts().get(productId).getProductRoles().forEach(productRoleCode -> {
+            Role role = new Role();
+            role.setPartyRole(Product.getPartyRole(productRoleCode, roleMappings).orElse(null));
+            role.setProductRole(productRoleCode);
+            roles.add(role);
+        });
         if (!groupInfos.isEmpty()) {
             List<String> groupIds = groupInfos.stream()
                     .map(UserGroupInfo::getId)
                     .collect(Collectors.toList());
-            claims.setGroupIds(groupIds);
+            institution.setGroups(groupIds);
         }
+
+        institution.setRoles(roles);
+        claims.setInstitution(institution);
+        claims.setDesiredExpiration(claims.getExpiration());
+        claims.setIssuedAt(new Date());
+        claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
         String result = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
@@ -156,20 +170,28 @@ public class ExchangeTokenService {
     }
 
 
-    @Getter
-    @Setter
+    @Data
     @ToString
     static class Institution implements Serializable {
         private String id;
         @JsonProperty("fiscal_code")
         private String taxCode;
-        private String role;
+        private List<Role> roles;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private List<String> groups;
     }
+
+    @Data
+    static class Role implements Serializable {
+        private PartyRole partyRole;
+        @JsonProperty("role")
+        private String productRole;
+    }
+
 
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
-        public static final String GROUP_IDS = "groups";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
@@ -185,10 +207,6 @@ public class ExchangeTokenService {
             return this;
         }
 
-        public Claims setGroupIds(List<String> groupIds) {
-            setValue(GROUP_IDS, groupIds);
-            return this;
-        }
     }
 
 }

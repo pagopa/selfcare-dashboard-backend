@@ -13,12 +13,7 @@
   },
   "response": {
     "status": "200",
-    "jsonBody": {
-      "person": {},
-      "institutions": [
-        {}
-      ]
-    },
+    "jsonBody": {},
     "headers": {
       "Content-Type": "application/json"
     }

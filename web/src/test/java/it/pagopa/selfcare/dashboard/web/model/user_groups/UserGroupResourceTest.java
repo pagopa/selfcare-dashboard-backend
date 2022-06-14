@@ -1,9 +1,9 @@
 package it.pagopa.selfcare.dashboard.web.model.user_groups;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.web.model.ProductInfoResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductRoleInfoResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

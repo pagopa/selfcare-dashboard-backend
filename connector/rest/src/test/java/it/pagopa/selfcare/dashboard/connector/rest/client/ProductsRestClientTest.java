@@ -6,10 +6,10 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -34,7 +34,6 @@ import java.util.Map;
 @ContextConfiguration(
         initializers = ProductsRestClientTest.RandomPortInitializer.class,
         classes = {ProductsRestClientTestConfig.class, HttpClientConfiguration.class})
-@Disabled
 class ProductsRestClientTest extends BaseFeignRestClientTest {
 
     @Order(1)
@@ -77,6 +76,27 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         // then
         Assertions.assertNotNull(response);
         Assertions.assertFalse(response.isEmpty());
+    }
+
+    @Test
+    void getProductsTree() {
+        //given
+        //when
+        List<ProductTree> response = restClient.getProductsTree();
+        //then
+        Assertions.assertFalse(response.isEmpty());
+        Assertions.assertEquals(2, response.get(0).getChildren().size());
+    }
+
+    @Test
+    void getProduct_fullyValued() {
+        //given
+        String productId = "productId";
+        //when
+        Product product = restClient.getProduct(productId);
+        //then
+        Assertions.assertNotNull(product);
+        Assertions.assertNotNull(product.getIdentityTokenAudience());
     }
 
 }

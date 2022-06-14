@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +10,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
@@ -34,18 +37,15 @@ class ProductUserResourceTest {
     void validateNullFields() {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
-        toCheckMap.put("id", NotBlank.class);
-        toCheckMap.put("certification", NotNull.class);
+        toCheckMap.put("id", NotNull.class);
         toCheckMap.put("product", NotNull.class);
         toCheckMap.put("name", NotBlank.class);
         toCheckMap.put("surname", NotBlank.class);
         toCheckMap.put("email", NotBlank.class);
         toCheckMap.put("role", NotNull.class);
         toCheckMap.put("status", NotBlank.class);
-        toCheckMap.put("fiscalCode", NotBlank.class);
         ProductUserResource resource = new ProductUserResource();
         resource.setId(null);
-        resource.setCertification(false);
         resource.setProduct(null);
         resource.setName(null);
         resource.setSurname(null);
@@ -70,11 +70,32 @@ class ProductUserResourceTest {
     void validateNotNullFields() {
         // given
         ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource(), "setRoleInfos");
+        resource.setEmail("email@example.com");
         resource.getProduct().setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then
         assertTrue(violations.isEmpty());
+    }
+
+
+    @Test
+    void validate_emailFieldsNotValid() {
+        // given
+        HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
+        toCheckMap.put("email", Email.class);
+        ProductUserResource resource = TestUtils.mockInstance(new ProductUserResource(), "setRoleInfos");
+        resource.getProduct().setRoleInfos(List.of(TestUtils.mockInstance(new ProductRoleInfoResource())));
+        // when
+        Set<ConstraintViolation<Object>> violations = validator.validate(resource);
+        // then
+        List<ConstraintViolation<Object>> filteredViolations = violations.stream()
+                .filter(violation -> {
+                    Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
+                    return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
+                })
+                .collect(Collectors.toList());
+        assertTrue(filteredViolations.isEmpty());
     }
 
 }

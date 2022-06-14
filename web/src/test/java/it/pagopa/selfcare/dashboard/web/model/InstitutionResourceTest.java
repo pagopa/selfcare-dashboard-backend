@@ -33,19 +33,15 @@ class InstitutionResourceTest {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("id", NotBlank.class);
+        toCheckMap.put("externalId", NotBlank.class);
+        toCheckMap.put("origin", NotBlank.class);
+        toCheckMap.put("originId", NotBlank.class);
         toCheckMap.put("name", NotBlank.class);
-        toCheckMap.put("fiscalCode", NotBlank.class);
         toCheckMap.put("mailAddress", NotBlank.class);
+        toCheckMap.put("fiscalCode", NotBlank.class);
         toCheckMap.put("userRole", NotBlank.class);
         toCheckMap.put("status", NotBlank.class);
         InstitutionResource institutionResource = new InstitutionResource();
-        institutionResource.setId(null);
-        institutionResource.setName(null);
-        institutionResource.setCategory(null);
-        institutionResource.setFiscalCode(null);
-        institutionResource.setMailAddress(null);
-        institutionResource.setUserRole(null);
-        institutionResource.setStatus(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionResource);

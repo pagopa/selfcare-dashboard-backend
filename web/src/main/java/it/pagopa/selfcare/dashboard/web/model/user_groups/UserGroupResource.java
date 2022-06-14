@@ -3,7 +3,7 @@ package it.pagopa.selfcare.dashboard.web.model.user_groups;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
-import it.pagopa.selfcare.dashboard.web.model.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;

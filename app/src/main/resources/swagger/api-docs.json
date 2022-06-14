@@ -6,8 +6,15 @@
     "version" : "0.0.1-SNAPSHOT"
   },
   "servers" : [ {
-    "url" : "http://localhost:80",
-    "description" : "Inferred Url"
+    "url": "{basePath}:{port}",
+    "variables": {
+      "basePath": {
+        "default": "http://localhost"
+      },
+      "port": {
+        "default": "8080"
+      }
+    }
   } ],
   "tags" : [ {
     "name" : "institutions",
@@ -39,24 +46,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -73,7 +111,7 @@
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
@@ -81,24 +119,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -115,7 +184,7 @@
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
@@ -143,29 +212,47 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "object"
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               },
-              "multipart/form-data" : {
-                "schema" : {
-                  "type" : "object"
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
           },
-          "201" : {
-            "description" : "Created"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -182,7 +269,7 @@
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
@@ -193,24 +280,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductsResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductsResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -227,7 +345,7 @@
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
@@ -267,24 +385,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductUserResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductUserResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -299,7 +448,7 @@
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
@@ -325,91 +474,257 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIdResource"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/institutions/{institutionId}/users" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUsers",
-        "description" : "Service to get all the users related to a specific pair of institution-product",
-        "operationId" : "getInstitutionUsersUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+    "/institutions/{institutionId}/products/{productId}/users/{userId}": {
+      "put": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "addUserProductRoles",
+        "description": "Service to add a new role/product to a specific user",
+        "operationId": "addUserProductRolesUsingPUT",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProductRoles"
+              }
+            }
           }
-        }, {
-          "name" : "role",
-          "in" : "query",
-          "description" : "User's role",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "ADMIN", "LIMITED" ]
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
-        }, {
-          "name" : "productRoles",
-          "in" : "query",
-          "description" : "User's roles in product",
-          "required" : false,
-          "style" : "form",
-          "explode" : true,
-          "schema" : {
-            "type" : "string"
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/InstitutionUserResource"
+        ]
+      }
+    },
+    "/institutions/{institutionId}/users": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUsers",
+        "description": "Service to get all the users related to a specific institution",
+        "operationId": "getInstitutionUsersUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "description": "Product's unique identifier",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "User's role",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "LIMITED"
+              ]
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "description": "User's roles in product",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionUserResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -421,12 +736,12 @@
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionUser",
-        "description" : "${swagger.dashboard.institutions.api.getInstitutionUser}",
+        "description" : "Service to get the users with the given user id related to a specific institution ",
         "operationId" : "getInstitutionUserUsingGET",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "simple",
           "schema" : {
@@ -443,24 +758,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
                   "$ref": "#/components/schemas/InstitutionUserDetailsResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -488,24 +834,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductRoleMappingsResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductRoleMappingsResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -530,14 +907,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -562,20 +963,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -600,20 +1019,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -630,7 +1067,7 @@
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "form",
           "schema" : {
@@ -645,35 +1082,57 @@
           "schema" : {
             "type" : "string"
           }
-        }, {
-          "name" : "realm",
-          "in" : "query",
-          "description" : "The domain for which the requested token is valid",
-          "required" : true,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/IdentityTokenResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdentityTokenResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -681,16 +1140,16 @@
         } ]
       }
     },
-    "/users/external-id" : {
+    "/users" : {
       "post" : {
         "tags" : [ "user" ],
-        "summary" : "getUserByExternalId",
-        "description" : "Retrieve the user for a given internal id",
-        "operationId" : "getUserByExternalIdUsingPOST",
+        "summary" : "saveUser",
+        "description" : "Save new user",
+        "operationId" : "saveUserUsingPOST",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "form",
           "schema" : {
@@ -701,33 +1160,123 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/EmbeddedExternalIdDto"
+                "$ref" : "#/components/schemas/UserDto"
               }
             }
           }
         },
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserResource"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserIdResource"
                 }
               }
             }
           },
-          "201" : {
-            "description" : "Created"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/users/search" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "search",
+        "description" : "Retrieve the user for a given fiscal code",
+        "operationId" : "searchUsingPOST",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SearchUserDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -736,6 +1285,87 @@
       }
     },
     "/users/{id}" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "summary" : "getUserByInternalId",
+        "description" : "Retrieve the user by internal id",
+        "operationId" : "getUserByInternalIdUsingGET",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      },
       "put" : {
         "tags" : [ "user" ],
         "summary" : "updateUser",
@@ -754,7 +1384,7 @@
         }, {
           "name" : "institutionId",
           "in" : "query",
-          "description" : "Institution's unique identifier (i.e.: IPA code)",
+          "description" : "Institution's unique internal identifier",
           "required" : true,
           "style" : "form",
           "schema" : {
@@ -771,20 +1401,93 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "user" ],
+        "summary" : "deleteUserById",
+        "description" : "Delete user using internal id",
+        "operationId" : "deleteUserByIdUsingDELETE",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204": {
+            "description": "No Content"
           },
-          "404" : {
-            "description" : "Not Found"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -866,24 +1569,55 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/UserGroupPlainResource"
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserGroupPlainResource"
                   }
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -907,20 +1641,48 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupIdResource"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "409": {
+            "description": "Conflict"
           },
-          "409" : {
-            "description" : "Conflict"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -954,24 +1716,55 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserGroupResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroupResource"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "404" : {
-            "description" : "Not Found"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1003,23 +1796,41 @@
           }
         },
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "409": {
+            "description": "Conflict"
           },
-          "404" : {
-            "description" : "Not Found"
-          },
-          "409" : {
-            "description" : "Conflict"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1042,14 +1853,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1074,20 +1909,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1122,20 +1975,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1160,20 +2031,38 @@
           }
         } ],
         "responses" : {
-          "201" : {
-            "description" : "Created"
+          "204": {
+            "description": "No Content"
           },
-          "204" : {
-            "description" : "No Content"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1208,14 +2097,38 @@
           }
         } ],
         "responses" : {
-          "204" : {
-            "description" : "No Content"
+          "204": {
+            "description": "No Content"
           },
-          "401" : {
-            "description" : "Unauthorized"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           },
-          "403" : {
-            "description" : "Forbidden"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -1226,34 +2139,55 @@
   },
   "components" : {
     "schemas" : {
-      "CreateUserDto" : {
-        "title" : "CreateUserDto",
-        "required" : [ "email", "name", "productRoles", "surname", "taxCode" ],
+      "CertifiedFieldResourceOfstring" : {
+        "title" : "CertifiedFieldResourceOfstring",
+        "required" : [ "certified", "value" ],
         "type" : "object",
         "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
+          "certified" : {
+            "type" : "boolean",
+            "description" : "Indicates whether the value comes from a certified information source",
+            "example" : false
           },
-          "name" : {
+          "value" : {
             "type" : "string",
-            "description" : "User's name"
+            "description" : "Field value"
+          }
+        }
+      },
+      "CreateUserDto" : {
+        "title": "CreateUserDto",
+        "required": [
+          "productRoles",
+          "taxCode"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "productRoles" : {
-            "uniqueItems" : true,
-            "type" : "array",
-            "description" : "User's roles in product",
-            "items" : {
-              "type" : "string"
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "productRoles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "User's roles in product",
+            "items": {
+              "type": "string"
             }
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           },
-          "taxCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "taxCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           }
         }
       },
@@ -1289,15 +2223,6 @@
           }
         }
       },
-      "EmbeddedExternalIdDto" : {
-        "title" : "EmbeddedExternalIdDto",
-        "type" : "object",
-        "properties" : {
-          "externalId" : {
-            "type" : "string"
-          }
-        }
-      },
       "IdentityTokenResource" : {
         "title" : "IdentityTokenResource",
         "required" : [ "token" ],
@@ -1311,12 +2236,16 @@
       },
       "InstitutionResource" : {
         "title" : "InstitutionResource",
-        "required" : [ "fiscalCode", "id", "mailAddress", "name", "status", "userRole" ],
+        "required" : [ "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
         "type" : "object",
         "properties" : {
           "category" : {
             "type" : "string",
             "description" : "Institution's category"
+          },
+          "externalId" : {
+            "type" : "string",
+            "description" : "Institution's unique external identifier"
           },
           "fiscalCode" : {
             "type" : "string",
@@ -1324,57 +2253,100 @@
           },
           "id" : {
             "type" : "string",
-            "description": "Institution's unique identifier (i.e.: IPA code)"
+            "description" : "Institution's unique internal identifier"
           },
-          "mailAddress": {
-            "type": "string",
-            "description": "Institution's email address"
+          "institutionType" : {
+            "type" : "string",
+            "description" : "Institution's type",
+            "enum" : [ "GSP", "PA", "PT", "SCP" ]
           },
-          "name": {
-            "type": "string",
-            "description": "Institution's name"
+          "mailAddress" : {
+            "type" : "string",
+            "description" : "Institution's email address"
           },
-          "status": {
-            "type": "string",
-            "description": "Institution's status"
+          "name" : {
+            "type" : "string",
+            "description" : "Institution's name"
           },
-          "userRole": {
-            "type": "string",
-            "description": "Logged user's role"
+          "origin" : {
+            "type" : "string",
+            "description" : "Institution's data origin"
+          },
+          "originId" : {
+            "type" : "string",
+            "description" : "Institution's identifier related to origin"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Institution's status"
+          },
+          "userRole" : {
+            "type" : "string",
+            "description" : "Logged user's role"
           }
         }
       },
-      "InstitutionUserDetailsResource": {
-        "title": "InstitutionUserDetailsResource",
-        "required": [
-          "certification",
-          "email",
-          "fiscalCode",
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User provided with certification",
-            "example": false
-          },
-          "email": {
+      "InstitutionUserDetailsResource" : {
+        "title" : "InstitutionUserDetailsResource",
+        "required" : [ "email", "fiscalCode", "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
             "type": "string",
-            "description": "User's email"
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           },
-          "id": {
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
+          },
+          "products" : {
+            "type" : "array",
+            "description" : "Authorized user products",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductInfoResource"
+            }
+          },
+          "role" : {
+            "type" : "string",
+            "description" : "User's role",
+            "enum" : [ "ADMIN", "LIMITED" ]
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "User's status"
+          },
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
+          }
+        }
+      },
+      "InstitutionUserResource" : {
+        "title" : "InstitutionUserResource",
+        "required" : [ "email", "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
             "type": "string",
-            "description": "User's unique identifier"
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
           },
           "name" : {
             "type" : "string",
@@ -1405,53 +2377,21 @@
           }
         }
       },
-      "InstitutionUserResource": {
-        "title": "InstitutionUserResource",
+      "InvalidParam": {
+        "title": "InvalidParam",
         "required": [
-          "email",
-          "id",
           "name",
-          "products",
-          "role",
-          "status",
-          "surname"
+          "reason"
         ],
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's email"
-          },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
-          },
           "name": {
             "type": "string",
-            "description": "User's name"
+            "description": "Invalid parameter name."
           },
-          "products": {
-            "type": "array",
-            "description": "Authorized user products",
-            "items": {
-              "$ref": "#/components/schemas/ProductInfoResource"
-            }
-          },
-          "role": {
+          "reason": {
             "type": "string",
-            "description": "User's role",
-            "enum": [
-              "ADMIN",
-              "LIMITED"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "description": "User's status"
-          },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+            "description": "Invalid parameter reason."
           }
         }
       },
@@ -1466,7 +2406,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "User's unique identifier"
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
           "name": {
             "type": "string",
@@ -1478,24 +2419,67 @@
           }
         }
       },
-      "ProductInfoResource" : {
-        "title" : "ProductInfoResource",
-        "required" : [ "id", "roleInfos" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+      "Problem": {
+        "title": "Problem",
+        "required": [
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "Human-readable description of this specific problem."
           },
-          "roleInfos" : {
-            "type" : "array",
-            "description" : "User's role infos in product",
-            "items" : {
-              "$ref" : "#/components/schemas/ProductRoleInfoResource"
+          "instance": {
+            "type": "string",
+            "description": "A URI that describes where the problem occurred."
+          },
+          "invalidParams": {
+            "type": "array",
+            "description": "A list of invalid parameters details.",
+            "items": {
+              "$ref": "#/components/schemas/InvalidParam"
             }
           },
-          "title" : {
-            "type" : "string",
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code.",
+            "format": "int32",
+            "example": 500
+          },
+          "title": {
+            "type": "string",
+            "description": "Short human-readable summary of the problem."
+          },
+          "type": {
+            "type": "string",
+            "description": "A URL to a page with more details regarding the problem."
+          }
+        },
+        "description": "A \"problem detail\" as a way to carry machine-readable details of errors (https://datatracker.ietf.org/doc/html/rfc7807)"
+      },
+      "ProductInfoResource": {
+        "title": "ProductInfoResource",
+        "required": [
+          "id",
+          "roleInfos"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
+          },
+          "roleInfos": {
+            "type": "array",
+            "description": "User's role infos in product",
+            "items": {
+              "$ref": "#/components/schemas/ProductRoleInfoResource"
+            }
+          },
+          "title": {
+            "type": "string",
             "description" : "Product's title"
           }
         }
@@ -1573,37 +2557,26 @@
         }
       },
       "ProductUserResource" : {
-        "title": "ProductUserResource",
-        "required": [
-          "certification",
-          "email",
-          "id",
-          "name",
-          "product",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "certification": {
-            "type": "boolean",
-            "description": "User provided with certification",
-            "example": false
-          },
-          "email": {
+        "title" : "ProductUserResource",
+        "required" : [ "email", "id", "name", "product", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
             "type": "string",
-            "description": "User's email"
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "product": {
+          "product" : {
             "description" : "Authorized user product",
             "$ref" : "#/components/schemas/ProductInfoResource"
           },
@@ -1636,6 +2609,13 @@
             "type" : "boolean",
             "description" : "flag indicating whether the logged user has the authorization to manage the product",
             "example" : false
+          },
+          "children" : {
+            "type" : "array",
+            "description" : "Product's sub products list",
+            "items" : {
+              "$ref" : "#/components/schemas/SubProductResource"
+            }
           },
           "description" : {
             "type" : "string",
@@ -1672,18 +2652,46 @@
           }
         }
       },
-      "UpdateUserDto" : {
-        "title" : "UpdateUserDto",
-        "required" : [ "email", "fiscalCode", "name", "surname" ],
+      "SearchUserDto" : {
+        "title" : "SearchUserDto",
+        "required" : [ "fiscalCode" ],
         "type" : "object",
         "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's institutional email"
-          },
           "fiscalCode" : {
             "type" : "string",
             "description" : "User's fiscal code"
+          }
+        }
+      },
+      "SubProductResource" : {
+        "title" : "SubProductResource",
+        "required" : [ "id", "status", "title" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Product's unique identifier"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Product's status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Product's title"
+          }
+        }
+      },
+      "UpdateUserDto" : {
+        "title" : "UpdateUserDto",
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type": "string",
+            "description": "User's institutional email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "name" : {
             "type" : "string",
@@ -1719,42 +2727,88 @@
           }
         }
       },
-      "UserGroupPlainResource" : {
-        "title" : "UserGroupPlainResource",
-        "required" : [ "description", "id", "institutionId", "membersCount", "name", "productId", "status" ],
+      "UserDto" : {
+        "title" : "UserDto",
+        "required" : [ "email", "fiscalCode", "name", "surname" ],
         "type" : "object",
         "properties" : {
-          "createdAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was created",
-            "format" : "date-time"
+          "email": {
+            "type": "string",
+            "description": "User's institutional email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "createdBy" : {
-            "type" : "string",
-            "description" : "User by which the group was created",
-            "format" : "uuid"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Users group's description"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Users group's unique identifier"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
+      "UserGroupIdResource": {
+        "title": "UserGroupIdResource",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Users group's unique identifier"
+          }
+        }
+      },
+      "UserGroupPlainResource": {
+        "title": "UserGroupPlainResource",
+        "required": [
+          "description",
+          "id",
+          "institutionId",
+          "membersCount",
+          "name",
+          "productId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Date on which the group was created",
+            "format": "date-time"
           },
-          "institutionId" : {
-            "type" : "string",
-            "description" : "Users group's institutionId"
+          "createdBy": {
+            "type": "string",
+            "description": "User by which the group was created",
+            "format": "uuid"
           },
-          "membersCount" : {
-            "type" : "integer",
-            "description" : "Number all the members of the group",
-            "format" : "int32"
+          "description": {
+            "type": "string",
+            "description": "Users group's description"
           },
-          "modifiedAt" : {
-            "type" : "string",
-            "description" : "Date on which the group was modified",
-            "format" : "date-time"
+          "id": {
+            "type": "string",
+            "description": "Users group's unique identifier"
+          },
+          "institutionId": {
+            "type": "string",
+            "description": "Users group's institutionId"
+          },
+          "membersCount": {
+            "type": "integer",
+            "description": "Number all the members of the group",
+            "format": "int32"
+          },
+          "modifiedAt": {
+            "type": "string",
+            "description": "Date on which the group was modified",
+            "format": "date-time"
           },
           "modifiedBy" : {
             "type" : "string",
@@ -1833,31 +2887,61 @@
           }
         }
       },
-      "UserResource" : {
-        "title" : "UserResource",
-        "required" : [ "certification", "email", "fiscalCode", "name", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "certification" : {
-            "type" : "boolean",
-            "description" : "User's certification source",
-            "example" : false
+      "UserIdResource" : {
+        "title": "UserIdResource",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
+          }
+        }
+      },
+      "UserProductRoles": {
+        "title": "UserProductRoles",
+        "type": "object",
+        "properties": {
+          "productRoles": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "UserResource": {
+        "title": "UserResource",
+        "required": [
+          "fiscalCode",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "description": "User's institutional email",
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           },
-          "email" : {
-            "type" : "string",
-            "description" : "User's email"
+          "familyName": {
+            "description": "User's surname",
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "User's fiscal code"
+          "fiscalCode": {
+            "type": "string",
+            "description": "User's fiscal code"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "name": {
+            "description": "User's name",
+            "$ref": "#/components/schemas/CertifiedFieldResourceOfstring"
           }
         }
       }

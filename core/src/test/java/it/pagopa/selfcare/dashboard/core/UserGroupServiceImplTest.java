@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
@@ -8,7 +7,6 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
@@ -33,8 +31,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Instant;
 import java.util.*;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.SUSPENDED;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 import static it.pagopa.selfcare.dashboard.core.UserGroupServiceImpl.REQUIRED_GROUP_ID_MESSAGE;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {UserGroupServiceImpl.class, CoreTestConfig.class})
@@ -61,64 +66,66 @@ class UserGroupServiceImplTest {
     @Test
     void createGroup() {
         //given
-        CreateUserGroup userGroup = TestUtils.mockInstance(new CreateUserGroup());
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
+        CreateUserGroup userGroup = mockInstance(new CreateUserGroup());
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
         List<String> userIds = List.of(id1, id2, id3, id4);
         userGroup.setMembers(userIds);
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
-
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
+        String groupIdMock = "groupId";
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
+        when(groupConnector.createUserGroup(any()))
+                .thenReturn(groupIdMock);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
-        Executable executable = () -> groupService.createUserGroup(userGroup);
+        String groupId = groupService.createUserGroup(userGroup);
         //then
-        assertDoesNotThrow(executable);
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .createUserGroup(Mockito.any());
+        assertEquals(groupIdMock, groupId);
+        verify(groupConnector, times(1))
+                .createUserGroup(any());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(userGroup.getInstitutionId()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(userGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(userGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verifyNoMoreInteractions(groupConnector, partyConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
     @Test
     void createGroup_invalidList() {
         //given
-        CreateUserGroup userGroup = TestUtils.mockInstance(new CreateUserGroup());
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        List<String> userIds = List.of(UUID.randomUUID().toString(), id2, id3, id4);
+        CreateUserGroup userGroup = mockInstance(new CreateUserGroup());
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        List<String> userIds = List.of(randomUUID().toString(), id2, id3, id4);
         userGroup.setMembers(userIds);
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.createUserGroup(userGroup);
@@ -126,15 +133,15 @@ class UserGroupServiceImplTest {
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(userGroup.getInstitutionId()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(userGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(userGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verifyNoMoreInteractions(partyConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verifyNoMoreInteractions(partyConnector);
         Mockito.verifyNoInteractions(groupConnector);
     }
 
@@ -145,9 +152,9 @@ class UserGroupServiceImplTest {
         // when
         groupService.delete(groupId);
         // then
-        Mockito.verify(groupConnector, Mockito.times(1))
+        verify(groupConnector, times(1))
                 .delete(groupId);
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        verifyNoMoreInteractions(groupConnector);
     }
 
     @Test
@@ -169,9 +176,9 @@ class UserGroupServiceImplTest {
         // when
         groupService.activate(groupId);
         // then
-        Mockito.verify(groupConnector, Mockito.times(1))
+        verify(groupConnector, times(1))
                 .activate(groupId);
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        verifyNoMoreInteractions(groupConnector);
     }
 
     @Test
@@ -193,9 +200,9 @@ class UserGroupServiceImplTest {
         // when
         groupService.suspend(groupId);
         // then
-        Mockito.verify(groupConnector, Mockito.times(1))
+        verify(groupConnector, times(1))
                 .suspend(groupId);
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        verifyNoMoreInteractions(groupConnector);
     }
 
     @Test
@@ -214,80 +221,80 @@ class UserGroupServiceImplTest {
     void updateUserGroup() {
         //given
         String groupId = "groupId";
-        UpdateUserGroup userGroup = TestUtils.mockInstance(new UpdateUserGroup());
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
+        UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
         List<String> userIds = List.of(id1.toString(), id2, id3, id4);
         userGroup.setMembers(userIds);
 
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
         foundGroup.setId(groupId);
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.updateUserGroup(groupId, userGroup);
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroupById(Mockito.anyString());
+        verify(groupConnector, times(1))
+                .getUserGroupById(anyString());
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(foundGroup.getInstitutionId()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(foundGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .updateUserGroup(Mockito.anyString(), Mockito.any());
-        Mockito.verifyNoMoreInteractions(partyConnector, groupConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verify(groupConnector, times(1))
+                .updateUserGroup(anyString(), any());
+        verifyNoMoreInteractions(partyConnector, groupConnector);
     }
 
     @Test
     void updateUserGroup_invalidMembersList() {
         //given
         String groupId = "groupId";
-        UpdateUserGroup userGroup = TestUtils.mockInstance(new UpdateUserGroup());
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        List<String> userIds = List.of(UUID.randomUUID().toString(), id2, id3, id4);
+        UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        List<String> userIds = List.of(randomUUID().toString(), id2, id3, id4);
         userGroup.setMembers(userIds);
 
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
         foundGroup.setId(groupId);
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
         //when
         Executable executable = () -> groupService.updateUserGroup(groupId, userGroup);
@@ -296,17 +303,17 @@ class UserGroupServiceImplTest {
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(foundGroup.getInstitutionId()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(foundGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroupById(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(partyConnector, groupConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verify(groupConnector, times(1))
+                .getUserGroupById(anyString());
+        verifyNoMoreInteractions(partyConnector, groupConnector);
     }
 
     @Test
@@ -314,16 +321,16 @@ class UserGroupServiceImplTest {
         //given
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
         foundGroup.setId(groupId);
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
@@ -332,7 +339,7 @@ class UserGroupServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
 
         foundGroup.setMembers(members);
@@ -346,18 +353,27 @@ class UserGroupServiceImplTest {
         modifiedBy.setId("modifiedBy");
         foundGroup.setModifiedBy(modifiedBy);
 
+        User createdByMock = mockInstance(new User(), "setId");
+        User modifiedByMock = mockInstance(new User(), "setId");
 
-        User createdByMock = TestUtils.mockInstance(new User(), "setId");
-        createdByMock.setId("createdBy");
-        User modifiedByMock = TestUtils.mockInstance(new User(), "setId");
-        modifiedByMock.setId("modifiedBy");
-
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
-        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getCreatedBy().getId()))
-                .thenReturn(createdByMock);
-        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getModifiedBy().getId()))
-                .thenReturn(modifiedByMock);
+        when(userRegistryConnector.getUserByInternalId(anyString(), any()))
+                .thenAnswer(invocation -> {
+                    User userMock = new User();
+                    userMock.setId(invocation.getArgument(0, String.class));
+                    return userMock;
+                });
+        when(userRegistryConnector.getUserByInternalId(eq(createdBy.getId()), any()))
+                .thenAnswer(invocation -> {
+                    createdByMock.setId(invocation.getArgument(0, String.class));
+                    return createdByMock;
+                });
+        when(userRegistryConnector.getUserByInternalId(eq(modifiedBy.getId()), any()))
+                .thenAnswer(invocation -> {
+                    modifiedByMock.setId(invocation.getArgument(0, String.class));
+                    return modifiedByMock;
+                });
         //when
         UserGroupInfo groupInfo = groupService.getUserGroupById(groupId, institutionId);
         //then
@@ -369,24 +385,28 @@ class UserGroupServiceImplTest {
         assertEquals(foundGroup.getName(), groupInfo.getName());
         assertEquals(foundGroup.getMembers(), groupInfo.getMembers());
         assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock, groupInfo.getCreatedBy());
+        assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
         assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(modifiedByMock, groupInfo.getModifiedBy());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroupById(Mockito.anyString());
-        Mockito.verify(userRegistryConnector, Mockito.times(2))
-                .getUserByInternalId(Mockito.anyString());
+        assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
+        verify(groupConnector, times(1))
+                .getUserGroupById(anyString());
+        verify(userRegistryConnector, times(groupInfo.getMembers().size()))
+                .getUserByInternalId(anyString(), eq(EnumSet.of(name, familyName, workContacts)));
+        verify(userRegistryConnector, times(1))
+                .getUserByInternalId(foundGroup.getCreatedBy().getId(), EnumSet.of(name, familyName));
+        verify(userRegistryConnector, times(1))
+                .getUserByInternalId(foundGroup.getModifiedBy().getId(), EnumSet.of(name, familyName));
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
     @Test
@@ -394,16 +414,16 @@ class UserGroupServiceImplTest {
         //given
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
         foundGroup.setId(groupId);
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
@@ -412,7 +432,7 @@ class UserGroupServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
 
         foundGroup.setMembers(members);
@@ -423,14 +443,21 @@ class UserGroupServiceImplTest {
         createdBy.setId("createdBy");
         foundGroup.setCreatedBy(createdBy);
 
+        User createdByMock = mockInstance(new User(), "setId");
 
-        User createdByMock = TestUtils.mockInstance(new User(), "setId");
-        createdByMock.setId("createdBy");
-
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
-        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getCreatedBy().getId()))
-                .thenReturn(createdByMock);
+        when(userRegistryConnector.getUserByInternalId(anyString(), any()))
+                .thenAnswer(invocation -> {
+                    User userMock = new User();
+                    userMock.setId(invocation.getArgument(0, String.class));
+                    return userMock;
+                });
+        when(userRegistryConnector.getUserByInternalId(any(), any()))
+                .thenAnswer(invocation -> {
+                    createdByMock.setId(invocation.getArgument(0, String.class));
+                    return createdByMock;
+                });
         //when
         UserGroupInfo groupInfo = groupService.getUserGroupById(groupId, institutionId);
         //then
@@ -442,24 +469,26 @@ class UserGroupServiceImplTest {
         assertEquals(foundGroup.getName(), groupInfo.getName());
         assertEquals(foundGroup.getMembers(), groupInfo.getMembers());
         assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock, groupInfo.getCreatedBy());
+        assertEquals(createdByMock.getId().toString(), groupInfo.getCreatedBy().getId());
         assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
         assertNull(groupInfo.getModifiedBy());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroupById(Mockito.anyString());
-        Mockito.verify(userRegistryConnector, Mockito.times(1))
-                .getUserByInternalId(Mockito.anyString());
+        verify(groupConnector, times(1))
+                .getUserGroupById(anyString());
+        verify(userRegistryConnector, times(groupInfo.getMembers().size()))
+                .getUserByInternalId(anyString(), eq(EnumSet.of(name, familyName, workContacts)));
+        verify(userRegistryConnector, times(1))
+                .getUserByInternalId(foundGroup.getCreatedBy().getId(), EnumSet.of(name, familyName));
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
     @Test
@@ -467,16 +496,16 @@ class UserGroupServiceImplTest {
         //given
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
         foundGroup.setId(groupId);
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
@@ -485,31 +514,38 @@ class UserGroupServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock4));
+        when(userRegistryConnector.getUserByInternalId(anyString(), any()))
+                .thenAnswer(invocation -> {
+                    User userMock = new User();
+                    userMock.setId(invocation.getArgument(0, String.class));
+                    return userMock;
+                });
 
         foundGroup.setMembers(members);
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId.get());
+        final String createdById = randomUUID().toString();
+        final String modifiedById = randomUUID().toString();
         User createdBy = new User();
-        createdBy.setId("createdBy");
+        createdBy.setId(createdById);
         foundGroup.setCreatedBy(createdBy);
         User modifiedBy = new User();
-        modifiedBy.setId("modifiedBy");
+        modifiedBy.setId(modifiedById);
         foundGroup.setModifiedBy(modifiedBy);
 
+        User createdByMock = mockInstance(new User(), "setId");
+        createdByMock.setId(createdById);
+        User modifiedByMock = mockInstance(new User(), "setId");
+        modifiedByMock.setId(modifiedById);
 
-        User createdByMock = TestUtils.mockInstance(new User(), "setId");
-        createdByMock.setId("createdBy");
-        User modifiedByMock = TestUtils.mockInstance(new User(), "setId");
-        modifiedByMock.setId("modifiedBy");
-
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(any()))
                 .thenReturn(foundGroup);
-        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getCreatedBy().getId()))
+        when(userRegistryConnector.getUserByInternalId(eq(createdById), any()))
                 .thenReturn(createdByMock);
-        Mockito.when(userRegistryConnector.getUserByInternalId(foundGroup.getModifiedBy().getId()))
+        when(userRegistryConnector.getUserByInternalId(eq(modifiedById), any()))
                 .thenReturn(modifiedByMock);
         //when
         UserGroupInfo groupInfo = groupService.getUserGroupById(groupId, institutionId);
@@ -522,24 +558,28 @@ class UserGroupServiceImplTest {
         assertEquals(foundGroup.getName(), groupInfo.getName());
         assertEquals(1, groupInfo.getMembers().size());
         assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock, groupInfo.getCreatedBy());
+        assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
         assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(modifiedByMock, groupInfo.getModifiedBy());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroupById(Mockito.anyString());
-        Mockito.verify(userRegistryConnector, Mockito.times(2))
-                .getUserByInternalId(Mockito.anyString());
+        assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
+        verify(groupConnector, times(1))
+                .getUserGroupById(groupId);
+        verify(userRegistryConnector, times(groupInfo.getMembers().size()))
+                .getUserByInternalId(anyString(), eq(EnumSet.of(name, familyName, workContacts)));
+        verify(userRegistryConnector, times(1))
+                .getUserByInternalId(foundGroup.getCreatedBy().getId(), EnumSet.of(name, familyName));
+        verify(userRegistryConnector, times(1))
+                .getUserByInternalId(foundGroup.getModifiedBy().getId(), EnumSet.of(name, familyName));
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
     @Test
@@ -577,29 +617,29 @@ class UserGroupServiceImplTest {
         //given
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
         foundGroup.setId(groupId);
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        UUID id3 = UUID.randomUUID();
-        UUID id4 = UUID.randomUUID();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
+        UUID id1 = randomUUID();
+        UUID id2 = randomUUID();
+        UUID id3 = randomUUID();
+        UUID id4 = randomUUID();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
         userInfoMock1.setId("createdBy");
         userInfoMock2.setId("modifiedBy");
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
 
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
         //when
         Executable executable = () -> groupService.getUserGroupById(groupId, institutionId);
         //then
         InvalidUserGroupException e = assertThrows(InvalidUserGroupException.class, executable);
         assertEquals("Could not find a UserGroup for given institutionId", e.getMessage());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroupById(Mockito.anyString());
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        verify(groupConnector, times(1))
+                .getUserGroupById(anyString());
+        verifyNoMoreInteractions(groupConnector);
         Mockito.verifyNoInteractions(userRegistryConnector, partyConnector);
     }
 
@@ -609,16 +649,16 @@ class UserGroupServiceImplTest {
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
         String productId = "productId";
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
         foundGroup.setId(groupId);
-        UUID userId = UUID.randomUUID();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        UUID userId = randomUUID();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(userId.toString());
         userInfoMock2.setId(id2);
@@ -633,30 +673,30 @@ class UserGroupServiceImplTest {
         foundGroup.setInstitutionId(institutionId.get());
         foundGroup.setProductId(productId);
 
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(members);
         //when
         Executable executable = () -> groupService.addMemberToUserGroup(groupId, userId);
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .addMemberToUserGroup(Mockito.anyString(), Mockito.any());
-        Mockito.verify(groupConnector, Mockito.times(1))
+        verify(groupConnector, times(1))
+                .addMemberToUserGroup(anyString(), any());
+        verify(groupConnector, times(1))
                 .getUserGroupById(groupId);
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
 
-        Mockito.verifyNoMoreInteractions(groupConnector, partyConnector);
+        verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
     @Test
@@ -665,17 +705,17 @@ class UserGroupServiceImplTest {
         String groupId = "groupId";
         Optional<String> institutionId = Optional.of("institutionId");
         String productId = "productId";
-        UserGroupInfo foundGroup = TestUtils.mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
         foundGroup.setId(groupId);
-        UUID userId = UUID.randomUUID();
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        UUID userId = randomUUID();
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
@@ -690,35 +730,35 @@ class UserGroupServiceImplTest {
         foundGroup.setInstitutionId(institutionId.get());
         foundGroup.setProductId(productId);
 
-        Mockito.when(groupConnector.getUserGroupById(Mockito.anyString()))
+        when(groupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(members);
         //when
         Executable executable = () -> groupService.addMemberToUserGroup(groupId, userId);
         //then
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("This user is not allowed for this group", e.getMessage());
-        Mockito.verify(groupConnector, Mockito.times(1))
+        verify(groupConnector, times(1))
                 .getUserGroupById(groupId);
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        Mockito.verify(partyConnector, Mockito.times(1))
-                .getUsers(Mockito.eq(institutionId.get()), filterCaptor.capture());
+        verify(partyConnector, times(1))
+                .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertEquals(Optional.empty(), capturedFilter.getUserId());
         assertEquals(Optional.empty(), capturedFilter.getProductRoles());
         assertEquals(Optional.empty(), capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(RelationshipState.ACTIVE, RelationshipState.SUSPENDED)), capturedFilter.getAllowedStates());
-        Mockito.verifyNoMoreInteractions(groupConnector, partyConnector);
+        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
     @Test
     void addMemberToUserGroup_nullId() {
         //given
         String groupId = null;
-        UUID userId = UUID.randomUUID();
+        UUID userId = randomUUID();
         //when
         Executable executable = () -> groupService.addMemberToUserGroup(groupId, userId);
         //then
@@ -744,21 +784,21 @@ class UserGroupServiceImplTest {
     void deleteMemberFromUserGroup() {
         //given
         String groupId = "groupId";
-        UUID userId = UUID.randomUUID();
+        UUID userId = randomUUID();
         //when
         Executable executable = () -> groupService.deleteMemberFromUserGroup(groupId, userId);
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .deleteMemberFromUserGroup(Mockito.anyString(), Mockito.any());
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        verify(groupConnector, times(1))
+                .deleteMemberFromUserGroup(anyString(), any());
+        verifyNoMoreInteractions(groupConnector);
     }
 
     @Test
     void deleteMemberFromUserGroup_nullId() {
         //given
         String groupId = null;
-        UUID userId = UUID.randomUUID();
+        UUID userId = randomUUID();
         //when
         Executable executable = () -> groupService.deleteMemberFromUserGroup(groupId, userId);
         //then
@@ -785,19 +825,19 @@ class UserGroupServiceImplTest {
         //given
         Optional<String> institutionId = Optional.of("institutionId");
         Optional<String> productId = Optional.of("productId");
-        Optional<UUID> userId = Optional.of(UUID.randomUUID());
+        Optional<UUID> userId = Optional.of(randomUUID());
         Pageable pageable = PageRequest.of(1, 2);
-        UserGroupInfo userGroupInfo = TestUtils.mockInstance(new UserGroupInfo());
-        Mockito.when(groupConnector.getUserGroups(Mockito.any(), Mockito.any()))
+        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
+        when(groupConnector.getUserGroups(any(), any()))
                 .thenReturn(List.of(userGroupInfo));
         //when
         Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, userId, pageable);
         //then
         assertNotNull(groupInfos);
         assertEquals(1, groupInfos.size());
-        Mockito.verify(groupConnector, Mockito.times(1))
-                .getUserGroups(Mockito.any(), Mockito.any());
-        Mockito.verifyNoMoreInteractions(groupConnector);
+        verify(groupConnector, times(1))
+                .getUserGroups(any(), any());
+        verifyNoMoreInteractions(groupConnector);
     }
 
     @Test
@@ -856,8 +896,8 @@ class UserGroupServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
@@ -870,13 +910,13 @@ class UserGroupServiceImplTest {
         //given
         String relationshipId = "relationshipId";
         String productId = null;
-        UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo());
-        ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
+        UserInfo userInfoMock = mockInstance(new UserInfo());
+        ProductInfo productInfoMock = mockInstance(new ProductInfo());
         productInfoMock.setId(productId);
         Map<String, ProductInfo> products = new HashMap<>();
         products.put(productInfoMock.getId(), productInfoMock);
         userInfoMock.setProducts(products);
-        Mockito.when(partyConnector.getUser(Mockito.anyString()))
+        when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         //when
         Executable executable = () -> {
@@ -885,13 +925,13 @@ class UserGroupServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Id is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUser(relationshipId);
         Mockito.verifyNoInteractions(groupConnector);
     }
@@ -902,9 +942,9 @@ class UserGroupServiceImplTest {
         String relationshipId = "relationship";
         String institutionId = null;
         String productId = "productId";
-        UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo());
+        UserInfo userInfoMock = mockInstance(new UserInfo());
         userInfoMock.setInstitutionId(institutionId);
-        ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
+        ProductInfo productInfoMock = mockInstance(new ProductInfo());
         productInfoMock.setId(productId);
         Map<String, ProductInfo> products = new HashMap<>();
         products.put(productInfoMock.getId(), productInfoMock);
@@ -912,7 +952,7 @@ class UserGroupServiceImplTest {
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
         filter.setProductId(Optional.of(productId));
         filter.setUserId(Optional.of(userInfoMock.getId()));
-        Mockito.when(partyConnector.getUser(Mockito.anyString()))
+        when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         //when
         Executable executable = () -> {
@@ -921,13 +961,13 @@ class UserGroupServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution id is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUser(relationshipId);
         Mockito.verifyNoInteractions(groupConnector);
     }
@@ -938,14 +978,14 @@ class UserGroupServiceImplTest {
         String relationshipId = "relationship";
         String institutionId = "institutionId";
         String productId = "productId";
-        UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo(), "setId");
+        UserInfo userInfoMock = mockInstance(new UserInfo(), "setId");
         userInfoMock.setInstitutionId(institutionId);
-        ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
+        ProductInfo productInfoMock = mockInstance(new ProductInfo());
         productInfoMock.setId(productId);
         Map<String, ProductInfo> products = new HashMap<>();
         products.put(productInfoMock.getId(), productInfoMock);
         userInfoMock.setProducts(products);
-        Mockito.when(partyConnector.getUser(Mockito.anyString()))
+        when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         //when
         Executable executable = () -> {
@@ -954,13 +994,13 @@ class UserGroupServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(simpleAsyncUncaughtExceptionHandler, Mockito.times(1))
-                .handleUncaughtException(throwableCaptor.capture(), Mockito.any(), Mockito.any());
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A user id is required", e.getMessage());
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUser(relationshipId);
         Mockito.verifyNoInteractions(groupConnector);
     }
@@ -972,10 +1012,10 @@ class UserGroupServiceImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String userId = "userId";
-        UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo(), "setId");
+        UserInfo userInfoMock = mockInstance(new UserInfo(), "setId");
         userInfoMock.setInstitutionId(institutionId);
         userInfoMock.setId(userId);
-        ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
+        ProductInfo productInfoMock = mockInstance(new ProductInfo());
         productInfoMock.setId(productId);
         Map<String, ProductInfo> products = new HashMap<>();
         products.put(productInfoMock.getId(), productInfoMock);
@@ -983,9 +1023,9 @@ class UserGroupServiceImplTest {
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
         filter.setProductId(Optional.of(productId));
         filter.setUserId(Optional.of(userInfoMock.getId()));
-        Mockito.when(partyConnector.getUser(Mockito.anyString()))
+        when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(Collections.emptyList());
         //when
         Executable executable = () -> {
@@ -994,13 +1034,13 @@ class UserGroupServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(groupConnector, Mockito.times(1))
+        verify(groupConnector, times(1))
                 .deleteMembers(userId, institutionId, productId);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUsers(institutionId, filter);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUser(relationshipId);
-        Mockito.verifyNoMoreInteractions(groupConnector, partyConnector);
+        verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
     @Test
@@ -1010,10 +1050,10 @@ class UserGroupServiceImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String userId = "userId";
-        UserInfo userInfoMock = TestUtils.mockInstance(new UserInfo(), "setId");
+        UserInfo userInfoMock = mockInstance(new UserInfo(), "setId");
         userInfoMock.setInstitutionId(institutionId);
         userInfoMock.setId(userId);
-        ProductInfo productInfoMock = TestUtils.mockInstance(new ProductInfo());
+        ProductInfo productInfoMock = mockInstance(new ProductInfo());
         productInfoMock.setId(productId);
         Map<String, ProductInfo> products = new HashMap<>();
         products.put(productInfoMock.getId(), productInfoMock);
@@ -1021,16 +1061,16 @@ class UserGroupServiceImplTest {
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
         filter.setProductId(Optional.of(productId));
         filter.setUserId(Optional.of(userInfoMock.getId()));
-        Mockito.when(partyConnector.getUser(Mockito.anyString()))
+        when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        String id4 = UUID.randomUUID().toString();
-        UserInfo userInfoMock1 = TestUtils.mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = TestUtils.mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = TestUtils.mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = TestUtils.mockInstance(new UserInfo(), 4, "setId");
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
@@ -1039,7 +1079,7 @@ class UserGroupServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        Mockito.when(partyConnector.getUsers(Mockito.anyString(), Mockito.any()))
+        when(partyConnector.getUsers(anyString(), any()))
                 .thenReturn(members);
         //when
         Executable executable = () -> {
@@ -1048,11 +1088,11 @@ class UserGroupServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUsers(institutionId, filter);
-        Mockito.verify(partyConnector, Mockito.times(1))
+        verify(partyConnector, times(1))
                 .getUser(relationshipId);
-        Mockito.verifyNoMoreInteractions(partyConnector);
+        verifyNoMoreInteractions(partyConnector);
         Mockito.verifyNoInteractions(groupConnector);
     }
 }

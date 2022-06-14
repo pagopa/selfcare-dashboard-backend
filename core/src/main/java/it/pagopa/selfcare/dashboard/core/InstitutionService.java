@@ -2,8 +2,9 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ public interface InstitutionService {
 
     Collection<InstitutionInfo> getInstitutions();
 
-    List<Product> getInstitutionProducts(String institutionId);
+    List<ProductTree> getInstitutionProducts(String institutionId);
 
     Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
@@ -25,6 +26,9 @@ public interface InstitutionService {
 
     Collection<UserInfo> getInstitutionProductUsers(String institutionId, String productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
-    void createUsers(String institutionId, String productId, CreateUserDto user);
+    UserId createUsers(String institutionId, String productId, CreateUserDto user);
+
+    void addUserProductRoles(String institutionId, String productId, String userId, CreateUserDto dto);
+
 
 }

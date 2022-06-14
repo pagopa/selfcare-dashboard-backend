@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/external/institutions/institutionId3/relationships",
+    "urlPath": "/pdnd-interop-uservice-party-process/0.0.1/institutions/institutionId3/relationships",
     "queryParameters": {
       "products": {
         "matches": "^\\w*(,\\w+)*$"

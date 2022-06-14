@@ -4,8 +4,9 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
-import it.pagopa.selfcare.dashboard.web.model.ProductRoleMappingsResource;
-import it.pagopa.selfcare.dashboard.web.model.ProductsResource;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -20,20 +21,29 @@ class ProductMapperTest {
     @Test
     void toResource_notNull() {
         // given
-        Product product = TestUtils.mockInstance(new Product());
+        ProductTree product = new ProductTree();
+        Product node = TestUtils.mockInstance(new Product());
+        node.setId("Node");
+        Product children = TestUtils.mockInstance(new Product());
+        children.setId("children");
+        product.setNode(node);
+        product.setChildren(List.of(children));
         // when
         ProductsResource resource = ProductsMapper.toResource(product);
         // then
-        assertEquals(product.getId(), resource.getId());
-        assertEquals(product.getLogo(), resource.getLogo());
-        assertEquals(product.getTitle(), resource.getTitle());
-        assertEquals(product.getDescription(), resource.getDescription());
-        assertEquals(product.getUrlPublic(), resource.getUrlPublic());
-        assertEquals(product.getUrlBO(), resource.getUrlBO());
-        assertEquals(product.getActivatedAt(), resource.getActivatedAt());
-        assertEquals(product.getStatus(), resource.getStatus());
-        assertEquals(product.isAuthorized(), resource.isAuthorized());
-        assertEquals(product.getUserRole(), resource.getUserRole());
+        assertEquals(product.getNode().getId(), resource.getId());
+        assertEquals(product.getNode().getLogo(), resource.getLogo());
+        assertEquals(product.getNode().getTitle(), resource.getTitle());
+        assertEquals(product.getNode().getDescription(), resource.getDescription());
+        assertEquals(product.getNode().getUrlPublic(), resource.getUrlPublic());
+        assertEquals(product.getNode().getUrlBO(), resource.getUrlBO());
+        assertEquals(product.getNode().getActivatedAt(), resource.getActivatedAt());
+        assertEquals(product.getNode().getStatus(), resource.getStatus());
+        assertEquals(product.getNode().isAuthorized(), resource.isAuthorized());
+        assertEquals(product.getNode().getUserRole(), resource.getUserRole());
+        assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
+        assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
+        assertEquals(product.getChildren().get(0).getStatus(), resource.getChildren().get(0).getStatus());
         TestUtils.reflectionEqualsByName(product, resource);
     }
 
@@ -41,7 +51,7 @@ class ProductMapperTest {
     @Test
     void toResource_null() {
         // given
-        Product model = null;
+        ProductTree model = null;
         // when
         ProductsResource resource = ProductsMapper.toResource(model);
         // then

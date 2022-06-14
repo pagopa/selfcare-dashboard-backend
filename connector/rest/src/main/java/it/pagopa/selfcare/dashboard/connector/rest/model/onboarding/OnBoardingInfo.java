@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class OnBoardingInfo {
-    private PersonInfo person;
+    private String userId;
     private List<OnboardingData> institutions;
 }
