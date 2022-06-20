@@ -26,7 +26,6 @@ public class User {
     private String taxCode;
     private PartyRole role;
     private String email;
-    private String product;
     private String productRole;
 
 }
