@@ -265,10 +265,10 @@ class PartyConnectorImpl implements PartyConnector {
 
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId(institutionId);
+        onboardingUsersRequest.setProductId(productId);
         Map<PartyRole, List<User>> partyRoleToUsersMap = userDto.getRoles().stream()
                 .map(role -> {
                     User user = new User();
-                    user.setProduct(productId);
                     user.setName(userDto.getName());
                     user.setSurname(userDto.getSurname());
                     user.setTaxCode(userDto.getTaxCode());

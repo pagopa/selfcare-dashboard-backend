@@ -958,13 +958,13 @@ class PartyConnectorImplTest {
         OnboardingUsersRequest request = onboardingRequestCaptor.getValue();
         Assertions.assertNotNull(request);
         Assertions.assertEquals(institutionId, request.getInstitutionId());
+        Assertions.assertEquals(productId, request.getProductId());
         Assertions.assertNotNull(request.getUsers());
         Assertions.assertEquals(1, request.getUsers().size());
         Assertions.assertEquals(createUserDto.getName(), request.getUsers().get(0).getName());
         Assertions.assertEquals(createUserDto.getSurname(), request.getUsers().get(0).getSurname());
         Assertions.assertEquals(createUserDto.getTaxCode(), request.getUsers().get(0).getTaxCode());
         Assertions.assertEquals(createUserDto.getEmail(), request.getUsers().get(0).getEmail());
-        Assertions.assertEquals(productId, request.getUsers().get(0).getProduct());
         Assertions.assertEquals(userId, request.getUsers().get(0).getId().toString());
         createUserDto.getRoles().forEach(role -> request.getUsers().forEach(user -> {
             Assertions.assertEquals(role.getProductRole(), user.getProductRole());
