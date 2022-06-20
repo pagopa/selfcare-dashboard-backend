@@ -1521,18 +1521,19 @@
             "type" : "integer",
             "format" : "int32"
           }
-        }, {
-          "name" : "size",
-          "in" : "query",
-          "description" : "Number of records per page, default size is 20",
-          "required" : false,
-          "style" : "form",
-          "allowReserved" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
+        },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Number of records per page",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }, {
           "name" : "sort",
           "in" : "query",
           "description" : "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
@@ -2349,11 +2350,11 @@
             "format" : "uuid"
           },
           "name" : {
-            "type" : "string",
-            "description" : "User's name"
+            "type": "string",
+            "description": "User's name"
           },
-          "products" : {
-            "type" : "array",
+          "products": {
+            "type": "array",
             "description": "Authorized user products",
             "items": {
               "$ref": "#/components/schemas/ProductInfoResource"
@@ -2480,7 +2481,7 @@
           },
           "title": {
             "type": "string",
-            "description" : "Product's title"
+            "description": "Product's title"
           }
         }
       },
@@ -2810,14 +2811,14 @@
             "description": "Date on which the group was modified",
             "format": "date-time"
           },
-          "modifiedBy" : {
-            "type" : "string",
-            "description" : "User by which the group was modified",
-            "format" : "uuid"
+          "modifiedBy": {
+            "type": "string",
+            "description": "User by which the group was modified",
+            "format": "uuid"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Users group's name"
+          "name": {
+            "type": "string",
+            "description": "Users group's name"
           },
           "productId" : {
             "type" : "string",

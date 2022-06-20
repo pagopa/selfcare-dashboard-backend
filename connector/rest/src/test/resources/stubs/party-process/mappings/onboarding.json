@@ -7,6 +7,9 @@
         "matchesJsonPath": "$.institutionId"
       },
       {
+        "matchesJsonPath": "$.productId"
+      },
+      {
         "matchesJsonPath": "$[?(@.users.size() == 1)]"
       }
     ]
