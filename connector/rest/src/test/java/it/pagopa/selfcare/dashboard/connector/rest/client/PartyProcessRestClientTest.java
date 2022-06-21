@@ -236,6 +236,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // given
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId("institutionId");
+        onboardingUsersRequest.setProductId("productId");
         onboardingUsersRequest.setUsers(List.of(TestUtils.mockInstance(new User())));
         // when
         Executable executable = () -> restClient.onboardingSubdelegates(onboardingUsersRequest);
@@ -249,6 +250,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         // given
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId("institutionId");
+        onboardingUsersRequest.setProductId("productId");
         onboardingUsersRequest.setUsers(List.of(TestUtils.mockInstance(new User())));
         // when
         Executable executable = () -> restClient.onboardingOperators(onboardingUsersRequest);
