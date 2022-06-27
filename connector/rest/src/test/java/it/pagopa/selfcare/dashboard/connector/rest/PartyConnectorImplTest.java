@@ -201,6 +201,7 @@ class PartyConnectorImplTest {
         InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNotNull(institutionInfo);
+        TestUtils.checkNotNullFields(institutionInfo);
         assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
         assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
         assertEquals(onboardingData.getExternalId(), institutionInfo.getExternalId());
@@ -1100,12 +1101,15 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
+        Attribute attribute = TestUtils.mockInstance(new Attribute());
+        institutionMock.setAttributes(List.of(attribute));
         Mockito.when(restClientMock.getInstitution(Mockito.any()))
                 .thenReturn(institutionMock);
         // when
         Institution institution = partyConnector.getInstitution(institutionId);
         // then
         Assertions.assertSame(institutionMock, institution);
+        TestUtils.checkNotNullFields(institution);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getInstitution(institutionId);
         Mockito.verifyNoMoreInteractions(restClientMock);
@@ -1143,12 +1147,15 @@ class PartyConnectorImplTest {
         // given
         String institutionExternalId = "institutionExternalId";
         Institution institutionMock = TestUtils.mockInstance(new Institution());
+        Attribute attribute = TestUtils.mockInstance(new Attribute());
+        institutionMock.setAttributes(List.of(attribute));
         Mockito.when(restClientMock.getInstitutionByExternalId(Mockito.any()))
                 .thenReturn(institutionMock);
         // when
         Institution institution = partyConnector.getInstitutionByExternalId(institutionExternalId);
         // then
         Assertions.assertSame(institutionMock, institution);
+        TestUtils.checkNotNullFields(institution);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getInstitutionByExternalId(institutionExternalId);
         Mockito.verifyNoMoreInteractions(restClientMock);
