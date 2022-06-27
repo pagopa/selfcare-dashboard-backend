@@ -1511,15 +1511,15 @@
             "type" : "string"
           }
         }, {
-          "name" : "page",
-          "in" : "query",
-          "description" : "Results page you want to retrieve (0..N)",
-          "required" : false,
-          "style" : "form",
-          "allowReserved" : true,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
+          "name": "page",
+          "in": "query",
+          "description": "Results page you want to retrieve (0..N)",
+          "required": false,
+          "style": "form",
+          "allowReserved": true,
+          "schema": {
+            "type": "integer",
+            "format": "int32"
           }
         },
           {
@@ -1533,17 +1533,18 @@
               "type": "integer",
               "format": "int32"
             }
-          }, {
-          "name" : "sort",
-          "in" : "query",
-          "description" : "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-          "required" : false,
-          "style" : "form",
-          "allowReserved" : true,
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "style": "form",
+            "allowReserved": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
             }
           }
         }, {
@@ -2236,20 +2237,35 @@
         }
       },
       "InstitutionResource" : {
-        "title" : "InstitutionResource",
-        "required" : [ "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
-        "type" : "object",
-        "properties" : {
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
+        "title": "InstitutionResource",
+        "required": [
+          "address",
+          "externalId",
+          "fiscalCode",
+          "id",
+          "mailAddress",
+          "name",
+          "origin",
+          "originId",
+          "status",
+          "userRole"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
           },
-          "externalId" : {
-            "type" : "string",
-            "description" : "Institution's unique external identifier"
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
-          "fiscalCode" : {
-            "type" : "string",
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier"
+          },
+          "fiscalCode": {
+            "type": "string",
             "description" : "Fiscal code corresponding to the institution"
           },
           "id" : {
@@ -2344,12 +2360,12 @@
             "format": "email",
             "example": "email@example.com"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "name" : {
+          "name": {
             "type": "string",
             "description": "User's name"
           },
@@ -2597,18 +2613,27 @@
         }
       },
       "ProductsResource" : {
-        "title" : "ProductsResource",
-        "required" : [ "authorized", "description", "id", "logo", "status", "title", "urlBO" ],
-        "type" : "object",
-        "properties" : {
-          "activatedAt" : {
-            "type" : "string",
-            "description" : "Date the products was activated",
-            "format" : "date-time"
+        "title": "ProductsResource",
+        "required": [
+          "authorized",
+          "description",
+          "id",
+          "imageUrl",
+          "logo",
+          "status",
+          "title",
+          "urlBO"
+        ],
+        "type": "object",
+        "properties": {
+          "activatedAt": {
+            "type": "string",
+            "description": "Date the products was activated",
+            "format": "date-time"
           },
-          "authorized" : {
-            "type" : "boolean",
-            "description" : "flag indicating whether the logged user has the authorization to manage the product",
+          "authorized": {
+            "type": "boolean",
+            "description": "flag indicating whether the logged user has the authorization to manage the product",
             "example" : false
           },
           "children" : {
@@ -2618,24 +2643,32 @@
               "$ref" : "#/components/schemas/SubProductResource"
             }
           },
-          "description" : {
-            "type" : "string",
-            "description" : "Product's description"
+          "description": {
+            "type": "string",
+            "description": "Product's description"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "logo" : {
-            "type" : "string",
-            "description" : "Product's logo"
+          "imageUrl": {
+            "type": "string",
+            "description": "Product's depict image"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "logo": {
+            "type": "string",
+            "description": "Product's logo"
           },
-          "title" : {
+          "status": {
+            "type": "string",
+            "description": "Product's status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
+          },
+          "title": {
             "type" : "string",
             "description" : "Product's title"
           },
@@ -2820,14 +2853,17 @@
             "type": "string",
             "description": "Users group's name"
           },
-          "productId" : {
-            "type" : "string",
-            "description" : "Users group's productId"
+          "productId": {
+            "type": "string",
+            "description": "Users group's productId"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Users group's status",
-            "enum" : [ "ACTIVE", "SUSPENDED" ]
+          "status": {
+            "type": "string",
+            "description": "Users group's status",
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED"
+            ]
           }
         }
       },

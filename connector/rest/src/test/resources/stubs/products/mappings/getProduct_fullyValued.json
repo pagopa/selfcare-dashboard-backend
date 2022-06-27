@@ -14,6 +14,7 @@
       "id": "string",
       "identityTokenAudience": "string",
       "logo": "string",
+      "depictImageUrl": "string",
       "parentId": "string",
       "roleManagementURL": "string",
       "title": "string",

@@ -28,6 +28,7 @@ public class InstitutionMapper {
             resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());
             resource.setStatus(model.getStatus());
+            resource.setAddress(model.getAddress());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<SelfCareGrantedAuthority> selcAuthority = authentication.getAuthorities()

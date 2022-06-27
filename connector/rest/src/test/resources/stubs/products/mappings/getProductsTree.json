@@ -10,6 +10,7 @@
         "children": [
           {
             "logo": "products logo",
+            "depictImageUrl": "string",
             "title": "products title",
             "description": "products description",
             "urlPublic": "urlPublic",
@@ -19,6 +20,7 @@
           },
           {
             "logo": "products logo",
+            "depictImageUrl": "string",
             "title": "products title",
             "description": "products description",
             "urlPublic": "urlPublic",
