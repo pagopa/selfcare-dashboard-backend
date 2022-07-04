@@ -13,6 +13,7 @@ public class InstitutionInfo {
     private InstitutionType institutionType;
     private String externalId;
     private String description;
+    private String address;
     private String taxCode;
     private String digitalAddress;
     private String status;
