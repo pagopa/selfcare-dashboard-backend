@@ -1,13 +1,13 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;

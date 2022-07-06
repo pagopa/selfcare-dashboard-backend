@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -13,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
 
+import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -33,10 +34,9 @@ class InstitutionMapperTest {
         InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setId");
         institutionInfo.setId(internalInstitutionId);
         institutionInfo.setExternalId(institutionId);
-        SelfCareAuthority selcRole = LIMITED;
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(internalInstitutionId, Collections.singleton(new ProductGrantedAuthority(selcRole, "productRole", "productId")))));
+                Collections.singletonList(new SelfCareGrantedAuthority(internalInstitutionId, Collections.singleton(new ProductGrantedAuthority(OPERATOR, "productRole", "productId")))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // when
@@ -52,7 +52,7 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getTaxCode(), resource.getFiscalCode());
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
         assertEquals(institutionInfo.getAddress(), resource.getAddress());
-        assertEquals(selcRole.name(), resource.getUserRole());
+        assertEquals(LIMITED.name(), resource.getUserRole());
         assertEquals(institutionInfo.getStatus(), resource.getStatus());
         TestUtils.reflectionEqualsByName(institutionInfo, resource);
     }
@@ -96,7 +96,7 @@ class InstitutionMapperTest {
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
-        assertEquals(SelfCareAuthority.ADMIN.toString(), resource.getUserRole());
+        assertEquals(ADMIN.toString(), resource.getUserRole());
     }
 
 
@@ -108,12 +108,12 @@ class InstitutionMapperTest {
         String institutionId = "institutionId";
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(new ProductGrantedAuthority(LIMITED, "productRole", "productId")))));
+                Collections.singletonList(new SelfCareGrantedAuthority(institutionId, Collections.singleton(new ProductGrantedAuthority(OPERATOR, "productRole", "productId")))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
-        assertEquals(SelfCareAuthority.ADMIN.toString(), resource.getUserRole());
+        assertEquals(ADMIN.toString(), resource.getUserRole());
     }
 
 

@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;

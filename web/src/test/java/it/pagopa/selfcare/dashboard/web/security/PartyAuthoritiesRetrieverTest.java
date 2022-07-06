@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.base.security.PartyRole.SUB_DELEGATE;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,7 +85,7 @@ class PartyAuthoritiesRetrieverTest {
     @Test
     void retrieveAuthorities() {
         // given
-        SelfCareAuthority role = ADMIN;
+        PartyRole role = MANAGER;
         String institutionId = "institutionId";
         Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(List.of(new AuthInfo() {
@@ -96,11 +98,6 @@ class PartyAuthoritiesRetrieverTest {
                     public Collection<ProductRole> getProductRoles() {
                         return Collections.singleton(new ProductRole() {
                             @Override
-                            public SelfCareAuthority getSelfCareRole() {
-                                return role;
-                            }
-
-                            @Override
                             public String getProductRole() {
                                 return "productRole1";
                             }
@@ -108,6 +105,11 @@ class PartyAuthoritiesRetrieverTest {
                             @Override
                             public String getProductId() {
                                 return "productId1";
+                            }
+
+                            @Override
+                            public PartyRole getPartyRole() {
+                                return MANAGER;
                             }
                         });
                     }
@@ -121,11 +123,6 @@ class PartyAuthoritiesRetrieverTest {
                     public Collection<ProductRole> getProductRoles() {
                         return Collections.singleton(new ProductRole() {
                             @Override
-                            public SelfCareAuthority getSelfCareRole() {
-                                return role;
-                            }
-
-                            @Override
                             public String getProductRole() {
                                 return "productRole2";
                             }
@@ -133,6 +130,11 @@ class PartyAuthoritiesRetrieverTest {
                             @Override
                             public String getProductId() {
                                 return "productId2";
+                            }
+
+                            @Override
+                            public PartyRole getPartyRole() {
+                                return SUB_DELEGATE;
                             }
                         });
                     }
@@ -144,7 +146,7 @@ class PartyAuthoritiesRetrieverTest {
         assertEquals(2, authorities.size());
         authorities.forEach(grantedAuthority -> {
             assertEquals(institutionId, ((SelfCareGrantedAuthority) grantedAuthority).getInstitutionId());
-            assertEquals(role.name(), grantedAuthority.getAuthority());
+            assertEquals(ADMIN.name(), grantedAuthority.getAuthority());
         });
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.isNull());

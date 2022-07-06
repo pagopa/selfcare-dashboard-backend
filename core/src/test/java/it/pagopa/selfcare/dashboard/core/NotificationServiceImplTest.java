@@ -1,12 +1,12 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import freemarker.template.Configuration;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;

@@ -12,7 +12,7 @@
 
 package it.pagopa.selfcare.dashboard.connector.rest.model;
 
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
