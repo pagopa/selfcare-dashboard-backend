@@ -2,10 +2,7 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
@@ -128,7 +125,7 @@ public class ExchangeTokenService {
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
-                .setHeaderParam(JwsHeader.TYPE, JwsHeader.JWT_TYPE)
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", result);
