@@ -1,10 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
@@ -29,8 +29,8 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.util.*;
 
-import static it.pagopa.selfcare.dashboard.connector.model.PartyRole.MANAGER;
-import static it.pagopa.selfcare.dashboard.connector.model.PartyRole.OPERATOR;
+import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
