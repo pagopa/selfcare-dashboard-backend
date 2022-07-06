@@ -1,10 +1,8 @@
 package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -13,6 +11,12 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.io.Serializable;
 import java.util.List;
+
+import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class SelfCarePermissionEvaluatorTest {
@@ -29,8 +33,8 @@ class SelfCarePermissionEvaluatorTest {
         // when
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("An authentication is required", e.getMessage());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An authentication is required", e.getMessage());
     }
 
 
@@ -43,8 +47,8 @@ class SelfCarePermissionEvaluatorTest {
         // when
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("A permission is required", e.getMessage());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A permission is required", e.getMessage());
     }
 
 
@@ -57,7 +61,7 @@ class SelfCarePermissionEvaluatorTest {
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
 
@@ -70,7 +74,7 @@ class SelfCarePermissionEvaluatorTest {
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
 
@@ -80,13 +84,13 @@ class SelfCarePermissionEvaluatorTest {
         String institutionId = "institutionId";
         Object targetDomainObject = new ProductAclDomain(institutionId, "notPermittedProductId");
         Object permission = new Object();
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
     @Test
@@ -95,14 +99,14 @@ class SelfCarePermissionEvaluatorTest {
         String institutionId = "institutionId";
         String productId = "productId";
         Object targetDomainObject = new ProductAclDomain(institutionId, productId);
-        Object permission = SelfCareAuthority.LIMITED.toString();
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", productId));
+        Object permission = LIMITED.toString();
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
     @Test
@@ -111,14 +115,14 @@ class SelfCarePermissionEvaluatorTest {
         String institutionId = "institutionId";
         String productId = "productId";
         Object targetDomainObject = new ProductAclDomain(institutionId, productId);
-        Object permission = SelfCareAuthority.ADMIN.toString();
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", productId));
+        Object permission = ADMIN.toString();
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertTrue(hasPermission);
+        assertTrue(hasPermission);
     }
 
     @Test
@@ -128,13 +132,13 @@ class SelfCarePermissionEvaluatorTest {
         String productId = "productId";
         Object targetDomainObject = new ProductAclDomain(institutionId, productId);
         Object permission = "ANY";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", productId));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertTrue(hasPermission);
+        assertTrue(hasPermission);
     }
 
 
@@ -145,13 +149,13 @@ class SelfCarePermissionEvaluatorTest {
         String productId = "productId";
         Object targetDomainObject = new ProductAclDomain(institutionId, productId);
         Object permission = "ANY";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.LIMITED, "productRole", productId));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(OPERATOR, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetDomainObject, permission);
         // then
-        Assertions.assertTrue(hasPermission);
+        assertTrue(hasPermission);
     }
 
 
@@ -165,8 +169,8 @@ class SelfCarePermissionEvaluatorTest {
         // when
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("An authentication is required", e.getMessage());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An authentication is required", e.getMessage());
     }
 
 
@@ -180,8 +184,8 @@ class SelfCarePermissionEvaluatorTest {
         // when
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("A targetType is required", e.getMessage());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A targetType is required", e.getMessage());
     }
 
 
@@ -195,8 +199,8 @@ class SelfCarePermissionEvaluatorTest {
         // when
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("A permission is required", e.getMessage());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A permission is required", e.getMessage());
     }
 
 
@@ -210,7 +214,7 @@ class SelfCarePermissionEvaluatorTest {
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
 
@@ -224,7 +228,7 @@ class SelfCarePermissionEvaluatorTest {
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
 
@@ -235,13 +239,13 @@ class SelfCarePermissionEvaluatorTest {
         String targetType = InstitutionResource.class.getSimpleName();
         Object permission = new Object();
         String institutionId = "institutionId";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
 
@@ -250,14 +254,14 @@ class SelfCarePermissionEvaluatorTest {
         // given
         Serializable targetId = "institutionId";
         String targetType = InstitutionResource.class.getSimpleName();
-        Object permission = SelfCareAuthority.LIMITED.toString();
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        Object permission = LIMITED.toString();
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(targetId.toString(), roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertFalse(hasPermission);
+        assertFalse(hasPermission);
     }
 
 
@@ -266,14 +270,14 @@ class SelfCarePermissionEvaluatorTest {
         // given
         Serializable targetId = "institutionId";
         String targetType = InstitutionResource.class.getSimpleName();
-        Object permission = SelfCareAuthority.ADMIN.toString();
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        Object permission = ADMIN.toString();
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(targetId.toString(), roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertTrue(hasPermission);
+        assertTrue(hasPermission);
     }
 
 
@@ -283,13 +287,13 @@ class SelfCarePermissionEvaluatorTest {
         Serializable targetId = "institutionId";
         String targetType = InstitutionResource.class.getSimpleName();
         Object permission = "ANY";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(targetId.toString(), roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertTrue(hasPermission);
+        assertTrue(hasPermission);
     }
 
 
@@ -299,13 +303,13 @@ class SelfCarePermissionEvaluatorTest {
         Serializable targetId = "institutionId";
         String targetType = InstitutionResource.class.getSimpleName();
         Object permission = "ANY";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.LIMITED, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(OPERATOR, "productRole", "productId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(targetId.toString(), roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         // when
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
-        Assertions.assertTrue(hasPermission);
+        assertTrue(hasPermission);
     }
 
 }

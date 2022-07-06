@@ -2,8 +2,8 @@ package it.pagopa.selfcare.dashboard.web.model.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

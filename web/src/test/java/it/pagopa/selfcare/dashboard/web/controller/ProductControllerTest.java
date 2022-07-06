@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
