@@ -124,13 +124,15 @@ class ExchangeTokenServiceTest {
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
+        verifyNoInteractions(jwtServiceMock);
     }
 
 
     @Test
     void exchange_noSelfCareAuth() throws Exception {
         // given
+        String institutionId = null;
+        String productId = null;
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         JwtService jwtServiceMock = mock(JwtService.class);
@@ -141,11 +143,11 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
+        assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
     }
 
 
@@ -153,6 +155,7 @@ class ExchangeTokenServiceTest {
     void exchange_SelfCareAuthOnDifferentInstId() throws Exception {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         JwtService jwtServiceMock = mock(JwtService.class);
@@ -160,16 +163,41 @@ class ExchangeTokenServiceTest {
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
-        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("institutionId2", roleOnProducts));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("differentInstitutionId", roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
+        assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
+    }
+
+
+    @Test
+    void exchange_SelfCareAuthOnDifferentProductId() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        JwtService jwtServiceMock = mock(JwtService.class);
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setDuration("PT5S");
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "differentProductId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        // when
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
     }
 
 
@@ -177,6 +205,7 @@ class ExchangeTokenServiceTest {
     void exchange_noSessionTokenClaims() throws Exception {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
@@ -186,12 +215,12 @@ class ExchangeTokenServiceTest {
         when(jwtServiceMock.getClaims(any()))
                 .thenReturn(null);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
@@ -205,6 +234,7 @@ class ExchangeTokenServiceTest {
     void exchange_noInstitutionInfo() throws Exception {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         String jti = "id";
         String sub = "subject";
         Date iat = Date.from(Instant.now().minusSeconds(1));
@@ -225,12 +255,12 @@ class ExchangeTokenServiceTest {
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
