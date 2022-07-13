@@ -1,9 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -212,7 +211,7 @@ class PartyConnectorImpl implements PartyConnector {
                                         PartyProductRole productRole = new PartyProductRole();
                                         productRole.setProductId(onboardingData.getProductInfo().getId());
                                         productRole.setProductRole(onboardingData.getProductInfo().getRole());
-                                        productRole.setSelfCareRole(onboardingData.getRole().getSelfCareAuthority());
+                                        productRole.setPartyRole(onboardingData.getRole());
                                         return productRole;
                                     }, Collectors.toList())),
                             map -> map.entrySet().stream()
@@ -355,12 +354,14 @@ class PartyConnectorImpl implements PartyConnector {
     }
 
 
-    @Getter
     @Setter(AccessLevel.PRIVATE)
     private static class PartyProductRole implements ProductRole {
-        private SelfCareAuthority selfCareRole;
+        @Getter
         private String productRole;
+        @Getter
         private String productId;
+        @Getter
+        private PartyRole partyRole;
     }
 
 

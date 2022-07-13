@@ -3,14 +3,12 @@ package it.pagopa.selfcare.dashboard.web.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
@@ -28,7 +26,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.test.context.TestSecurityContextHolder;
@@ -47,7 +44,12 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.util.*;
 
+import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.data.domain.Pageable.unpaged;
 
 @ExtendWith({MockitoExtension.class, SystemStubsExtension.class})
 class ExchangeTokenServiceTest {
@@ -115,23 +117,25 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
         // when
         Executable executable = () -> exchangeTokenService.exchange(null, null);
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
+        verifyNoInteractions(jwtServiceMock);
     }
 
 
     @Test
     void exchange_noSelfCareAuth() throws Exception {
         // given
+        String institutionId = null;
+        String productId = null;
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
@@ -139,11 +143,11 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
+        assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
     }
 
 
@@ -151,23 +155,49 @@ class ExchangeTokenServiceTest {
     void exchange_SelfCareAuthOnDifferentInstId() throws Exception {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
+        JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
-        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("institutionId2", roleOnProducts));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("differentInstitutionId", roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A Self Care Granted SelfCareAuthority is required", e.getMessage());
-        Mockito.verifyNoInteractions(jwtServiceMock);
+        assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
+    }
+
+
+    @Test
+    void exchange_SelfCareAuthOnDifferentProductId() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        JwtService jwtServiceMock = mock(JwtService.class);
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setDuration("PT5S");
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "differentProductId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        // when
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
     }
 
 
@@ -175,27 +205,28 @@ class ExchangeTokenServiceTest {
     void exchange_noSessionTokenClaims() throws Exception {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
                 .thenReturn(null);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
-        Mockito.verify(jwtServiceMock, Mockito.times(1))
-                .getClaims(Mockito.any());
-        Mockito.verifyNoMoreInteractions(jwtServiceMock);
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verifyNoMoreInteractions(jwtServiceMock);
     }
 
 
@@ -203,6 +234,7 @@ class ExchangeTokenServiceTest {
     void exchange_noInstitutionInfo() throws Exception {
         // given
         String institutionId = "institutionId";
+        String productId = "productId";
         String jti = "id";
         String sub = "subject";
         Date iat = Date.from(Instant.now().minusSeconds(1));
@@ -212,31 +244,31 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
                         .setIssuedAt(iat)
                         .setExpiration(exp));
-        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
-        ProductsConnector productsConnectorMock = Mockito.mock(ProductsConnector.class);
-        UserGroupService groupServiceMock = Mockito.mock(UserGroupService.class);
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, "productRole", "productId"));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, null);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
-        Mockito.verify(jwtServiceMock, Mockito.times(1))
-                .getClaims(Mockito.any());
-        Mockito.verify(institutionServiceMock, Mockito.times(1))
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
+        verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
     }
 
     @ParameterizedTest
@@ -251,39 +283,39 @@ class ExchangeTokenServiceTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRole = "productRole";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, productRole, productId));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         UUID userId = UUID.randomUUID();
         SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
 
-        ProductsConnector productsConnectorMock = Mockito.mock(ProductsConnector.class);
-        Product product = TestUtils.mockInstance(new Product());
-        ProductRoleInfo productRoleInfo = TestUtils.mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = TestUtils.mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        Product product = mockInstance(new Product());
+        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
+        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
         productRole1.setCode(productRole);
         productRoleInfo.setRoles(List.of(productRole1));
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
         product.setIdentityTokenAudience(realm);
-        Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
+        when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
 
         TestSecurityContextHolder.setAuthentication(authentication);
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
                         .setIssuedAt(iat)
                         .setExpiration(exp));
-        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
-        Mockito.when(institutionServiceMock.getInstitution(Mockito.any()))
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
-        UserGroupService groupServiceMock = Mockito.mock(UserGroupService.class);
-        Mockito.when(groupServiceMock.getUserGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenReturn(Collections.emptyList());
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
@@ -327,13 +359,13 @@ class ExchangeTokenServiceTest {
         assertNotNull(institution.getRoles());
         assertEquals(1, institution.getRoles().size());
         assertFalse(exchangedClaims.containsKey("groups"));
-        Mockito.verify(jwtServiceMock, Mockito.times(1))
-                .getClaims(Mockito.any());
-        Mockito.verify(institutionServiceMock, Mockito.times(1))
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verify(groupServiceMock, Mockito.times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.unpaged());
-        Mockito.verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
+        verify(groupServiceMock, times(1))
+                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), unpaged());
+        verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
 
@@ -350,35 +382,35 @@ class ExchangeTokenServiceTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRole = "productRole";
-        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(SelfCareAuthority.ADMIN, productRole, productId));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         UUID userId = UUID.randomUUID();
         SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
-        JwtService jwtServiceMock = Mockito.mock(JwtService.class);
-        Mockito.when(jwtServiceMock.getClaims(Mockito.any()))
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
                         .setIssuedAt(iat)
                         .setExpiration(exp));
-        InstitutionService institutionServiceMock = Mockito.mock(InstitutionService.class);
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
-        Mockito.when(institutionServiceMock.getInstitution(Mockito.any()))
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
-        UserGroupService groupServiceMock = Mockito.mock(UserGroupService.class);
-        UserGroupInfo groupInfo = TestUtils.mockInstance(new UserGroupInfo());
-        UserInfo user = TestUtils.mockInstance(new UserInfo());
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
+        UserInfo user = mockInstance(new UserInfo());
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
-        Mockito.when(groupServiceMock.getUserGroups(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenReturn(Collections.singletonList(groupInfo));
 
-        ProductsConnector productsConnectorMock = Mockito.mock(ProductsConnector.class);
-        Product product = TestUtils.mockInstance(new Product());
-        ProductRoleInfo productRoleInfo = TestUtils.mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = TestUtils.mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        Product product = mockInstance(new Product());
+        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
+        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
         productRole1.setCode(productRole);
         productRoleInfo.setRoles(List.of(productRole1));
         EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
@@ -386,7 +418,7 @@ class ExchangeTokenServiceTest {
         product.setRoleMappings(roleMappings);
         product.setIdentityTokenAudience(realm);
 
-        Mockito.when(productsConnectorMock.getProduct(Mockito.anyString()))
+        when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
 
 
@@ -431,13 +463,13 @@ class ExchangeTokenServiceTest {
         List<String> groups = institution.getGroups();
         assertEquals(groupInfo.getId(), groups.get(0));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
-        Mockito.verify(jwtServiceMock, Mockito.times(1))
-                .getClaims(Mockito.any());
-        Mockito.verify(institutionServiceMock, Mockito.times(1))
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
-        Mockito.verify(groupServiceMock, Mockito.times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.unpaged());
-        Mockito.verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
+        verify(groupServiceMock, times(1))
+                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), unpaged());
+        verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
 

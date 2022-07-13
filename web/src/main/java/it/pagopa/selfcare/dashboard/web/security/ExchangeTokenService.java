@@ -2,21 +2,18 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
@@ -26,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -82,46 +78,46 @@ public class ExchangeTokenService {
         if (authentication == null) {
             throw new IllegalStateException("Authentication is required");
         }
-        Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
+        final ProductGrantedAuthority productGrantedAuthority = authentication.getAuthorities()
                 .stream()
                 .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
                 .map(SelfCareGrantedAuthority.class::cast)
                 .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
-                .findAny();
-        SelfCareGrantedAuthority grantedAuthority = (SelfCareGrantedAuthority) selcAuthority
-                .orElseThrow(() -> new IllegalArgumentException("A Self Care Granted SelfCareAuthority is required"));
+                .map(SelfCareGrantedAuthority::getRoleOnProducts)
+                .filter(map -> map.containsKey(productId))
+                .map(map -> map.get(productId))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException(String.format("A Product Granted SelfCareAuthority is required for product '%s' and institution '%s'", productId, institutionId)));
         Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString());
         Assert.notNull(selcClaims, "Session token claims is required");
         InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
         Assert.notNull(institutionInfo, "Institution info is required");
         SelfCareUser principal = (SelfCareUser) authentication.getPrincipal();
-        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(UUID.fromString(principal.getId())), Pageable.unpaged());
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setTaxCode(institutionInfo.getTaxCode());
-        Product product = productsConnector.getProduct(productId);
-        EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
-
-        List<Role> roles = new ArrayList<>();
-        claims.setAudience(product.getIdentityTokenAudience());
-        grantedAuthority.getRoleOnProducts().get(productId).getProductRoles().forEach(productRoleCode -> {
-            Role role = new Role();
-            role.setPartyRole(Product.getPartyRole(productRoleCode, roleMappings).orElse(null));
-            role.setProductRole(productRoleCode);
-            roles.add(role);
-        });
+        institution.setRoles(productGrantedAuthority.getProductRoles().stream()
+                .map(productRoleCode -> {
+                    Role role = new Role();
+                    role.setPartyRole(productGrantedAuthority.getPartyRole());
+                    role.setProductRole(productRoleCode);
+                    return role;
+                }).collect(Collectors.toList()));
+        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
+                Optional.of(productId),
+                Optional.of(UUID.fromString(principal.getId())),
+                Pageable.unpaged());
         if (!groupInfos.isEmpty()) {
-            List<String> groupIds = groupInfos.stream()
+            institution.setGroups(groupInfos.stream()
                     .map(UserGroupInfo::getId)
-                    .collect(Collectors.toList());
-            institution.setGroups(groupIds);
+                    .collect(Collectors.toList()));
         }
-
-        institution.setRoles(roles);
         claims.setInstitution(institution);
+        Product product = productsConnector.getProduct(productId);
+        claims.setAudience(product.getIdentityTokenAudience());
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
@@ -129,6 +125,7 @@ public class ExchangeTokenService {
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", result);

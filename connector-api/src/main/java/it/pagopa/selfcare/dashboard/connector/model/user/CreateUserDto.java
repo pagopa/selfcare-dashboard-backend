@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.model.user;
 
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import lombok.Data;
 
 import java.util.Set;

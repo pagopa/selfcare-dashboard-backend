@@ -38,7 +38,7 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
         if (authInfos != null) {
             authorities = authInfos.stream()
                     .map(authInfo -> new SelfCareGrantedAuthority(authInfo.getInstitutionId(), authInfo.getProductRoles().stream()
-                            .map(productRole -> new ProductGrantedAuthority(productRole.getSelfCareRole(),
+                            .map(productRole -> new ProductGrantedAuthority(productRole.getPartyRole(),
                                     productRole.getProductRole(),
                                     productRole.getProductId()))
                             .collect(Collectors.toMap(ProductGrantedAuthority::getProductId,

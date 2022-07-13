@@ -12,7 +12,7 @@
 
 package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 
-import it.pagopa.selfcare.dashboard.connector.model.PartyRole;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import lombok.Data;
 
 import java.util.UUID;
