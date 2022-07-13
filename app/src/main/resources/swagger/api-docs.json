@@ -2587,34 +2587,31 @@
           },
           "id" : {
             "type" : "string",
-            "description": "Product's unique identifier"
+            "description" : "Product's unique identifier"
           },
-          "imageUrl": {
-            "type": "string",
-            "description": "Product's depict image"
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "Product's depict image"
           },
-          "logo": {
-            "type": "string",
-            "description": "Product's logo"
+          "logo" : {
+            "type" : "string",
+            "description" : "Product's logo"
           },
-          "logoBgColor": {
-            "type": "string",
-            "description": "Product logo's background color"
+          "logoBgColor" : {
+            "pattern" : "^#[0-9A-F]{6}$",
+            "type" : "string",
+            "description" : "Product logo's background color"
           },
-          "status": {
-            "type": "string",
-            "description": "Product's status",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "PENDING"
-            ]
+          "status" : {
+            "type" : "string",
+            "description" : "Product's status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
           },
-          "title": {
-            "type": "string",
-            "description": "Product's title"
+          "title" : {
+            "type" : "string",
+            "description" : "Product's title"
           },
-          "urlBO": {
+          "urlBO" : {
             "type" : "string",
             "description" : "URL that redirects to the back-office section, where is possible to manage the product"
           },
