@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProductsResourceTest {
 
     private Validator validator;
-    private static final ProductsResource PRODUCTS_RESOURCE = TestUtils.mockInstance(new ProductsResource());
 
     @BeforeEach
     void setUp() {
@@ -47,6 +47,7 @@ class ProductsResourceTest {
         productsResource.setImageUrl(null);
         productsResource.setTitle(null);
         productsResource.setDescription(null);
+        productsResource.setLogoBgColor(null);
         productsResource.setUrlBO(null);
         productsResource.setStatus(null);
         // when
@@ -62,10 +63,22 @@ class ProductsResourceTest {
     }
 
     @Test
+    void validateRegExViolation() {
+        //given
+        ProductsResource productsResource = TestUtils.mockInstance(new ProductsResource());
+        //when
+        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
+        // then
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
     void validateNotNullFields() {
         // given
+        ProductsResource productsResource = TestUtils.mockInstance(new ProductsResource());
+        productsResource.setLogoBgColor("#FF56E1");
         // when
-        Set<ConstraintViolation<Object>> violations = validator.validate(PRODUCTS_RESOURCE);
+        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
         // then
         assertTrue(violations.isEmpty());
     }

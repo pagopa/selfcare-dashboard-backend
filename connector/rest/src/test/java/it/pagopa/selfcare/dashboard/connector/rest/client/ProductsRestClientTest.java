@@ -9,7 +9,6 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.rest.config.ProductsRestClientTestConfig;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -23,6 +22,8 @@ import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(
         locations = "classpath:config/products-rest-client.properties",
@@ -63,7 +64,7 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         // given and when
         List<Product> response = restClient.getProducts();
         // then
-        Assertions.assertFalse(response.isEmpty());
+        assertFalse(response.isEmpty());
     }
 
 
@@ -74,8 +75,8 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         // when
         Map<PartyRole, ProductRoleInfo> response = restClient.getProductRoleMappings(productId);
         // then
-        Assertions.assertNotNull(response);
-        Assertions.assertFalse(response.isEmpty());
+        assertNotNull(response);
+        assertFalse(response.isEmpty());
     }
 
     @Test
@@ -84,8 +85,9 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         //when
         List<ProductTree> response = restClient.getProductsTree();
         //then
-        Assertions.assertFalse(response.isEmpty());
-        Assertions.assertEquals(2, response.get(0).getChildren().size());
+        assertFalse(response.isEmpty());
+        assertNotNull(response.get(0).getNode().getLogoBgColor());
+        assertEquals(1, response.get(0).getChildren().size());
     }
 
     @Test
@@ -95,8 +97,8 @@ class ProductsRestClientTest extends BaseFeignRestClientTest {
         //when
         Product product = restClient.getProduct(productId);
         //then
-        Assertions.assertNotNull(product);
-        Assertions.assertNotNull(product.getIdentityTokenAudience());
+        assertNotNull(product);
+        assertNotNull(product.getIdentityTokenAudience());
     }
 
 }
