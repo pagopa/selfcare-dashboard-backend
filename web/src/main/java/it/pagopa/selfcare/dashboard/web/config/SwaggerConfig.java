@@ -6,15 +6,13 @@ import it.pagopa.selfcare.commons.web.swagger.EmailAnnotationSwaggerPluginConfig
 import it.pagopa.selfcare.commons.web.swagger.PageableParameterConfig;
 import it.pagopa.selfcare.commons.web.swagger.ServerSwaggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseBuilder;
@@ -31,6 +29,7 @@ import java.util.List;
  * The Class SwaggerConfig.
  */
 @Configuration
+@Import(BeanValidatorPluginsConfiguration.class)
 class SwaggerConfig {
 
     private static final String AUTH_SCHEMA_NAME = "bearerAuth";

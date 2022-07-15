@@ -34,6 +34,7 @@ class ProductMapperTest {
         assertEquals(product.getNode().getId(), resource.getId());
         assertEquals(product.getNode().getLogo(), resource.getLogo());
         assertEquals(product.getNode().getTitle(), resource.getTitle());
+        assertEquals(product.getNode().getLogoBgColor(), resource.getLogoBgColor());
         assertEquals(product.getNode().getDescription(), resource.getDescription());
         assertEquals(product.getNode().getUrlPublic(), resource.getUrlPublic());
         assertEquals(product.getNode().getUrlBO(), resource.getUrlBO());

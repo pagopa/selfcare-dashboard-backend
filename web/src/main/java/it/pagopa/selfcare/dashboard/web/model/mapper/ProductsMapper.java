@@ -20,6 +20,7 @@ public class ProductsMapper {
             resource = new ProductsResource();
             resource.setId(model.getNode().getId());
             resource.setLogo(model.getNode().getLogo());
+            resource.setLogoBgColor(model.getNode().getLogoBgColor());
             resource.setImageUrl(model.getNode().getDepictImageUrl());
             resource.setTitle(model.getNode().getTitle());
             resource.setDescription(model.getNode().getDescription());

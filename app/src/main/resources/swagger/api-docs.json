@@ -2597,6 +2597,11 @@
             "type" : "string",
             "description" : "Product's logo"
           },
+          "logoBgColor" : {
+            "pattern" : "^#[0-9A-F]{6}$",
+            "type" : "string",
+            "description" : "Product logo's background color"
+          },
           "status" : {
             "type" : "string",
             "description" : "Product's status",
