@@ -501,7 +501,13 @@ class NotificationServiceImplTest {
         String productTitle = "productId";
         String userId = "userId";
         Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
-
+        User user = mockInstance(new User());
+        WorkContact contact = new WorkContact();
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        workContactMap.put("string", contact);
+        user.setWorkContacts(workContactMap);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(user);
         //when
         Executable executable = () -> {
             notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
