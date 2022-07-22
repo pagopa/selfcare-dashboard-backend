@@ -188,16 +188,17 @@ public class NotificationServiceImpl implements NotificationService {
         Assert.notNull(relationshipId, "A relationship Id is required");
         UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.workContacts));
         Assert.notNull(user.getInstitutionId(), INSTITUTION_ID_IS_REQUIRED);
-        Optional<String> email = Optional.ofNullable(user)
-                .map(UserInfo::getUser)
-                .map(User::getWorkContacts)
-                .map(Map::entrySet)
-                .stream()
-                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(user.getInstitutionId())))
-                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
-                .findAny()
-                .map(WorkContact::getEmail)
-                .map(CertifiedField::getValue);
+//        Optional<String> email = Optional.ofNullable(user)
+//                .map(UserInfo::getUser)
+//                .map(User::getWorkContacts)
+//                .map(Map::entrySet)
+//                .stream()
+//                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(user.getInstitutionId())))
+//                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
+//                .findAny()
+//                .map(WorkContact::getEmail)
+//                .map(CertifiedField::getValue);
+        Optional<String> email = Optional.ofNullable(user.getUser().getWorkContact(user.getInstitutionId()).getEmail().getValue());
         Assert.isTrue(email.isPresent(), "User workContact is required");
 
         ProductInfo productInfo = user.getProducts().values().iterator().next();
