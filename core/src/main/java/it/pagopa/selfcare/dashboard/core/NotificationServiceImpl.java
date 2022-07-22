@@ -11,7 +11,10 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.notification.MessageRequest;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailPreparationException;
@@ -74,15 +77,10 @@ public class NotificationServiceImpl implements NotificationService {
         Assert.notNull(productTitle, A_PRODUCT_TITLE_IS_REQUIRED);
         Assert.notEmpty(productRoles, PRODUCT_ROLES_ARE_REQUIRED);
         User user = userConnector.getUserByInternalId(userId, EMAIL_FIELD_LIST);
-        Optional<String> email = Optional.ofNullable(user)
-                .map(User::getWorkContacts)
-                .map(Map::entrySet)
-                .stream()
-                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(institutionId)))
-                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
-                .findAny()
-                .map(WorkContact::getEmail)
-                .map(CertifiedField::getValue);
+        Optional<String> email = Optional.empty();
+        if (null != user.getWorkContact(institutionId)) {
+            email = Optional.ofNullable(user.getWorkContact(institutionId).getEmail().getValue());
+        }
         Assert.isTrue(email.isPresent(), "User workContact is required");
 
         sendCreateNotification(institutionId, productTitle, email.get(), productRoles);
@@ -188,17 +186,10 @@ public class NotificationServiceImpl implements NotificationService {
         Assert.notNull(relationshipId, "A relationship Id is required");
         UserInfo user = userService.findByRelationshipId(relationshipId, EnumSet.of(User.Fields.workContacts));
         Assert.notNull(user.getInstitutionId(), INSTITUTION_ID_IS_REQUIRED);
-//        Optional<String> email = Optional.ofNullable(user)
-//                .map(UserInfo::getUser)
-//                .map(User::getWorkContacts)
-//                .map(Map::entrySet)
-//                .stream()
-//                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(user.getInstitutionId())))
-//                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
-//                .findAny()
-//                .map(WorkContact::getEmail)
-//                .map(CertifiedField::getValue);
-        Optional<String> email = Optional.ofNullable(user.getUser().getWorkContact(user.getInstitutionId()).getEmail().getValue());
+        Optional<String> email = Optional.empty();
+        if (null != user.getUser().getWorkContact(user.getInstitutionId())) {
+            email = Optional.ofNullable(user.getUser().getWorkContact(user.getInstitutionId()).getEmail().getValue());
+        }
         Assert.isTrue(email.isPresent(), "User workContact is required");
 
         ProductInfo productInfo = user.getProducts().values().iterator().next();
