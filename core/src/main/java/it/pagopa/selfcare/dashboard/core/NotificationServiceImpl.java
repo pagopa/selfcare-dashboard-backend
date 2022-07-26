@@ -78,8 +78,9 @@ public class NotificationServiceImpl implements NotificationService {
                 .map(User::getWorkContacts)
                 .map(Map::entrySet)
                 .stream()
-                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(institutionId)))
-                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
+                .flatMap(Collection::stream)
+                .filter(contactEntry -> contactEntry.getKey().equals(institutionId))
+                .map(Map.Entry::getValue)
                 .findAny()
                 .map(WorkContact::getEmail)
                 .map(CertifiedField::getValue);
@@ -193,8 +194,9 @@ public class NotificationServiceImpl implements NotificationService {
                 .map(User::getWorkContacts)
                 .map(Map::entrySet)
                 .stream()
-                .filter(entries -> entries.stream().anyMatch(contactEntry -> contactEntry.getKey().equals(user.getInstitutionId())))
-                .flatMap(entries -> entries.stream().map(Map.Entry::getValue))
+                .flatMap(Collection::stream)
+                .filter(contactEntry -> contactEntry.getKey().equals(user.getInstitutionId()))
+                .map(Map.Entry::getValue)
                 .findAny()
                 .map(WorkContact::getEmail)
                 .map(CertifiedField::getValue);
