@@ -26,6 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.test.context.TestSecurityContextHolder;
@@ -46,10 +47,12 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.domain.Pageable.unpaged;
+import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 @ExtendWith({MockitoExtension.class, SystemStubsExtension.class})
 class ExchangeTokenServiceTest {
@@ -316,7 +319,7 @@ class ExchangeTokenServiceTest {
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
-                .thenReturn(Collections.emptyList());
+                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
@@ -405,7 +408,7 @@ class ExchangeTokenServiceTest {
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
-                .thenReturn(Collections.singletonList(groupInfo));
+                .thenAnswer(invocation -> getPage(List.of(groupInfo), invocation.getArgument(3, Pageable.class), () -> 1L));
 
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = mockInstance(new Product());
