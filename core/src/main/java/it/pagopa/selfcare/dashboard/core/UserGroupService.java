@@ -3,9 +3,9 @@ package it.pagopa.selfcare.dashboard.core;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ public interface UserGroupService {
 
     UserGroupInfo getUserGroupById(String groupId, Optional<String> institutionId);
 
-    Collection<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable);
+    Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable);
 
     void deleteMembersByRelationshipId(String relationshipId);
 
