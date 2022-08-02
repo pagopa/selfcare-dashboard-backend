@@ -501,7 +501,13 @@ class NotificationServiceImplTest {
         String productTitle = "productId";
         String userId = "userId";
         Set<CreateUserDto.Role> roles = Set.of(mockInstance(new CreateUserDto.Role()));
-
+        User user = mockInstance(new User());
+        WorkContact contact = new WorkContact();
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        workContactMap.put("string", contact);
+        user.setWorkContacts(workContactMap);
+        when(userConnectorMock.getUserByInternalId(any(), any()))
+                .thenReturn(user);
         //when
         Executable executable = () -> {
             notificationService.sendAddedProductRoleNotification(institutionId, productTitle, userId, roles);
@@ -802,8 +808,13 @@ class NotificationServiceImplTest {
         CertifiedField<String> certifiedFieldEmail = new CertifiedField<>();
         certifiedFieldEmail.setValue(email);
         workContact.setEmail(certifiedFieldEmail);
+        WorkContact workContact2 = mockInstance(new WorkContact());
+        CertifiedField<String> certifiedEmail2 = new CertifiedField<>();
+        certifiedEmail2.setValue("badEmail");
+        workContact2.setEmail(certifiedEmail2);
         Map<String, WorkContact> workContactsMap = new HashMap<>();
         workContactsMap.put(institutionMock.getId(), workContact);
+        workContactsMap.put("badInstitutionId", workContact2);
         userMock.setWorkContacts(workContactsMap);
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
@@ -955,7 +966,6 @@ class NotificationServiceImplTest {
         //given
         String relationshipId = "relationshipId";
         UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
-        userInfo.getUser().setEmail(null);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
         //when
@@ -1377,6 +1387,42 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
         verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
         verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock, notificationConnectorMock);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("getRelationshipBasedNotificationArgumentsProvider")
+    void sendRelationshipBasedNotification_nullEmailValue(String argType, String templateName, String subject, BiConsumer<NotificationService, String> consumer) throws IOException {
+        //given
+        String relationshipId = "relationshipId";
+        String institutionId = "institutionId";
+        UserInfo userInfo = mockInstance(new UserInfo(), "setProducts");
+        userInfo.setInstitutionId(institutionId);
+        User userMock = mockInstance(new User());
+        Map<String, WorkContact> workContactsMap = new HashMap<>();
+        WorkContact workContact = mockInstance(new WorkContact());
+        workContact.setEmail(null);
+        workContactsMap.put(institutionId, workContact);
+        userMock.setWorkContacts(workContactsMap);
+        userInfo.setUser(userMock);
+        when(userServiceMock.findByRelationshipId(any(), any()))
+                .thenReturn(userInfo);
+        //when
+        Executable executable = () -> {
+            consumer.accept(notificationService, relationshipId);
+            Thread.sleep(500);
+        };
+        //then
+        assertDoesNotThrow(executable);
+        verify(simpleAsyncUncaughtExceptionHandler, times(1))
+                .handleUncaughtException(throwableCaptor.capture(), any(), any());
+        Throwable e = throwableCaptor.getValue();
+        assertNotNull(e);
+        assertEquals(IllegalArgumentException.class, e.getClass());
+        assertEquals("User workContact is required", e.getMessage());
+        verify(userServiceMock, times(1))
+                .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
+        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock);
     }
 
 }
