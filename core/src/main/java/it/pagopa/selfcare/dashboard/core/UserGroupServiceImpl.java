@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -200,7 +201,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public Collection<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable) {
+    public Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
         Assert.notNull(institutionId, "An optional institutionId is required");
@@ -210,8 +211,8 @@ public class UserGroupServiceImpl implements UserGroupService {
         userGroupFilter.setInstitutionId(institutionId);
         userGroupFilter.setUserId(userId);
         userGroupFilter.setProductId(productId);
-        Collection<UserGroupInfo> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroups result = {}", groupInfos);
+        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
+        log.debug("getUserGroups result = {}", groupInfos);
         log.trace("getUserGroups end");
 
         return groupInfos;

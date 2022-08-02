@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -106,7 +107,8 @@ public class ExchangeTokenService {
                     role.setProductRole(productRoleCode);
                     return role;
                 }).collect(Collectors.toList()));
-        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
+        //FIXME: remove groups from token because of pagination (may not retrieve all the groups)
+        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
                 Optional.of(productId),
                 Optional.of(UUID.fromString(principal.getId())),
                 Pageable.unpaged());

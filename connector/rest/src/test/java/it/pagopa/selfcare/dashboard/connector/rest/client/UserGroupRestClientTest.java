@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(
         locations = "classpath:config/user-group-rest-client.properties",
@@ -136,17 +137,17 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //when
         UserGroupResponse response = restClient.getUserGroupById(groupId);
         //then
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getCreatedAt());
-        Assertions.assertNotNull(response.getCreatedBy());
-        Assertions.assertNotNull(response.getDescription());
-        Assertions.assertNotNull(response.getId());
-        Assertions.assertNotNull(response.getMembers());
-        Assertions.assertNotNull(response.getName());
-        Assertions.assertNotNull(response.getInstitutionId());
-        Assertions.assertNotNull(response.getModifiedAt());
-        Assertions.assertNotNull(response.getModifiedBy());
-        Assertions.assertNotNull(response.getStatus());
+        assertNotNull(response);
+        assertNotNull(response.getCreatedAt());
+        assertNotNull(response.getCreatedBy());
+        assertNotNull(response.getDescription());
+        assertNotNull(response.getId());
+        assertNotNull(response.getMembers());
+        assertNotNull(response.getName());
+        assertNotNull(response.getInstitutionId());
+        assertNotNull(response.getModifiedAt());
+        assertNotNull(response.getModifiedBy());
+        assertNotNull(response.getStatus());
 
     }
 
@@ -157,7 +158,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //when
         UserGroupResponse response = restClient.getUserGroupById(groupId);
         //then
-        Assertions.assertNotNull(response);
+        assertNotNull(response);
         Assertions.assertNull(response.getCreatedAt());
         Assertions.assertNull(response.getCreatedBy());
         Assertions.assertNull(response.getDescription());
@@ -199,20 +200,25 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String productId = null;
         UUID userId = null;
         Pageable pageable = Pageable.unpaged();
-
-        List<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
+        // when
+        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
         //then
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.get(0).getCreatedAt());
-        Assertions.assertNotNull(response.get(0).getCreatedBy());
-        Assertions.assertNotNull(response.get(0).getDescription());
-        Assertions.assertNotNull(response.get(0).getId());
-        Assertions.assertNotNull(response.get(0).getMembers());
-        Assertions.assertNotNull(response.get(0).getName());
-        Assertions.assertNotNull(response.get(0).getInstitutionId());
-        Assertions.assertNotNull(response.get(0).getModifiedAt());
-        Assertions.assertNotNull(response.get(0).getModifiedBy());
-        Assertions.assertNotNull(response.get(0).getStatus());
+        assertNotNull(response);
+        assertEquals(0, response.getNumber());
+        assertEquals(20, response.getSize());
+        assertEquals(1, response.getTotalElements());
+        assertEquals(1, response.getTotalPages());
+        assertNotNull(response.getContent());
+        assertNotNull(response.getContent().get(0).getCreatedAt());
+        assertNotNull(response.getContent().get(0).getCreatedBy());
+        assertNotNull(response.getContent().get(0).getDescription());
+        assertNotNull(response.getContent().get(0).getId());
+        assertNotNull(response.getContent().get(0).getMembers());
+        assertNotNull(response.getContent().get(0).getName());
+        assertNotNull(response.getContent().get(0).getInstitutionId());
+        assertNotNull(response.getContent().get(0).getModifiedAt());
+        assertNotNull(response.getContent().get(0).getModifiedBy());
+        assertNotNull(response.getContent().get(0).getStatus());
     }
 
     @Test
@@ -222,20 +228,25 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String productId = null;
         UUID userId = null;
         Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
-
-        List<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
+        // when
+        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
         //then
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.get(0).getCreatedAt());
-        Assertions.assertNotNull(response.get(0).getCreatedBy());
-        Assertions.assertNotNull(response.get(0).getDescription());
-        Assertions.assertNotNull(response.get(0).getId());
-        Assertions.assertNotNull(response.get(0).getMembers());
-        Assertions.assertNotNull(response.get(0).getName());
-        Assertions.assertNotNull(response.get(0).getInstitutionId());
-        Assertions.assertNotNull(response.get(0).getModifiedAt());
-        Assertions.assertNotNull(response.get(0).getModifiedBy());
-        Assertions.assertNotNull(response.get(0).getStatus());
+        assertNotNull(response);
+        assertEquals(0, response.getNumber());
+        assertEquals(20, response.getSize());
+        assertEquals(1, response.getTotalElements());
+        assertEquals(1, response.getTotalPages());
+        assertNotNull(response.getContent());
+        assertNotNull(response.getContent().get(0).getCreatedAt());
+        assertNotNull(response.getContent().get(0).getCreatedBy());
+        assertNotNull(response.getContent().get(0).getDescription());
+        assertNotNull(response.getContent().get(0).getId());
+        assertNotNull(response.getContent().get(0).getMembers());
+        assertNotNull(response.getContent().get(0).getName());
+        assertNotNull(response.getContent().get(0).getInstitutionId());
+        assertNotNull(response.getContent().get(0).getModifiedAt());
+        assertNotNull(response.getContent().get(0).getModifiedBy());
+        assertNotNull(response.getContent().get(0).getStatus());
     }
 
     @Test

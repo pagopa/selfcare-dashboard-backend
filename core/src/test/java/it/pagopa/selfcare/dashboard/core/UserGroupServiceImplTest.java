@@ -23,6 +23,7 @@ import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,6 +41,7 @@ import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {UserGroupServiceImpl.class, CoreTestConfig.class})
@@ -829,12 +831,13 @@ class UserGroupServiceImplTest {
         Pageable pageable = PageRequest.of(1, 2);
         UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
         when(groupConnector.getUserGroups(any(), any()))
-                .thenReturn(List.of(userGroupInfo));
+                .thenAnswer(invocation -> getPage(List.of(userGroupInfo), invocation.getArgument(1, Pageable.class), () -> 1L));
         //when
-        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, userId, pageable);
+        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, userId, pageable);
         //then
         assertNotNull(groupInfos);
-        assertEquals(1, groupInfos.size());
+        assertNotNull(groupInfos.getContent());
+        assertEquals(1, groupInfos.getContent().size());
         verify(groupConnector, times(1))
                 .getUserGroups(any(), any());
         verifyNoMoreInteractions(groupConnector);
