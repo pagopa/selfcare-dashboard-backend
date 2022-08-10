@@ -6,24 +6,29 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
+import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collection;
 import java.util.EnumMap;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpHeaders.LOCATION;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {ProductController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {ProductController.class, WebTestConfig.class})
@@ -40,12 +45,15 @@ class ProductControllerTest {
     @MockBean
     private ProductService productServiceMock;
 
+    @MockBean
+    private ExchangeTokenService exchangeTokenServiceMock;
+
 
     @Test
     void getProductRoles() throws Exception {
         // given
         String productId = "prod1";
-        Mockito.when(productServiceMock.getProductRoles(Mockito.anyString()))
+        when(productServiceMock.getProductRoles(anyString()))
                 .thenReturn(new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class) {{
                     put(PartyRole.MANAGER, new ProductRoleInfo());
                     put(PartyRole.OPERATOR, new ProductRoleInfo());
@@ -53,18 +61,43 @@ class ProductControllerTest {
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{productId}/roles", productId)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .contentType(APPLICATION_JSON_VALUE)
+                .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
                 .andReturn();
         // then
         Collection<ProductRoleMappingsResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
                 });
         assertNotNull(resources);
-        Mockito.verify(productServiceMock, Mockito.times(1))
+        verify(productServiceMock, times(1))
                 .getProductRoles(productId);
-        Mockito.verifyNoMoreInteractions(productServiceMock);
+        verifyNoMoreInteractions(productServiceMock);
+        verifyNoInteractions(exchangeTokenServiceMock);
     }
 
+
+    @Test
+    void retrieveProductBackoffice() throws Exception {
+        // given
+        String productId = "prod1";
+        String institutionId = "inst1";
+        final String identityToken = "identityToken";
+        final String backOfficeUrl = "back-office-url#token=";
+        when(exchangeTokenServiceMock.exchange(any(), any()))
+                .thenReturn(new ExchangedToken(identityToken, backOfficeUrl + "<IdentityToken>"));
+        // when
+        mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/{productId}/back-office", productId)
+                .queryParam("institutionId", institutionId)
+                .contentType(APPLICATION_JSON_VALUE)
+                .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isSeeOther())
+                .andExpect(header().string(LOCATION, backOfficeUrl + identityToken));
+        // then
+        verify(exchangeTokenServiceMock, times(1))
+                .exchange(institutionId, productId);
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
+        verifyNoInteractions(productServiceMock);
+    }
 }

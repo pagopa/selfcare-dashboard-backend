@@ -17,6 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
+import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -332,12 +333,13 @@ class ExchangeTokenServiceTest {
         properties.setIssuer(issuer);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
         // when
-        String token = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
         // then
-        assertNotNull(token);
+        assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
+        assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(loadPublicKey())
-                .parseClaimsJws(token);
+                .parseClaimsJws(exchangedToken.getIdentityToken());
         assertNotNull(claimsJws);
         assertNotNull(claimsJws.getHeader());
         assertEquals(kid, claimsJws.getHeader().getKeyId());
@@ -437,12 +439,13 @@ class ExchangeTokenServiceTest {
         properties.setIssuer(issuer);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
         // when
-        String token = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
         // then
-        assertNotNull(token);
+        assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
+        assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(loadPublicKey())
-                .parseClaimsJws(token);
+                .parseClaimsJws(exchangedToken.getIdentityToken());
         assertNotNull(claimsJws);
         assertNotNull(claimsJws.getHeader());
         assertEquals(kid, claimsJws.getHeader().getKeyId());

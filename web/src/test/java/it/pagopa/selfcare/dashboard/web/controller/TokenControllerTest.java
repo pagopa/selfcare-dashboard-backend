@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class TokenControllerTest {
         String institutionId = "inst1";
         String productId = "prod1";
         Mockito.when(exchangeTokenServiceMock.exchange(Mockito.anyString(), Mockito.anyString()))
-                .thenReturn("token");
+                .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/exchange")
