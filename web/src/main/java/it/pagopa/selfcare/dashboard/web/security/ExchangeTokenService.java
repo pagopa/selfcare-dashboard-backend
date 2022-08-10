@@ -17,6 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
+import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +73,7 @@ public class ExchangeTokenService {
     }
 
 
-    public String exchange(String institutionId, String productId) {
+    public ExchangedToken exchange(String institutionId, String productId) {
         log.trace("exchange start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -123,16 +124,16 @@ public class ExchangeTokenService {
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-        String result = Jwts.builder()
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        String jwts = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
         log.trace("exchange end");
-        return result;
+        return new ExchangedToken(jwts, product.getUrlBO());
     }
 
 
