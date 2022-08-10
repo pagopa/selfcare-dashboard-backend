@@ -368,7 +368,7 @@ class ExchangeTokenServiceTest {
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), pageable);
+                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
