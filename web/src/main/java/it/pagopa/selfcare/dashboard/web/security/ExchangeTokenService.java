@@ -108,11 +108,16 @@ public class ExchangeTokenService {
                     role.setProductRole(productRoleCode);
                     return role;
                 }).collect(Collectors.toList()));
-        //FIXME: remove groups from token because of pagination (may not retrieve all the groups)
         Page<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
                 Optional.of(productId),
                 Optional.of(UUID.fromString(principal.getId())),
-                Pageable.unpaged());
+                Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
+        if (groupInfos.hasNext()) {
+            log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s and product %s. The Identity Token will contain only the first 100 records",
+                    principal.getId(),
+                    institutionId,
+                    productId));
+        }
         if (!groupInfos.isEmpty()) {
             institution.setGroups(groupInfos.stream()
                     .map(UserGroupInfo::getId)
