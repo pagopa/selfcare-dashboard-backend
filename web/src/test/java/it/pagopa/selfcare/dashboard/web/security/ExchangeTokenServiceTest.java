@@ -17,6 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
+import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.test.context.TestSecurityContextHolder;
@@ -46,10 +48,11 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.data.domain.Pageable.unpaged;
+import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 @ExtendWith({MockitoExtension.class, SystemStubsExtension.class})
 class ExchangeTokenServiceTest {
@@ -316,7 +319,7 @@ class ExchangeTokenServiceTest {
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
-                .thenReturn(Collections.emptyList());
+                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
@@ -329,12 +332,13 @@ class ExchangeTokenServiceTest {
         properties.setIssuer(issuer);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
         // when
-        String token = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
         // then
-        assertNotNull(token);
+        assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
+        assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(loadPublicKey())
-                .parseClaimsJws(token);
+                .parseClaimsJws(exchangedToken.getIdentityToken());
         assertNotNull(claimsJws);
         assertNotNull(claimsJws.getHeader());
         assertEquals(kid, claimsJws.getHeader().getKeyId());
@@ -364,7 +368,7 @@ class ExchangeTokenServiceTest {
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), unpaged());
+                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
@@ -374,7 +378,6 @@ class ExchangeTokenServiceTest {
     void exchange_ok(PrivateKey privateKey) throws Exception {
         // given
         String realm = "identityTokenAudienceFromProduct";
-
         String jti = "id";
         String sub = "subject";
         Date iat = Date.from(Instant.now().minusSeconds(1));
@@ -382,6 +385,7 @@ class ExchangeTokenServiceTest {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRole = "productRole";
+        final Pageable pageable = Pageable.ofSize(100);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         UUID userId = UUID.randomUUID();
@@ -404,9 +408,12 @@ class ExchangeTokenServiceTest {
         UserInfo user = mockInstance(new UserInfo());
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
+        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        for (int i = 0; i < pageable.getPageSize(); i++) {
+            groupInfos.add(groupInfo);
+        }
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
-                .thenReturn(Collections.singletonList(groupInfo));
-
+                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = mockInstance(new Product());
         ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
@@ -417,11 +424,8 @@ class ExchangeTokenServiceTest {
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
         product.setIdentityTokenAudience(realm);
-
         when(productsConnectorMock.getProduct(Mockito.anyString()))
                 .thenReturn(product);
-
-
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         String kid = "kid";
@@ -434,12 +438,13 @@ class ExchangeTokenServiceTest {
         properties.setIssuer(issuer);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
         // when
-        String token = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
         // then
-        assertNotNull(token);
+        assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
+        assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(loadPublicKey())
-                .parseClaimsJws(token);
+                .parseClaimsJws(exchangedToken.getIdentityToken());
         assertNotNull(claimsJws);
         assertNotNull(claimsJws.getHeader());
         assertEquals(kid, claimsJws.getHeader().getKeyId());
@@ -461,14 +466,15 @@ class ExchangeTokenServiceTest {
         assertEquals(institutionId, institution.getId());
         assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
-        assertEquals(groupInfo.getId(), groups.get(0));
+        assertEquals(pageable.getPageSize(), groups.size());
+        assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         verify(jwtServiceMock, times(1))
                 .getClaims(any());
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), unpaged());
+                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 

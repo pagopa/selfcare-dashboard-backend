@@ -3,7 +3,11 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.commons.web.model.Problem;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.core.UserService;
@@ -38,6 +42,12 @@ public class UserController {
     @PostMapping(value = "/search")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}")
+    @ApiResponse(responseCode = "404",
+            description = "Not Found",
+            content = {
+                    @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
+                            schema = @Schema(implementation = Problem.class))
+            })
     public UserResource search(@ApiParam("${swagger.dashboard.user.model.searchUserDto}")
                                @RequestBody
                                @Valid

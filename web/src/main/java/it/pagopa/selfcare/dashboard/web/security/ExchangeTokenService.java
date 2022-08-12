@@ -17,10 +17,12 @@ import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
+import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,7 +73,7 @@ public class ExchangeTokenService {
     }
 
 
-    public String exchange(String institutionId, String productId) {
+    public ExchangedToken exchange(String institutionId, String productId) {
         log.trace("exchange start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -106,10 +108,16 @@ public class ExchangeTokenService {
                     role.setProductRole(productRoleCode);
                     return role;
                 }).collect(Collectors.toList()));
-        Collection<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
+        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
                 Optional.of(productId),
                 Optional.of(UUID.fromString(principal.getId())),
-                Pageable.unpaged());
+                Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
+        if (groupInfos.hasNext()) {
+            log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s and product %s. The Identity Token will contain only the first 100 records",
+                    principal.getId(),
+                    institutionId,
+                    productId));
+        }
         if (!groupInfos.isEmpty()) {
             institution.setGroups(groupInfos.stream()
                     .map(UserGroupInfo::getId)
@@ -121,16 +129,16 @@ public class ExchangeTokenService {
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-        String result = Jwts.builder()
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        String jwts = Jwts.builder()
                 .setClaims(claims)
                 .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", result);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
         log.trace("exchange end");
-        return result;
+        return new ExchangedToken(jwts, product.getUrlBO());
     }
 
 

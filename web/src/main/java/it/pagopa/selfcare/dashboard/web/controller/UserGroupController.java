@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import io.swagger.annotations.*;
+import it.pagopa.selfcare.commons.web.model.Page;
+import it.pagopa.selfcare.commons.web.model.mapper.PageMapper;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
@@ -15,11 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -146,7 +145,7 @@ public class UserGroupController {
     @GetMapping(value = "")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroups}")
-    public List<UserGroupPlainResource> getUserGroups(@ApiParam("${swagger.dashboard.user-group.model.institutionId}")
+    public Page<UserGroupPlainResource> getUserGroups(@ApiParam("${swagger.dashboard.user-group.model.institutionId}")
                                                       @RequestParam(value = "institutionId", required = false)
                                                               Optional<String> institutionId,
                                                       @ApiParam("${swagger.dashboard.user-group.model.productId}")
@@ -158,13 +157,11 @@ public class UserGroupController {
                                                       Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, pageable = {}", institutionId, productId, pageable);
-        Collection<UserGroupInfo> groups = groupService.getUserGroups(institutionId, productId, memberId, pageable);
-        List<UserGroupPlainResource> result = groups.stream()
-                .map(GroupMapper::toPlainGroupResource)
-                .collect(Collectors.toList());
-        log.debug("getUserGroups result = {}", result);
+        Page<UserGroupPlainResource> groups = PageMapper.map(groupService.getUserGroups(institutionId, productId, memberId, pageable)
+                .map(GroupMapper::toPlainGroupResource));
+        log.debug("getUserGroups result = {}", groups);
         log.trace("getUserGroups end");
-        return result;
+        return groups;
     }
 
     @DeleteMapping(value = "/{userGroupId}/members/{userId}")

@@ -793,6 +793,81 @@
         } ]
       }
     },
+    "/products/{productId}/back-office" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "retrieveProductBackoffice",
+        "description" : "Service to trigger token exchange and redirect to product's back office URL",
+        "operationId" : "retrieveProductBackofficeUsingGET",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "303" : {
+            "description" : "See Other"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/products/{productId}/roles" : {
       "get" : {
         "tags" : [ "products" ],
@@ -1247,6 +1322,16 @@
               }
             }
           },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
           "500" : {
             "description" : "Internal Server Error",
             "content" : {
@@ -1492,7 +1577,7 @@
         }, {
           "name" : "page",
           "in" : "query",
-          "description" : "Results page you want to retrieve (0..N)",
+          "description" : "The page number to access (0 indexed, defaults to 0)",
           "required" : false,
           "style" : "form",
           "allowReserved" : true,
@@ -1503,7 +1588,7 @@
         }, {
           "name" : "size",
           "in" : "query",
-          "description" : "Number of records per page",
+          "description" : "Number of records per page (defaults to 20, max 2000)",
           "required" : false,
           "style" : "form",
           "allowReserved" : true,
@@ -1550,10 +1635,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/UserGroupPlainResource"
-                  }
+                  "$ref" : "#/components/schemas/PageOfUserGroupPlainResource"
                 }
               }
             }
@@ -2366,6 +2448,40 @@
           "reason" : {
             "type" : "string",
             "description" : "Invalid parameter reason."
+          }
+        }
+      },
+      "PageOfUserGroupPlainResource" : {
+        "title" : "PageOfUserGroupPlainResource",
+        "required" : [ "content", "number", "size", "totalElements", "totalPages" ],
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "description" : "The page content",
+            "items" : {
+              "$ref" : "#/components/schemas/UserGroupPlainResource"
+            }
+          },
+          "number" : {
+            "type" : "integer",
+            "description" : "The number of the current page",
+            "format" : "int32"
+          },
+          "size" : {
+            "type" : "integer",
+            "description" : "The size of the page",
+            "format" : "int32"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "description" : "The total amount of elements",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "description" : "The number of total pages",
+            "format" : "int32"
           }
         }
       },
