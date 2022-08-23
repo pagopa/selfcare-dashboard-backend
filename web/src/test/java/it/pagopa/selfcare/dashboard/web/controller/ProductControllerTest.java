@@ -92,7 +92,7 @@ class ProductControllerTest {
                 .queryParam("institutionId", institutionId)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isSeeOther())
+                .andExpect(status().isOk())
                 .andExpect(header().string(LOCATION, backOfficeUrl + identityToken));
         // then
         verify(exchangeTokenServiceMock, times(1))
