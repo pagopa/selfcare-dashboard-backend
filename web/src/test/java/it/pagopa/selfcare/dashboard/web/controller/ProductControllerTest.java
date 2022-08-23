@@ -19,15 +19,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.EnumMap;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {ProductController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -87,14 +87,17 @@ class ProductControllerTest {
         when(exchangeTokenServiceMock.exchange(any(), any()))
                 .thenReturn(new ExchangedToken(identityToken, backOfficeUrl + "<IdentityToken>"));
         // when
-        mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{productId}/back-office", productId)
-                .queryParam("institutionId", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{productId}/back-office", productId)
+                        .queryParam("institutionId", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(header().string(LOCATION, backOfficeUrl + identityToken));
+                .andReturn();
         // then
+        URI response = objectMapper.readValue(result.getResponse().getContentAsString(),URI.class);
+        assertTrue(response.toString().contains(identityToken));
+        assertTrue(response.toString().contains(backOfficeUrl));
         verify(exchangeTokenServiceMock, times(1))
                 .exchange(institutionId, productId);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
