@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,13 +52,14 @@ public class ProductController {
 
 
     @GetMapping(value = "/{productId}/back-office")
-    @ResponseStatus(HttpStatus.SEE_OTHER)
+
+    @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
-    public ResponseEntity<Void> retrieveProductBackoffice(@ApiParam("${swagger.dashboard.products.model.id}")
+    public URI retrieveProductBackoffice(@ApiParam("${swagger.dashboard.products.model.id}")
                                                           @PathVariable("productId")
                                                                   String productId,
-                                                          @ApiParam("${swagger.dashboard.institutions.model.id}")
+                                         @ApiParam("${swagger.dashboard.institutions.model.id}")
                                                           @RequestParam("institutionId")
                                                                   String institutionId) {
         log.trace("accessProductBackoffice start");
@@ -67,7 +67,8 @@ public class ProductController {
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
         log.trace("accessProductBackoffice end");
-        return ResponseEntity.status(HttpStatus.SEE_OTHER).location(location).build();
+        return location;
+
     }
 
 }
