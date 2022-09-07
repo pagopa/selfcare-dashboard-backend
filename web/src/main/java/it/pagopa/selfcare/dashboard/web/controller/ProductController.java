@@ -52,6 +52,7 @@ public class ProductController {
 
 
     @GetMapping(value = "/{productId}/back-office")
+
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
@@ -67,6 +68,7 @@ public class ProductController {
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
         log.trace("accessProductBackoffice end");
         return location;
+
     }
 
 }

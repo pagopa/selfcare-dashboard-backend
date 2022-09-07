@@ -24,10 +24,12 @@ import java.util.Collection;
 import java.util.EnumMap;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {ProductController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -98,9 +100,11 @@ class ProductControllerTest {
         URI response = objectMapper.readValue(result.getResponse().getContentAsString(),URI.class);
         assertTrue(response.toString().contains(identityToken));
         assertTrue(response.toString().contains(backOfficeUrl));
+
         verify(exchangeTokenServiceMock, times(1))
                 .exchange(institutionId, productId);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
         verifyNoInteractions(productServiceMock);
     }
+
 }
