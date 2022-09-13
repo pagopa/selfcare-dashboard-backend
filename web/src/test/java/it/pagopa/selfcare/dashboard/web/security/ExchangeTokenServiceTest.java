@@ -463,6 +463,7 @@ class ExchangeTokenServiceTest {
         assertTrue(exchangedClaims.getExpiration().after(exchangedClaims.getIssuedAt()));
         ExchangeTokenService.Institution institution = exchangedClaims.getInstitution();
         assertNotNull(institution);
+        assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
         assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
@@ -511,6 +512,7 @@ class ExchangeTokenServiceTest {
             ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
             institution.setId(o.get("id").toString());
             institution.setRoles((List<ExchangeTokenService.Role>) o.get("roles"));
+            institution.setName(o.get("name").toString());
             institution.setTaxCode(o.get("fiscal_code").toString());
             institution.setGroups((List<String>) o.get("groups"));
             return institution;
