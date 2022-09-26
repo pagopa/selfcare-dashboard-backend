@@ -12,7 +12,7 @@
         "default" : "http://localhost"
       },
       "port" : {
-        "default" : "8080"
+        "default" : "80"
       },
       "basePath" : {
         "default" : ""
@@ -2328,7 +2328,7 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PT", "SCP" ]
+            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
           },
           "mailAddress" : {
             "type" : "string",
