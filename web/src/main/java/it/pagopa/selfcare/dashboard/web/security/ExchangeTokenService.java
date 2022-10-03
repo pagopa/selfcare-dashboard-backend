@@ -100,6 +100,7 @@ public class ExchangeTokenService {
         claims.setIssuer(issuer);
         Institution institution = new Institution();
         institution.setId(institutionId);
+        institution.setName(institutionInfo.getDescription());
         institution.setTaxCode(institutionInfo.getTaxCode());
         institution.setRoles(productGrantedAuthority.getProductRoles().stream()
                 .map(productRoleCode -> {
@@ -181,6 +182,7 @@ public class ExchangeTokenService {
         private String id;
         @JsonProperty("fiscal_code")
         private String taxCode;
+        private String name;
         private List<Role> roles;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private List<String> groups;
