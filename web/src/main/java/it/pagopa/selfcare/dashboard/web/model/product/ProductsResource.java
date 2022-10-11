@@ -5,10 +5,12 @@ import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -67,5 +69,9 @@ public class ProductsResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.children}")
     private List<SubProductResource> children;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.backOfficeEnvironmentConfigurations}")
+    @Valid
+    private Collection<BackOfficeConfigurationsResource> backOfficeEnvironmentConfigurations;
 
 }

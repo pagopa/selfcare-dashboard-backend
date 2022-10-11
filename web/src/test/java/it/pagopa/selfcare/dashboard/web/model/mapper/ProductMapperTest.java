@@ -1,10 +1,11 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.product.BackOfficeConfigurations;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.web.model.product.BackOfficeConfigurationsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.commons.utils.TestUtils.reflectionEqualsByName;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductMapperTest {
@@ -22,9 +25,10 @@ class ProductMapperTest {
     void toResource_notNull() {
         // given
         ProductTree product = new ProductTree();
-        Product node = TestUtils.mockInstance(new Product());
+        Product node = mockInstance(new Product(), "setBackOfficeEnvironmentConfigurations");
         node.setId("Node");
-        Product children = TestUtils.mockInstance(new Product());
+        node.setBackOfficeEnvironmentConfigurations(Map.of("test", mockInstance(new BackOfficeConfigurations())));
+        Product children = mockInstance(new Product());
         children.setId("children");
         product.setNode(node);
         product.setChildren(List.of(children));
@@ -42,10 +46,11 @@ class ProductMapperTest {
         assertEquals(product.getNode().getStatus(), resource.getStatus());
         assertEquals(product.getNode().isAuthorized(), resource.isAuthorized());
         assertEquals(product.getNode().getUserRole(), resource.getUserRole());
+        assertNotNull(resource.getBackOfficeEnvironmentConfigurations());
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
         assertEquals(product.getChildren().get(0).getStatus(), resource.getChildren().get(0).getStatus());
-        TestUtils.reflectionEqualsByName(product, resource);
+        reflectionEqualsByName(product, resource);
     }
 
 
@@ -74,7 +79,7 @@ class ProductMapperTest {
     @Test
     void toProductRoleResource_notNull() {
         // given
-        ProductRoleInfo.ProductRole input = TestUtils.mockInstance(new ProductRoleInfo.ProductRole());
+        ProductRoleInfo.ProductRole input = mockInstance(new ProductRoleInfo.ProductRole());
         // when
         ProductRoleMappingsResource.ProductRoleResource output = ProductsMapper.toProductRoleResource(input);
         // then
@@ -99,7 +104,7 @@ class ProductMapperTest {
     @Test
     void toProductRoleMappingsResource_fromEntry_nullRoles() {
         // given
-        Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.DELEGATE, TestUtils.mockInstance(new ProductRoleInfo()));
+        Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.DELEGATE, mockInstance(new ProductRoleInfo()));
         // when
         ProductRoleMappingsResource output = ProductsMapper.toProductRoleMappingsResource(input);
         // then
@@ -111,8 +116,8 @@ class ProductMapperTest {
     @Test
     void toProductRoleMappingsResource_fromEntry_notNull() {
         // given
-        ProductRoleInfo productRoleInfo = TestUtils.mockInstance(new ProductRoleInfo(), "setRoles");
-        productRoleInfo.setRoles(List.of(TestUtils.mockInstance(new ProductRoleInfo.ProductRole())));
+        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo(), "setRoles");
+        productRoleInfo.setRoles(List.of(mockInstance(new ProductRoleInfo.ProductRole())));
         Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.DELEGATE, productRoleInfo);
         // when
         ProductRoleMappingsResource output = ProductsMapper.toProductRoleMappingsResource(input);
@@ -141,11 +146,58 @@ class ProductMapperTest {
     void toProductRoleMappingsResource_fromMap_notNull() {
         // given
         EnumMap<PartyRole, ProductRoleInfo> input = new EnumMap<>(PartyRole.class) {{
-            put(PartyRole.MANAGER, TestUtils.mockInstance(new ProductRoleInfo(), 1));
-            put(PartyRole.OPERATOR, TestUtils.mockInstance(new ProductRoleInfo(), 2));
+            put(PartyRole.MANAGER, mockInstance(new ProductRoleInfo(), 1));
+            put(PartyRole.OPERATOR, mockInstance(new ProductRoleInfo(), 2));
         }};
         // when
         Collection<ProductRoleMappingsResource> output = ProductsMapper.toProductRoleMappingsResource(input);
+        // then
+        assertNotNull(output);
+        assertEquals(input.size(), output.size());
+    }
+
+
+    @Test
+    void toProductBackOfficeConfigurations_fromEntry_null() {
+        // given
+        final Map<String, BackOfficeConfigurations> input = null;
+        // when
+        final Collection<BackOfficeConfigurationsResource> output = ProductsMapper.toProductBackOfficeConfigurations(input);
+        // then
+        assertNull(output);
+    }
+
+
+    @Test
+    void toProductBackOfficeConfigurations_fromEntry_notNull() {
+        // given
+        final Map.Entry<String, BackOfficeConfigurations> input = Map.entry("test", mockInstance(new BackOfficeConfigurations()));
+        // when
+        final BackOfficeConfigurationsResource output = ProductsMapper.toProductBackOfficeConfigurations(input);
+        // then
+        assertNotNull(output);
+        assertEquals(input.getKey(), output.getEnvironment());
+        assertEquals(input.getValue().getUrl(), output.getUrl());
+    }
+
+
+    @Test
+    void toProductBackOfficeConfigurations_fromMap_null() {
+        // given
+        Map<String, BackOfficeConfigurations> input = null;
+        // when
+        final Collection<BackOfficeConfigurationsResource> output = ProductsMapper.toProductBackOfficeConfigurations(input);
+        // then
+        assertNull(output);
+    }
+
+
+    @Test
+    void toProductBackOfficeConfigurations_fromMap_notNull() {
+        // given
+        final Map<String, BackOfficeConfigurations> input = Map.of("test", mockInstance(new BackOfficeConfigurations()));
+        // when
+        final Collection<BackOfficeConfigurationsResource> output = ProductsMapper.toProductBackOfficeConfigurations(input);
         // then
         assertNotNull(output);
         assertEquals(input.size(), output.size());

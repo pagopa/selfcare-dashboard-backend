@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Slf4j
 @RestController
 @RequestMapping(value = "token", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,12 +39,15 @@ public class TokenController {
                                                   String institutionId,
                                           @ApiParam("${swagger.dashboard.products.model.id}")
                                           @RequestParam("productId")
-                                                  String productId) {
+                                                  String productId,
+                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
+                                          @RequestParam(value = "environment", required = false)
+                                                  Optional<String> environment) {
 
         log.trace("exchange start");
         log.debug("exchange institutionId = {}, productId = {}", institutionId, productId);
 
-        String token = exchangeTokenService.exchange(institutionId, productId).getIdentityToken();
+        String token = exchangeTokenService.exchange(institutionId, productId, environment).getIdentityToken();
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
