@@ -73,7 +73,7 @@ public class ExchangeTokenService {
     }
 
 
-    public ExchangedToken exchange(String institutionId, String productId) {
+    public ExchangedToken exchange(String institutionId, String productId, Optional<String> environment) {
         log.trace("exchange start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -126,7 +126,8 @@ public class ExchangeTokenService {
         }
         claims.setInstitution(institution);
         Product product = productsConnector.getProduct(productId);
-        claims.setAudience(product.getIdentityTokenAudience());
+        environment.ifPresentOrElse(env -> claims.setAudience(product.getBackOfficeEnvironmentConfigurations().get(env).getIdentityTokenAudience())
+                , () -> claims.setAudience(product.getIdentityTokenAudience()));
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
@@ -138,8 +139,10 @@ public class ExchangeTokenService {
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
+        final String urlBO = environment.map(env -> product.getBackOfficeEnvironmentConfigurations().get(env).getUrl())
+                .orElse(product.getUrlBO());
         log.trace("exchange end");
-        return new ExchangedToken(jwts, product.getUrlBO());
+        return new ExchangedToken(jwts, urlBO);
     }
 
 

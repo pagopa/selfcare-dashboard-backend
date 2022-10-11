@@ -1,9 +1,11 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.dashboard.connector.model.product.BackOfficeConfigurations;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.web.model.product.BackOfficeConfigurationsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.SubProductResource;
@@ -30,6 +32,7 @@ public class ProductsMapper {
             resource.setAuthorized(model.getNode().isAuthorized());
             resource.setUserRole(model.getNode().getUserRole());
             resource.setStatus(model.getNode().getStatus());
+            resource.setBackOfficeEnvironmentConfigurations(toProductBackOfficeConfigurations(model.getNode().getBackOfficeEnvironmentConfigurations()));
             if (model.getChildren() != null) {
                 resource.setChildren(model.getChildren().stream()
                         .map(ProductsMapper::toChildren)
@@ -50,6 +53,29 @@ public class ProductsMapper {
         }
         return resource;
     }
+
+
+    public static Collection<BackOfficeConfigurationsResource> toProductBackOfficeConfigurations(Map<String, BackOfficeConfigurations> backOfficeEnvironmentConfigurations) {
+        Collection<BackOfficeConfigurationsResource> resource = null;
+        if (backOfficeEnvironmentConfigurations != null) {
+            resource = backOfficeEnvironmentConfigurations.entrySet().stream()
+                    .map(ProductsMapper::toProductBackOfficeConfigurations)
+                    .collect(Collectors.toList());
+        }
+        return resource;
+    }
+
+
+    static BackOfficeConfigurationsResource toProductBackOfficeConfigurations(Map.Entry<String, BackOfficeConfigurations> entry) {
+        BackOfficeConfigurationsResource resource = null;
+        if (entry != null) {
+            resource = new BackOfficeConfigurationsResource();
+            resource.setEnvironment(entry.getKey());
+            resource.setUrl(entry.getValue().getUrl());
+        }
+        return resource;
+    }
+
 
     public static Collection<ProductRoleMappingsResource> toProductRoleMappingsResource(Map<PartyRole, ProductRoleInfo> roleMappings) {
         Collection<ProductRoleMappingsResource> resource = null;

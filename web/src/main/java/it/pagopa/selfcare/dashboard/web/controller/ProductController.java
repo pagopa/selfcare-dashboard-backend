@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -56,14 +57,17 @@ public class ProductController {
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
     public URI retrieveProductBackoffice(@ApiParam("${swagger.dashboard.products.model.id}")
-                                                          @PathVariable("productId")
-                                                                  String productId,
+                                         @PathVariable("productId")
+                                                 String productId,
                                          @ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                          @RequestParam("institutionId")
-                                                                  String institutionId) {
+                                         @RequestParam("institutionId")
+                                                 String institutionId,
+                                         @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
+                                         @RequestParam(value = "environment", required = false)
+                                                 Optional<String> environment) {
         log.trace("accessProductBackoffice start");
         log.debug("accessProductBackoffice institutionId = {}, productId = {}", institutionId, productId);
-        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, environment);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
         log.trace("accessProductBackoffice end");
         return location;
