@@ -18,7 +18,13 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @WebMvcTest(value = {TokenController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {TokenController.class, WebTestConfig.class})
@@ -41,7 +47,7 @@ class TokenControllerTest {
         // given
         String institutionId = "inst1";
         String productId = "prod1";
-        Mockito.when(exchangeTokenServiceMock.exchange(Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(exchangeTokenServiceMock.exchange(anyString(), anyString(), any()))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -56,11 +62,10 @@ class TokenControllerTest {
         IdentityTokenResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), IdentityTokenResource.class);
         assertNotNull(resource);
         assertNotNull(resource.getToken());
-        Mockito.verify(exchangeTokenServiceMock, Mockito.times(1))
-                .exchange(institutionId, productId);
-        Mockito.verifyNoMoreInteractions(exchangeTokenServiceMock);
+        verify(exchangeTokenServiceMock, Mockito.times(1))
+                .exchange(institutionId, productId, Optional.empty());
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
-
 
 
 }
