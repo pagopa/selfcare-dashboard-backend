@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.net.URI;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -86,23 +87,23 @@ class ProductControllerTest {
         String institutionId = "inst1";
         final String identityToken = "identityToken";
         final String backOfficeUrl = "back-office-url#token=";
-        when(exchangeTokenServiceMock.exchange(any(), any()))
+        when(exchangeTokenServiceMock.exchange(any(), any(), any()))
                 .thenReturn(new ExchangedToken(identityToken, backOfficeUrl + "<IdentityToken>"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{productId}/back-office", productId)
-                        .queryParam("institutionId", institutionId)
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
+                .get(BASE_URL + "/{productId}/back-office", productId)
+                .queryParam("institutionId", institutionId)
+                .contentType(APPLICATION_JSON_VALUE)
+                .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
         // then
-        URI response = objectMapper.readValue(result.getResponse().getContentAsString(),URI.class);
+        URI response = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
         assertTrue(response.toString().contains(identityToken));
         assertTrue(response.toString().contains(backOfficeUrl));
 
         verify(exchangeTokenServiceMock, times(1))
-                .exchange(institutionId, productId);
+                .exchange(institutionId, productId, Optional.empty());
         verifyNoMoreInteractions(exchangeTokenServiceMock);
         verifyNoInteractions(productServiceMock);
     }

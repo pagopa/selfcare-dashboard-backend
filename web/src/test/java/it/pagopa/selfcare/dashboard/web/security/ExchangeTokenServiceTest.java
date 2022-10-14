@@ -123,7 +123,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(null, null);
+        Executable executable = () -> exchangeTokenService.exchange(null, null, null);
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
@@ -146,7 +146,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -171,7 +171,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -196,7 +196,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -223,7 +223,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId, null);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
@@ -263,7 +263,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId);
+        Executable executable = () -> exchangeTokenService.exchange(institutionId, productId, null);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
@@ -332,7 +332,7 @@ class ExchangeTokenServiceTest {
         properties.setIssuer(issuer);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
         // when
-        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
         assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
         assertNotNull(exchangedToken.getIdentityToken());
@@ -438,7 +438,7 @@ class ExchangeTokenServiceTest {
         properties.setIssuer(issuer);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
         // when
-        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId);
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
         assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
         assertNotNull(exchangedToken.getIdentityToken());

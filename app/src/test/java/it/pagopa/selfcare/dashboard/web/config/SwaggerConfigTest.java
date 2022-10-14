@@ -72,12 +72,12 @@ class SwaggerConfigTest {
                     assertNotNull(result.getResponse());
                     final String content = result.getResponse().getContentAsString();
                     assertFalse(content.isBlank());
-                    assertFalse(content.contains("${"), "Generated swagger contains placeholders");
                     Object swagger = objectMapper.readValue(result.getResponse().getContentAsString(), Object.class);
                     String formatted = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(swagger);
                     Path basePath = Paths.get("src/main/resources/swagger/");
                     Files.createDirectories(basePath);
                     Files.write(basePath.resolve("api-docs.json"), formatted.getBytes());
+                    assertFalse(content.contains("${"), "Generated swagger contains placeholders");
                 });
     }
 

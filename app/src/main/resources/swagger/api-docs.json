@@ -817,6 +817,15 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "environment",
+          "in" : "query",
+          "description" : "Back Office environment",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -1140,6 +1149,15 @@
           "in" : "query",
           "description" : "Product's unique identifier",
           "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "environment",
+          "in" : "query",
+          "description" : "Back Office environment",
+          "required" : false,
           "style" : "form",
           "schema" : {
             "type" : "string"
@@ -2208,6 +2226,21 @@
   },
   "components" : {
     "schemas" : {
+      "BackOfficeConfigurationsResource" : {
+        "title" : "BackOfficeConfigurationsResource",
+        "required" : [ "environment", "url" ],
+        "type" : "object",
+        "properties" : {
+          "environment" : {
+            "type" : "string",
+            "description" : "Back Office environment"
+          },
+          "url" : {
+            "type" : "string",
+            "description" : "URL that redirects to the back-office section, where is possible to manage the product"
+          }
+        }
+      },
       "CertifiedFieldResourceOfstring" : {
         "title" : "CertifiedFieldResourceOfstring",
         "required" : [ "certified", "value" ],
@@ -2697,6 +2730,13 @@
             "type" : "boolean",
             "description" : "flag indicating whether the logged user has the authorization to manage the product",
             "example" : false
+          },
+          "backOfficeEnvironmentConfigurations" : {
+            "type" : "array",
+            "description" : "Environment-specific configurations for back-office redirection with Token Exchange",
+            "items" : {
+              "$ref" : "#/components/schemas/BackOfficeConfigurationsResource"
+            }
           },
           "children" : {
             "type" : "array",
