@@ -2717,18 +2717,27 @@
         }
       },
       "ProductsResource" : {
-        "title" : "ProductsResource",
-        "required" : [ "authorized", "description", "id", "imageUrl", "logo", "status", "title", "urlBO" ],
-        "type" : "object",
-        "properties" : {
-          "activatedAt" : {
-            "type" : "string",
-            "description" : "Date the products was activated",
-            "format" : "date-time"
+        "title": "ProductsResource",
+        "required": [
+          "authorized",
+          "description",
+          "id",
+          "imageUrl",
+          "logo",
+          "productOnBoardingStatus",
+          "title",
+          "urlBO"
+        ],
+        "type": "object",
+        "properties": {
+          "activatedAt": {
+            "type": "string",
+            "description": "Date the products was activated",
+            "format": "date-time"
           },
-          "authorized" : {
-            "type" : "boolean",
-            "description" : "flag indicating whether the logged user has the authorization to manage the product",
+          "authorized": {
+            "type": "boolean",
+            "description": "flag indicating whether the logged user has the authorization to manage the product",
             "example" : false
           },
           "backOfficeEnvironmentConfigurations" : {
@@ -2766,10 +2775,14 @@
             "type" : "string",
             "description" : "Product logo's background color"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "productOnBoardingStatus": {
+            "type": "string",
+            "description": "Product's onBoarding status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           },
           "title" : {
             "type" : "string",
@@ -2801,18 +2814,26 @@
         }
       },
       "SubProductResource" : {
-        "title" : "SubProductResource",
-        "required" : [ "id", "status", "title" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+        "title": "SubProductResource",
+        "required": [
+          "id",
+          "productOnBoardingStatus",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "productOnBoardingStatus": {
+            "type": "string",
+            "description": "Product's onBoarding status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           },
           "title" : {
             "type" : "string",

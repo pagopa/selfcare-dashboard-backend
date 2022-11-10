@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -62,10 +62,10 @@ public class ProductsResource {
     @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
     private String userRole;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.productOnBoardingStatus}", required = true)
     @JsonProperty(required = true)
     @NotNull
-    private ProductStatus status;
+    private ProductOnBoardingStatus productOnBoardingStatus;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.children}")
     private List<SubProductResource> children;

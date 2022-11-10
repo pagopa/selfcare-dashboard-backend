@@ -13,6 +13,7 @@
       "description": "string",
       "id": "string",
       "identityTokenAudience": "string",
+      "status": "ACTIVE",
       "logo": "string",
       "depictImageUrl": "string",
       "parentId": "string",

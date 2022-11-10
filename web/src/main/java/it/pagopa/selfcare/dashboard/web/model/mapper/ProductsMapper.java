@@ -31,7 +31,7 @@ public class ProductsMapper {
             resource.setActivatedAt(model.getNode().getActivatedAt());
             resource.setAuthorized(model.getNode().isAuthorized());
             resource.setUserRole(model.getNode().getUserRole());
-            resource.setStatus(model.getNode().getStatus());
+            resource.setProductOnBoardingStatus(model.getNode().getOnBoardingStatus());
             resource.setBackOfficeEnvironmentConfigurations(toProductBackOfficeConfigurations(model.getNode().getBackOfficeEnvironmentConfigurations()));
             if (model.getChildren() != null) {
                 resource.setChildren(model.getChildren().stream()
@@ -48,7 +48,7 @@ public class ProductsMapper {
         if (model != null) {
             resource = new SubProductResource();
             resource.setId(model.getId());
-            resource.setStatus(model.getStatus());
+            resource.setProductOnBoardingStatus(model.getOnBoardingStatus());
             resource.setTitle(model.getTitle());
         }
         return resource;

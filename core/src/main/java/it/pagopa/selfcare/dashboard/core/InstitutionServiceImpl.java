@@ -114,7 +114,7 @@ class InstitutionServiceImpl implements InstitutionService {
                             .filter(product -> userAuthProducts.containsKey(product.getNode().getId()))
                             .peek(product -> product.getNode().setAuthorized(true))
                             .peek(product -> product.getNode().setUserRole(LIMITED.name()))
-                            .peek(product -> product.getNode().setStatus(institutionsProductsMap.get(product.getNode().getId()).getStatus()))
+                            .peek(product -> product.getNode().setOnBoardingStatus(institutionsProductsMap.get(product.getNode().getId()).getOnBoardingStatus()))
                             .collect(Collectors.toList());
                     productTrees.stream()
                             .filter(productTree -> productTree.getChildren() != null)
@@ -123,14 +123,14 @@ class InstitutionServiceImpl implements InstitutionService {
                                     .filter(product -> userAuthProducts.containsKey(product.getId()))
                                     .peek(product -> product.setAuthorized(true))
                                     .peek(product -> product.setUserRole(LIMITED.name()))
-                                    .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
+                                    .peek(product -> product.setOnBoardingStatus(institutionsProductsMap.get(product.getId()).getOnBoardingStatus()))
                                     .collect(Collectors.toList())));
                 } else {
                     productTrees.forEach(product -> {
                         product.getNode().setAuthorized(userAuthProducts.containsKey(product.getNode().getId()));
-                        product.getNode().setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getNode().getId()))
-                                .map(PartyProduct::getStatus)
-                                .orElse(ProductStatus.INACTIVE));
+                        product.getNode().setOnBoardingStatus(Optional.ofNullable(institutionsProductsMap.get(product.getNode().getId()))
+                                .map(PartyProduct::getOnBoardingStatus)
+                                .orElse(ProductOnBoardingStatus.INACTIVE));
                         Optional.ofNullable(userAuthProducts.get(product.getNode().getId()))
                                 .ifPresentOrElse(authority -> product.getNode().setUserRole(authority.getAuthority()), () -> product.getNode().setUserRole(null));
                     });
@@ -139,9 +139,9 @@ class InstitutionServiceImpl implements InstitutionService {
                             .filter(Objects::nonNull)
                             .flatMap(Collection::stream)
                             .forEach(product ->
-                                    product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
-                                            .map(PartyProduct::getStatus)
-                                            .orElse(ProductStatus.INACTIVE)));
+                                    product.setOnBoardingStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
+                                            .map(PartyProduct::getOnBoardingStatus)
+                                            .orElse(ProductOnBoardingStatus.INACTIVE)));
                 }
             }
         }

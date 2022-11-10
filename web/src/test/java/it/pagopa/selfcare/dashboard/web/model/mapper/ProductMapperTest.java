@@ -43,13 +43,13 @@ class ProductMapperTest {
         assertEquals(product.getNode().getUrlPublic(), resource.getUrlPublic());
         assertEquals(product.getNode().getUrlBO(), resource.getUrlBO());
         assertEquals(product.getNode().getActivatedAt(), resource.getActivatedAt());
-        assertEquals(product.getNode().getStatus(), resource.getStatus());
+        assertEquals(product.getNode().getOnBoardingStatus(), resource.getProductOnBoardingStatus());
         assertEquals(product.getNode().isAuthorized(), resource.isAuthorized());
         assertEquals(product.getNode().getUserRole(), resource.getUserRole());
         assertNotNull(resource.getBackOfficeEnvironmentConfigurations());
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
-        assertEquals(product.getChildren().get(0).getStatus(), resource.getChildren().get(0).getStatus());
+        assertEquals(product.getChildren().get(0).getOnBoardingStatus(), resource.getChildren().get(0).getProductOnBoardingStatus());
         reflectionEqualsByName(product, resource);
     }
 

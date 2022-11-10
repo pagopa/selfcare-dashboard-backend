@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class PartyProduct {
-    private ProductStatus status;
+    private ProductOnBoardingStatus onBoardingStatus;
     private String id;
 }
