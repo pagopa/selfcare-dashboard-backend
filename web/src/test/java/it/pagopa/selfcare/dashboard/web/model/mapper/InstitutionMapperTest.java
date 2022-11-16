@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
-import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,10 @@ import java.util.Collections;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.commons.utils.TestUtils.reflectionEqualsByName;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -31,7 +34,7 @@ class InstitutionMapperTest {
         // given
         String internalInstitutionId = "institutionId";
         String institutionId = "externalId";
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setId");
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setId");
         institutionInfo.setId(internalInstitutionId);
         institutionInfo.setExternalId(institutionId);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -53,15 +56,15 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
         assertEquals(institutionInfo.getAddress(), resource.getAddress());
         assertEquals(LIMITED.name(), resource.getUserRole());
-        assertEquals(institutionInfo.getStatus(), resource.getStatus());
-        TestUtils.reflectionEqualsByName(institutionInfo, resource);
+        assertEquals(institutionInfo.getStatus().toString(), resource.getStatus());
+        reflectionEqualsByName(institutionInfo, resource, "status");
     }
 
 
     @Test
     void toResource_notNullNoAuth() {
         // given
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
@@ -72,7 +75,8 @@ class InstitutionMapperTest {
     @Test
     void toResource_emptyAuthNoPendingStatus() {
         // given
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo());
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setStatus");
+        institutionInfo.setStatus(ACTIVE);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.emptyList());
@@ -87,8 +91,8 @@ class InstitutionMapperTest {
     @Test
     void toResource_emptyAuthPendingStatus() {
         // given
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setStatus");
-        institutionInfo.setStatus("PENDING");
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setStatus");
+        institutionInfo.setStatus(PENDING);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.emptyList());
@@ -103,8 +107,8 @@ class InstitutionMapperTest {
     @Test
     void toResource_AuthOnDifferentInstitutionPendingStatus() {
         // given
-        InstitutionInfo institutionInfo = TestUtils.mockInstance(new InstitutionInfo(), "setStatus");
-        institutionInfo.setStatus("PENDING");
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setStatus");
+        institutionInfo.setStatus(PENDING);
         String institutionId = "institutionId";
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,

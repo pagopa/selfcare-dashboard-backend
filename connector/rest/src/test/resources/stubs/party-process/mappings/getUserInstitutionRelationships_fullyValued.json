@@ -23,7 +23,20 @@
           "description": "AGENCY X",
           "digitalAddress": "email@pec.mail.org",
           "address": "via del campo",
-          "taxCode": "string"
+          "zipCode": "string",
+          "taxCode": "string",
+          "paymentServiceProvider": {
+            "abiCode": "string",
+            "businessRegisterNumber": "string",
+            "legalRegisterName": "string",
+            "legalRegisterNumber": "string",
+            "vatNumberGroup": true
+          },
+          "dataProtectionOfficer": {
+            "address": "string",
+            "email": "string",
+            "pec": "string"
+          }
         },
         "billing": {
           "vatNumber": "string",
