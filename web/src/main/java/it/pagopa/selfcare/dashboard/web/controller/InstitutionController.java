@@ -111,6 +111,9 @@ public class InstitutionController {
         return result;
     }
 
+    /**
+     * @Deprecated since it's not used
+     */
     @Deprecated(forRemoval = true)
     @GetMapping(value = "/{institutionId}/users")
     @ResponseStatus(HttpStatus.OK)
@@ -118,16 +121,16 @@ public class InstitutionController {
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public List<InstitutionUserResource> getInstitutionUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
-                                                                     String institutionId,
+                                                             String institutionId,
                                                              @ApiParam("${swagger.dashboard.products.model.id}")
                                                              @RequestParam(value = "productId", required = false)
-                                                                     Optional<String> productId,
+                                                             Optional<String> productId,
                                                              @ApiParam("${swagger.dashboard.user.model.role}")
                                                              @RequestParam(value = "role", required = false)
-                                                                     Optional<SelfCareAuthority> role,
+                                                             Optional<SelfCareAuthority> role,
                                                              @ApiParam("${swagger.dashboard.user.model.productRoles}")
                                                              @RequestParam(value = "productRoles", required = false)
-                                                                     Optional<Set<String>> productRoles) {
+                                                             Optional<Set<String>> productRoles) {
 
         log.trace("getInstitutionUsers start");
         log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);

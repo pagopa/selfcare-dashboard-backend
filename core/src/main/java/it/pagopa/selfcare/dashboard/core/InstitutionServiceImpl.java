@@ -151,6 +151,7 @@ class InstitutionServiceImpl implements InstitutionService {
     }
 
 
+    @Deprecated(forRemoval = true)
     @Override
     public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles) {
         log.trace("getInstitutionUsers start");
