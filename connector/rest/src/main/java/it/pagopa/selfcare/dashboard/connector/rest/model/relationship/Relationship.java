@@ -10,24 +10,25 @@
  * Do not edit the class manually.
  */
 
-package it.pagopa.selfcare.dashboard.connector.rest.model;
+package it.pagopa.selfcare.dashboard.connector.rest.model.relationship;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionUpdate;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Data
-public class RelationshipInfo {
+public class Relationship {
 
-    private String id;
-    private String from;
-    private String to;
+    private UUID id;
+    private UUID from;
+    private UUID to;
     private PartyRole role;
-    private ProductInfo product;
+    private RelationshipProduct product;
     private RelationshipState state;
     private String pricingPlan;
     private InstitutionUpdate institutionUpdate;

@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,4 +32,5 @@ public interface InstitutionService {
     void addUserProductRoles(String institutionId, String productId, String userId, CreateUserDto dto);
 
 
+    OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
 }

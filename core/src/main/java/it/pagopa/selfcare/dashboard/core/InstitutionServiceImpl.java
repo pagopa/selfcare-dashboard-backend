@@ -9,8 +9,10 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -304,6 +306,19 @@ class InstitutionServiceImpl implements InstitutionService {
         partyConnector.createUsers(institutionId, productId, userId, user);
         notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
         log.trace("addProductUser end");
+    }
+
+
+    @Override
+    public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
+        log.trace("getOnboardingRequestInfo start");
+        log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
+        final OnboardingRequestInfo onboardingRequestInfo = partyConnector.getOnboardingRequestInfo(tokenId);
+        onboardingRequestInfo.getManager().setUser(userRegistryConnector.getUserByInternalId(onboardingRequestInfo.getManager().getId(), USER_FIELD_LIST_ENHANCED));
+        onboardingRequestInfo.getAdmins().forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST_ENHANCED)));
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnboardingRequestInfo result = {}", onboardingRequestInfo);
+        log.trace("getOnboardingRequestInfo end");
+        return onboardingRequestInfo;
     }
 
 }

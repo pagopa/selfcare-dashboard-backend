@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,4 +37,5 @@ public interface PartyConnector {
 
     Institution getInstitutionByExternalId(String institutionExternalId);
 
+    OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
 }
