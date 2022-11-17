@@ -23,8 +23,8 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 
 @Slf4j

@@ -33,8 +33,8 @@ import java.time.Instant;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 import static it.pagopa.selfcare.dashboard.core.UserGroupServiceImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static java.util.UUID.randomUUID;

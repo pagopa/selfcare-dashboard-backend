@@ -40,8 +40,8 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
 
 @Slf4j
 @Service
