@@ -20,6 +20,7 @@ public interface InstitutionService {
 
     List<ProductTree> getInstitutionProducts(String institutionId);
 
+    @Deprecated
     Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
     UserInfo getInstitutionUser(String institutionId, String userId);
