@@ -151,7 +151,11 @@ class InstitutionServiceImpl implements InstitutionService {
         return productTrees;
     }
 
-
+    /**
+     * @deprecated method has been deprecated because a new method has been implemented.
+     * Remove the query from the repository
+     */
+    @Deprecated(forRemoval = true)
     @Override
     public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles) {
         log.trace("getInstitutionUsers start");
