@@ -114,7 +114,7 @@ public class InstitutionController {
     /**
      * @deprecated since it's not used
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "1.5")
     @GetMapping(value = "/{institutionId}/users")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
