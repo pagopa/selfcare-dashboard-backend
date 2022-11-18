@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.model.product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import lombok.Data;
 
 import javax.validation.Valid;
@@ -66,6 +67,11 @@ public class ProductsResource {
     @JsonProperty(required = true)
     @NotNull
     private ProductOnBoardingStatus productOnBoardingStatus;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}", required = true)
+    @JsonProperty(required = true)
+    @NotNull
+    private ProductStatus status;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.children}")
     private List<SubProductResource> children;

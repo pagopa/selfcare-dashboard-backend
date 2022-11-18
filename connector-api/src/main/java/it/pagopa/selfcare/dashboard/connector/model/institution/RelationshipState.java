@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.connector.model.user;
+package it.pagopa.selfcare.dashboard.connector.model.institution;
 
 public enum RelationshipState {
     PENDING,

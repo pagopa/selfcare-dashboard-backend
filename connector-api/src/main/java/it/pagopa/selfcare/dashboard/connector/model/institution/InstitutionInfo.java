@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.connector.model.institution;
 
-import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
 import lombok.Data;
 
 import java.util.Objects;

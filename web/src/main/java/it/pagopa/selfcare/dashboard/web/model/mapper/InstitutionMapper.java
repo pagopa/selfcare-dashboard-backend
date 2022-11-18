@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
 
 public class InstitutionMapper {
 

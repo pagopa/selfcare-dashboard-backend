@@ -32,6 +32,7 @@ public class ProductsMapper {
             resource.setAuthorized(model.getNode().isAuthorized());
             resource.setUserRole(model.getNode().getUserRole());
             resource.setProductOnBoardingStatus(model.getNode().getOnBoardingStatus());
+            resource.setStatus(model.getNode().getStatus());
             resource.setBackOfficeEnvironmentConfigurations(toProductBackOfficeConfigurations(model.getNode().getBackOfficeEnvironmentConfigurations()));
             if (model.getChildren() != null) {
                 resource.setChildren(model.getChildren().stream()
@@ -49,6 +50,7 @@ public class ProductsMapper {
             resource = new SubProductResource();
             resource.setId(model.getId());
             resource.setProductOnBoardingStatus(model.getOnBoardingStatus());
+            resource.setStatus(model.getStatus());
             resource.setTitle(model.getTitle());
         }
         return resource;

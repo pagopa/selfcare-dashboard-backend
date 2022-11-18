@@ -1,7 +1,6 @@
-package it.pagopa.selfcare.dashboard.web.model;
+package it.pagopa.selfcare.dashboard.web.model.product;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,11 +16,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ProductsResourceTest {
-
+class SubProductResourceTest {
     private Validator validator;
 
     @BeforeEach
@@ -35,25 +32,16 @@ class ProductsResourceTest {
         // given
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("id", NotBlank.class);
-        toCheckMap.put("logo", NotBlank.class);
-        toCheckMap.put("imageUrl", NotBlank.class);
         toCheckMap.put("title", NotBlank.class);
-        toCheckMap.put("description", NotBlank.class);
-        toCheckMap.put("urlBO", NotBlank.class);
         toCheckMap.put("productOnBoardingStatus", NotNull.class);
         toCheckMap.put("status", NotNull.class);
-        ProductsResource productsResource = new ProductsResource();
-        productsResource.setId(null);
-        productsResource.setLogo(null);
-        productsResource.setImageUrl(null);
-        productsResource.setTitle(null);
-        productsResource.setDescription(null);
-        productsResource.setLogoBgColor(null);
-        productsResource.setUrlBO(null);
-        productsResource.setProductOnBoardingStatus(null);
-        productsResource.setStatus(null);
+        SubProductResource subProductResource = new SubProductResource();
+        subProductResource.setId(null);
+        subProductResource.setTitle(null);
+        subProductResource.setProductOnBoardingStatus(null);
+        subProductResource.setStatus(null);
         // when
-        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
+        Set<ConstraintViolation<Object>> violations = validator.validate(subProductResource);
         // then
         List<ConstraintViolation<Object>> filteredViolations = violations.stream()
                 .filter(violation -> {
@@ -65,24 +53,12 @@ class ProductsResourceTest {
     }
 
     @Test
-    void validateRegExViolation() {
-        //given
-        ProductsResource productsResource = TestUtils.mockInstance(new ProductsResource());
-        //when
-        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
-        // then
-        assertFalse(violations.isEmpty());
-    }
-
-    @Test
     void validateNotNullFields() {
         // given
-        ProductsResource productsResource = TestUtils.mockInstance(new ProductsResource());
-        productsResource.setLogoBgColor("#FF56E1");
+        SubProductResource subProductResource = TestUtils.mockInstance(new SubProductResource());
         // when
-        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
+        Set<ConstraintViolation<Object>> violations = validator.validate(subProductResource);
         // then
         assertTrue(violations.isEmpty());
     }
-
 }

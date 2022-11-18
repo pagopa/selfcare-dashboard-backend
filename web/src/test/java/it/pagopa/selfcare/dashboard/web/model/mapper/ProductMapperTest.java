@@ -50,6 +50,7 @@ class ProductMapperTest {
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
         assertEquals(product.getChildren().get(0).getOnBoardingStatus(), resource.getChildren().get(0).getProductOnBoardingStatus());
+        assertEquals(product.getChildren().get(0).getStatus(), resource.getChildren().get(0).getStatus());
         reflectionEqualsByName(product, resource);
     }
 
