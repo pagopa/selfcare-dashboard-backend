@@ -202,7 +202,7 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(1, products.size());
-        Assertions.assertEquals(ProductStatus.INACTIVE, products.get(0).getNode().getStatus());
+        Assertions.assertEquals(ProductOnBoardingStatus.INACTIVE, products.get(0).getNode().getOnBoardingStatus());
         verify(productsConnectorMock, times(1)).getProductsTree();
         verify(partyConnectorMock, times(1)).getInstitutionProducts(institutionId);
         verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
@@ -220,13 +220,13 @@ class InstitutionServiceImplTest {
                 .thenReturn(List.of(p1, p2, p3, p4));
         PartyProduct pp1 = new PartyProduct();
         pp1.setId(p1.getNode().getId());
-        pp1.setStatus(ProductStatus.ACTIVE);
+        pp1.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
         PartyProduct pp3 = new PartyProduct();
         pp3.setId(p3.getNode().getId());
-        pp3.setStatus(ProductStatus.ACTIVE);
+        pp3.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
         PartyProduct pp4 = new PartyProduct();
         pp4.setId(p4.getNode().getId());
-        pp4.setStatus(ProductStatus.PENDING);
+        pp4.setOnBoardingStatus(ProductOnBoardingStatus.PENDING);
         when(partyConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(OPERATOR, "productRole2", p2.getNode().getId());
@@ -242,12 +242,12 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(2, products.size());
-        HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
-        expectedStatusMap.put(pp3.getId(), pp3.getStatus());
-        expectedStatusMap.put(pp4.getId(), pp4.getStatus());
+        HashMap<String, ProductOnBoardingStatus> expectedStatusMap = new HashMap<>();
+        expectedStatusMap.put(pp3.getId(), pp3.getOnBoardingStatus());
+        expectedStatusMap.put(pp4.getId(), pp4.getOnBoardingStatus());
         products.forEach(product -> {
             Assertions.assertTrue(expectedStatusMap.containsKey(product.getNode().getId()));
-            Assertions.assertEquals(expectedStatusMap.get(product.getNode().getId()), product.getNode().getStatus());
+            Assertions.assertEquals(expectedStatusMap.get(product.getNode().getId()), product.getNode().getOnBoardingStatus());
             Assertions.assertTrue(product.getNode().isAuthorized());
             Assertions.assertEquals(LIMITED.name(), product.getNode().getUserRole());
         });
@@ -269,13 +269,13 @@ class InstitutionServiceImplTest {
                 .thenReturn(List.of(p1, p2, p3));
         PartyProduct pp1 = new PartyProduct();
         pp1.setId(p1.getNode().getId());
-        pp1.setStatus(ProductStatus.ACTIVE);
+        pp1.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
         PartyProduct pp3 = new PartyProduct();
         pp3.setId(p3.getNode().getId());
-        pp3.setStatus(ProductStatus.ACTIVE);
+        pp3.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
         PartyProduct pp4 = new PartyProduct();
         pp4.setId(p4.getNode().getId());
-        pp4.setStatus(ProductStatus.PENDING);
+        pp4.setOnBoardingStatus(ProductOnBoardingStatus.PENDING);
         when(partyConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(MANAGER, "productRole2", p2.getNode().getId());
@@ -291,15 +291,15 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(3, products.size());
-        HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
-        expectedStatusMap.put(pp1.getId(), pp1.getStatus());
-        expectedStatusMap.put(p2.getNode().getId(), ProductStatus.INACTIVE);
-        expectedStatusMap.put(pp3.getId(), pp3.getStatus());
-        expectedStatusMap.put(pp4.getId(), pp4.getStatus());
+        HashMap<String, ProductOnBoardingStatus> expectedStatusMap = new HashMap<>();
+        expectedStatusMap.put(pp1.getId(), pp1.getOnBoardingStatus());
+        expectedStatusMap.put(p2.getNode().getId(), ProductOnBoardingStatus.INACTIVE);
+        expectedStatusMap.put(pp3.getId(), pp3.getOnBoardingStatus());
+        expectedStatusMap.put(pp4.getId(), pp4.getOnBoardingStatus());
         Set<String> expectedAuthorizedProducts = Set.of(p3.getNode().getId(), p2.getNode().getId());
         products.forEach(product -> {
             Assertions.assertTrue(expectedStatusMap.containsKey(product.getNode().getId()));
-            Assertions.assertEquals(expectedStatusMap.get(product.getNode().getId()), product.getNode().getStatus());
+            Assertions.assertEquals(expectedStatusMap.get(product.getNode().getId()), product.getNode().getOnBoardingStatus());
             Assertions.assertEquals(expectedAuthorizedProducts.contains(product.getNode().getId()), product.getNode().isAuthorized());
             if (selfCareGrantedAuthority.getRoleOnProducts().containsKey(product.getNode().getId())) {
                 Assertions.assertEquals(selfCareGrantedAuthority.getRoleOnProducts().get(product.getNode().getId()).getAuthority(), product.getNode().getUserRole());
@@ -327,10 +327,10 @@ class InstitutionServiceImplTest {
                 .thenReturn(List.of(p1, p2));
         PartyProduct pp1 = new PartyProduct();
         pp1.setId(p1.getNode().getId());
-        pp1.setStatus(ProductStatus.ACTIVE);
+        pp1.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
         PartyProduct pp2 = new PartyProduct();
         pp2.setId(p2.getNode().getId());
-        pp2.setStatus(ProductStatus.ACTIVE);
+        pp2.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
         when(partyConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(List.of(pp1, pp2));
         ProductGrantedAuthority productGrantedAuthority1 = new ProductGrantedAuthority(OPERATOR, "productRole1", p1.getNode().getId());
@@ -346,15 +346,15 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertFalse(products.isEmpty());
         Assertions.assertEquals(2, products.size());
-        HashMap<String, ProductStatus> expectedStatusMap = new HashMap<>();
-        expectedStatusMap.put(pp1.getId(), pp1.getStatus());
-        expectedStatusMap.put(p2.getNode().getId(), ProductStatus.ACTIVE);
-        expectedStatusMap.put(pp2.getId(), pp2.getStatus());
-        expectedStatusMap.put(p1.getNode().getId(), ProductStatus.ACTIVE);
+        HashMap<String, ProductOnBoardingStatus> expectedStatusMap = new HashMap<>();
+        expectedStatusMap.put(pp1.getId(), pp1.getOnBoardingStatus());
+        expectedStatusMap.put(p2.getNode().getId(), ProductOnBoardingStatus.ACTIVE);
+        expectedStatusMap.put(pp2.getId(), pp2.getOnBoardingStatus());
+        expectedStatusMap.put(p1.getNode().getId(), ProductOnBoardingStatus.ACTIVE);
         Set<String> expectedAuthorizedProducts = Set.of(p1.getNode().getId(), p2.getNode().getId());
         products.forEach(product -> {
             Assertions.assertTrue(expectedStatusMap.containsKey(product.getNode().getId()));
-            Assertions.assertEquals(expectedStatusMap.get(product.getNode().getId()), product.getNode().getStatus());
+            Assertions.assertEquals(expectedStatusMap.get(product.getNode().getId()), product.getNode().getOnBoardingStatus());
             Assertions.assertEquals(expectedAuthorizedProducts.contains(product.getNode().getId()), product.getNode().isAuthorized());
             if (selfCareGrantedAuthority.getRoleOnProducts().containsKey(product.getNode().getId())) {
                 Assertions.assertEquals(selfCareGrantedAuthority.getRoleOnProducts().get(product.getNode().getId()).getAuthority(), product.getNode().getUserRole());
