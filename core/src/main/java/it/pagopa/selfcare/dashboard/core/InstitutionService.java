@@ -21,6 +21,11 @@ public interface InstitutionService {
 
     List<ProductTree> getInstitutionProducts(String institutionId);
 
+    /**
+     * @deprecated method has been deprecated because a new method has been implemented.
+     * Remove the query from the repository
+     */
+    @Deprecated(forRemoval = true)
     Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
     UserInfo getInstitutionUser(String institutionId, String userId);

@@ -112,7 +112,7 @@ public class InstitutionController {
     }
 
     /**
-     * @Deprecated since it's not used
+     * @deprecated since it's not used
      */
     @Deprecated(forRemoval = true)
     @GetMapping(value = "/{institutionId}/users")
