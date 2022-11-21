@@ -2490,7 +2490,7 @@
       },
       "InstitutionResource" : {
         "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
+        "required" : [ "address", "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
         "type" : "object",
         "properties" : {
           "address" : {
@@ -2541,6 +2541,10 @@
           "userRole" : {
             "type" : "string",
             "description" : "Logged user's role"
+          },
+          "zipCode" : {
+            "type" : "string",
+            "description" : "Institution's zipCode"
           }
         }
       },
