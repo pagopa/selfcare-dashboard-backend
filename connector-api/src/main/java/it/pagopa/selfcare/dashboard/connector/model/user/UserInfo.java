@@ -13,6 +13,7 @@
 package it.pagopa.selfcare.dashboard.connector.model.user;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

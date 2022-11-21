@@ -23,6 +23,9 @@
     "name" : "institutions",
     "description" : "Institution operations"
   }, {
+    "name" : "onboarding",
+    "description" : "Onboarding operations"
+  }, {
     "name" : "products",
     "description" : "Products operations"
   }, {
@@ -706,6 +709,7 @@
             }
           }
         },
+        "deprecated" : true,
         "security" : [ {
           "bearerAuth" : [ "global" ]
         } ]
@@ -743,6 +747,80 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/InstitutionUserDetailsResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/onboarding-requests/{tokenId}" : {
+      "get" : {
+        "tags" : [ "onboarding" ],
+        "summary" : "retrieveOnboardingRequest",
+        "description" : "Service to retrieve a specific onboarding request",
+        "operationId" : "retrieveOnboardingRequestUsingGET",
+        "parameters" : [ {
+          "name" : "tokenId",
+          "in" : "path",
+          "description" : "Onboarding request's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/OnboardingRequestResource"
                 }
               }
             }
@@ -2322,6 +2400,29 @@
           }
         }
       },
+      "DpoData" : {
+        "title" : "DpoData",
+        "required" : [ "address", "email", "pec" ],
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : "string",
+            "description" : "DPO's address"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "DPO's email",
+            "format" : "email",
+            "example" : "email@example.com"
+          },
+          "pec" : {
+            "type" : "string",
+            "description" : "DPO's PEC",
+            "format" : "email",
+            "example" : "email@example.com"
+          }
+        }
+      },
       "IdentityTokenResource" : {
         "title" : "IdentityTokenResource",
         "required" : [ "token" ],
@@ -2333,9 +2434,63 @@
           }
         }
       },
+      "InstitutionInfo" : {
+        "title" : "InstitutionInfo",
+        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "recipientCode", "vatNumber", "zipCode" ],
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : "string",
+            "description" : "Institution's physical address"
+          },
+          "dpoData" : {
+            "description" : "Data Protection Officer (DPO) specific data",
+            "$ref" : "#/components/schemas/DpoData"
+          },
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "Fiscal code corresponding to the institution"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "Institution's unique internal identifier"
+          },
+          "institutionType" : {
+            "type" : "string",
+            "description" : "Institution's type",
+            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+          },
+          "mailAddress" : {
+            "type" : "string",
+            "description" : "Institution's email address",
+            "format" : "email",
+            "example" : "email@example.com"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Institution's name"
+          },
+          "pspData" : {
+            "description" : "Payment Service Provider (PSP) specific data",
+            "$ref" : "#/components/schemas/PspData"
+          },
+          "recipientCode" : {
+            "type" : "string",
+            "description" : "Billing recipient code"
+          },
+          "vatNumber" : {
+            "type" : "string",
+            "description" : "Institution's VAT number"
+          },
+          "zipCode" : {
+            "type" : "string",
+            "description" : "Institution's zipCode"
+          }
+        }
+      },
       "InstitutionResource" : {
         "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
+        "required" : [ "address", "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
         "type" : "object",
         "properties" : {
           "address" : {
@@ -2386,6 +2541,10 @@
           "userRole" : {
             "type" : "string",
             "description" : "Logged user's role"
+          },
+          "zipCode" : {
+            "type" : "string",
+            "description" : "Institution's zipCode"
           }
         }
       },
@@ -2489,6 +2648,33 @@
           "reason" : {
             "type" : "string",
             "description" : "Invalid parameter reason."
+          }
+        }
+      },
+      "OnboardingRequestResource" : {
+        "title" : "OnboardingRequestResource",
+        "required" : [ "admins", "institutionInfo", "manager", "status" ],
+        "type" : "object",
+        "properties" : {
+          "admins" : {
+            "type" : "array",
+            "description" : "Administrators specific data",
+            "items" : {
+              "$ref" : "#/components/schemas/UserInfo"
+            }
+          },
+          "institutionInfo" : {
+            "description" : "Institution specific data",
+            "$ref" : "#/components/schemas/InstitutionInfo"
+          },
+          "manager" : {
+            "description" : "Manager specific data",
+            "$ref" : "#/components/schemas/UserInfo"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Onboarding request's status",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         }
       },
@@ -2718,7 +2904,7 @@
       },
       "ProductsResource" : {
         "title" : "ProductsResource",
-        "required" : [ "authorized", "description", "id", "imageUrl", "logo", "status", "title", "urlBO" ],
+        "required" : [ "authorized", "description", "id", "imageUrl", "logo", "productOnBoardingStatus", "status", "title", "urlBO" ],
         "type" : "object",
         "properties" : {
           "activatedAt" : {
@@ -2766,10 +2952,15 @@
             "type" : "string",
             "description" : "Product logo's background color"
           },
+          "productOnBoardingStatus" : {
+            "type" : "string",
+            "description" : "Product's onBoarding status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          },
           "status" : {
             "type" : "string",
             "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+            "enum" : [ "ACTIVE", "INACTIVE", "PHASE_OUT", "TESTING" ]
           },
           "title" : {
             "type" : "string",
@@ -2789,6 +2980,34 @@
           }
         }
       },
+      "PspData" : {
+        "title" : "PspData",
+        "required" : [ "abiCode", "businessRegisterNumber", "legalRegisterName", "legalRegisterNumber", "vatNumberGroup" ],
+        "type" : "object",
+        "properties" : {
+          "abiCode" : {
+            "type" : "string",
+            "description" : "PSP's ABI code"
+          },
+          "businessRegisterNumber" : {
+            "type" : "string",
+            "description" : "PSP's Business Register number"
+          },
+          "legalRegisterName" : {
+            "type" : "string",
+            "description" : "PSP's legal register name"
+          },
+          "legalRegisterNumber" : {
+            "type" : "string",
+            "description" : "PSP's legal register number"
+          },
+          "vatNumberGroup" : {
+            "type" : "boolean",
+            "description" : "PSP's Vat Number group",
+            "example" : false
+          }
+        }
+      },
       "SearchUserDto" : {
         "title" : "SearchUserDto",
         "required" : [ "fiscalCode" ],
@@ -2802,17 +3021,22 @@
       },
       "SubProductResource" : {
         "title" : "SubProductResource",
-        "required" : [ "id", "status", "title" ],
+        "required" : [ "id", "productOnBoardingStatus", "status", "title" ],
         "type" : "object",
         "properties" : {
           "id" : {
             "type" : "string",
             "description" : "Product's unique identifier"
           },
+          "productOnBoardingStatus" : {
+            "type" : "string",
+            "description" : "Product's onBoarding status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          },
           "status" : {
             "type" : "string",
             "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+            "enum" : [ "ACTIVE", "INACTIVE", "PHASE_OUT", "TESTING" ]
           },
           "title" : {
             "type" : "string",
@@ -3023,6 +3247,36 @@
             "type" : "string",
             "description" : "User's unique identifier",
             "format" : "uuid"
+          }
+        }
+      },
+      "UserInfo" : {
+        "title" : "UserInfo",
+        "required" : [ "email", "fiscalCode", "id", "name", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "User's institutional email",
+            "format" : "email",
+            "example" : "email@example.com"
+          },
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
+          },
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       },

@@ -42,6 +42,7 @@ class InstitutionResourceTest {
         toCheckMap.put("userRole", NotBlank.class);
         toCheckMap.put("status", NotBlank.class);
         toCheckMap.put("address", NotBlank.class);
+        toCheckMap.put("zipCode", NotBlank.class);
         InstitutionResource institutionResource = new InstitutionResource();
         institutionResource.setInstitutionType(null);
 

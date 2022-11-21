@@ -14,10 +14,14 @@ public class InstitutionInfo {
     private String externalId;
     private String description;
     private String address;
+    private String zipCode;
     private String taxCode;
     private String digitalAddress;
-    private String status;
+    private RelationshipState status;
     private String category;
+    private Billing billing;
+    private PaymentServiceProvider paymentServiceProvider;
+    private DataProtectionOfficer dataProtectionOfficer;
 
     @Override
     public boolean equals(Object o) {

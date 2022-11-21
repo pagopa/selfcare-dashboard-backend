@@ -45,6 +45,7 @@ import static java.util.UUID.randomUUID;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -103,10 +104,10 @@ class InstitutionControllerTest {
     void getInstitution_institutionInfoNotNull() throws Exception {
         // given
         String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitution(Mockito.anyString()))
+        when(institutionServiceMock.getInstitution(anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
-                    InstitutionInfo institutionInfo = new InstitutionInfo();
+                    InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setExternalId");
                     institutionInfo.setExternalId(id);
                     return institutionInfo;
                 });
@@ -129,7 +130,7 @@ class InstitutionControllerTest {
     void getInstitution_institutionInfoNull() throws Exception {
         // given
         String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitution(Mockito.anyString()))
+        when(institutionServiceMock.getInstitution(anyString()))
                 .thenReturn(null);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
