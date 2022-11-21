@@ -57,6 +57,7 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getAddress(), resource.getAddress());
         assertEquals(LIMITED.name(), resource.getUserRole());
         assertEquals(institutionInfo.getStatus().toString(), resource.getStatus());
+        assertEquals(institutionInfo.getZipCode(), resource.getZipCode());
         reflectionEqualsByName(institutionInfo, resource, "status");
     }
 

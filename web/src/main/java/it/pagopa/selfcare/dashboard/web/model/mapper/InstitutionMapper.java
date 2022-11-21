@@ -31,6 +31,7 @@ public class InstitutionMapper {
             resource.setMailAddress(model.getDigitalAddress());
             resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
+            resource.setZipCode(model.getZipCode());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<SelfCareGrantedAuthority> selcAuthority = authentication.getAuthorities()

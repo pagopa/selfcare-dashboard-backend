@@ -226,6 +226,7 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData.getExternalId(), institutionInfo.getExternalId());
         assertEquals(onboardingData.getState(), institutionInfo.getStatus());
         assertEquals(onboardingData.getAttributes().get(0).getDescription(), institutionInfo.getCategory());
+        assertEquals(onboardingData.getZipCode(), institutionInfo.getZipCode());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         verifyNoMoreInteractions(partyProcessRestClientMock);
