@@ -78,4 +78,8 @@ public interface PartyProcessRestClient {
     @ResponseBody
     Institution getInstitutionByExternalId(@PathVariable(value = "externalId") String externalId);
 
+    @PostMapping(value = "${rest-client.party-process.approveOnboardingRequest.path}")
+    @ResponseBody
+    void approveOnboardingRequest(@PathVariable(value = "tokenId") String tokenId);
+
 }

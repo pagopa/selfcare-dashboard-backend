@@ -38,4 +38,6 @@ public interface PartyConnector {
     Institution getInstitutionByExternalId(String institutionExternalId);
 
     OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
+
+    void approveOnboardingRequest(String tokenId);
 }

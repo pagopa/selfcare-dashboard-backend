@@ -40,6 +40,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -57,6 +58,7 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
+import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_TOKEN_ID_MESSAGE;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -1255,6 +1257,45 @@ class PartyConnectorImplTest {
                 .getRelationshipById(managerRelationshipBinding.getRelationshipId());
         verifyNoMoreInteractions(partyManagementRestClientMock);
         verifyNoInteractions(partyProcessRestClientMock);
+    }
+
+    @Test
+    void getOnboardingRequestInfo_hasNullToken() {
+        // given
+        String tokenId = null;
+        // when
+        Executable executable = () -> partyConnector.getOnboardingRequestInfo(tokenId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void approveOnboardingRequest() {
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(partyProcessRestClientMock).approveOnboardingRequest(anyString());
+        // when
+        partyConnector.approveOnboardingRequest(tokenId);
+        // then
+        verify(partyProcessRestClientMock, times(1))
+                .approveOnboardingRequest(tokenId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void approveOnboardingRequest_hasNullToken() {
+        // given
+        String tokenId = null;
+        // when
+        Executable executable = () -> partyConnector.approveOnboardingRequest(tokenId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
     }
 
 }

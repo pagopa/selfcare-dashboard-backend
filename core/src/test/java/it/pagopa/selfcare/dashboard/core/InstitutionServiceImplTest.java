@@ -45,6 +45,7 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
+import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_TOKEN_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -1282,5 +1283,31 @@ class InstitutionServiceImplTest {
         assertTrue(capturedFields.contains(familyName));
         assertTrue(capturedFields.contains(workContacts));
         assertTrue(capturedFields.contains(fiscalCode));
+    }
+
+    @Test
+    void approveOnboardingRequest() {
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(partyConnectorMock).approveOnboardingRequest(anyString());
+        // when
+        institutionService.approveOnboardingRequest(tokenId);
+        // then
+        verify(partyConnectorMock, times(1))
+                .approveOnboardingRequest(tokenId);
+        verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void approveOnboardingRequest_hasNullToken() {
+        // given
+        String tokenId = null;
+        // when
+        Executable executable = () -> institutionService.approveOnboardingRequest(tokenId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyConnectorMock);
     }
 }
