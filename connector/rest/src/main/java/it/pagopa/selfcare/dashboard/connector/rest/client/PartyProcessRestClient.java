@@ -82,4 +82,7 @@ public interface PartyProcessRestClient {
     @ResponseBody
     void approveOnboardingRequest(@PathVariable(value = "tokenId") String tokenId);
 
+    @DeleteMapping(value = "/onboarding/reject/{tokenId}")
+    @ResponseBody
+    void rejectOnboardingRequest(@PathVariable(value = "tokenId") String tokenId);
 }

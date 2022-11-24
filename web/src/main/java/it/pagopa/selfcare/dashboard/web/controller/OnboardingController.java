@@ -56,4 +56,16 @@ public class OnboardingController {
         institutionService.approveOnboardingRequest(tokenId.toString());
         log.trace("approveOnboardingRequest end");
     }
+
+    @DeleteMapping(value = "/reject/{tokenId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.onboarding-requests.api.rejectOnboardingRequest}")
+    public void rejectOnboardingRequest(@ApiParam("${swagger.dashboard.onboarding-requests.model.tokenId}")
+                                        @PathVariable("tokenId")
+                                        UUID tokenId){
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        institutionService.rejectOnboardingRequest(tokenId.toString());
+        log.trace("rejectOnboardingRequest end");
+    }
 }

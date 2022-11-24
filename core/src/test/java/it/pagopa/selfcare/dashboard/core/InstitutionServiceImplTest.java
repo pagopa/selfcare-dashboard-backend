@@ -1310,4 +1310,29 @@ class InstitutionServiceImplTest {
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
         verifyNoInteractions(partyConnectorMock);
     }
+
+    @Test
+    void rejectOnboardingRequest(){
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(partyConnectorMock).rejectOnboardingRequest(anyString());
+        // when
+        institutionService.rejectOnboardingRequest(tokenId);
+        // then
+        verify(partyConnectorMock, times(1)).rejectOnboardingRequest(tokenId);
+        verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void rejectOnboardingRequest_hasNullToken(){
+        // given
+        String tokenId = null;
+        // when
+        Executable executable = () -> institutionService.rejectOnboardingRequest(tokenId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
+        verifyNoMoreInteractions(partyConnectorMock);
+    }
 }

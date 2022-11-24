@@ -1298,4 +1298,31 @@ class PartyConnectorImplTest {
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
     }
 
+    @Test
+    void rejectOnboardingRequest() {
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(partyProcessRestClientMock).rejectOnboardingRequest(anyString());
+        // when
+        partyConnector.rejectOnboardingRequest(tokenId);
+        // then
+        verify(partyProcessRestClientMock, times(1))
+                .rejectOnboardingRequest(tokenId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void rejectOnboardingRequest_hasNullToken() {
+        // given
+        String tokenId = null;
+        // when
+        Executable executable = () -> partyConnector.rejectOnboardingRequest(tokenId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
 }

@@ -411,6 +411,15 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("retrieveOnboardingRequest end");
     }
 
+    @Override
+    public void rejectOnboardingRequest(String tokenId){
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyProcessRestClient.rejectOnboardingRequest(tokenId);
+        log.trace("rejectOnboardingRequest end");
+    }
+
 
     @Setter(AccessLevel.PRIVATE)
     private static class PartyProductRole implements ProductRole {

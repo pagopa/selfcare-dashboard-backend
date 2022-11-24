@@ -334,4 +334,13 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("approveOnboardingRequest end");
     }
 
+    @Override
+    public void rejectOnboardingRequest(String tokenId) {
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyConnector.rejectOnboardingRequest(tokenId);
+        log.trace("rejectOnboardingRequest end");
+    }
+
 }

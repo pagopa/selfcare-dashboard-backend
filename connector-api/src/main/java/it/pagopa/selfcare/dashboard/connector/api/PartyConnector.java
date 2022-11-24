@@ -40,4 +40,6 @@ public interface PartyConnector {
     OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
 
     void approveOnboardingRequest(String tokenId);
+
+    void rejectOnboardingRequest(String tokenId);
 }

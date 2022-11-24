@@ -121,4 +121,23 @@ class OnboardingControllerTest {
         verifyNoMoreInteractions(institutionServiceMock);
     }
 
+    @Test
+    void rejectOnboardingRequest() throws  Exception {
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(institutionServiceMock).rejectOnboardingRequest(anyString());
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .delete(BASE_URL + "/reject/" + tokenId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertEquals("", result.getResponse().getContentAsString());
+        verify(institutionServiceMock, times(1)).rejectOnboardingRequest(tokenId);
+        verifyNoMoreInteractions(institutionServiceMock);
+    }
+
 }
