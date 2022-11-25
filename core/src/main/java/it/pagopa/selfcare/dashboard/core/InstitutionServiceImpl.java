@@ -46,6 +46,7 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED = "An Optional role object is required";
     private static final String AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED = "An Optional product role object is required";
     private static final String A_USER_INFO_FILTER_OBJECT_IS_REQUIRED = "A UserInfoFilter object is required";
+    static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
@@ -322,6 +323,24 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnboardingRequestInfo result = {}", onboardingRequestInfo);
         log.trace("getOnboardingRequestInfo end");
         return onboardingRequestInfo;
+    }
+
+    @Override
+    public void approveOnboardingRequest(String tokenId) {
+        log.trace("approveOnboardingRequest start");
+        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyConnector.approveOnboardingRequest(tokenId);
+        log.trace("approveOnboardingRequest end");
+    }
+
+    @Override
+    public void rejectOnboardingRequest(String tokenId) {
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyConnector.rejectOnboardingRequest(tokenId);
+        log.trace("rejectOnboardingRequest end");
     }
 
 }

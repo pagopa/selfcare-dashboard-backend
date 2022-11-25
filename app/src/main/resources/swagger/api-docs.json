@@ -797,6 +797,120 @@
         } ]
       }
     },
+    "/onboarding-requests/approve/{tokenId}" : {
+      "post" : {
+        "tags" : [ "onboarding" ],
+        "summary" : "approveOnboardingRequest",
+        "description" : "Service to approve a specific onboarding request",
+        "operationId" : "approveOnboardingRequestUsingPOST",
+        "parameters" : [ {
+          "name" : "tokenId",
+          "in" : "path",
+          "description" : "Onboarding request's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/onboarding-requests/reject/{tokenId}" : {
+      "delete" : {
+        "tags" : [ "onboarding" ],
+        "summary" : "rejectOnboardingRequest",
+        "description" : "Service to reject a specific onboarding request",
+        "operationId" : "rejectOnboardingRequestUsingDELETE",
+        "parameters" : [ {
+          "name" : "tokenId",
+          "in" : "path",
+          "description" : "Onboarding request's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/onboarding-requests/{tokenId}" : {
       "get" : {
         "tags" : [ "onboarding" ],

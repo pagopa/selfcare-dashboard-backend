@@ -349,4 +349,25 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNull(response.getZipCode());
     }
 
+    @Test
+    void approveOnboardingRequest() {
+        // given
+        String tokenId = "tokenId";
+        // when
+        Executable executable = () -> restClient.approveOnboardingRequest(tokenId);
+        // then
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void rejectOnboardingRequest() {
+        // given
+        String tokenId = "tokenId";
+        // when
+        Executable executable = () -> restClient.rejectOnboardingRequest(tokenId);
+        // then
+        assertDoesNotThrow(executable);
+    }
+
+
 }

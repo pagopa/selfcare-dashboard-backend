@@ -7,12 +7,14 @@ import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -95,6 +98,45 @@ class OnboardingControllerTest {
         // then
         verify(institutionServiceMock, times(1))
                 .getOnboardingRequestInfo(tokenId);
+        verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+
+    @Test
+    void approveOnboardingRequest() throws Exception {
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(institutionServiceMock).approveOnboardingRequest(anyString());
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .post(BASE_URL + "/approve/" + tokenId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertEquals("", result.getResponse().getContentAsString());
+        verify(institutionServiceMock, times(1)).approveOnboardingRequest(tokenId);
+        verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+    @Test
+    void rejectOnboardingRequest() throws  Exception {
+        // given
+        String tokenId = UUID.randomUUID().toString();
+        Mockito.doNothing()
+                .when(institutionServiceMock).rejectOnboardingRequest(anyString());
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .delete(BASE_URL + "/reject/" + tokenId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertEquals("", result.getResponse().getContentAsString());
+        verify(institutionServiceMock, times(1)).rejectOnboardingRequest(tokenId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 

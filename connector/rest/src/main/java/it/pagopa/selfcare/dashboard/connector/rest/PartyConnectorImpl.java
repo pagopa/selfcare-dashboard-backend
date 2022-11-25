@@ -49,6 +49,7 @@ class PartyConnectorImpl implements PartyConnector {
 
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
     private static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
 
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
             (inst1, inst2) -> ACTIVE.equals(inst1.getStatus()) ? inst1 : inst2;
@@ -367,7 +368,7 @@ class PartyConnectorImpl implements PartyConnector {
     public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
         log.trace("getOnboardingRequestInfo start");
         log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
-        Assert.hasText(tokenId, "A tokenId is required");
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
         final OnboardingRequestInfo onboardingRequestInfo = new OnboardingRequestInfo();
         onboardingRequestInfo.setAdmins(new ArrayList<>());
         final TokenInfo tokenInfo = partyManagementRestClient.getToken(UUID.fromString(tokenId));
@@ -399,6 +400,24 @@ class PartyConnectorImpl implements PartyConnector {
         log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
         log.trace("getOnboardingRequestInfo end");
         return onboardingRequestInfo;
+    }
+
+    @Override
+    public void approveOnboardingRequest(String tokenId) {
+        log.trace("approveOnboardingRequest start");
+        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyProcessRestClient.approveOnboardingRequest(tokenId);
+        log.trace("retrieveOnboardingRequest end");
+    }
+
+    @Override
+    public void rejectOnboardingRequest(String tokenId){
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyProcessRestClient.rejectOnboardingRequest(tokenId);
+        log.trace("rejectOnboardingRequest end");
     }
 
 

@@ -35,7 +35,7 @@ public class OnboardingController {
     @ApiOperation(value = "", notes = "${swagger.dashboard.onboarding-requests.api.retrieveOnboardingRequest}")
     public OnboardingRequestResource retrieveOnboardingRequest(@ApiParam("${swagger.dashboard.onboarding-requests.model.tokenId}")
                                                                @PathVariable("tokenId")
-                                                                       UUID tokenId) {
+                                                               UUID tokenId) {
         log.trace("retrieveOnboardingRequest start");
         log.debug("retrieveOnboardingRequest tokenId = {}", tokenId);
         final OnboardingRequestInfo onboardingRequestInfo = institutionService.getOnboardingRequestInfo(tokenId.toString());
@@ -45,4 +45,27 @@ public class OnboardingController {
         return result;
     }
 
+    @PostMapping(value = "/approve/{tokenId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.onboarding-requests.api.approveOnboardingRequest}")
+    public void approveOnboardingRequest(@ApiParam("${swagger.dashboard.onboarding-requests.model.tokenId}")
+                                         @PathVariable("tokenId")
+                                         UUID tokenId) {
+        log.trace("approveOnboardingRequest start");
+        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
+        institutionService.approveOnboardingRequest(tokenId.toString());
+        log.trace("approveOnboardingRequest end");
+    }
+
+    @DeleteMapping(value = "/reject/{tokenId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.onboarding-requests.api.rejectOnboardingRequest}")
+    public void rejectOnboardingRequest(@ApiParam("${swagger.dashboard.onboarding-requests.model.tokenId}")
+                                        @PathVariable("tokenId")
+                                        UUID tokenId){
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        institutionService.rejectOnboardingRequest(tokenId.toString());
+        log.trace("rejectOnboardingRequest end");
+    }
 }
