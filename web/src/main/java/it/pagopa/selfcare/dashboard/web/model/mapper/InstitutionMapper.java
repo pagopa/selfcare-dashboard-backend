@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
+
 public class InstitutionMapper {
 
     public static InstitutionResource toResource(InstitutionInfo model) {
@@ -27,8 +29,9 @@ public class InstitutionMapper {
             resource.setCategory(model.getCategory());
             resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());
-            resource.setStatus(model.getStatus());
+            resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
+            resource.setZipCode(model.getZipCode());
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<SelfCareGrantedAuthority> selcAuthority = authentication.getAuthorities()
@@ -39,7 +42,7 @@ public class InstitutionMapper {
                         .findAny();
                 selcAuthority.ifPresentOrElse(selfCareAuthority -> resource.setUserRole(selfCareAuthority.getAuthority()),
                         () -> {
-                            if ("PENDING".equals(resource.getStatus())) {
+                            if (PENDING.equals(model.getStatus())) {
                                 resource.setUserRole(SelfCareAuthority.ADMIN.toString());
                             }
                         });

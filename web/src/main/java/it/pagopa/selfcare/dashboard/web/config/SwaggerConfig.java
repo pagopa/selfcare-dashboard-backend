@@ -67,7 +67,8 @@ class SwaggerConfig {
                         new Tag("token", environment.getProperty("swagger.dashboard.token.api.description")),
                         new Tag("products", environment.getProperty("swagger.dashboard.product.api.description")),
                         new Tag("relationships", environment.getProperty("swagger.dashboard.relationships.api.description")),
-                        new Tag("user-groups", environment.getProperty("swagger.dashboard.user-groups.api.description")))
+                        new Tag("user-groups", environment.getProperty("swagger.dashboard.user-groups.api.description")),
+                        new Tag("onboarding", environment.getProperty("swagger.dashboard.onboarding.api.description")))
                 .directModelSubstitute(LocalTime.class, String.class)
                 .ignoredParameterTypes(Pageable.class)
                 .forCodeGeneration(true)

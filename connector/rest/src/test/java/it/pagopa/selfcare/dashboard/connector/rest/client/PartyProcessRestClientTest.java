@@ -6,7 +6,7 @@ import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -31,8 +31,8 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource(
@@ -348,5 +348,26 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNull(response.getTaxCode());
         assertNull(response.getZipCode());
     }
+
+    @Test
+    void approveOnboardingRequest() {
+        // given
+        String tokenId = "tokenId";
+        // when
+        Executable executable = () -> restClient.approveOnboardingRequest(tokenId);
+        // then
+        assertDoesNotThrow(executable);
+    }
+
+    @Test
+    void rejectOnboardingRequest() {
+        // given
+        String tokenId = "tokenId";
+        // when
+        Executable executable = () -> restClient.rejectOnboardingRequest(tokenId);
+        // then
+        assertDoesNotThrow(executable);
+    }
+
 
 }

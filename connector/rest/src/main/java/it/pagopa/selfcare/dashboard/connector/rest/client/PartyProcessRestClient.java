@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.user.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -78,4 +78,11 @@ public interface PartyProcessRestClient {
     @ResponseBody
     Institution getInstitutionByExternalId(@PathVariable(value = "externalId") String externalId);
 
+    @PostMapping(value = "${rest-client.party-process.approveOnboardingRequest.path}")
+    @ResponseBody
+    void approveOnboardingRequest(@PathVariable(value = "tokenId") String tokenId);
+
+    @DeleteMapping(value = "/onboarding/reject/{tokenId}")
+    @ResponseBody
+    void rejectOnboardingRequest(@PathVariable(value = "tokenId") String tokenId);
 }

@@ -9,8 +9,10 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,7 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED = "An Optional role object is required";
     private static final String AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED = "An Optional product role object is required";
     private static final String A_USER_INFO_FILTER_OBJECT_IS_REQUIRED = "A UserInfoFilter object is required";
+    static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
@@ -114,7 +117,7 @@ class InstitutionServiceImpl implements InstitutionService {
                             .filter(product -> userAuthProducts.containsKey(product.getNode().getId()))
                             .peek(product -> product.getNode().setAuthorized(true))
                             .peek(product -> product.getNode().setUserRole(LIMITED.name()))
-                            .peek(product -> product.getNode().setStatus(institutionsProductsMap.get(product.getNode().getId()).getStatus()))
+                            .peek(product -> product.getNode().setOnBoardingStatus(institutionsProductsMap.get(product.getNode().getId()).getOnBoardingStatus()))
                             .collect(Collectors.toList());
                     productTrees.stream()
                             .filter(productTree -> productTree.getChildren() != null)
@@ -123,14 +126,14 @@ class InstitutionServiceImpl implements InstitutionService {
                                     .filter(product -> userAuthProducts.containsKey(product.getId()))
                                     .peek(product -> product.setAuthorized(true))
                                     .peek(product -> product.setUserRole(LIMITED.name()))
-                                    .peek(product -> product.setStatus(institutionsProductsMap.get(product.getId()).getStatus()))
+                                    .peek(product -> product.setOnBoardingStatus(institutionsProductsMap.get(product.getId()).getOnBoardingStatus()))
                                     .collect(Collectors.toList())));
                 } else {
                     productTrees.forEach(product -> {
                         product.getNode().setAuthorized(userAuthProducts.containsKey(product.getNode().getId()));
-                        product.getNode().setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getNode().getId()))
-                                .map(PartyProduct::getStatus)
-                                .orElse(ProductStatus.INACTIVE));
+                        product.getNode().setOnBoardingStatus(Optional.ofNullable(institutionsProductsMap.get(product.getNode().getId()))
+                                .map(PartyProduct::getOnBoardingStatus)
+                                .orElse(ProductOnBoardingStatus.INACTIVE));
                         Optional.ofNullable(userAuthProducts.get(product.getNode().getId()))
                                 .ifPresentOrElse(authority -> product.getNode().setUserRole(authority.getAuthority()), () -> product.getNode().setUserRole(null));
                     });
@@ -139,9 +142,9 @@ class InstitutionServiceImpl implements InstitutionService {
                             .filter(Objects::nonNull)
                             .flatMap(Collection::stream)
                             .forEach(product ->
-                                    product.setStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
-                                            .map(PartyProduct::getStatus)
-                                            .orElse(ProductStatus.INACTIVE)));
+                                    product.setOnBoardingStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
+                                            .map(PartyProduct::getOnBoardingStatus)
+                                            .orElse(ProductOnBoardingStatus.INACTIVE)));
                 }
             }
         }
@@ -150,7 +153,11 @@ class InstitutionServiceImpl implements InstitutionService {
         return productTrees;
     }
 
-
+    /**
+     * @deprecated method has been deprecated because a new method has been implemented.
+     * Remove the query from the repository
+     */
+    @Deprecated(forRemoval = true)
     @Override
     public Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles) {
         log.trace("getInstitutionUsers start");
@@ -303,6 +310,37 @@ class InstitutionServiceImpl implements InstitutionService {
         partyConnector.createUsers(institutionId, productId, userId, user);
         notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
         log.trace("addProductUser end");
+    }
+
+
+    @Override
+    public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
+        log.trace("getOnboardingRequestInfo start");
+        log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
+        final OnboardingRequestInfo onboardingRequestInfo = partyConnector.getOnboardingRequestInfo(tokenId);
+        onboardingRequestInfo.getManager().setUser(userRegistryConnector.getUserByInternalId(onboardingRequestInfo.getManager().getId(), USER_FIELD_LIST_ENHANCED));
+        onboardingRequestInfo.getAdmins().forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST_ENHANCED)));
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnboardingRequestInfo result = {}", onboardingRequestInfo);
+        log.trace("getOnboardingRequestInfo end");
+        return onboardingRequestInfo;
+    }
+
+    @Override
+    public void approveOnboardingRequest(String tokenId) {
+        log.trace("approveOnboardingRequest start");
+        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyConnector.approveOnboardingRequest(tokenId);
+        log.trace("approveOnboardingRequest end");
+    }
+
+    @Override
+    public void rejectOnboardingRequest(String tokenId) {
+        log.trace("rejectOnboardingRequest start");
+        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
+        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
+        partyConnector.rejectOnboardingRequest(tokenId);
+        log.trace("rejectOnboardingRequest end");
     }
 
 }

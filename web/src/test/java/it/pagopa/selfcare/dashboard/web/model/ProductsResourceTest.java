@@ -40,6 +40,7 @@ class ProductsResourceTest {
         toCheckMap.put("title", NotBlank.class);
         toCheckMap.put("description", NotBlank.class);
         toCheckMap.put("urlBO", NotBlank.class);
+        toCheckMap.put("productOnBoardingStatus", NotNull.class);
         toCheckMap.put("status", NotNull.class);
         ProductsResource productsResource = new ProductsResource();
         productsResource.setId(null);
@@ -49,6 +50,7 @@ class ProductsResourceTest {
         productsResource.setDescription(null);
         productsResource.setLogoBgColor(null);
         productsResource.setUrlBO(null);
+        productsResource.setProductOnBoardingStatus(null);
         productsResource.setStatus(null);
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);

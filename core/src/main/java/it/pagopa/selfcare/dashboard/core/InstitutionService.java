@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,11 @@ public interface InstitutionService {
 
     List<ProductTree> getInstitutionProducts(String institutionId);
 
+    /**
+     * @deprecated method has been deprecated because a new method has been implemented.
+     * Remove the query from the repository
+     */
+    @Deprecated(forRemoval = true, since = "1.5")
     Collection<UserInfo> getInstitutionUsers(String institutionId, Optional<String> productId, Optional<SelfCareAuthority> role, Optional<Set<String>> productRoles);
 
     UserInfo getInstitutionUser(String institutionId, String userId);
@@ -31,4 +37,9 @@ public interface InstitutionService {
     void addUserProductRoles(String institutionId, String productId, String userId, CreateUserDto dto);
 
 
+    OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
+
+    void approveOnboardingRequest(String tokenId);
+
+    void rejectOnboardingRequest(String tokenId);
 }
