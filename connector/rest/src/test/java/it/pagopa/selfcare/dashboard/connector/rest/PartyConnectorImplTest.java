@@ -235,53 +235,114 @@ class PartyConnectorImplTest {
         verifyNoInteractions(partyManagementRestClientMock);
     }
 
-
     @Test
-    void getOnBoardedInstitutions() {
+    void getOnBoardedInstitutions_toBeValidatedtoBeValidate(){
         // given
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
         onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData1.setState(ACTIVE);
+        onboardingData1.setState(RelationshipState.TOBEVALIDATED);
         OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
         onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData2.setState(RelationshipState.PENDING);
+        onboardingData2.setState(RelationshipState.TOBEVALIDATED);
         onboardingData2.setId(onboardingData1.getId());
-        OnboardingData onboardingData3 = mockInstance(new OnboardingData(), 3, "setState");
-        onboardingData3.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData3.setState(RelationshipState.PENDING);
-        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3, onboardingData3));
+        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2));
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
         Collection<InstitutionInfo> institutions = partyConnector.getOnBoardedInstitutions();
         // then
         assertNotNull(institutions);
-        assertEquals(2, institutions.size());
+        assertEquals(1, institutions.size());
         Map<RelationshipState, List<InstitutionInfo>> map = institutions.stream()
                 .collect(Collectors.groupingBy(InstitutionInfo::getStatus));
-        List<InstitutionInfo> institutionInfos = map.get(ACTIVE);
-        assertNotNull(institutionInfos);
+        List<InstitutionInfo> institutionInfos = map.get(RelationshipState.TOBEVALIDATED);
+        assertEquals(1, institutionInfos.size());
+        assertEquals(onboardingData2.getDescription(), institutionInfos.get(0).getDescription());
+        assertEquals(onboardingData2.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        assertEquals(onboardingData2.getExternalId(), institutionInfos.get(0).getExternalId());
+        assertEquals(onboardingData2.getState(), institutionInfos.get(0).getStatus());
+        assertEquals(onboardingData2.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
+        assertEquals(onboardingData2.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        verify(partyProcessRestClientMock, times(1))
+                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void getOnBoardedInstitutions_pendingToBeValidated(){
+        // given
+        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+        OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
+        onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData1.setState(RelationshipState.PENDING);
+        OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
+        onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData2.setState(RelationshipState.TOBEVALIDATED);
+        onboardingData2.setId(onboardingData1.getId());
+        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2));
+        when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
+                .thenReturn(onBoardingInfo);
+        // when
+        Collection<InstitutionInfo> institutions = partyConnector.getOnBoardedInstitutions();
+        // then
+        assertNotNull(institutions);
+        assertEquals(1, institutions.size());
+        Map<RelationshipState, List<InstitutionInfo>> map = institutions.stream()
+                .collect(Collectors.groupingBy(InstitutionInfo::getStatus));
+        List<InstitutionInfo> institutionInfos = map.get(RelationshipState.PENDING);
         assertEquals(1, institutionInfos.size());
         assertEquals(onboardingData1.getDescription(), institutionInfos.get(0).getDescription());
         assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
         assertEquals(onboardingData1.getExternalId(), institutionInfos.get(0).getExternalId());
         assertEquals(onboardingData1.getState(), institutionInfos.get(0).getStatus());
         assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
-        institutionInfos = map.get(RelationshipState.PENDING);
-        assertNotNull(institutionInfos);
-        assertEquals(1, institutionInfos.size());
-        assertEquals(onboardingData3.getDescription(), institutionInfos.get(0).getDescription());
-        assertEquals(onboardingData3.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData3.getExternalId(), institutionInfos.get(0).getExternalId());
-        assertEquals(onboardingData3.getState(), institutionInfos.get(0).getStatus());
-        assertEquals(onboardingData3.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
+        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
         verify(partyProcessRestClientMock, times(1))
-                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING)));
+                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);
         verifyNoInteractions(partyManagementRestClientMock);
     }
 
+    @Test
+    void getOnBoardedInstitutions_activePendingToBeValidated(){
+        // given
+        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+        OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
+        onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData1.setState(RelationshipState.ACTIVE);
+        OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
+        onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData2.setState(RelationshipState.PENDING);
+        onboardingData2.setId(onboardingData1.getId());
+        OnboardingData onboardingData3 = mockInstance(new OnboardingData(), 3, "setState", "setId");
+        onboardingData3.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData3.setState(RelationshipState.TOBEVALIDATED);
+        onboardingData3.setId(onboardingData1.getId());
+        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3));
+        when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
+                .thenReturn(onBoardingInfo);
+        // when
+        Collection<InstitutionInfo> institutions = partyConnector.getOnBoardedInstitutions();
+        // then
+        assertNotNull(institutions);
+        assertEquals(1, institutions.size());
+        Map<RelationshipState, List<InstitutionInfo>> map = institutions.stream()
+                .collect(Collectors.groupingBy(InstitutionInfo::getStatus));
+        List<InstitutionInfo> institutionInfos = map.get(RelationshipState.ACTIVE);
+        assertEquals(1, institutionInfos.size());
+        assertEquals(onboardingData1.getDescription(), institutionInfos.get(0).getDescription());
+        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        assertEquals(onboardingData1.getExternalId(), institutionInfos.get(0).getExternalId());
+        assertEquals(onboardingData1.getState(), institutionInfos.get(0).getStatus());
+        assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
+        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        verify(partyProcessRestClientMock, times(1))
+                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
 
     @Test
     void getInstitutionProducts_nullProducts() {
