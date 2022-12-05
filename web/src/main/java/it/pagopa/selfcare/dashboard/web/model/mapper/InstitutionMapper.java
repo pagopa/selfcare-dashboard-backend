@@ -43,7 +43,7 @@ public class InstitutionMapper {
                         .findAny();
                 selcAuthority.ifPresentOrElse(selfCareAuthority -> resource.setUserRole(selfCareAuthority.getAuthority()),
                         () -> {
-                            if (PENDING.equals(model.getStatus()) || TOBEVALIDATED.equals(model.getStatus())) {
+                            if (PENDING.equals(model.getStatus()) || TOBEVALIDATED.equals(model.getStatus())) { //TODO check if correct
                                 resource.setUserRole(SelfCareAuthority.ADMIN.toString());
                             }
                         });
