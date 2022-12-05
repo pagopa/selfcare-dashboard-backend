@@ -40,8 +40,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
 @Slf4j
 @Service
@@ -51,8 +50,15 @@ class PartyConnectorImpl implements PartyConnector {
     private static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
 
-    private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION =
-            (inst1, inst2) -> ACTIVE.equals(inst1.getStatus()) ? inst1 : inst2;
+    private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
+                if(ACTIVE.equals(inst1.getStatus())){
+                    return inst1;
+                } else if (PENDING.equals(inst1.getStatus())){
+                    return inst1;
+                } else {
+                    return inst2;
+                }
+            };
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setOriginId(onboardingData.getOriginId());
@@ -163,7 +169,7 @@ class PartyConnectorImpl implements PartyConnector {
     @Override
     public Collection<InstitutionInfo> getOnBoardedInstitutions() {
         log.trace("getOnBoardedInstitutions start");
-        OnBoardingInfo onBoardingInfo = partyProcessRestClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING));
+        OnBoardingInfo onBoardingInfo = partyProcessRestClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED));
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
         log.debug("getOnBoardedInstitutions result = {}", result);
         log.trace("getOnBoardedInstitutions end");
