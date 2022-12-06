@@ -34,7 +34,6 @@ public class InstitutionMapper {
             resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
             resource.setZipCode(model.getZipCode());
-            //TODO verify if we need to check whether the field geographicTaxonomies is empty or not
             resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
                     .map(GeographicTaxonomyMapper::toGeographicTaxonomyResource)
                     .collect(Collectors.toList()));
