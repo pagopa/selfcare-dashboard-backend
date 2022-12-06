@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.model.institution;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -22,6 +23,7 @@ public class InstitutionInfo {
     private Billing billing;
     private PaymentServiceProvider paymentServiceProvider;
     private DataProtectionOfficer dataProtectionOfficer;
+    private List<GeographicTaxonomy> geographicTaxonomies;
 
     @Override
     public boolean equals(Object o) {

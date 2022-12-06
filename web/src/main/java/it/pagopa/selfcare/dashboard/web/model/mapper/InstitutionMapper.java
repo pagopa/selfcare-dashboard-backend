@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.TOBEVALIDATED;
@@ -33,6 +34,10 @@ public class InstitutionMapper {
             resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
             resource.setZipCode(model.getZipCode());
+            //TODO verify if we need to check whether the field geographicTaxonomies is empty or not
+            resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
+                    .map(GeographicTaxonomyMapper::toGeographicTaxonomyResource)
+                    .collect(Collectors.toList()));
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<SelfCareGrantedAuthority> selcAuthority = authentication.getAuthorities()
