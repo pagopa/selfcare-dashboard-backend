@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GeographicTaxonomyResourceTest {
+class GeographicTaxonomyResourceTest {
 
     private Validator validator;
 
