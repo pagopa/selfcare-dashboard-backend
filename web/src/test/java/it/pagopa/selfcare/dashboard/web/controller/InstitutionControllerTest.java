@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
@@ -108,6 +109,7 @@ class InstitutionControllerTest {
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
                     InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setExternalId");
+                    institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
                     institutionInfo.setExternalId(id);
                     return institutionInfo;
                 });
@@ -150,7 +152,12 @@ class InstitutionControllerTest {
     void getInstitutions_institutionInfoNotNull() throws Exception {
         // given
         when(institutionServiceMock.getInstitutions())
-                .thenAnswer(invocationOnMock -> List.of(mockInstance(new InstitutionInfo())));
+                .thenAnswer(invocationOnMock -> {
+                    List<InstitutionInfo> listOfInstitutionInfo = List.of(mockInstance(new InstitutionInfo()));
+                    listOfInstitutionInfo.get(0).setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+                    System.out.println(listOfInstitutionInfo);
+                    return listOfInstitutionInfo;
+                });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/")
