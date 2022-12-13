@@ -6,6 +6,8 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class InstitutionResource {
@@ -70,4 +72,9 @@ public class InstitutionResource {
     @JsonProperty(required = true)
     @NotBlank
     private String zipCode;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}", required = true)
+    @JsonProperty(required = true)
+    @NotNull
+    private List<GeographicTaxonomyResource> geographicTaxonomies;
 }

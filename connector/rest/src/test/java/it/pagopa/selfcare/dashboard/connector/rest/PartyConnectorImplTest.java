@@ -11,10 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Attribute;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -171,6 +168,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData = mockInstance(new OnboardingData());
+        onboardingData.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onBoardingInfo.setInstitutions(singletonList(onboardingData));
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
@@ -184,7 +182,6 @@ class PartyConnectorImplTest {
         verifyNoMoreInteractions(partyProcessRestClientMock);
         verifyNoInteractions(partyManagementRestClientMock);
     }
-
 
     @Test
     void getInstitution_emptyAttributes() {
@@ -193,6 +190,7 @@ class PartyConnectorImplTest {
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData = mockInstance(new OnboardingData());
         onboardingData.setAttributes(Collections.emptyList());
+        onboardingData.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onBoardingInfo.setInstitutions(singletonList(onboardingData));
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
@@ -207,6 +205,25 @@ class PartyConnectorImplTest {
         verifyNoInteractions(partyManagementRestClientMock);
     }
 
+    @Test
+    void getInstitution_nullGeographicTaxonomy() {
+        // given
+        String institutionId = "institutionId";
+        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
+        OnboardingData onboardingData = mockInstance(new OnboardingData(), "setGeographicTaxonomies");
+        onBoardingInfo.setInstitutions(singletonList(onboardingData));
+        when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
+                .thenReturn(onBoardingInfo);
+        // when
+        Executable executable = () -> partyConnector.getOnBoardedInstitution(institutionId);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals(String.format("The institution %s does not have geographic taxonomies.", onboardingData.getId()), e.getMessage());
+        verify(partyProcessRestClientMock, times(1))
+                .getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
 
     @Test
     void getOnBoardedInstitution() {
@@ -215,6 +232,7 @@ class PartyConnectorImplTest {
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData = mockInstance(new OnboardingData());
         onboardingData.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onBoardingInfo.setInstitutions(singletonList(onboardingData));
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
@@ -228,6 +246,8 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData.getExternalId(), institutionInfo.getExternalId());
         assertEquals(onboardingData.getState(), institutionInfo.getStatus());
         assertEquals(onboardingData.getAttributes().get(0).getDescription(), institutionInfo.getCategory());
+        assertEquals(onboardingData.getGeographicTaxonomies().get(0).getCode(), institutionInfo.getGeographicTaxonomies().get(0).getCode());
+        assertEquals(onboardingData.getGeographicTaxonomies().get(0).getDesc(), institutionInfo.getGeographicTaxonomies().get(0).getDesc());
         assertEquals(onboardingData.getZipCode(), institutionInfo.getZipCode());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
@@ -241,9 +261,11 @@ class PartyConnectorImplTest {
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
         onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData1.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onboardingData1.setState(RelationshipState.TOBEVALIDATED);
         OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
         onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData2.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onboardingData2.setState(RelationshipState.TOBEVALIDATED);
         onboardingData2.setId(onboardingData1.getId());
         onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2));
@@ -264,6 +286,8 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData2.getState(), institutionInfos.get(0).getStatus());
         assertEquals(onboardingData2.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
         assertEquals(onboardingData2.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        assertEquals(onboardingData2.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
+        assertEquals(onboardingData2.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);
@@ -276,11 +300,13 @@ class PartyConnectorImplTest {
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
         onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData1.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onboardingData1.setState(RelationshipState.PENDING);
         OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
         onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
         onboardingData2.setState(RelationshipState.TOBEVALIDATED);
         onboardingData2.setId(onboardingData1.getId());
+        onboardingData2.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2));
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
@@ -299,6 +325,8 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData1.getState(), institutionInfos.get(0).getStatus());
         assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
         assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
+        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);
@@ -311,14 +339,17 @@ class PartyConnectorImplTest {
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
         onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData1.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onboardingData1.setState(RelationshipState.ACTIVE);
         OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
         onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
+        onboardingData2.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onboardingData2.setState(RelationshipState.PENDING);
         onboardingData2.setId(onboardingData1.getId());
         OnboardingData onboardingData3 = mockInstance(new OnboardingData(), 3, "setState", "setId");
         onboardingData3.setAttributes(List.of(mockInstance(new Attribute())));
         onboardingData3.setState(RelationshipState.TOBEVALIDATED);
+        onboardingData3.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         onboardingData3.setId(onboardingData1.getId());
         onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3));
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
@@ -338,6 +369,8 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData1.getState(), institutionInfos.get(0).getStatus());
         assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
         assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
+        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
+        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);
@@ -1211,6 +1244,7 @@ class PartyConnectorImplTest {
         String institutionId = "institutionId";
         Institution institutionMock = mockInstance(new Institution());
         Attribute attribute = mockInstance(new Attribute());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         institutionMock.setAttributes(List.of(attribute));
         when(partyProcessRestClientMock.getInstitution(any()))
                 .thenReturn(institutionMock);
@@ -1259,6 +1293,7 @@ class PartyConnectorImplTest {
         String institutionExternalId = "institutionExternalId";
         Institution institutionMock = mockInstance(new Institution());
         Attribute attribute = mockInstance(new Attribute());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         institutionMock.setAttributes(List.of(attribute));
         when(partyProcessRestClientMock.getInstitutionByExternalId(any()))
                 .thenReturn(institutionMock);
