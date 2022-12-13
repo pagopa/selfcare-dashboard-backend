@@ -43,6 +43,12 @@
               "code": "string",
               "description": "string"
             }
+          ],
+          "geographicTaxonomies": [
+            {
+              "code": "string",
+              "desc": "string"
+            }
           ]
         }
       ]

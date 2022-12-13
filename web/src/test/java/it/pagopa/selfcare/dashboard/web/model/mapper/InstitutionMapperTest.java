@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
+import java.util.List;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
@@ -35,6 +37,7 @@ class InstitutionMapperTest {
         String internalInstitutionId = "institutionId";
         String institutionId = "externalId";
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setId");
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         institutionInfo.setId(internalInstitutionId);
         institutionInfo.setExternalId(institutionId);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -58,6 +61,8 @@ class InstitutionMapperTest {
         assertEquals(LIMITED.name(), resource.getUserRole());
         assertEquals(institutionInfo.getStatus().toString(), resource.getStatus());
         assertEquals(institutionInfo.getZipCode(), resource.getZipCode());
+        assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
+        assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
         reflectionEqualsByName(institutionInfo, resource, "status");
     }
 
@@ -66,6 +71,7 @@ class InstitutionMapperTest {
     void toResource_notNullNoAuth() {
         // given
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         // when
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
@@ -78,6 +84,7 @@ class InstitutionMapperTest {
         // given
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setStatus");
         institutionInfo.setStatus(ACTIVE);
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.emptyList());
@@ -94,6 +101,7 @@ class InstitutionMapperTest {
         // given
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setStatus");
         institutionInfo.setStatus(PENDING);
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
                 Collections.emptyList());
@@ -110,6 +118,7 @@ class InstitutionMapperTest {
         // given
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setStatus");
         institutionInfo.setStatus(PENDING);
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         String institutionId = "institutionId";
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,

@@ -20,5 +20,6 @@ public class Institution {
     private String origin;
     private InstitutionType institutionType;
     private List<Attribute> attributes;
+    private List<GeographicTaxonomy> geographicTaxonomies;
 
 }
