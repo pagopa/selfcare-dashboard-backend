@@ -2537,21 +2537,6 @@
           }
         }
       },
-      "GeographicTaxonomyResource" : {
-        "title" : "GeographicTaxonomyResource",
-        "required" : [ "code", "desc" ],
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "string",
-            "description" : "Institution's geographic taxonomy ISTAT code"
-          },
-          "desc" : {
-            "type" : "string",
-            "description" : "Institution's geographic taxonomy extended name"
-          }
-        }
-      },
       "IdentityTokenResource" : {
         "title" : "IdentityTokenResource",
         "required" : [ "token" ],
@@ -2619,7 +2604,7 @@
       },
       "InstitutionResource" : {
         "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
+        "required" : [ "address", "externalId", "fiscalCode", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
         "type" : "object",
         "properties" : {
           "address" : {
@@ -2637,13 +2622,6 @@
           "fiscalCode" : {
             "type" : "string",
             "description" : "Fiscal code corresponding to the institution"
-          },
-          "geographicTaxonomies" : {
-            "type" : "array",
-            "description" : "Institution's geographic taxonomy",
-            "items" : {
-              "$ref" : "#/components/schemas/GeographicTaxonomyResource"
-            }
           },
           "id" : {
             "type" : "string",
