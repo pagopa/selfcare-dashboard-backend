@@ -2618,17 +2618,31 @@
         }
       },
       "InstitutionResource" : {
-        "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
-        "type" : "object",
-        "properties" : {
-          "address" : {
-            "type" : "string",
-            "description" : "Institution's physical address"
+        "title": "InstitutionResource",
+        "required": [
+          "address",
+          "externalId",
+          "fiscalCode",
+          "geographicTaxonomies",
+          "id",
+          "mailAddress",
+          "name",
+          "origin",
+          "originId",
+          "recipientCode",
+          "status",
+          "userRole",
+          "zipCode"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
           },
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
           "externalId" : {
             "type" : "string",
@@ -2660,26 +2674,30 @@
           },
           "name" : {
             "type" : "string",
-            "description" : "Institution's name"
+            "description": "Institution's name"
           },
-          "origin" : {
-            "type" : "string",
-            "description" : "Institution's data origin"
+          "origin": {
+            "type": "string",
+            "description": "Institution's data origin"
           },
-          "originId" : {
-            "type" : "string",
-            "description" : "Institution's identifier related to origin"
+          "originId": {
+            "type": "string",
+            "description": "Institution's identifier related to origin"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
+          "recipientCode": {
+            "type": "string",
+            "description": "Billing recipient code"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
           },
-          "zipCode" : {
-            "type" : "string",
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
+          },
+          "zipCode": {
+            "type": "string",
             "description" : "Institution's zipCode"
           }
         }
