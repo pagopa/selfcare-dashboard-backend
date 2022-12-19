@@ -73,6 +73,9 @@ public class InstitutionResource {
     @NotBlank
     private String zipCode;
 
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}")
+    private String recipientCode;
+
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}", required = true)
     @JsonProperty(required = true)
     @NotNull
