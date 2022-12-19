@@ -1,8 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +11,10 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,6 +48,7 @@ class InstitutionResourceTest {
         toCheckMap.put("geographicTaxonomies", NotNull.class);
         InstitutionResource institutionResource = new InstitutionResource();
         institutionResource.setInstitutionType(null);
+        institutionResource.setRecipientCode(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionResource);
