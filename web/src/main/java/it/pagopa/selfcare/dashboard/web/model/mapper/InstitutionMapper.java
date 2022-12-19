@@ -8,8 +8,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.TOBEVALIDATED;
 
 public class InstitutionMapper {
 
@@ -32,6 +34,9 @@ public class InstitutionMapper {
             resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
             resource.setZipCode(model.getZipCode());
+            resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
+                    .map(GeographicTaxonomyMapper::toGeographicTaxonomyResource)
+                    .collect(Collectors.toList()));
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<SelfCareGrantedAuthority> selcAuthority = authentication.getAuthorities()
@@ -42,7 +47,7 @@ public class InstitutionMapper {
                         .findAny();
                 selcAuthority.ifPresentOrElse(selfCareAuthority -> resource.setUserRole(selfCareAuthority.getAuthority()),
                         () -> {
-                            if (PENDING.equals(model.getStatus())) {
+                            if (PENDING.equals(model.getStatus()) || TOBEVALIDATED.equals(model.getStatus())) {
                                 resource.setUserRole(SelfCareAuthority.ADMIN.toString());
                             }
                         });
