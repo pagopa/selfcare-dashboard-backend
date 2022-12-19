@@ -2629,7 +2629,6 @@
           "name",
           "origin",
           "originId",
-          "recipientCode",
           "status",
           "userRole",
           "zipCode"
@@ -2644,15 +2643,15 @@
             "type": "string",
             "description": "Institution's category"
           },
-          "externalId" : {
-            "type" : "string",
-            "description" : "Institution's unique external identifier"
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "geographicTaxonomies" : {
+          "geographicTaxonomies": {
             "type" : "array",
             "description" : "Institution's geographic taxonomy",
             "items" : {
@@ -2666,14 +2665,20 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+            "enum": [
+              "GSP",
+              "PA",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "name" : {
-            "type" : "string",
+          "name": {
+            "type": "string",
             "description": "Institution's name"
           },
           "origin": {
@@ -2698,7 +2703,7 @@
           },
           "zipCode": {
             "type": "string",
-            "description" : "Institution's zipCode"
+            "description": "Institution's zipCode"
           }
         }
       },

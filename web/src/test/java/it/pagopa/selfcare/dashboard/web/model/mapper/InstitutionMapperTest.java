@@ -97,6 +97,7 @@ class InstitutionMapperTest {
     }
 
 
+
     @Test
     void toResource_emptyAuthPendingStatus() {
         // given
@@ -111,6 +112,42 @@ class InstitutionMapperTest {
         InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
         // then
         assertEquals(ADMIN.toString(), resource.getUserRole());
+    }
+
+    @Test
+    void toResource_emptyBillingData() {
+        // given
+        String internalInstitutionId = "institutionId";
+        String institutionId = "externalId";
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setId", "setBilling");
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        institutionInfo.setId(internalInstitutionId);
+        institutionInfo.setExternalId(institutionId);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority(internalInstitutionId, Collections.singleton(new ProductGrantedAuthority(OPERATOR, "productRole", "productId")))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
+        // then
+        assertEquals(institutionInfo.getExternalId(), resource.getExternalId());
+        assertEquals(institutionInfo.getId(), resource.getId());
+        assertEquals(institutionInfo.getInstitutionType(), resource.getInstitutionType());
+        assertEquals(institutionInfo.getOriginId(), resource.getOriginId());
+        assertEquals(institutionInfo.getOrigin(), resource.getOrigin());
+        assertEquals(institutionInfo.getCategory(), resource.getCategory());
+        assertEquals(institutionInfo.getDescription(), resource.getName());
+        assertEquals(institutionInfo.getTaxCode(), resource.getFiscalCode());
+        assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
+        assertEquals(institutionInfo.getAddress(), resource.getAddress());
+        assertEquals(LIMITED.name(), resource.getUserRole());
+        assertNull(resource.getRecipientCode());
+        assertEquals(institutionInfo.getStatus().toString(), resource.getStatus());
+        assertEquals(institutionInfo.getZipCode(), resource.getZipCode());
+        assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
+        assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
+        reflectionEqualsByName(institutionInfo, resource, "status");
     }
 
 

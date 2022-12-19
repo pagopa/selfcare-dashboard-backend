@@ -45,10 +45,10 @@ class InstitutionResourceTest {
         toCheckMap.put("status", NotBlank.class);
         toCheckMap.put("address", NotBlank.class);
         toCheckMap.put("zipCode", NotBlank.class);
-        toCheckMap.put("recipientCode", NotBlank.class);
         toCheckMap.put("geographicTaxonomies", NotNull.class);
         InstitutionResource institutionResource = new InstitutionResource();
         institutionResource.setInstitutionType(null);
+        institutionResource.setRecipientCode(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionResource);

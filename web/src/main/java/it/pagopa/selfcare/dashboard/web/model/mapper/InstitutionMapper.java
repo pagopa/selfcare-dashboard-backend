@@ -34,7 +34,9 @@ public class InstitutionMapper {
             resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
             resource.setZipCode(model.getZipCode());
-            resource.setRecipientCode(model.getBilling().getRecipientCode());
+            if (model.getBilling() != null) {
+                resource.setRecipientCode(model.getBilling().getRecipientCode());
+            }
             resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
                     .map(GeographicTaxonomyMapper::toGeographicTaxonomyResource)
                     .collect(Collectors.toList()));
