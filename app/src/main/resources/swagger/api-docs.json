@@ -2618,27 +2618,40 @@
         }
       },
       "InstitutionResource" : {
-        "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
-        "type" : "object",
-        "properties" : {
-          "address" : {
-            "type" : "string",
-            "description" : "Institution's physical address"
+        "title": "InstitutionResource",
+        "required": [
+          "address",
+          "externalId",
+          "fiscalCode",
+          "geographicTaxonomies",
+          "id",
+          "mailAddress",
+          "name",
+          "origin",
+          "originId",
+          "status",
+          "userRole",
+          "zipCode"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
           },
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
-          "externalId" : {
-            "type" : "string",
-            "description" : "Institution's unique external identifier"
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "geographicTaxonomies" : {
+          "geographicTaxonomies": {
             "type" : "array",
             "description" : "Institution's geographic taxonomy",
             "items" : {
@@ -2652,35 +2665,45 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+            "enum": [
+              "GSP",
+              "PA",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
-          "origin" : {
-            "type" : "string",
-            "description" : "Institution's data origin"
+          "origin": {
+            "type": "string",
+            "description": "Institution's data origin"
           },
-          "originId" : {
-            "type" : "string",
-            "description" : "Institution's identifier related to origin"
+          "originId": {
+            "type": "string",
+            "description": "Institution's identifier related to origin"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
+          "recipientCode": {
+            "type": "string",
+            "description": "Billing recipient code"
           },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
           },
-          "zipCode" : {
-            "type" : "string",
-            "description" : "Institution's zipCode"
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "Institution's zipCode"
           }
         }
       },
