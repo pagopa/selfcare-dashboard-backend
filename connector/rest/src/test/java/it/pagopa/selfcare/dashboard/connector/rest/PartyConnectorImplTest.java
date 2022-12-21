@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -127,7 +128,7 @@ class PartyConnectorImplTest {
 
 
     @Test
-    void getInstitution_nullInstitutions() {
+    void getInstitution_nullInstitutiogns() {
         // given
         String institutionId = "institutionId";
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
@@ -1424,6 +1425,11 @@ class PartyConnectorImplTest {
         final Relationship managerRelationshipMock = mockInstance(new Relationship());
         when(partyManagementRestClientMock.getRelationshipById(any()))
                 .thenReturn(managerRelationshipMock);
+        final Institution institutionMock = mockInstance(new Institution(), "setTaxCode");
+        institutionMock.setTaxCode(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        when(partyManagementRestClientMock.getInstitutionByExternalId(any()))
+                .thenReturn(institutionMock);
         // when
         final OnboardingRequestInfo result = partyConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
         // then
@@ -1440,6 +1446,8 @@ class PartyConnectorImplTest {
         assertEquals(managerRelationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getInstitutionInfo().getPaymentServiceProvider());
         assertEquals(managerRelationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getInstitutionInfo().getDataProtectionOfficer());
         assertEquals(managerRelationshipMock.getBilling(), result.getInstitutionInfo().getBilling());
+        assertEquals(institutionMock.getGeographicTaxonomies().get(0).getCode(), result.getInstitutionInfo().getGeographicTaxonomies().get(0).getCode());
+        assertEquals(institutionMock.getGeographicTaxonomies().get(0).getDesc(), result.getInstitutionInfo().getGeographicTaxonomies().get(0).getDesc());
         assertNotNull(result.getManager());
         assertEquals(managerRelationshipBinding.getPartyId().toString(), result.getManager().getId());
         assertEquals(ADMIN, result.getManager().getRole());
@@ -1451,6 +1459,8 @@ class PartyConnectorImplTest {
                 .getToken(tokenInfoMock.getId());
         verify(partyManagementRestClientMock, times(1))
                 .getRelationshipById(managerRelationshipBinding.getRelationshipId());
+        verify(partyManagementRestClientMock, times(1))
+                .getInstitutionByExternalId(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
         verifyNoMoreInteractions(partyManagementRestClientMock);
         verifyNoInteractions(partyProcessRestClientMock);
     }
@@ -1465,6 +1475,36 @@ class PartyConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void getOnboardingRequestInfo_hasNullInstitution() {
+        // given
+        final TokenInfo tokenInfoMock = mockInstance(new TokenInfo(), "setId", "setLegals");
+        tokenInfoMock.setId(UUID.randomUUID());
+        final RelationshipBinding managerRelationshipBinding = mockInstance(new RelationshipBinding(), "setRole");
+        managerRelationshipBinding.setRole(PartyRole.MANAGER);
+        final RelationshipBinding adminRelationshipBinding = mockInstance(new RelationshipBinding(), "setRole");
+        adminRelationshipBinding.setRole(PartyRole.DELEGATE);
+        tokenInfoMock.setLegals(List.of(managerRelationshipBinding, adminRelationshipBinding));
+        when(partyManagementRestClientMock.getToken(any()))
+                .thenReturn(tokenInfoMock);
+        final Relationship managerRelationshipMock = mockInstance(new Relationship());
+        when(partyManagementRestClientMock.getRelationshipById(any()))
+                .thenReturn(managerRelationshipMock);
+        // when
+        Executable executable = () -> partyConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
+        // then
+        ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
+        assertEquals(String.format("Institution %s not found", managerRelationshipMock.getInstitutionUpdate().getTaxCode()), e.getMessage());
+        verify(partyManagementRestClientMock, times(1))
+                .getToken(tokenInfoMock.getId());
+        verify(partyManagementRestClientMock, times(1))
+                .getRelationshipById(managerRelationshipBinding.getRelationshipId());
+        verify(partyManagementRestClientMock, times(1))
+                .getInstitutionByExternalId(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
+        verifyNoMoreInteractions(partyManagementRestClientMock);
+        verifyNoInteractions(partyProcessRestClientMock);
     }
 
     @Test

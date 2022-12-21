@@ -2564,32 +2564,56 @@
         }
       },
       "InstitutionInfo" : {
-        "title" : "InstitutionInfo",
-        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "recipientCode", "vatNumber", "zipCode" ],
-        "type" : "object",
-        "properties" : {
-          "address" : {
-            "type" : "string",
-            "description" : "Institution's physical address"
+        "title": "InstitutionInfo",
+        "required": [
+          "address",
+          "fiscalCode",
+          "geographicTaxonomies",
+          "id",
+          "institutionType",
+          "mailAddress",
+          "name",
+          "recipientCode",
+          "vatNumber",
+          "zipCode"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
           },
-          "dpoData" : {
-            "description" : "Data Protection Officer (DPO) specific data",
-            "$ref" : "#/components/schemas/DpoData"
+          "dpoData": {
+            "description": "Data Protection Officer (DPO) specific data",
+            "$ref": "#/components/schemas/DpoData"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Institution's unique internal identifier"
+          "geographicTaxonomies": {
+            "type": "array",
+            "description": "Institution's geographic taxonomy",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomyResource"
+            }
           },
-          "institutionType" : {
-            "type" : "string",
-            "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+          "id": {
+            "type": "string",
+            "description": "Institution's unique internal identifier"
           },
-          "mailAddress" : {
+          "institutionType": {
+            "type": "string",
+            "description": "Institution's type",
+            "enum": [
+              "GSP",
+              "PA",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
+          },
+          "mailAddress": {
             "type" : "string",
             "description" : "Institution's email address",
             "format" : "email",
@@ -2652,19 +2676,19 @@
             "description": "Fiscal code corresponding to the institution"
           },
           "geographicTaxonomies": {
-            "type" : "array",
-            "description" : "Institution's geographic taxonomy",
-            "items" : {
-              "$ref" : "#/components/schemas/GeographicTaxonomyResource"
+            "type": "array",
+            "description": "Institution's geographic taxonomy",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomyResource"
             }
           },
-          "id" : {
-            "type" : "string",
-            "description" : "Institution's unique internal identifier"
+          "id": {
+            "type": "string",
+            "description": "Institution's unique internal identifier"
           },
-          "institutionType" : {
-            "type" : "string",
-            "description" : "Institution's type",
+          "institutionType": {
+            "type": "string",
+            "description": "Institution's type",
             "enum": [
               "GSP",
               "PA",

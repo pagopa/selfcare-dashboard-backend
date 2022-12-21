@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
@@ -51,6 +52,7 @@ class OnboardingControllerTest {
         // given
         String tokenId = UUID.randomUUID().toString();
         final OnboardingRequestInfo dto = mockInstance(new OnboardingRequestInfo());
+        dto.getInstitutionInfo().setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         dto.getManager().getUser().setId(UUID.randomUUID().toString());
         dto.getManager().getUser().setWorkContacts(Map.of(dto.getInstitutionInfo().getId(), mockInstance(new WorkContact())));
         dto.setAdmins(List.of(dto.getManager()));
@@ -83,6 +85,7 @@ class OnboardingControllerTest {
                 .andExpect(jsonPath("$.institutionInfo.dpoData.address", notNullValue()))
                 .andExpect(jsonPath("$.institutionInfo.dpoData.pec", notNullValue()))
                 .andExpect(jsonPath("$.institutionInfo.dpoData.email", notNullValue()))
+                .andExpect(jsonPath("$.institutionInfo.geographicTaxonomies", notNullValue()))
                 .andExpect(jsonPath("$.manager", notNullValue()))
                 .andExpect(jsonPath("$.manager.id", notNullValue()))
                 .andExpect(jsonPath("$.manager.name", notNullValue()))
