@@ -287,18 +287,7 @@ class PartyConnectorImpl implements PartyConnector {
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId(institutionId);
         onboardingUsersRequest.setProductId(productId);
-        Map<PartyRole, List<User>> partyRoleToUsersMap = userDto.getRoles().stream()
-                .map(role -> {
-                    User user = new User();
-                    user.setName(userDto.getName());
-                    user.setSurname(userDto.getSurname());
-                    user.setTaxCode(userDto.getTaxCode());
-                    user.setEmail(userDto.getEmail());
-                    user.setId(UUID.fromString(userId));
-                    user.setProductRole(role.getProductRole());
-                    user.setRole(role.getPartyRole());
-                    return user;
-                }).collect(Collectors.groupingBy(User::getRole));
+        Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
 
         if (partyRoleToUsersMap.size() > 1) {
             throw new ValidationException(String.format("Is not allowed to create both %s and %s users", PartyRole.SUB_DELEGATE, PartyRole.OPERATOR));
@@ -321,23 +310,13 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("createUsers end");
     }
 
+
     @Override
     public void checkExistingRelationshipRoles(String institutionId, String productId, CreateUserDto userDto, String userId) {
         log.trace("checkExistingRelationshipRoles start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}, userId = {}", institutionId, productId, userDto, userId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "checkExistingRelationshipRoles institutionId = {}, productId = {}, createUserDto = {}, userId = {}", institutionId, productId, userDto, userId);
 
-        Map<PartyRole, List<User>> partyRoleToUsersMap = userDto.getRoles().stream()
-                .map(role -> {
-                    User user = new User();
-                    user.setName(userDto.getName());
-                    user.setSurname(userDto.getSurname());
-                    user.setTaxCode(userDto.getTaxCode());
-                    user.setEmail(userDto.getEmail());
-                    user.setId(UUID.fromString(userId));
-                    user.setProductRole(role.getProductRole());
-                    user.setRole(role.getPartyRole());
-                    return user;
-                }).collect(Collectors.groupingBy(User::getRole));
+        Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(Optional.of(productId));
@@ -350,11 +329,28 @@ class PartyConnectorImpl implements PartyConnector {
             List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
 
             if (!roles.contains(PartyRole.OPERATOR) || !(partyRoles.contains(PartyRole.OPERATOR))) {
-                throw new ValidationException("User already exists with the selected role");
+                throw new ValidationException("User role conflict");
             }
         }
         log.trace("checkExistingRelationshipRoles end");
     }
+
+
+    private Map<PartyRole, List<User>> getPartyRoleListMap(String userId, CreateUserDto userDto) {
+        return userDto.getRoles().stream()
+                .map(role -> {
+                    User user = new User();
+                    user.setName(userDto.getName());
+                    user.setSurname(userDto.getSurname());
+                    user.setTaxCode(userDto.getTaxCode());
+                    user.setEmail(userDto.getEmail());
+                    user.setId(UUID.fromString(userId));
+                    user.setProductRole(role.getProductRole());
+                    user.setRole(role.getPartyRole());
+                    return user;
+                }).collect(Collectors.groupingBy(User::getRole));
+    }
+
 
     @Override
     public void suspend(String relationshipId) {
