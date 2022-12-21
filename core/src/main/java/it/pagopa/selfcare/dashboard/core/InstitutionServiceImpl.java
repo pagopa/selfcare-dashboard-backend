@@ -282,6 +282,7 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
         UserId userId = userRegistryConnector.saveUser(user.getUser());
+        partyConnector.checkExistingRelationshipRoles(institutionId, productId, user, userId.getId().toString());
         partyConnector.createUsers(institutionId, productId, userId.getId().toString(), user);
         notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
         log.debug("createUsers result = {}", userId);
