@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
@@ -46,6 +47,8 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED = "An Optional role object is required";
     private static final String AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED = "An Optional product role object is required";
     private static final String A_USER_INFO_FILTER_OBJECT_IS_REQUIRED = "A UserInfoFilter object is required";
+
+    private static final String REQUIRED_GEOGRAPHIC_TAXONOMIES = "A list of geographic taxonomies is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
@@ -82,6 +85,15 @@ class InstitutionServiceImpl implements InstitutionService {
         return result;
     }
 
+    @Override
+    public void updateInstitutionGeographicTaxonomy(String institutionId, List<GeographicTaxonomy> geographicTaxonomies) {
+        log.trace("updateInstitutionGeographicTaxonomy start");
+        log.debug("updateInstitutionGeographicTaxonomy institutiondId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomies);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES);
+        partyConnector.updateGeographicTaxonomy(institutionId, geographicTaxonomies);
+        log.trace("updateInstitutionGeographicTaxonomy end");
+    }
 
     @Override
     public Collection<InstitutionInfo> getInstitutions() {

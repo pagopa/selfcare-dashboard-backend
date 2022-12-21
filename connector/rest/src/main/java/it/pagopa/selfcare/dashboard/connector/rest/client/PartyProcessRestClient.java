@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -45,6 +46,12 @@ public interface PartyProcessRestClient {
     OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
                                      @RequestParam(value = "institutionExternalId", required = false) String institutionExternalId,
                                      @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
+
+    @PutMapping(value = "${rest-client.party-process.updateInstitution.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    void putInstitution(@PathVariable("id") String institutionId,
+                        @RequestBody InstitutionPut request);
+
 
     @GetMapping(value = "${rest-client.party-process.getRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

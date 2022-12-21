@@ -11,10 +11,8 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
+import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GeographicTaxonomyMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
@@ -110,6 +108,23 @@ public class InstitutionController {
 
         return result;
     }
+
+    @PutMapping("/updateGeographicTaxonomy/{institutionId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
+    public void updateInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                    @PathVariable("institutionId")
+                                                    String institutionId,
+                                                    @ApiParam("${swagger.dashboard.institutions.model.geographicTaxonomy}")
+                                                    @RequestBody
+                                                    @Valid
+                                                    GeographicTaxonomyDtoList geographicTaxonomyDtoList) {
+        log.trace("updateInstitutionGeographicTaxonomy start");
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomyDtoList);
+        institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomyDtoList.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::toGeographicTaxonomy).collect(Collectors.toList()));
+        log.trace("updateInstitutionsGeographicTaxonomy end");
+    }
+
 
     /**
      * @deprecated since it's not used
