@@ -1068,7 +1068,7 @@ class PartyConnectorImplTest {
 
     @ParameterizedTest
     @EnumSource(value = PartyRole.class)
-    void checkExistingRelationshipRoles_conflict(PartyRole partyRole) {
+    void checkExistingRelationshipRoles_userExistingConflict(PartyRole partyRole) {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
@@ -1101,9 +1101,42 @@ class PartyConnectorImplTest {
         verifyNoInteractions(partyManagementRestClientMock);
     }
 
+    @Test
+    void checkExistingRelationshipRoles_userExistingNoConflict() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoles = "Operator";
+        String userId = UUID.randomUUID().toString();
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(PartyRole.OPERATOR);
+        createUserDto.setRoles(Set.of(roleMock));
+        UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
+        mockUserInfoFilter.setProductId(Optional.of(productId));
+        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
+        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        RelationshipInfo mockRelationshipInfo = new RelationshipInfo();
+        mockRelationshipInfo.setFrom("from");
+        mockRelationshipInfo.setId("id");
+        mockRelationshipInfo.setTo("to");
+        mockRelationshipInfo.setRole(PartyRole.OPERATOR);
+        RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
+        mockRelationshipsResponse.add(mockRelationshipInfo);
+        when(partyProcessRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
+                .thenReturn(mockRelationshipsResponse);
+        // when
+        partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        // then
+        verify(partyProcessRestClientMock, times(1))
+                .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
     @ParameterizedTest
     @EnumSource(value = PartyRole.class)
-    void checkExistingRelationshipRoles_noConflict(PartyRole partyRole) {
+    void checkExistingRelationshipRoles_noUserExisting(PartyRole partyRole) {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
