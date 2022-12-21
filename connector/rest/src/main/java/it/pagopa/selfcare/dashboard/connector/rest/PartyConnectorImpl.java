@@ -5,7 +5,6 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -322,6 +321,40 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("createUsers end");
     }
 
+    @Override
+    public void checkExistingRelationshipRoles(String institutionId, String productId, CreateUserDto userDto, String userId) {
+        log.trace("checkExistingRelationshipRoles start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}, userId = {}", institutionId, productId, userDto, userId);
+
+        Map<PartyRole, List<User>> partyRoleToUsersMap = userDto.getRoles().stream()
+                .map(role -> {
+                    User user = new User();
+                    user.setName(userDto.getName());
+                    user.setSurname(userDto.getSurname());
+                    user.setTaxCode(userDto.getTaxCode());
+                    user.setEmail(userDto.getEmail());
+                    user.setId(UUID.fromString(userId));
+                    user.setProductRole(role.getProductRole());
+                    user.setRole(role.getPartyRole());
+                    return user;
+                }).collect(Collectors.groupingBy(User::getRole));
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(productId));
+        userInfoFilter.setUserId(Optional.ofNullable(userId));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
+
+        RelationshipsResponse institutionRelationships = partyProcessRestClient.getUserInstitutionRelationships(institutionId, EnumSet.allOf(PartyRole.class), userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
+        if (!institutionRelationships.isEmpty()) {
+            Set<PartyRole> roles = partyRoleToUsersMap.keySet();
+            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
+
+            if (!roles.contains(PartyRole.OPERATOR) || !(partyRoles.contains(PartyRole.OPERATOR))) {
+                throw new ValidationException("User already exists with the selected role");
+            }
+        }
+        log.trace("checkExistingRelationshipRoles end");
+    }
 
     @Override
     public void suspend(String relationshipId) {
