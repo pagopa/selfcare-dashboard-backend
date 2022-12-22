@@ -128,7 +128,7 @@ class PartyConnectorImplTest {
 
 
     @Test
-    void getInstitution_nullInstitutiogns() {
+    void getInstitution_nullInstitutions() {
         // given
         String institutionId = "institutionId";
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
