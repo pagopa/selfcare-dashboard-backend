@@ -1437,17 +1437,8 @@ class PartyConnectorImplTest {
         assertNotNull(result.getInstitutionInfo());
         assertEquals(managerRelationshipMock.getTo().toString(), result.getInstitutionInfo().getId());
         assertEquals(managerRelationshipMock.getState(), result.getInstitutionInfo().getStatus());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getInstitutionType(), result.getInstitutionInfo().getInstitutionType());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getDescription(), result.getInstitutionInfo().getDescription());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getTaxCode(), result.getInstitutionInfo().getTaxCode());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getDigitalAddress(), result.getInstitutionInfo().getDigitalAddress());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getAddress(), result.getInstitutionInfo().getAddress());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getZipCode(), result.getInstitutionInfo().getZipCode());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getInstitutionInfo().getPaymentServiceProvider());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getInstitutionInfo().getDataProtectionOfficer());
         assertEquals(managerRelationshipMock.getBilling(), result.getInstitutionInfo().getBilling());
-        assertEquals(institutionMock.getGeographicTaxonomies().get(0).getCode(), result.getInstitutionInfo().getGeographicTaxonomies().get(0).getCode());
-        assertEquals(institutionMock.getGeographicTaxonomies().get(0).getDesc(), result.getInstitutionInfo().getGeographicTaxonomies().get(0).getDesc());
+        assertEquals(institutionMock.getGeographicTaxonomies().get(0), result.getInstitutionInfo().getGeographicTaxonomies().get(0));
         assertNotNull(result.getManager());
         assertEquals(managerRelationshipBinding.getPartyId().toString(), result.getManager().getId());
         assertEquals(ADMIN, result.getManager().getRole());
@@ -1463,6 +1454,24 @@ class PartyConnectorImplTest {
                 .getInstitutionByExternalId(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
         verifyNoMoreInteractions(partyManagementRestClientMock);
         verifyNoInteractions(partyProcessRestClientMock);
+    }
+
+    @Test
+    void relationshipToInstitutionInfoFunction() {
+        // given
+        Relationship relationshipMock = mockInstance(new Relationship());
+        // when
+        final InstitutionInfo result = PartyConnectorImpl.RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationshipMock);
+        // then
+        assertEquals(relationshipMock.getInstitutionUpdate().getInstitutionType(), result.getInstitutionType());
+        assertEquals(relationshipMock.getInstitutionUpdate().getDescription(), result.getDescription());
+        assertEquals(relationshipMock.getInstitutionUpdate().getTaxCode(), result.getTaxCode());
+        assertEquals(relationshipMock.getInstitutionUpdate().getDigitalAddress(), result.getDigitalAddress());
+        assertEquals(relationshipMock.getInstitutionUpdate().getAddress(), result.getAddress());
+        assertEquals(relationshipMock.getInstitutionUpdate().getZipCode(), result.getZipCode());
+        assertEquals(relationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getPaymentServiceProvider());
+        assertEquals(relationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getDataProtectionOfficer());
+        assertEquals(relationshipMock.getBilling(), result.getBilling());
     }
 
     @Test

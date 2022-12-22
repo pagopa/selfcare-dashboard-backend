@@ -2614,14 +2614,14 @@
             ]
           },
           "mailAddress": {
-            "type" : "string",
-            "description" : "Institution's email address",
-            "format" : "email",
-            "example" : "email@example.com"
+            "type": "string",
+            "description": "Institution's email address",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
           },
           "pspData" : {
             "description" : "Payment Service Provider (PSP) specific data",
