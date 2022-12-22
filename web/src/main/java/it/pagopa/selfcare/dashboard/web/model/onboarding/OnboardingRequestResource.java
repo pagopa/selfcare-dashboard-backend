@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.model.onboarding;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
+import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyResource;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -98,6 +99,11 @@ public class OnboardingRequestResource {
         @ApiModelProperty(value = "${swagger.dashboard.institutions.model.dpoData}")
         @Valid
         private DpoData dpoData;
+
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}", required = true)
+        @JsonProperty(required = true)
+        @NotNull
+        private List<GeographicTaxonomyResource> geographicTaxonomies;
 
 
         @Data

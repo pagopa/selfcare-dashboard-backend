@@ -8,6 +8,8 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
+import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
@@ -15,7 +17,6 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User.Fields;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
-import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -1253,6 +1254,7 @@ class InstitutionServiceImplTest {
         final OnboardingRequestInfo onboardingRequestInfoMock = mockInstance(new OnboardingRequestInfo(), "setAdmins");
         final UserInfo adminMock = mockInstance(new UserInfo());
         onboardingRequestInfoMock.setAdmins(List.of(adminMock));
+        onboardingRequestInfoMock.getInstitutionInfo().setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         when(partyConnectorMock.getOnboardingRequestInfo(any()))
                 .thenReturn(onboardingRequestInfoMock);
         User userMock = mockInstance(new User(), "setId");
@@ -1273,6 +1275,8 @@ class InstitutionServiceImplTest {
         assertEquals(result.getManager().getId(), result.getManager().getUser().getId());
         assertNotNull(result.getAdmins().get(0).getUser());
         assertEquals(result.getAdmins().get(0).getId(), result.getAdmins().get(0).getUser().getId());
+        assertEquals(onboardingRequestInfoMock.getInstitutionInfo().getGeographicTaxonomies().get(0).getCode(), result.getInstitutionInfo().getGeographicTaxonomies().get(0).getCode());
+        assertEquals(onboardingRequestInfoMock.getInstitutionInfo().getGeographicTaxonomies().get(0).getDesc(), result.getInstitutionInfo().getGeographicTaxonomies().get(0).getDesc());
         verify(partyConnectorMock, times(1))
                 .getOnboardingRequestInfo(tokenId);
         ArgumentCaptor<String> userIdCaptor = ArgumentCaptor.forClass(String.class);

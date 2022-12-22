@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
 import it.pagopa.selfcare.dashboard.connector.rest.model.token.TokenInfo;
 import org.springframework.cloud.openfeign.CollectionFormat;
@@ -25,4 +26,7 @@ public interface PartyManagementRestClient {
     @CollectionFormat(feign.CollectionFormat.CSV)
     TokenInfo getToken(@PathVariable("tokenId") UUID tokenId);
 
+    @GetMapping(value = "${rest-client.party-management.getInstitutionByExternalId.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    Institution getInstitutionByExternalId(@PathVariable(value = "externalId") String externalId);
 }

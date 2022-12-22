@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.onboarding;
 
+import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -92,6 +93,7 @@ class OnboardingRequestResourceTest {
         toCheckMap.put("fiscalCode", NotBlank.class);
         toCheckMap.put("vatNumber", NotBlank.class);
         toCheckMap.put("recipientCode", NotBlank.class);
+        toCheckMap.put("geographicTaxonomies", NotNull.class);
 
         OnboardingRequestResource.InstitutionInfo resource = new OnboardingRequestResource.InstitutionInfo();
 
@@ -163,6 +165,7 @@ class OnboardingRequestResourceTest {
         resource.getInstitutionInfo().setMailAddress("email@example.com");
         resource.getInstitutionInfo().getDpoData().setEmail("email@example.com");
         resource.getInstitutionInfo().getDpoData().setPec("email@example.com");
+        resource.getInstitutionInfo().setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomyResource())));
         resource.getManager().setEmail("email@example.com");
         resource.setAdmins(List.of(resource.getManager()));
         // when
