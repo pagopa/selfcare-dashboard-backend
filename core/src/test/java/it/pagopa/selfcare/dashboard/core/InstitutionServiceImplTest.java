@@ -1044,7 +1044,8 @@ class InstitutionServiceImplTest {
                 }
             });
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
-            verifyNoMoreInteractions(partyConnectorMock);
+            verify(partyConnectorMock, times(1))
+                    .createUsers(institutionId, productId, userId.getId().toString(), createUserDto);
         } else {
             InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
             createUserDto.getRoles().forEach(role -> {
@@ -1092,6 +1093,8 @@ class InstitutionServiceImplTest {
         assertEquals(userId.getId(), result.getId());
         verify(userRegistryConnector, times(1))
                 .saveUser(createUserDto.getUser());
+        verify(partyConnectorMock, times(1))
+                .checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId.getId().toString());
         verify(partyConnectorMock, times(1))
                 .createUsers(institutionId, productId, userId.getId().toString(), createUserDto);
         verify(notificationServiceMock, times(1)).
