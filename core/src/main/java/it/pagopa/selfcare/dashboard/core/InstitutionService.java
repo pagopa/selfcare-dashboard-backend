@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -20,7 +20,7 @@ public interface InstitutionService {
 
     Collection<InstitutionInfo> getInstitutions();
 
-    void updateInstitutionGeographicTaxonomy(String institutionId, List<GeographicTaxonomy> geographicTaxonomies);
+    void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 
     List<ProductTree> getInstitutionProducts(String institutionId);
 

@@ -49,8 +49,8 @@ public interface PartyProcessRestClient {
 
     @PutMapping(value = "${rest-client.party-process.updateInstitution.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    void putInstitution(@PathVariable("id") String institutionId,
-                        @RequestBody InstitutionPut request);
+    void updateInstitutionGeographicTaxonomy(@PathVariable("id") String institutionId,
+                                             @RequestBody InstitutionPut request);
 
 
     @GetMapping(value = "${rest-client.party-process.getRelationship.path}", produces = MediaType.APPLICATION_JSON_VALUE)

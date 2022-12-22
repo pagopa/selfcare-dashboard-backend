@@ -93,26 +93,105 @@
             }
           },
           "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/institutions/{institutionId}" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitution",
-        "description" : "Service to get a specific institution related to logged user",
+    "/institutions/updateGeographicTaxonomy/{institutionId}": {
+      "put": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "updateInstitutionGeographicTaxonomy",
+        "description": "Service to update the geographic taxonomy of an onboarded institution",
+        "operationId": "updateInstitutionGeographicTaxonomyUsingPUT",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeographicTaxonomyDtoList"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/institutions/{institutionId}": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitution",
+        "description": "Service to get a specific institution related to logged user",
         "operationId" : "getInstitutionUsingGET",
         "parameters" : [ {
           "name" : "institutionId",
@@ -2527,26 +2606,59 @@
             "type" : "string",
             "description" : "DPO's email",
             "format" : "email",
-            "example" : "email@example.com"
+            "example": "email@example.com"
           },
-          "pec" : {
-            "type" : "string",
-            "description" : "DPO's PEC",
-            "format" : "email",
-            "example" : "email@example.com"
+          "pec": {
+            "type": "string",
+            "description": "DPO's PEC",
+            "format": "email",
+            "example": "email@example.com"
           }
         }
       },
-      "GeographicTaxonomyResource" : {
-        "title" : "GeographicTaxonomyResource",
-        "required" : [ "code", "desc" ],
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "string",
-            "description" : "Institution's geographic taxonomy ISTAT code"
+      "GeographicTaxonomyDto": {
+        "title": "GeographicTaxonomyDto",
+        "required": [
+          "code",
+          "desc"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy ISTAT code"
           },
-          "desc" : {
+          "desc": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy extended name"
+          }
+        }
+      },
+      "GeographicTaxonomyDtoList": {
+        "title": "GeographicTaxonomyDtoList",
+        "type": "object",
+        "properties": {
+          "geographicTaxonomyDtoList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomyDto"
+            }
+          }
+        }
+      },
+      "GeographicTaxonomyResource": {
+        "title": "GeographicTaxonomyResource",
+        "required": [
+          "code",
+          "desc"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy ISTAT code"
+          },
+          "desc": {
             "type" : "string",
             "description" : "Institution's geographic taxonomy extended name"
           }
@@ -2623,15 +2735,15 @@
             "type": "string",
             "description": "Institution's name"
           },
-          "pspData" : {
-            "description" : "Payment Service Provider (PSP) specific data",
-            "$ref" : "#/components/schemas/PspData"
+          "pspData": {
+            "description": "Payment Service Provider (PSP) specific data",
+            "$ref": "#/components/schemas/PspData"
           },
-          "recipientCode" : {
-            "type" : "string",
-            "description" : "Billing recipient code"
+          "recipientCode": {
+            "type": "string",
+            "description": "Billing recipient code"
           },
-          "vatNumber" : {
+          "vatNumber": {
             "type" : "string",
             "description" : "Institution's VAT number"
           },

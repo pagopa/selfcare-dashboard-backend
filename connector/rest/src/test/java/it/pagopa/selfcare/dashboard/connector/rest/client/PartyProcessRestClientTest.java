@@ -236,10 +236,16 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
     void putInstitution() {
         // given
         final String institutionIdMock = "institutionId";
+        final String institutionPutMockCode = "setCode";
         InstitutionPut geographicTaxonomyCodesMock = TestUtils.mockInstance(new InstitutionPut());
-        geographicTaxonomyCodesMock.getGeographicTaxonomyCodes().add("Test1");
+        geographicTaxonomyCodesMock.setGeographicTaxonomyCodes(List.of(TestUtils.mockInstance(institutionPutMockCode)));
 
-        System.out.println(geographicTaxonomyCodesMock);
+        // when
+        Executable executable = () -> restClient.updateInstitutionGeographicTaxonomy(institutionIdMock, geographicTaxonomyCodesMock);
+
+        // then
+        assertDoesNotThrow(executable);
+
     }
 
     @Test
