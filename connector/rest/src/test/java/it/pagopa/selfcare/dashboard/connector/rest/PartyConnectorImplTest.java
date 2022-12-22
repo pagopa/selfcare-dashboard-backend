@@ -389,14 +389,13 @@ class PartyConnectorImplTest {
         Mockito.doNothing()
                 .when(partyProcessRestClientMock).updateInstitutionGeographicTaxonomy(anyString(), any());
         // when
-        partyConnector.updateGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
         // then
         ArgumentCaptor<InstitutionPut> argumentCaptor = ArgumentCaptor.forClass(InstitutionPut.class);
         verify(partyProcessRestClientMock, times(1))
                 .updateInstitutionGeographicTaxonomy(Mockito.eq(institutionId), argumentCaptor.capture());
         InstitutionPut institutionPut = argumentCaptor.getValue();
         assertEquals(geographicTaxonomiesMock.getGeographicTaxonomyList().get(0).getCode(), institutionPut.getGeographicTaxonomyCodes().get(0));
-
         verifyNoMoreInteractions(partyProcessRestClientMock);
         verifyNoInteractions(partyManagementRestClientMock);
     }
@@ -407,7 +406,7 @@ class PartyConnectorImplTest {
         String institutionId = null;
         GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
         // when
-        Executable executable = () -> partyConnector.updateGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
@@ -418,10 +417,9 @@ class PartyConnectorImplTest {
     void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
         // given
         String institutionId = "institutionId";
-        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
-        geographicTaxonomiesMock.setGeographicTaxonomyList(null);
+        GeographicTaxonomyList geographicTaxonomiesMock = null;
         // when
-        Executable executable = () -> partyConnector.updateGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE, e.getMessage());

@@ -18,7 +18,7 @@ public interface PartyConnector {
 
     Collection<InstitutionInfo> getOnBoardedInstitutions();
 
-    void updateGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
+    void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 
     UserInfo getUser(String relationshipId);
 

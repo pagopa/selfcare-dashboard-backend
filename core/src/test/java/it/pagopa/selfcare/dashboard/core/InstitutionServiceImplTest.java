@@ -110,12 +110,12 @@ class InstitutionServiceImplTest {
         GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
         geographicTaxonomies.setGeographicTaxonomyList(List.of(mockInstance(new GeographicTaxonomy())));
         Mockito.doNothing()
-                .when(partyConnectorMock).updateGeographicTaxonomy(anyString(), any());
+                .when(partyConnectorMock).updateInstitutionGeographicTaxonomy(anyString(), any());
         // when
         institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         // then
         verify(partyConnectorMock, times(1))
-                .updateGeographicTaxonomy(institutionId, geographicTaxonomies);
+                .updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -136,7 +136,7 @@ class InstitutionServiceImplTest {
     void updateInstitutionGeographicTaxonomy_hasNullGeographicTaxonomies() {
         // given
         String institutionId = "institutionId";
-        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
+        GeographicTaxonomyList geographicTaxonomies = null;
         // when
         Executable executable = () -> institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         // then

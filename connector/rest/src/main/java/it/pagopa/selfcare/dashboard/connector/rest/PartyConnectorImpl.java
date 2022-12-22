@@ -53,7 +53,7 @@ class PartyConnectorImpl implements PartyConnector {
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
-    static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "A list of geographic taxonomies is required";
+    static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
 
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
         if (ACTIVE.equals(inst1.getStatus())) {
@@ -180,7 +180,7 @@ class PartyConnectorImpl implements PartyConnector {
     }
 
     @Override
-    public void updateGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
+    public void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
         log.trace("updateInstitutionGeographicTaxonomy start");
         log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geograpihc taxonomies = {}", institutionId, geographicTaxonomies);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);

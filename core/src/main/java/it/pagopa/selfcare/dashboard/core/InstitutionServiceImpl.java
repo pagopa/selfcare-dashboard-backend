@@ -91,7 +91,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug("updateInstitutionGeographicTaxonomy institutiondId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomies);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES);
-        partyConnector.updateGeographicTaxonomy(institutionId, geographicTaxonomies);
+        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         log.trace("updateInstitutionGeographicTaxonomy end");
     }
 
