@@ -93,70 +93,151 @@
             }
           },
           "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
           }
         },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
       }
     },
-    "/institutions/{institutionId}" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitution",
-        "description" : "Service to get a specific institution related to logged user",
-        "operationId" : "getInstitutionUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique internal identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+    "/institutions/{institutionId}": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitution",
+        "description": "Service to get a specific institution related to logged user",
+        "operationId": "getInstitutionUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionResource"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionResource"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/institutions/{institutionId}/geographicTaxonomy": {
+      "put": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "updateInstitutionGeographicTaxonomy",
+        "description": "Service to update the geographic taxonomy of an onboarded institution",
+        "operationId": "updateInstitutionGeographicTaxonomyUsingPUT",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeographicTaxonomyListDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
           },
           "401" : {
             "description" : "Unauthorized",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not Found",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -2519,42 +2600,81 @@
         "required" : [ "address", "email", "pec" ],
         "type" : "object",
         "properties" : {
-          "address" : {
-            "type" : "string",
-            "description" : "DPO's address"
+          "address": {
+            "type": "string",
+            "description": "DPO's address"
           },
-          "email" : {
-            "type" : "string",
-            "description" : "DPO's email",
-            "format" : "email",
-            "example" : "email@example.com"
+          "email": {
+            "type": "string",
+            "description": "DPO's email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "pec" : {
-            "type" : "string",
-            "description" : "DPO's PEC",
-            "format" : "email",
-            "example" : "email@example.com"
+          "pec": {
+            "type": "string",
+            "description": "DPO's PEC",
+            "format": "email",
+            "example": "email@example.com"
           }
         }
       },
-      "GeographicTaxonomyResource" : {
-        "title" : "GeographicTaxonomyResource",
-        "required" : [ "code", "desc" ],
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "string",
-            "description" : "Institution's geographic taxonomy ISTAT code"
+      "GeographicTaxonomyDto": {
+        "title": "GeographicTaxonomyDto",
+        "required": [
+          "code",
+          "desc"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy ISTAT code"
           },
-          "desc" : {
-            "type" : "string",
-            "description" : "Institution's geographic taxonomy extended name"
+          "desc": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy extended name"
           }
         }
       },
-      "IdentityTokenResource" : {
-        "title" : "IdentityTokenResource",
-        "required" : [ "token" ],
+      "GeographicTaxonomyListDto": {
+        "title": "GeographicTaxonomyListDto",
+        "required": [
+          "geographicTaxonomyDtoList"
+        ],
+        "type": "object",
+        "properties": {
+          "geographicTaxonomyDtoList": {
+            "type": "array",
+            "description": "List of institution's geographic taxonomies",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomyDto"
+            }
+          }
+        }
+      },
+      "GeographicTaxonomyResource": {
+        "title": "GeographicTaxonomyResource",
+        "required": [
+          "code",
+          "desc"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy ISTAT code"
+          },
+          "desc": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy extended name"
+          }
+        }
+      },
+      "IdentityTokenResource": {
+        "title": "IdentityTokenResource",
+        "required": [
+          "token"
+        ],
         "type" : "object",
         "properties" : {
           "token" : {
@@ -2623,21 +2743,21 @@
             "type": "string",
             "description": "Institution's name"
           },
-          "pspData" : {
-            "description" : "Payment Service Provider (PSP) specific data",
-            "$ref" : "#/components/schemas/PspData"
+          "pspData": {
+            "description": "Payment Service Provider (PSP) specific data",
+            "$ref": "#/components/schemas/PspData"
           },
-          "recipientCode" : {
-            "type" : "string",
-            "description" : "Billing recipient code"
+          "recipientCode": {
+            "type": "string",
+            "description": "Billing recipient code"
           },
-          "vatNumber" : {
-            "type" : "string",
-            "description" : "Institution's VAT number"
+          "vatNumber": {
+            "type": "string",
+            "description": "Institution's VAT number"
           },
-          "zipCode" : {
-            "type" : "string",
-            "description" : "Institution's zipCode"
+          "zipCode": {
+            "type": "string",
+            "description": "Institution's zipCode"
           }
         }
       },

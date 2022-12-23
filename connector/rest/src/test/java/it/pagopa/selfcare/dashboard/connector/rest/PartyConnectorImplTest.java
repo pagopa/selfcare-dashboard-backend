@@ -21,6 +21,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -56,7 +57,7 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_TOKEN_ID_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -377,6 +378,54 @@ class PartyConnectorImplTest {
         verifyNoMoreInteractions(partyProcessRestClientMock);
         verifyNoInteractions(partyManagementRestClientMock);
     }
+
+    @Test
+    void updateGeographicTaxonomy() {
+        // given
+        String institutionId = "institutionId";
+        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
+        geographicTaxonomiesMock.setGeographicTaxonomyList(List.of(mockInstance(new GeographicTaxonomy())));
+        System.out.println(geographicTaxonomiesMock);
+        Mockito.doNothing()
+                .when(partyProcessRestClientMock).updateInstitutionGeographicTaxonomy(anyString(), any());
+        // when
+        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        ArgumentCaptor<InstitutionPut> argumentCaptor = ArgumentCaptor.forClass(InstitutionPut.class);
+        verify(partyProcessRestClientMock, times(1))
+                .updateInstitutionGeographicTaxonomy(Mockito.eq(institutionId), argumentCaptor.capture());
+        InstitutionPut institutionPut = argumentCaptor.getValue();
+        assertEquals(geographicTaxonomiesMock.getGeographicTaxonomyList().get(0).getCode(), institutionPut.getGeographicTaxonomyCodes().get(0));
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullInstitutionId() {
+        // given
+        String institutionId = null;
+        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
+        // when
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        GeographicTaxonomyList geographicTaxonomiesMock = null;
+        // when
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
 
     @Test
     void getInstitutionProducts_nullProducts() {
