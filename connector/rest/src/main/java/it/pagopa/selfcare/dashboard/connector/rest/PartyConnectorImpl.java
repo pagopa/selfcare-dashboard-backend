@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -73,7 +74,7 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setAddress(onboardingData.getAddress());
         institutionInfo.setZipCode(onboardingData.getZipCode());
         institutionInfo.setBilling(onboardingData.getBilling());
-        if(onboardingData.getGeographicTaxonomies() == null){
+        if (onboardingData.getGeographicTaxonomies() == null) {
             throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionInfo.getId()));
         } else {
             institutionInfo.setGeographicTaxonomies(onboardingData.getGeographicTaxonomies());
@@ -81,6 +82,22 @@ class PartyConnectorImpl implements PartyConnector {
         if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
             institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
         }
+        return institutionInfo;
+    };
+
+    static final Function<Relationship, InstitutionInfo> RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION = relationship -> {
+        InstitutionInfo institutionInfo = new InstitutionInfo();
+        institutionInfo.setId(relationship.getTo().toString());
+        institutionInfo.setStatus(relationship.getState());
+        institutionInfo.setInstitutionType(relationship.getInstitutionUpdate().getInstitutionType());
+        institutionInfo.setDescription(relationship.getInstitutionUpdate().getDescription());
+        institutionInfo.setTaxCode(relationship.getInstitutionUpdate().getTaxCode());
+        institutionInfo.setDigitalAddress(relationship.getInstitutionUpdate().getDigitalAddress());
+        institutionInfo.setAddress(relationship.getInstitutionUpdate().getAddress());
+        institutionInfo.setZipCode(relationship.getInstitutionUpdate().getZipCode());
+        institutionInfo.setPaymentServiceProvider(relationship.getInstitutionUpdate().getPaymentServiceProvider());
+        institutionInfo.setDataProtectionOfficer(relationship.getInstitutionUpdate().getDataProtectionOfficer());
+        institutionInfo.setBilling(relationship.getBilling());
         return institutionInfo;
     };
     static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
@@ -421,22 +438,18 @@ class PartyConnectorImpl implements PartyConnector {
             if (PartyRole.MANAGER.equals(relationshipBinding.getRole())) {
                 onboardingRequestInfo.setManager(userInfo);
                 final Relationship relationship = partyManagementRestClient.getRelationshipById(relationshipBinding.getRelationshipId());
-                InstitutionInfo institutionInfo = new InstitutionInfo();
-                institutionInfo.setId(relationship.getTo().toString());
-                institutionInfo.setStatus(relationship.getState());
-                institutionInfo.setInstitutionType(relationship.getInstitutionUpdate().getInstitutionType());
-                institutionInfo.setDescription(relationship.getInstitutionUpdate().getDescription());
-                institutionInfo.setTaxCode(relationship.getInstitutionUpdate().getTaxCode());
-                institutionInfo.setDigitalAddress(relationship.getInstitutionUpdate().getDigitalAddress());
-                institutionInfo.setAddress(relationship.getInstitutionUpdate().getAddress());
-                institutionInfo.setZipCode(relationship.getInstitutionUpdate().getZipCode());
-                institutionInfo.setPaymentServiceProvider(relationship.getInstitutionUpdate().getPaymentServiceProvider());
-                institutionInfo.setDataProtectionOfficer(relationship.getInstitutionUpdate().getDataProtectionOfficer());
-                institutionInfo.setBilling(relationship.getBilling());
+                InstitutionInfo institutionInfo = RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationship);
                 onboardingRequestInfo.setInstitutionInfo(institutionInfo);
+                Institution institution = partyManagementRestClient.getInstitutionByExternalId(institutionInfo.getTaxCode());
+                if (institution == null) {
+                    throw new ResourceNotFoundException(String.format("Institution %s not found", institutionInfo.getTaxCode()));
+                }
+                onboardingRequestInfo.getInstitutionInfo().setGeographicTaxonomies(institution.getGeographicTaxonomies());
+
             } else {
                 onboardingRequestInfo.getAdmins().add(userInfo);
             }
+
         });
         log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
         log.trace("getOnboardingRequestInfo end");
