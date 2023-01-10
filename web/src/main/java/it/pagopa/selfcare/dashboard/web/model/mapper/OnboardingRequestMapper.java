@@ -59,9 +59,6 @@ public class OnboardingRequestMapper {
                             });
                     resource.setPspData(toResource(model.getPaymentServiceProvider()));
                     resource.setDpoData(toResource(model.getDataProtectionOfficer()));
-                    resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
-                            .map(GeographicTaxonomyMapper::toGeographicTaxonomyResource)
-                            .collect(Collectors.toList()));
                     return resource;
                 }).orElse(null);
     }

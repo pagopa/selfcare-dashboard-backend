@@ -3,7 +3,6 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
@@ -456,12 +455,6 @@ class PartyConnectorImpl implements PartyConnector {
                 final Relationship relationship = partyManagementRestClient.getRelationshipById(relationshipBinding.getRelationshipId());
                 InstitutionInfo institutionInfo = RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationship);
                 onboardingRequestInfo.setInstitutionInfo(institutionInfo);
-                Institution institution = partyManagementRestClient.getInstitutionByExternalId(institutionInfo.getTaxCode());
-                if (institution == null) {
-                    throw new ResourceNotFoundException(String.format("Institution %s not found", institutionInfo.getTaxCode()));
-                }
-                onboardingRequestInfo.getInstitutionInfo().setGeographicTaxonomies(institution.getGeographicTaxonomies());
-
             } else {
                 onboardingRequestInfo.getAdmins().add(userInfo);
             }

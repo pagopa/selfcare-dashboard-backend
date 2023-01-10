@@ -236,12 +236,12 @@
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -2675,20 +2675,19 @@
         "required": [
           "token"
         ],
-        "type" : "object",
-        "properties" : {
-          "token" : {
-            "type" : "string",
-            "description" : "The Identity Token"
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The Identity Token"
           }
         }
       },
-      "InstitutionInfo" : {
+      "InstitutionInfo": {
         "title": "InstitutionInfo",
         "required": [
           "address",
           "fiscalCode",
-          "geographicTaxonomies",
           "id",
           "institutionType",
           "mailAddress",
@@ -2710,13 +2709,6 @@
           "fiscalCode": {
             "type": "string",
             "description": "Fiscal code corresponding to the institution"
-          },
-          "geographicTaxonomies": {
-            "type": "array",
-            "description": "Institution's geographic taxonomy",
-            "items": {
-              "$ref": "#/components/schemas/GeographicTaxonomyResource"
-            }
           },
           "id": {
             "type": "string",

@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.institution.DataProtectionOfficer;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.PaymentServiceProvider;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -35,7 +34,6 @@ class OnboardingRequestMapperTest {
     void toOnboardingRequestResource() {
         // given
         final OnboardingRequestInfo dto = mockInstance(new OnboardingRequestInfo());
-        dto.getInstitutionInfo().setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         dto.getManager().getUser().setId(UUID.randomUUID().toString());
         dto.setAdmins(List.of(dto.getManager()));
         // when
@@ -43,7 +41,6 @@ class OnboardingRequestMapperTest {
         // then
         assertNotNull(resource);
         assertNotNull(resource.getInstitutionInfo());
-        assertNotNull(resource.getInstitutionInfo().getGeographicTaxonomies());
         assertNotNull(resource.getManager());
         assertNotNull(resource.getAdmins());
         assertEquals(dto.getInstitutionInfo().getStatus().toString(), resource.getStatus().toString());
@@ -65,7 +62,6 @@ class OnboardingRequestMapperTest {
     void toInstitutionInfoResource() {
         // given
         final InstitutionInfo dto = mockInstance(new InstitutionInfo());
-        dto.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         // when
         final OnboardingRequestResource.InstitutionInfo resource = OnboardingRequestMapper.toResource(dto);
         // then
@@ -79,8 +75,6 @@ class OnboardingRequestMapperTest {
         assertEquals(dto.getZipCode(), resource.getZipCode());
         assertEquals(dto.getBilling().getRecipientCode(), resource.getRecipientCode());
         assertEquals(dto.getBilling().getVatNumber(), resource.getVatNumber());
-        assertEquals(dto.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
-        assertEquals(dto.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
         reflectionEqualsByName(dto.getPaymentServiceProvider(), resource.getPspData());
         reflectionEqualsByName(dto.getDataProtectionOfficer(), resource.getDpoData());
     }
