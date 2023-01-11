@@ -196,7 +196,7 @@ class PartyConnectorImpl implements PartyConnector {
         log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Institution institution = partyProcessRestClient.getInstitution(institutionId);
-        List<GeographicTaxonomy> result = Collections.emptyList();
+        List<GeographicTaxonomy> result;
         if (institution.getGeographicTaxonomies() == null) {
             throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionId));
         } else {
