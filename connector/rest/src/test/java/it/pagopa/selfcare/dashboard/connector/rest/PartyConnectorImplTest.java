@@ -1580,4 +1580,53 @@ class PartyConnectorImplTest {
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
     }
 
+    @Test
+    void getGeographicTaxonomyList_nullInstitutionId() {
+        // given
+        String institutionId = null;
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList_nullResponse() {
+        // given
+        String institutionId = "institutionId";
+        // when
+        Institution institution = partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        assertNull(institution);
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        Attribute attribute = mockInstance(new Attribute());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        institutionMock.setAttributes(List.of(attribute));
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        Institution institution = partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        assertSame(institutionMock, institution);
+        checkNotNullFields(institution);
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
 }

@@ -20,6 +20,8 @@ public interface PartyConnector {
 
     void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 
+    Institution getGeographicTaxonomyList(String institutionId);
+
     UserInfo getUser(String relationshipId);
 
     List<PartyProduct> getInstitutionProducts(String institutionId);

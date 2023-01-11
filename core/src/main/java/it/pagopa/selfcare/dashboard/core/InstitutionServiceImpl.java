@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
@@ -93,6 +94,17 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES);
         partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         log.trace("updateInstitutionGeographicTaxonomy end");
+    }
+
+    @Override
+    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
+        log.trace("getGeographicTaxonomyList start");
+        log.debug("getGeographicTaxonomyList externalInstitutionId = {}", institutionId);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        List<GeographicTaxonomy> result = partyConnector.getGeographicTaxonomyList(institutionId).getGeographicTaxonomies();
+        log.debug("getGeographicTaxonomyList result = {}", result);
+        log.trace("getGeographicTaxonomyList end");
+        return result;
     }
 
     @Override

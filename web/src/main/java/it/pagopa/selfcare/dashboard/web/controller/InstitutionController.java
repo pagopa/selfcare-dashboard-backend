@@ -124,11 +124,27 @@ public class InstitutionController {
         log.trace("updateInstitutionGeographicTaxonomy start");
         log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomyListDto);
         GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
-        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::toGeographicTaxonomy).collect(Collectors.toList()));
+        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).collect(Collectors.toList()));
         institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         log.trace("updateInstitutionsGeographicTaxonomy end");
     }
 
+    @GetMapping(value = "/{institutionId}/geographicTaxonomy")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionGeographicTaxonomy}")
+    public List<GeographicTaxonomyResource> getInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                                             @PathVariable("institutionId")
+                                                                             String institutionId) {
+        log.trace("getInstitutionGeographicTaxonomy start");
+        log.debug("getInstitutionGeographicTaxonomy institutionId = {}", institutionId);
+        List<GeographicTaxonomyResource> geographicTaxonomies = institutionService.getGeographicTaxonomyList(institutionId)
+                .stream()
+                .map(GeographicTaxonomyMapper::toResource)
+                .collect(Collectors.toList());
+        log.debug("getInstitutionGeographicTaxonomy result = {}", geographicTaxonomies);
+        log.trace("getInstitutionGeographicTaxonomy end");
+        return geographicTaxonomies;
+    }
 
     /**
      * @deprecated since it's not used

@@ -190,6 +190,17 @@ class PartyConnectorImpl implements PartyConnector {
         log.trace("updateInstitutionGeographicTaxonomy end");
     }
 
+    @Override
+    public Institution getGeographicTaxonomyList(String institutionId) {
+        log.trace("getGeographicTaxonomyList start");
+        log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+        Institution result = partyProcessRestClient.getInstitution(institutionId);
+        log.debug("getGeographicTaxonomyList result = {}", result);
+        log.trace("getGeographicTaxonomyList end");
+        return result;
+    }
+
 
     @Override
     public UserInfo getUser(String relationshipId) {
