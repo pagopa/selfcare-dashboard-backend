@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -20,7 +21,7 @@ public interface PartyConnector {
 
     void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 
-    Institution getGeographicTaxonomyList(String institutionId);
+    List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId);
 
     UserInfo getUser(String relationshipId);
 

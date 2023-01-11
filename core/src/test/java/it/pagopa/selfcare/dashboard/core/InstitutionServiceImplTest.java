@@ -153,7 +153,7 @@ class InstitutionServiceImplTest {
         Institution institutionMock = mockInstance(new Institution());
         institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         when(partyConnectorMock.getGeographicTaxonomyList(anyString()))
-                .thenReturn(institutionMock);
+                .thenReturn(institutionMock.getGeographicTaxonomies());
         // when
         List<GeographicTaxonomy> result = institutionService.getGeographicTaxonomyList(institutionId);
         // then
@@ -172,7 +172,7 @@ class InstitutionServiceImplTest {
         Institution institutionMock = mockInstance(new Institution());
         institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         when(partyConnectorMock.getGeographicTaxonomyList(anyString()))
-                .thenReturn(institutionMock);
+                .thenReturn(institutionMock.getGeographicTaxonomies());
         // when
         Executable executable = () -> institutionService.getGeographicTaxonomyList(institutionId);
         // then

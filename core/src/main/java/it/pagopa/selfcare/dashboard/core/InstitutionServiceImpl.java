@@ -101,7 +101,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getGeographicTaxonomyList start");
         log.debug("getGeographicTaxonomyList externalInstitutionId = {}", institutionId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        List<GeographicTaxonomy> result = partyConnector.getGeographicTaxonomyList(institutionId).getGeographicTaxonomies();
+        List<GeographicTaxonomy> result = partyConnector.getGeographicTaxonomyList(institutionId);
         log.debug("getGeographicTaxonomyList result = {}", result);
         log.trace("getGeographicTaxonomyList end");
         return result;
