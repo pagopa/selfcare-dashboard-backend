@@ -1580,4 +1580,57 @@ class PartyConnectorImplTest {
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
     }
 
+    @Test
+    void getGeographicTaxonomyList_nullInstitutionId() {
+        // given
+        String institutionId = null;
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList_noGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals(String.format("The institution %s does not have geographic taxonomies.", institutionId), e.getMessage());
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        Attribute attribute = mockInstance(new Attribute());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        institutionMock.setAttributes(List.of(attribute));
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        List<GeographicTaxonomy> geographicTaxonomies = partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        assertSame(institutionMock.getGeographicTaxonomies(), geographicTaxonomies);
+        assertNotNull(geographicTaxonomies);
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
 }

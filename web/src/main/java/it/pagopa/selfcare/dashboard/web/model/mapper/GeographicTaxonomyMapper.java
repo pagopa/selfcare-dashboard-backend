@@ -6,7 +6,7 @@ import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyResource;
 
 public class GeographicTaxonomyMapper {
 
-    public static GeographicTaxonomyResource toGeographicTaxonomyResource(GeographicTaxonomy model) {
+    public static GeographicTaxonomyResource toResource(GeographicTaxonomy model) {
         GeographicTaxonomyResource resource = null;
         if (model != null) {
             resource = new GeographicTaxonomyResource();
@@ -16,7 +16,7 @@ public class GeographicTaxonomyMapper {
         return resource;
     }
 
-    public static GeographicTaxonomy toGeographicTaxonomy(GeographicTaxonomyDto resource) {
+    public static GeographicTaxonomy fromDto(GeographicTaxonomyDto resource) {
         GeographicTaxonomy model = null;
         if (resource != null) {
             model = new GeographicTaxonomy();

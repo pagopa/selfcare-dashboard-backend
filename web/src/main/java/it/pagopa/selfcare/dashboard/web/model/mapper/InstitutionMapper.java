@@ -38,7 +38,7 @@ public class InstitutionMapper {
                 resource.setRecipientCode(model.getBilling().getRecipientCode());
             }
             resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
-                    .map(GeographicTaxonomyMapper::toGeographicTaxonomyResource)
+                    .map(GeographicTaxonomyMapper::toResource)
                     .collect(Collectors.toList()));
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {

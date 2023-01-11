@@ -16,7 +16,7 @@ class GeographicTaxonomyMapperTest {
         // given
         GeographicTaxonomy model = new GeographicTaxonomy();
         // when
-        GeographicTaxonomyResource resource = GeographicTaxonomyMapper.toGeographicTaxonomyResource(model);
+        GeographicTaxonomyResource resource = GeographicTaxonomyMapper.toResource(model);
         // then
         assertEquals(model.getCode(), resource.getCode());
         assertEquals(model.getDesc(), resource.getDesc());
@@ -27,7 +27,7 @@ class GeographicTaxonomyMapperTest {
         // given
         GeographicTaxonomy model = null;
         // when
-        GeographicTaxonomyResource resource = GeographicTaxonomyMapper.toGeographicTaxonomyResource(model);
+        GeographicTaxonomyResource resource = GeographicTaxonomyMapper.toResource(model);
         // then
         assertNull(resource);
     }
@@ -37,7 +37,7 @@ class GeographicTaxonomyMapperTest {
         // given
         GeographicTaxonomyDto dtoModel = new GeographicTaxonomyDto();
         // when
-        GeographicTaxonomy resource = GeographicTaxonomyMapper.toGeographicTaxonomy(dtoModel);
+        GeographicTaxonomy resource = GeographicTaxonomyMapper.fromDto(dtoModel);
         // then
         assertEquals(dtoModel.getCode(), resource.getCode());
         assertEquals(dtoModel.getDesc(), resource.getDesc());
@@ -48,7 +48,7 @@ class GeographicTaxonomyMapperTest {
         // given
         GeographicTaxonomyDto dtoModel = null;
         // when
-        GeographicTaxonomy resource = GeographicTaxonomyMapper.toGeographicTaxonomy(dtoModel);
+        GeographicTaxonomy resource = GeographicTaxonomyMapper.fromDto(dtoModel);
         // then
         assertNull(resource);
     }
