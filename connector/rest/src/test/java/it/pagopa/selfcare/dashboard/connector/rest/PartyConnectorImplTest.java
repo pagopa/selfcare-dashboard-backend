@@ -10,7 +10,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -21,6 +20,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -56,7 +56,7 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_TOKEN_ID_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -377,6 +377,54 @@ class PartyConnectorImplTest {
         verifyNoMoreInteractions(partyProcessRestClientMock);
         verifyNoInteractions(partyManagementRestClientMock);
     }
+
+    @Test
+    void updateGeographicTaxonomy() {
+        // given
+        String institutionId = "institutionId";
+        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
+        geographicTaxonomiesMock.setGeographicTaxonomyList(List.of(mockInstance(new GeographicTaxonomy())));
+        System.out.println(geographicTaxonomiesMock);
+        Mockito.doNothing()
+                .when(partyProcessRestClientMock).updateInstitutionGeographicTaxonomy(anyString(), any());
+        // when
+        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        ArgumentCaptor<InstitutionPut> argumentCaptor = ArgumentCaptor.forClass(InstitutionPut.class);
+        verify(partyProcessRestClientMock, times(1))
+                .updateInstitutionGeographicTaxonomy(Mockito.eq(institutionId), argumentCaptor.capture());
+        InstitutionPut institutionPut = argumentCaptor.getValue();
+        assertEquals(geographicTaxonomiesMock.getGeographicTaxonomyList().get(0).getCode(), institutionPut.getGeographicTaxonomyCodes().get(0));
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullInstitutionId() {
+        // given
+        String institutionId = null;
+        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
+        // when
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        GeographicTaxonomyList geographicTaxonomiesMock = null;
+        // when
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
 
     @Test
     void getInstitutionProducts_nullProducts() {
@@ -1425,11 +1473,6 @@ class PartyConnectorImplTest {
         final Relationship managerRelationshipMock = mockInstance(new Relationship());
         when(partyManagementRestClientMock.getRelationshipById(any()))
                 .thenReturn(managerRelationshipMock);
-        final Institution institutionMock = mockInstance(new Institution(), "setTaxCode");
-        institutionMock.setTaxCode(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
-        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        when(partyManagementRestClientMock.getInstitutionByExternalId(any()))
-                .thenReturn(institutionMock);
         // when
         final OnboardingRequestInfo result = partyConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
         // then
@@ -1438,7 +1481,6 @@ class PartyConnectorImplTest {
         assertEquals(managerRelationshipMock.getTo().toString(), result.getInstitutionInfo().getId());
         assertEquals(managerRelationshipMock.getState(), result.getInstitutionInfo().getStatus());
         assertEquals(managerRelationshipMock.getBilling(), result.getInstitutionInfo().getBilling());
-        assertEquals(institutionMock.getGeographicTaxonomies().get(0), result.getInstitutionInfo().getGeographicTaxonomies().get(0));
         assertNotNull(result.getManager());
         assertEquals(managerRelationshipBinding.getPartyId().toString(), result.getManager().getId());
         assertEquals(ADMIN, result.getManager().getRole());
@@ -1450,8 +1492,6 @@ class PartyConnectorImplTest {
                 .getToken(tokenInfoMock.getId());
         verify(partyManagementRestClientMock, times(1))
                 .getRelationshipById(managerRelationshipBinding.getRelationshipId());
-        verify(partyManagementRestClientMock, times(1))
-                .getInstitutionByExternalId(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
         verifyNoMoreInteractions(partyManagementRestClientMock);
         verifyNoInteractions(partyProcessRestClientMock);
     }
@@ -1484,36 +1524,6 @@ class PartyConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
-    }
-
-    @Test
-    void getOnboardingRequestInfo_hasNullInstitution() {
-        // given
-        final TokenInfo tokenInfoMock = mockInstance(new TokenInfo(), "setId", "setLegals");
-        tokenInfoMock.setId(UUID.randomUUID());
-        final RelationshipBinding managerRelationshipBinding = mockInstance(new RelationshipBinding(), "setRole");
-        managerRelationshipBinding.setRole(PartyRole.MANAGER);
-        final RelationshipBinding adminRelationshipBinding = mockInstance(new RelationshipBinding(), "setRole");
-        adminRelationshipBinding.setRole(PartyRole.DELEGATE);
-        tokenInfoMock.setLegals(List.of(managerRelationshipBinding, adminRelationshipBinding));
-        when(partyManagementRestClientMock.getToken(any()))
-                .thenReturn(tokenInfoMock);
-        final Relationship managerRelationshipMock = mockInstance(new Relationship());
-        when(partyManagementRestClientMock.getRelationshipById(any()))
-                .thenReturn(managerRelationshipMock);
-        // when
-        Executable executable = () -> partyConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
-        // then
-        ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
-        assertEquals(String.format("Institution %s not found", managerRelationshipMock.getInstitutionUpdate().getTaxCode()), e.getMessage());
-        verify(partyManagementRestClientMock, times(1))
-                .getToken(tokenInfoMock.getId());
-        verify(partyManagementRestClientMock, times(1))
-                .getRelationshipById(managerRelationshipBinding.getRelationshipId());
-        verify(partyManagementRestClientMock, times(1))
-                .getInstitutionByExternalId(managerRelationshipMock.getInstitutionUpdate().getTaxCode());
-        verifyNoMoreInteractions(partyManagementRestClientMock);
-        verifyNoInteractions(partyProcessRestClientMock);
     }
 
     @Test
@@ -1568,6 +1578,59 @@ class PartyConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void getGeographicTaxonomyList_nullInstitutionId() {
+        // given
+        String institutionId = null;
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList_noGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals(String.format("The institution %s does not have geographic taxonomies.", institutionId), e.getMessage());
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        Attribute attribute = mockInstance(new Attribute());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        institutionMock.setAttributes(List.of(attribute));
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        List<GeographicTaxonomy> geographicTaxonomies = partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        assertSame(institutionMock.getGeographicTaxonomies(), geographicTaxonomies);
+        assertNotNull(geographicTaxonomies);
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
     }
 
 }

@@ -3,9 +3,10 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
-import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -16,6 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -48,18 +50,19 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 class PartyConnectorImpl implements PartyConnector {
 
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
-    private static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
+    static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
 
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
-                if(ACTIVE.equals(inst1.getStatus())){
-                    return inst1;
-                } else if (PENDING.equals(inst1.getStatus())){
-                    return inst1;
-                } else {
-                    return inst2;
-                }
-            };
+        if (ACTIVE.equals(inst1.getStatus())) {
+            return inst1;
+        } else if (PENDING.equals(inst1.getStatus())) {
+            return inst1;
+        } else {
+            return inst2;
+        }
+    };
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setOriginId(onboardingData.getOriginId());
@@ -172,6 +175,35 @@ class PartyConnectorImpl implements PartyConnector {
                 .findAny().orElse(null);
         log.debug("getOnBoardedInstitution result = {}", result);
         log.trace("getOnBoardedInstitution end");
+        return result;
+    }
+
+    @Override
+    public void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
+        log.trace("updateInstitutionGeographicTaxonomy start");
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geograpihc taxonomies = {}", institutionId, geographicTaxonomies);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+        Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE);
+        InstitutionPut geographicTaxonomiesRequest = new InstitutionPut();
+        geographicTaxonomiesRequest.setGeographicTaxonomyCodes(geographicTaxonomies.getGeographicTaxonomyList().stream().map(GeographicTaxonomy::getCode).collect(Collectors.toList()));
+        partyProcessRestClient.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesRequest);
+        log.trace("updateInstitutionGeographicTaxonomy end");
+    }
+
+    @Override
+    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
+        log.trace("getGeographicTaxonomyList start");
+        log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+        Institution institution = partyProcessRestClient.getInstitution(institutionId);
+        List<GeographicTaxonomy> result;
+        if (institution.getGeographicTaxonomies() == null) {
+            throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionId));
+        } else {
+            result = institution.getGeographicTaxonomies();
+        }
+        log.debug("getGeographicTaxonomyList result = {}", result);
+        log.trace("getGeographicTaxonomyList end");
         return result;
     }
 
@@ -440,12 +472,6 @@ class PartyConnectorImpl implements PartyConnector {
                 final Relationship relationship = partyManagementRestClient.getRelationshipById(relationshipBinding.getRelationshipId());
                 InstitutionInfo institutionInfo = RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationship);
                 onboardingRequestInfo.setInstitutionInfo(institutionInfo);
-                Institution institution = partyManagementRestClient.getInstitutionByExternalId(institutionInfo.getTaxCode());
-                if (institution == null) {
-                    throw new ResourceNotFoundException(String.format("Institution %s not found", institutionInfo.getTaxCode()));
-                }
-                onboardingRequestInfo.getInstitutionInfo().setGeographicTaxonomies(institution.getGeographicTaxonomies());
-
             } else {
                 onboardingRequestInfo.getAdmins().add(userInfo);
             }

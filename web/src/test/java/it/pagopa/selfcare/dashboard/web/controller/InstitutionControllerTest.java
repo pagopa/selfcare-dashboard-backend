@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
@@ -14,6 +15,7 @@ import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
+import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
@@ -383,6 +385,62 @@ class InstitutionControllerTest {
         assertFalse(products.isEmpty());
         verify(institutionServiceMock, times(1))
                 .getInstitutionProductUsers(institutionId, productId, Optional.of(role), Optional.empty());
+        verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+    @Test
+    void updateInstitutionGeographicTaxonomy(@Value("classpath:stubs/geographicTaxonomyListDto.json") Resource geographicTaxonomyDto) throws Exception {
+        // given
+        String institutionId = "institutionId";
+        Mockito.doNothing()
+                .when(institutionServiceMock).updateInstitutionGeographicTaxonomy(anyString(), any());
+        GeographicTaxonomyListDto geographicTaxonomyListDto = objectMapper.readValue(
+                geographicTaxonomyDto.getInputStream().readAllBytes(),
+                GeographicTaxonomyListDto.class
+        );
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/" + institutionId + "/geographicTaxonomy")
+                        .content(geographicTaxonomyDto.getInputStream().readAllBytes())
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertEquals("", result.getResponse().getContentAsString());
+        ArgumentCaptor<GeographicTaxonomyList> argumentCaptor = ArgumentCaptor.forClass(GeographicTaxonomyList.class);
+        verify(institutionServiceMock, times(1))
+                .updateInstitutionGeographicTaxonomy(Mockito.eq(institutionId), argumentCaptor.capture());
+        GeographicTaxonomyList geographicTaxonomyList = argumentCaptor.getValue();
+        assertEquals(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().get(0).getCode(), geographicTaxonomyList.getGeographicTaxonomyList().get(0).getCode());
+        assertEquals(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().get(0).getDesc(), geographicTaxonomyList.getGeographicTaxonomyList().get(0).getDesc());
+        verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+    @Test
+    void getInstitutionGeographicTaxonomy() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        List<GeographicTaxonomy> geographicTaxonomyListMock = List.of(mockInstance(new GeographicTaxonomy()));
+        when(institutionServiceMock.getGeographicTaxonomyList(Mockito.anyString()))
+                .thenReturn(geographicTaxonomyListMock);
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/geographicTaxonomy", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        List<GeographicTaxonomy> response = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+        assertNotNull(response);
+        assertEquals(geographicTaxonomyListMock.get(0).getCode(), response.get(0).getCode());
+        assertEquals(geographicTaxonomyListMock.get(0).getDesc(), response.get(0).getDesc());
+        verify(institutionServiceMock, times(1))
+                .getGeographicTaxonomyList(institutionId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 

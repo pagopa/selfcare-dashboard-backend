@@ -5,16 +5,15 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
+import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GeographicTaxonomyMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
@@ -109,6 +108,42 @@ public class InstitutionController {
         log.trace("getInstitution end");
 
         return result;
+    }
+
+    @PutMapping("/{institutionId}/geographicTaxonomy")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    public void updateInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                    @PathVariable("institutionId")
+                                                    String institutionId,
+                                                    @ApiParam("${swagger.dashboard.institutions.model.geographicTaxonomy}")
+                                                    @RequestBody
+                                                    @Valid
+                                                    GeographicTaxonomyListDto geographicTaxonomyListDto) {
+        log.trace("updateInstitutionGeographicTaxonomy start");
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomyListDto);
+        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
+        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).collect(Collectors.toList()));
+        institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
+        log.trace("updateInstitutionsGeographicTaxonomy end");
+    }
+
+    @GetMapping(value = "/{institutionId}/geographicTaxonomy")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionGeographicTaxonomy}")
+    public List<GeographicTaxonomyResource> getInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                                             @PathVariable("institutionId")
+                                                                             String institutionId) {
+        log.trace("getInstitutionGeographicTaxonomy start");
+        log.debug("getInstitutionGeographicTaxonomy institutionId = {}", institutionId);
+        List<GeographicTaxonomyResource> geographicTaxonomies = institutionService.getGeographicTaxonomyList(institutionId)
+                .stream()
+                .map(GeographicTaxonomyMapper::toResource)
+                .collect(Collectors.toList());
+        log.debug("getInstitutionGeographicTaxonomy result = {}", geographicTaxonomies);
+        log.trace("getInstitutionGeographicTaxonomy end");
+        return geographicTaxonomies;
     }
 
     /**
