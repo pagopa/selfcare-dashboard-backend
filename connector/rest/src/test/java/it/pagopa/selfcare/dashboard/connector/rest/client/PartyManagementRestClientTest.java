@@ -3,6 +3,8 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
+import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyManagementRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
 import lombok.SneakyThrows;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @TestPropertySource(
         locations = "classpath:config/party-management-rest-client.properties",
@@ -70,6 +73,37 @@ class PartyManagementRestClientTest extends BaseFeignRestClientTest {
         checkNotNullFields(response.getInstitutionUpdate());
         checkNotNullFields(response.getInstitutionUpdate().getPaymentServiceProvider());
         checkNotNullFields(response.getInstitutionUpdate().getDataProtectionOfficer());
+    }
+
+    @Test
+    void getInstitutionByExternalId_fullyValued() {
+        // given
+        final String externalId = "institutionId1";
+        //String externalId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
+        // when
+        Institution response = restClient.getInstitutionByExternalId(externalId);
+        // then
+        assertNotNull(response);
+        TestUtils.checkNotNullFields(response);
+        response.getAttributes().forEach(TestUtils::checkNotNullFields);
+    }
+
+    @Test
+    void getInstitutionByExternalId_fullyNull() {
+        // given
+        final String externalId = "institutionId2";
+        // when
+        Institution response = restClient.getInstitutionByExternalId(externalId);
+        // then
+        assertNotNull(response);
+        assertNull(response.getAddress());
+        assertNull(response.getDescription());
+        assertNull(response.getDigitalAddress());
+        assertNull(response.getId());
+        assertNull(response.getExternalId());
+        assertNull(response.getTaxCode());
+        assertNull(response.getZipCode());
+        assertNull(response.getGeographicTaxonomies());
     }
 
 }

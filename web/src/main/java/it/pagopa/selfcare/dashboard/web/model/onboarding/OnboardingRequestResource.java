@@ -99,7 +99,6 @@ public class OnboardingRequestResource {
         @Valid
         private DpoData dpoData;
 
-
         @Data
         public static class PspData {
 

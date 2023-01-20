@@ -1,10 +1,10 @@
 package it.pagopa.selfcare.dashboard.web.handler;
 
 import it.pagopa.selfcare.commons.web.model.Problem;
+import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
-import it.pagopa.selfcare.dashboard.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;

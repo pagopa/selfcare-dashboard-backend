@@ -20,6 +20,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -55,7 +56,7 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_TOKEN_ID_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -376,6 +377,54 @@ class PartyConnectorImplTest {
         verifyNoMoreInteractions(partyProcessRestClientMock);
         verifyNoInteractions(partyManagementRestClientMock);
     }
+
+    @Test
+    void updateGeographicTaxonomy() {
+        // given
+        String institutionId = "institutionId";
+        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
+        geographicTaxonomiesMock.setGeographicTaxonomyList(List.of(mockInstance(new GeographicTaxonomy())));
+        System.out.println(geographicTaxonomiesMock);
+        Mockito.doNothing()
+                .when(partyProcessRestClientMock).updateInstitutionGeographicTaxonomy(anyString(), any());
+        // when
+        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        ArgumentCaptor<InstitutionPut> argumentCaptor = ArgumentCaptor.forClass(InstitutionPut.class);
+        verify(partyProcessRestClientMock, times(1))
+                .updateInstitutionGeographicTaxonomy(Mockito.eq(institutionId), argumentCaptor.capture());
+        InstitutionPut institutionPut = argumentCaptor.getValue();
+        assertEquals(geographicTaxonomiesMock.getGeographicTaxonomyList().get(0).getCode(), institutionPut.getGeographicTaxonomyCodes().get(0));
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullInstitutionId() {
+        // given
+        String institutionId = null;
+        GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
+        // when
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        GeographicTaxonomyList geographicTaxonomiesMock = null;
+        // when
+        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE, e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
 
     @Test
     void getInstitutionProducts_nullProducts() {
@@ -1038,7 +1087,7 @@ class PartyConnectorImplTest {
         String productRoles = "Operator Api";
         String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
-        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyROle");
+        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyRole");
         roleMock.setProductRole(productRoles);
         roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
@@ -1063,6 +1112,106 @@ class PartyConnectorImplTest {
                 assertEquals("Invalid Party role", e.getMessage());
         }
         verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PartyRole.class)
+    void checkExistingRelationshipRoles_userExistingConflict(PartyRole partyRole) {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoles = "Operator Api";
+        String userId = UUID.randomUUID().toString();
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(partyRole);
+        createUserDto.setRoles(Set.of(roleMock));
+        UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
+        mockUserInfoFilter.setProductId(Optional.of(productId));
+        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
+        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        RelationshipInfo mockRelationshipInfo = new RelationshipInfo();
+        mockRelationshipInfo.setFrom("from");
+        mockRelationshipInfo.setId("id");
+        mockRelationshipInfo.setTo("to");
+        RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
+        mockRelationshipsResponse.add(mockRelationshipInfo);
+        when(partyProcessRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
+                .thenReturn(mockRelationshipsResponse);
+        // when
+        Executable executable = () -> partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals("User role conflict", e.getMessage());
+        verify(partyProcessRestClientMock, times(1))
+                .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @Test
+    void checkExistingRelationshipRoles_userExistingNoConflict() {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoles = "Operator";
+        String userId = UUID.randomUUID().toString();
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(PartyRole.OPERATOR);
+        createUserDto.setRoles(Set.of(roleMock));
+        UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
+        mockUserInfoFilter.setProductId(Optional.of(productId));
+        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
+        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        RelationshipInfo mockRelationshipInfo = new RelationshipInfo();
+        mockRelationshipInfo.setFrom("from");
+        mockRelationshipInfo.setId("id");
+        mockRelationshipInfo.setTo("to");
+        mockRelationshipInfo.setRole(PartyRole.OPERATOR);
+        RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
+        mockRelationshipsResponse.add(mockRelationshipInfo);
+        when(partyProcessRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
+                .thenReturn(mockRelationshipsResponse);
+        // when
+        partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        // then
+        verify(partyProcessRestClientMock, times(1))
+                .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PartyRole.class)
+    void checkExistingRelationshipRoles_noUserExisting(PartyRole partyRole) {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoles = "Operator Api";
+        String userId = UUID.randomUUID().toString();
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(partyRole);
+        createUserDto.setRoles(Set.of(roleMock));
+        UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
+        mockUserInfoFilter.setProductId(Optional.of(productId));
+        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
+        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        RelationshipInfo mockRelationshipInfo = new RelationshipInfo();
+        mockRelationshipInfo.setFrom("from");
+        mockRelationshipInfo.setId("id");
+        mockRelationshipInfo.setTo("to");
+        RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
+        when(partyProcessRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
+                .thenReturn(mockRelationshipsResponse);
+        // when
+        partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        // then
+        verify(partyProcessRestClientMock, times(1))
+                .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
         verifyNoInteractions(partyManagementRestClientMock);
     }
 
@@ -1331,14 +1480,6 @@ class PartyConnectorImplTest {
         assertNotNull(result.getInstitutionInfo());
         assertEquals(managerRelationshipMock.getTo().toString(), result.getInstitutionInfo().getId());
         assertEquals(managerRelationshipMock.getState(), result.getInstitutionInfo().getStatus());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getInstitutionType(), result.getInstitutionInfo().getInstitutionType());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getDescription(), result.getInstitutionInfo().getDescription());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getTaxCode(), result.getInstitutionInfo().getTaxCode());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getDigitalAddress(), result.getInstitutionInfo().getDigitalAddress());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getAddress(), result.getInstitutionInfo().getAddress());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getZipCode(), result.getInstitutionInfo().getZipCode());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getInstitutionInfo().getPaymentServiceProvider());
-        assertEquals(managerRelationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getInstitutionInfo().getDataProtectionOfficer());
         assertEquals(managerRelationshipMock.getBilling(), result.getInstitutionInfo().getBilling());
         assertNotNull(result.getManager());
         assertEquals(managerRelationshipBinding.getPartyId().toString(), result.getManager().getId());
@@ -1353,6 +1494,24 @@ class PartyConnectorImplTest {
                 .getRelationshipById(managerRelationshipBinding.getRelationshipId());
         verifyNoMoreInteractions(partyManagementRestClientMock);
         verifyNoInteractions(partyProcessRestClientMock);
+    }
+
+    @Test
+    void relationshipToInstitutionInfoFunction() {
+        // given
+        Relationship relationshipMock = mockInstance(new Relationship());
+        // when
+        final InstitutionInfo result = PartyConnectorImpl.RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationshipMock);
+        // then
+        assertEquals(relationshipMock.getInstitutionUpdate().getInstitutionType(), result.getInstitutionType());
+        assertEquals(relationshipMock.getInstitutionUpdate().getDescription(), result.getDescription());
+        assertEquals(relationshipMock.getInstitutionUpdate().getTaxCode(), result.getTaxCode());
+        assertEquals(relationshipMock.getInstitutionUpdate().getDigitalAddress(), result.getDigitalAddress());
+        assertEquals(relationshipMock.getInstitutionUpdate().getAddress(), result.getAddress());
+        assertEquals(relationshipMock.getInstitutionUpdate().getZipCode(), result.getZipCode());
+        assertEquals(relationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getPaymentServiceProvider());
+        assertEquals(relationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getDataProtectionOfficer());
+        assertEquals(relationshipMock.getBilling(), result.getBilling());
     }
 
     @Test
@@ -1419,6 +1578,59 @@ class PartyConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
         verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+    @Test
+    void getGeographicTaxonomyList_nullInstitutionId() {
+        // given
+        String institutionId = null;
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+        verifyNoInteractions(partyProcessRestClientMock, partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList_noGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals(String.format("The institution %s does not have geographic taxonomies.", institutionId), e.getMessage());
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
+    }
+
+
+    @Test
+    void getGeographicTaxonomyList() {
+        // given
+        String institutionId = "institutionId";
+        Institution institutionMock = mockInstance(new Institution());
+        Attribute attribute = mockInstance(new Attribute());
+        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        institutionMock.setAttributes(List.of(attribute));
+        when(partyProcessRestClientMock.getInstitution(any()))
+                .thenReturn(institutionMock);
+        // when
+        List<GeographicTaxonomy> geographicTaxonomies = partyConnector.getGeographicTaxonomyList(institutionId);
+        // then
+        assertSame(institutionMock.getGeographicTaxonomies(), geographicTaxonomies);
+        assertNotNull(geographicTaxonomies);
+        verify(partyProcessRestClientMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(partyProcessRestClientMock);
+        verifyNoInteractions(partyManagementRestClientMock);
     }
 
 }

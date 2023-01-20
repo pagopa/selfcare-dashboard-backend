@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -16,6 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -48,18 +50,19 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 class PartyConnectorImpl implements PartyConnector {
 
     private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
-    private static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
+    static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
 
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
-                if(ACTIVE.equals(inst1.getStatus())){
-                    return inst1;
-                } else if (PENDING.equals(inst1.getStatus())){
-                    return inst1;
-                } else {
-                    return inst2;
-                }
-            };
+        if (ACTIVE.equals(inst1.getStatus())) {
+            return inst1;
+        } else if (PENDING.equals(inst1.getStatus())) {
+            return inst1;
+        } else {
+            return inst2;
+        }
+    };
     private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setOriginId(onboardingData.getOriginId());
@@ -74,7 +77,7 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setAddress(onboardingData.getAddress());
         institutionInfo.setZipCode(onboardingData.getZipCode());
         institutionInfo.setBilling(onboardingData.getBilling());
-        if(onboardingData.getGeographicTaxonomies() == null){
+        if (onboardingData.getGeographicTaxonomies() == null) {
             throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionInfo.getId()));
         } else {
             institutionInfo.setGeographicTaxonomies(onboardingData.getGeographicTaxonomies());
@@ -82,6 +85,22 @@ class PartyConnectorImpl implements PartyConnector {
         if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
             institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
         }
+        return institutionInfo;
+    };
+
+    static final Function<Relationship, InstitutionInfo> RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION = relationship -> {
+        InstitutionInfo institutionInfo = new InstitutionInfo();
+        institutionInfo.setId(relationship.getTo().toString());
+        institutionInfo.setStatus(relationship.getState());
+        institutionInfo.setInstitutionType(relationship.getInstitutionUpdate().getInstitutionType());
+        institutionInfo.setDescription(relationship.getInstitutionUpdate().getDescription());
+        institutionInfo.setTaxCode(relationship.getInstitutionUpdate().getTaxCode());
+        institutionInfo.setDigitalAddress(relationship.getInstitutionUpdate().getDigitalAddress());
+        institutionInfo.setAddress(relationship.getInstitutionUpdate().getAddress());
+        institutionInfo.setZipCode(relationship.getInstitutionUpdate().getZipCode());
+        institutionInfo.setPaymentServiceProvider(relationship.getInstitutionUpdate().getPaymentServiceProvider());
+        institutionInfo.setDataProtectionOfficer(relationship.getInstitutionUpdate().getDataProtectionOfficer());
+        institutionInfo.setBilling(relationship.getBilling());
         return institutionInfo;
     };
     static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
@@ -156,6 +175,35 @@ class PartyConnectorImpl implements PartyConnector {
                 .findAny().orElse(null);
         log.debug("getOnBoardedInstitution result = {}", result);
         log.trace("getOnBoardedInstitution end");
+        return result;
+    }
+
+    @Override
+    public void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
+        log.trace("updateInstitutionGeographicTaxonomy start");
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geograpihc taxonomies = {}", institutionId, geographicTaxonomies);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+        Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE);
+        InstitutionPut geographicTaxonomiesRequest = new InstitutionPut();
+        geographicTaxonomiesRequest.setGeographicTaxonomyCodes(geographicTaxonomies.getGeographicTaxonomyList().stream().map(GeographicTaxonomy::getCode).collect(Collectors.toList()));
+        partyProcessRestClient.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesRequest);
+        log.trace("updateInstitutionGeographicTaxonomy end");
+    }
+
+    @Override
+    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
+        log.trace("getGeographicTaxonomyList start");
+        log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+        Institution institution = partyProcessRestClient.getInstitution(institutionId);
+        List<GeographicTaxonomy> result;
+        if (institution.getGeographicTaxonomies() == null) {
+            throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionId));
+        } else {
+            result = institution.getGeographicTaxonomies();
+        }
+        log.debug("getGeographicTaxonomyList result = {}", result);
+        log.trace("getGeographicTaxonomyList end");
         return result;
     }
 
@@ -288,18 +336,7 @@ class PartyConnectorImpl implements PartyConnector {
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId(institutionId);
         onboardingUsersRequest.setProductId(productId);
-        Map<PartyRole, List<User>> partyRoleToUsersMap = userDto.getRoles().stream()
-                .map(role -> {
-                    User user = new User();
-                    user.setName(userDto.getName());
-                    user.setSurname(userDto.getSurname());
-                    user.setTaxCode(userDto.getTaxCode());
-                    user.setEmail(userDto.getEmail());
-                    user.setId(UUID.fromString(userId));
-                    user.setProductRole(role.getProductRole());
-                    user.setRole(role.getPartyRole());
-                    return user;
-                }).collect(Collectors.groupingBy(User::getRole));
+        Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
 
         if (partyRoleToUsersMap.size() > 1) {
             throw new ValidationException(String.format("Is not allowed to create both %s and %s users", PartyRole.SUB_DELEGATE, PartyRole.OPERATOR));
@@ -320,6 +357,47 @@ class PartyConnectorImpl implements PartyConnector {
         });
 
         log.trace("createUsers end");
+    }
+
+
+    @Override
+    public void checkExistingRelationshipRoles(String institutionId, String productId, CreateUserDto userDto, String userId) {
+        log.trace("checkExistingRelationshipRoles start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "checkExistingRelationshipRoles institutionId = {}, productId = {}, createUserDto = {}, userId = {}", institutionId, productId, userDto, userId);
+
+        Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(Optional.of(productId));
+        userInfoFilter.setUserId(Optional.ofNullable(userId));
+        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
+
+        RelationshipsResponse institutionRelationships = partyProcessRestClient.getUserInstitutionRelationships(institutionId, EnumSet.allOf(PartyRole.class), userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
+        if (!institutionRelationships.isEmpty()) {
+            Set<PartyRole> roles = partyRoleToUsersMap.keySet();
+            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
+
+            if (!roles.contains(PartyRole.OPERATOR) || !(partyRoles.contains(PartyRole.OPERATOR))) {
+                throw new ValidationException("User role conflict");
+            }
+        }
+        log.trace("checkExistingRelationshipRoles end");
+    }
+
+
+    private Map<PartyRole, List<User>> getPartyRoleListMap(String userId, CreateUserDto userDto) {
+        return userDto.getRoles().stream()
+                .map(role -> {
+                    User user = new User();
+                    user.setName(userDto.getName());
+                    user.setSurname(userDto.getSurname());
+                    user.setTaxCode(userDto.getTaxCode());
+                    user.setEmail(userDto.getEmail());
+                    user.setId(UUID.fromString(userId));
+                    user.setProductRole(role.getProductRole());
+                    user.setRole(role.getPartyRole());
+                    return user;
+                }).collect(Collectors.groupingBy(User::getRole));
     }
 
 
@@ -392,22 +470,12 @@ class PartyConnectorImpl implements PartyConnector {
             if (PartyRole.MANAGER.equals(relationshipBinding.getRole())) {
                 onboardingRequestInfo.setManager(userInfo);
                 final Relationship relationship = partyManagementRestClient.getRelationshipById(relationshipBinding.getRelationshipId());
-                InstitutionInfo institutionInfo = new InstitutionInfo();
-                institutionInfo.setId(relationship.getTo().toString());
-                institutionInfo.setStatus(relationship.getState());
-                institutionInfo.setInstitutionType(relationship.getInstitutionUpdate().getInstitutionType());
-                institutionInfo.setDescription(relationship.getInstitutionUpdate().getDescription());
-                institutionInfo.setTaxCode(relationship.getInstitutionUpdate().getTaxCode());
-                institutionInfo.setDigitalAddress(relationship.getInstitutionUpdate().getDigitalAddress());
-                institutionInfo.setAddress(relationship.getInstitutionUpdate().getAddress());
-                institutionInfo.setZipCode(relationship.getInstitutionUpdate().getZipCode());
-                institutionInfo.setPaymentServiceProvider(relationship.getInstitutionUpdate().getPaymentServiceProvider());
-                institutionInfo.setDataProtectionOfficer(relationship.getInstitutionUpdate().getDataProtectionOfficer());
-                institutionInfo.setBilling(relationship.getBilling());
+                InstitutionInfo institutionInfo = RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationship);
                 onboardingRequestInfo.setInstitutionInfo(institutionInfo);
             } else {
                 onboardingRequestInfo.getAdmins().add(userInfo);
             }
+
         });
         log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
         log.trace("getOnboardingRequestInfo end");

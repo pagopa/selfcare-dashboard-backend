@@ -8,6 +8,7 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PartyProcessRestClientTestConfig;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
@@ -230,6 +231,22 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNull(response.getUserId());
     }
 
+
+    @Test
+    void putInstitution() {
+        // given
+        final String institutionIdMock = "institutionId";
+        final String institutionPutMockCode = "setCode";
+        InstitutionPut geographicTaxonomyCodesMock = TestUtils.mockInstance(new InstitutionPut());
+        geographicTaxonomyCodesMock.setGeographicTaxonomyCodes(List.of(TestUtils.mockInstance(institutionPutMockCode)));
+
+        // when
+        Executable executable = () -> restClient.updateInstitutionGeographicTaxonomy(institutionIdMock, geographicTaxonomyCodesMock);
+
+        // then
+        assertDoesNotThrow(executable);
+
+    }
 
     @Test
     void onboardingSubdelegates() {
