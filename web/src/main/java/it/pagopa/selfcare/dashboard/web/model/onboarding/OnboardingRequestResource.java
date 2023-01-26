@@ -33,9 +33,7 @@ public class OnboardingRequestResource {
     @Valid
     private UserInfo manager;
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.admins}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.admins}")
     @Valid
     private List<UserInfo> admins;
 

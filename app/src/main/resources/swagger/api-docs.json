@@ -2961,7 +2961,7 @@
       },
       "OnboardingRequestResource" : {
         "title" : "OnboardingRequestResource",
-        "required" : [ "admins", "institutionInfo", "manager", "status" ],
+        "required" : [ "institutionInfo", "manager", "status" ],
         "type" : "object",
         "properties" : {
           "admins" : {

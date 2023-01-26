@@ -10,6 +10,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -163,11 +164,12 @@ class OnboardingRequestResourceTest {
         resource.getInstitutionInfo().getDpoData().setEmail("email@example.com");
         resource.getInstitutionInfo().getDpoData().setPec("email@example.com");
         resource.getManager().setEmail("email@example.com");
-        resource.setAdmins(List.of(resource.getManager()));
+        resource.setAdmins(Collections.emptyList());
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(resource);
         // then
         assertTrue(violations.isEmpty(), violations.toString());
     }
+
 
 }
