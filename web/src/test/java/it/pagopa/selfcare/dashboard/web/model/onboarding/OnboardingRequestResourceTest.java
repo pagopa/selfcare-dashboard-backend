@@ -8,7 +8,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ class OnboardingRequestResourceTest {
         toCheckMap.put("status", NotNull.class);
         toCheckMap.put("institutionInfo", NotNull.class);
         toCheckMap.put("manager", NotNull.class);
-        toCheckMap.put("admins", NotEmpty.class);
+        toCheckMap.put("admins", NotNull.class);
 
         OnboardingRequestResource resource = new OnboardingRequestResource();
 

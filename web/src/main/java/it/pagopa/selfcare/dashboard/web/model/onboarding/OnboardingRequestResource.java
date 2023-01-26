@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,7 @@ public class OnboardingRequestResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.admins}", required = true)
     @JsonProperty(required = true)
-    @NotEmpty
+    @NotNull
     @Valid
     private List<UserInfo> admins;
 
