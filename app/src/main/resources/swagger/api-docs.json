@@ -8,54 +8,69 @@
   "servers" : [ {
     "url" : "{url}:{port}{basePath}",
     "variables" : {
-      "url" : {
-        "default" : "http://localhost"
+      "url": {
+        "default": "http://localhost"
       },
-      "port" : {
-        "default" : "80"
+      "port": {
+        "default": "80"
       },
-      "basePath" : {
-        "default" : ""
+      "basePath": {
+        "default": ""
       }
     }
-  } ],
-  "tags" : [ {
-    "name" : "institutions",
-    "description" : "Institution operations"
-  }, {
-    "name" : "onboarding",
-    "description" : "Onboarding operations"
-  }, {
-    "name" : "products",
-    "description" : "Products operations"
-  }, {
-    "name" : "relationships",
-    "description" : "Relationships operations"
-  }, {
-    "name" : "token",
-    "description" : "Token operations"
-  }, {
-    "name" : "user",
-    "description" : "User Controller"
-  }, {
-    "name" : "user-groups",
-    "description" : "UserGroups operations"
-  } ],
-  "paths" : {
-    "/institutions" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutions",
-        "description" : "Service to get all the institutions related to logged user",
-        "operationId" : "getInstitutionsUsingGET",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
+  }
+  ],
+  "tags": [
+    {
+      "name": "institutions",
+      "description": "Institution operations"
+    },
+    {
+      "name": "onboarding",
+      "description": "Onboarding operations"
+    },
+    {
+      "name": "pnPGInstitutions",
+      "description": "PN PG Institution operations"
+    },
+    {
+      "name": "products",
+      "description": "Products operations"
+    },
+    {
+      "name": "relationships",
+      "description": "Relationships operations"
+    },
+    {
+      "name": "token",
+      "description": "Token operations"
+    },
+    {
+      "name": "user",
+      "description": "User Controller"
+    },
+    {
+      "name": "user-groups",
+      "description": "UserGroups operations"
+    }
+  ],
+  "paths": {
+    "/institutions": {
+      "get": {
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutions",
+        "description": "Service to get all the institutions related to logged user",
+        "operationId": "getInstitutionsUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
                     "$ref" : "#/components/schemas/InstitutionResource"
                   }
                 }
@@ -880,36 +895,41 @@
     },
     "/institutions/{institutionId}/users/{userId}" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUser",
-        "description" : "Service to get the users with the given user id related to a specific institution ",
-        "operationId" : "getInstitutionUserUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique internal identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUser",
+        "description": "Service to get the users with the given user id related to a specific institution",
+        "operationId": "getInstitutionUserUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User's unique identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
           }
-        }, {
-          "name" : "userId",
-          "in" : "path",
-          "description" : "User's unique identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/InstitutionUserDetailsResource"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionUserDetailsResource"
                 }
               }
             }
@@ -1092,42 +1112,123 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/OnboardingRequestResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingRequestResource"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
           },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
           },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/pnPGInstitutions/{externalId}": {
+      "get": {
+        "tags": [
+          "pnPGInstitutions"
+        ],
+        "summary": "getPnPGInstitution",
+        "description": "Service to get the PG institutions related to selection of logged user",
+        "operationId": "getPnPGInstitutionUsingGET",
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "description": "PG Institution's unique external identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PnPGInstitutionResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -3094,49 +3195,128 @@
         "required" : [ "id", "name", "surname" ],
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
           }
         }
       },
-      "Problem" : {
-        "title" : "Problem",
-        "required" : [ "status", "title" ],
-        "type" : "object",
-        "properties" : {
-          "detail" : {
-            "type" : "string",
-            "description" : "Human-readable description of this specific problem."
+      "PnPGInstitutionResource": {
+        "title": "PnPGInstitutionResource",
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
           },
-          "instance" : {
-            "type" : "string",
-            "description" : "A URI that describes where the problem occurred."
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
           },
-          "invalidParams" : {
-            "type" : "array",
-            "description" : "A list of invalid parameters details.",
-            "items" : {
-              "$ref" : "#/components/schemas/InvalidParam"
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
+          },
+          "geographicTaxonomies": {
+            "type": "array",
+            "description": "Institution's geographic taxonomy",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomyResource"
             }
           },
-          "status" : {
-            "type" : "integer",
-            "description" : "The HTTP status code.",
-            "format" : "int32",
-            "example" : 500
+          "id": {
+            "type": "string",
+            "description": "Institution's unique internal identifier"
           },
-          "title" : {
-            "type" : "string",
+          "institutionType": {
+            "type": "string",
+            "description": "Institution's type",
+            "enum": [
+              "GSP",
+              "PA",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
+          },
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
+          },
+          "origin": {
+            "type": "string",
+            "description": "Institution's data origin"
+          },
+          "originId": {
+            "type": "string",
+            "description": "Institution's identifier related to origin"
+          },
+          "recipientCode": {
+            "type": "string",
+            "description": "Billing recipient code"
+          },
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "Institution's zipCode"
+          }
+        }
+      },
+      "Problem": {
+        "title": "Problem",
+        "required": [
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "Human-readable description of this specific problem."
+          },
+          "instance": {
+            "type": "string",
+            "description": "A URI that describes where the problem occurred."
+          },
+          "invalidParams": {
+            "type": "array",
+            "description": "A list of invalid parameters details.",
+            "items": {
+              "$ref": "#/components/schemas/InvalidParam"
+            }
+          },
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code.",
+            "format": "int32",
+            "example": 500
+          },
+          "title": {
+            "type": "string",
             "description" : "Short human-readable summary of the problem."
           },
           "type" : {
