@@ -71,16 +71,16 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref" : "#/components/schemas/InstitutionResource"
+                    "$ref": "#/components/schemas/InstitutionResource"
                   }
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
                 "schema" : {
                   "$ref" : "#/components/schemas/Problem"
                 }
@@ -910,12 +910,12 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -1209,12 +1209,12 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -2856,7 +2856,14 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+            "enum": [
+              "GSP",
+              "PA",
+              "PG",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -2921,7 +2928,14 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+            "enum": [
+              "GSP",
+              "PA",
+              "PG",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -3178,6 +3192,7 @@
             "enum": [
               "GSP",
               "PA",
+              "PG",
               "PSP",
               "PT",
               "SCP"
@@ -3248,11 +3263,11 @@
           },
           "title": {
             "type": "string",
-            "description" : "Short human-readable summary of the problem."
+            "description": "Short human-readable summary of the problem."
           },
-          "type" : {
-            "type" : "string",
-            "description" : "A URL to a page with more details regarding the problem."
+          "type": {
+            "type": "string",
+            "description": "A URL to a page with more details regarding the problem."
           }
         },
         "description" : "A \"problem detail\" as a way to carry machine-readable details of errors (https://datatracker.ietf.org/doc/html/rfc7807)"
