@@ -33,7 +33,8 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
         log.trace("retrieveAuthorities start");
         Collection<GrantedAuthority> authorities = null;
 
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
+//        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null); // fixme: decomment me
+        Collection<AuthInfo> authInfos = null;
 
         if (authInfos != null) {
             authorities = authInfos.stream()
