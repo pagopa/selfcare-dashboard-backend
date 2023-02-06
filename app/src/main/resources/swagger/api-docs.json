@@ -101,16 +101,16 @@
             "description": "Not Found",
             "content": {
               "application/problem+json": {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
                 "schema" : {
                   "$ref" : "#/components/schemas/Problem"
                 }
@@ -940,12 +940,12 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -2929,8 +2929,8 @@
             "description" : "Institution's unique internal identifier"
           },
           "institutionType" : {
-            "type" : "string",
-            "description" : "Institution's type",
+            "type": "string",
+            "description": "Institution's type",
             "enum": [
               "GSP",
               "PA",
@@ -2940,10 +2940,10 @@
               "SCP"
             ]
           },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address",
-            "format" : "email",
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address",
+            "format": "email",
             "example": "email@example.com"
           },
           "name": {
@@ -3086,14 +3086,14 @@
             "description": "Institution's category"
           },
           "externalId": {
-            "type" : "string",
-            "description" : "Institution's unique external identifier"
+            "type": "string",
+            "description": "Institution's unique external identifier"
           },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
           },
-          "geographicTaxonomies" : {
+          "geographicTaxonomies": {
             "type" : "array",
             "description" : "Institution's geographic taxonomy",
             "items" : {
@@ -3287,15 +3287,15 @@
         "properties" : {
           "content" : {
             "type" : "array",
-            "description" : "The page content",
-            "items" : {
-              "$ref" : "#/components/schemas/UserGroupPlainResource"
+            "description": "The page content",
+            "items": {
+              "$ref": "#/components/schemas/UserGroupPlainResource"
             }
           },
-          "number" : {
-            "type" : "integer",
-            "description" : "The number of the current page",
-            "format" : "int32"
+          "number": {
+            "type": "integer",
+            "description": "The number of the current page",
+            "format": "int32"
           },
           "size": {
             "type": "integer",
