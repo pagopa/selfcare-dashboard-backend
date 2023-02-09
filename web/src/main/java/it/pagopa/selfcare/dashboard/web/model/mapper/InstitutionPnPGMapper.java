@@ -24,11 +24,10 @@ public class InstitutionPnPGMapper {
             resource = new InstitutionPnPGResource();
             resource.setId(model.getId());
             resource.setExternalId(model.getExternalId());
-            resource.setInstitutionType(model.getInstitutionType());
+            resource.setInstitutionType("Azienda privata");
             resource.setOrigin(model.getOrigin());
             resource.setOriginId(model.getOriginId());
             resource.setName(model.getDescription());
-            resource.setCategory(model.getCategory());
             resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());
             resource.setStatus(model.getStatus().toString());

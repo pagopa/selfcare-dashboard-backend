@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -33,7 +32,7 @@ public class InstitutionPnPGResource {
     private String origin;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}")
-    private InstitutionType institutionType;
+    private String institutionType;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
     @JsonProperty(required = true)
