@@ -169,10 +169,6 @@ class InstitutionServiceImplTest {
     void getGeographicTaxonomyList_hasNullInstitutionId() {
         // given
         String institutionId = null;
-        Institution institutionMock = mockInstance(new Institution());
-        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        when(partyConnectorMock.getGeographicTaxonomyList(anyString()))
-                .thenReturn(institutionMock.getGeographicTaxonomies());
         // when
         Executable executable = () -> institutionService.getGeographicTaxonomyList(institutionId);
         // then
