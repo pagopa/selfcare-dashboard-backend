@@ -5,10 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.PnPGInstitutionLegalAddressData;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionPnPGResource;
+import it.pagopa.selfcare.dashboard.web.model.PnPGInstitutionLegalAddressResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionPnPGMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.PnPGOnboardingMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,6 +64,21 @@ public class PnPGInstitutionController {
         log.debug("getPnPGInstitutionProducts result = {}", result);
         log.trace("getPnPGInstitutionProducts end");
 
+        return result;
+    }
+
+    @GetMapping(value = "/{externalInstitutionId}/legal-address")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.getInstitutionLegalAddress}")
+    public PnPGInstitutionLegalAddressResource getInstitutionLegalAddress(@ApiParam("${swagger.dashboard.pnPGInstitutions.model.externalId}")
+                                                                          @PathVariable("externalInstitutionId")
+                                                                          String externalInstitutionId) {
+        log.trace("getInstitutionLegalAddress start");
+        log.debug("getInstitutionLegalAddress institutionId = {}", externalInstitutionId);
+        PnPGInstitutionLegalAddressData institutionLegalAddressData = pnPGInstitutionService.getInstitutionLegalAddress(externalInstitutionId);
+        PnPGInstitutionLegalAddressResource result = PnPGOnboardingMapper.toResource(institutionLegalAddressData);
+        log.debug("getInstitutionLegalAddress result = {}", result);
+        log.trace("getInstitutionLegalAddress end");
         return result;
     }
 
