@@ -1,0 +1,22 @@
+image:
+  repository: selcuacr.azurecr.io/selfcaredashboardbackend
+  tag: 0.0.1-SNAPSHOT
+
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://uat.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+configEnvSpecific:
+  JAVA_TOOL_OPTIONS: "-javaagent:/applicationinsights-agent.jar"
+  APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL: "OFF"
+  B4F_DASHBOARD_LOG_LEVEL: "DEBUG"
+  REST_CLIENT_LOGGER_LEVEL: "FULL"
+  JWT_TOKEN_EXCHANGE_ISSUER: "https://uat.selfcare.pagopa.it"
+  PUBLIC_FILE_STORAGE_BASE_URL: "https://selcucheckoutsa.z6.web.core.windows.net"
