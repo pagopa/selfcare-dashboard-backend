@@ -1,5 +1,5 @@
 image:
-  repository: selcuacr.azurecr.io/selfcaredashboardbackend
+  repository: selcucommonacr.azurecr.io/selfcaredashboardbackend
   tag: 0.0.1-SNAPSHOT
 
 ingress:

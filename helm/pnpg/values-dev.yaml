@@ -1,5 +1,5 @@
 image:
-  repository: selcdacr.azurecr.io/selfcaredashboardbackend
+  repository: selcdcommonacr.azurecr.io/selfcaredashboardbackend
 
 ingress:
   annotations:
