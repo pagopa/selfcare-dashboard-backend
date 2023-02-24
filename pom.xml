@@ -22,7 +22,7 @@
     <description>Self Care Dashboard Backend</description>
 
     <properties>
-        <selc-commons.version>2.4.4</selc-commons.version>
+        <selc-commons.version>2.4.5</selc-commons.version>
     </properties>
 
     <dependencyManagement>
