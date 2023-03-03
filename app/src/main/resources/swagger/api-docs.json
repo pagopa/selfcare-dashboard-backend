@@ -3213,9 +3213,22 @@
             "type" : "string",
             "description" : "Institution's status"
           },
+          "supportContact" : {
+            "description" : "'Institution's assistance contacts'",
+            "$ref" : "#/components/schemas/SupportContactResource"
+          },
           "userRole" : {
             "type" : "string",
             "description" : "Logged user's role"
+          },
+          "vatNumber" : {
+            "type" : "string",
+            "description" : "Institution's VAT number"
+          },
+          "vatNumberGroup" : {
+            "type" : "boolean",
+            "description" : "PSP's Vat Number group",
+            "example" : false
           },
           "zipCode" : {
             "type" : "string",
@@ -3758,6 +3771,20 @@
           "title" : {
             "type" : "string",
             "description" : "Product's title"
+          }
+        }
+      },
+      "SupportContactResource" : {
+        "title" : "SupportContactResource",
+        "type" : "object",
+        "properties" : {
+          "supportEmail" : {
+            "type" : "string",
+            "description" : "Institution's support email contact"
+          },
+          "supportPhone" : {
+            "type" : "string",
+            "description" : "Institution's support phone contact"
           }
         }
       },

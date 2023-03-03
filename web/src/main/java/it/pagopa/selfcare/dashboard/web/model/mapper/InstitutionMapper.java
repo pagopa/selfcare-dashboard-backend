@@ -36,7 +36,12 @@ public class InstitutionMapper {
             resource.setZipCode(model.getZipCode());
             if (model.getBilling() != null) {
                 resource.setRecipientCode(model.getBilling().getRecipientCode());
+                resource.setVatNumber(model.getBilling().getVatNumber());
             }
+            if (model.getPaymentServiceProvider() != null) {
+                resource.setVatNumberGroup(model.getPaymentServiceProvider().getVatNumberGroup());
+            }
+            resource.setSupportContact(SupportContactMapper.toResource(model.getSupportContact()));
             resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
                     .map(GeographicTaxonomyMapper::toResource)
                     .collect(Collectors.toList()));
@@ -55,6 +60,7 @@ public class InstitutionMapper {
                             }
                         });
             }
+
         }
 
         return resource;

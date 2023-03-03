@@ -36,6 +36,17 @@
             "recipientCode": "string",
             "publicServices": true
           },
+          "supportContact": {
+            "supportEmail": "string",
+            "supportPhone": "string"
+          },
+          "paymentServiceProvider": {
+            "abiCode": "string",
+            "businessRegisterNumber": "string",
+            "legalRegisterName": "string",
+            "legalRegisterNumber": "string",
+            "vatNumberGroup": true
+          },
           "origin": "IPA",
           "attributes": [
             {

@@ -5,10 +5,7 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -85,6 +82,8 @@ class PartyConnectorImpl implements PartyConnector {
         if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
             institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
         }
+        institutionInfo.setSupportContact(onboardingData.getSupportContact());
+        institutionInfo.setPaymentServiceProvider(onboardingData.getPaymentServiceProvider());
         return institutionInfo;
     };
 
