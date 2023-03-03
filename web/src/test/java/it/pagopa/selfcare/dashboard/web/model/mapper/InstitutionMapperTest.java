@@ -64,6 +64,9 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getBilling().getRecipientCode(), resource.getRecipientCode());
         assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
         assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
+        assertEquals(institutionInfo.getPaymentServiceProvider().getVatNumberGroup(), resource.getVatNumberGroup());
+        assertEquals((institutionInfo.getBilling().getVatNumber()), resource.getVatNumber());
+        reflectionEqualsByName(institutionInfo.getSupportContact(), resource.getSupportContact());
         reflectionEqualsByName(institutionInfo, resource, "status");
     }
 
@@ -147,9 +150,50 @@ class InstitutionMapperTest {
         assertEquals(institutionInfo.getZipCode(), resource.getZipCode());
         assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
         assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
+        assertEquals(institutionInfo.getPaymentServiceProvider().getVatNumberGroup(), resource.getVatNumberGroup());
+        assertNull(resource.getVatNumber());
+        reflectionEqualsByName(institutionInfo.getSupportContact(), resource.getSupportContact());
         reflectionEqualsByName(institutionInfo, resource, "status");
     }
 
+    @Test
+    void toResource_emptyPaymentServiceProvider() {
+        // given
+        String internalInstitutionId = "institutionId";
+        String institutionId = "externalId";
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setId", "setPaymentServiceProvider");
+        institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        institutionInfo.setId(internalInstitutionId);
+        institutionInfo.setExternalId(institutionId);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority(internalInstitutionId, Collections.singleton(new ProductGrantedAuthority(OPERATOR, "productRole", "productId")))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // when
+        InstitutionResource resource = InstitutionMapper.toResource(institutionInfo);
+        // then
+        assertEquals(institutionInfo.getExternalId(), resource.getExternalId());
+        assertEquals(institutionInfo.getId(), resource.getId());
+        assertEquals(institutionInfo.getInstitutionType(), resource.getInstitutionType());
+        assertEquals(institutionInfo.getOriginId(), resource.getOriginId());
+        assertEquals(institutionInfo.getOrigin(), resource.getOrigin());
+        assertEquals(institutionInfo.getCategory(), resource.getCategory());
+        assertEquals(institutionInfo.getDescription(), resource.getName());
+        assertEquals(institutionInfo.getTaxCode(), resource.getFiscalCode());
+        assertEquals(institutionInfo.getDigitalAddress(), resource.getMailAddress());
+        assertEquals(institutionInfo.getAddress(), resource.getAddress());
+        assertEquals(LIMITED.name(), resource.getUserRole());
+        assertEquals(institutionInfo.getBilling().getRecipientCode(), resource.getRecipientCode());
+        assertEquals(institutionInfo.getStatus().toString(), resource.getStatus());
+        assertEquals(institutionInfo.getZipCode(), resource.getZipCode());
+        assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
+        assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
+        assertNull(resource.getVatNumberGroup());
+        assertEquals(institutionInfo.getBilling().getVatNumber(), resource.getVatNumber());
+        reflectionEqualsByName(institutionInfo.getSupportContact(), resource.getSupportContact());
+        reflectionEqualsByName(institutionInfo, resource, "status");
+    }
 
     @Test
     void toResource_AuthOnDifferentInstitutionPendingStatus() {

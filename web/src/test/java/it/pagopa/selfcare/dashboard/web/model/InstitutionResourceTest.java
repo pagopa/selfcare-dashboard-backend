@@ -49,6 +49,9 @@ class InstitutionResourceTest {
         InstitutionResource institutionResource = new InstitutionResource();
         institutionResource.setInstitutionType(null);
         institutionResource.setRecipientCode(null);
+        institutionResource.setVatNumberGroup(null);
+        institutionResource.setVatNumber(null);
+        institutionResource.setSupportContact(null);
 
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(institutionResource);
