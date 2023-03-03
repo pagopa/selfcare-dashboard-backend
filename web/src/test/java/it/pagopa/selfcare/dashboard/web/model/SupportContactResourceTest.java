@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SupportContactResourceTest {
+class SupportContactResourceTest {
 
     private Validator validator;
     private static final SupportContactResource SUPPORT_CONTACT_RESOURCE = TestUtils.mockInstance(new SupportContactResource());
