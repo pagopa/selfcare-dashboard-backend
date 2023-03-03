@@ -24,6 +24,7 @@ public class InstitutionInfo {
     private PaymentServiceProvider paymentServiceProvider;
     private DataProtectionOfficer dataProtectionOfficer;
     private List<GeographicTaxonomy> geographicTaxonomies;
+    private SupportContact supportContact;
 
     @Override
     public boolean equals(Object o) {
@@ -37,4 +38,5 @@ public class InstitutionInfo {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 }
