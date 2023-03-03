@@ -27,5 +27,7 @@ public class OnboardingData {
     private String origin;
     private List<Attribute> attributes;
     private List<GeographicTaxonomy> geographicTaxonomies;
+    private SupportContact supportContact;
+    private PaymentServiceProvider paymentServiceProvider;
 
 }

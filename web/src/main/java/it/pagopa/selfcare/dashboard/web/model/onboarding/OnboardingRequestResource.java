@@ -16,6 +16,7 @@ import java.util.UUID;
 @Data
 public class OnboardingRequestResource {
 
+
     @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.status}", required = true)
     @JsonProperty(required = true)
     @NotNull
