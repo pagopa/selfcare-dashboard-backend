@@ -3005,7 +3005,7 @@
       },
       "InstitutionPnPGResource" : {
         "title" : "InstitutionPnPGResource",
-        "required" : [ "address", "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
+        "required" : [ "address", "externalId", "fiscalCode", "id", "name", "origin", "originId", "status" ],
         "type" : "object",
         "properties" : {
           "address" : {
@@ -3023,13 +3023,6 @@
           "fiscalCode" : {
             "type" : "string",
             "description" : "Fiscal code corresponding to the institution"
-          },
-          "geographicTaxonomies" : {
-            "type" : "array",
-            "description" : "Institution's geographic taxonomy",
-            "items" : {
-              "$ref" : "#/components/schemas/GeographicTaxonomyResource"
-            }
           },
           "id" : {
             "type" : "string",

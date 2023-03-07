@@ -47,13 +47,13 @@ public class InstitutionPnPGResource {
     @NotBlank
     private String fiscalCode;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.mailAddress}", required = true)
-    @JsonProperty(required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.mailAddress}", required = false)
+    @JsonProperty(required = false)
 //    @NotBlank
     private String mailAddress;
 
-    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}", required = true)
-    @JsonProperty(required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}", required = false)
+    @JsonProperty(required = false)
 //    @NotBlank
     private String userRole;
 
@@ -67,16 +67,11 @@ public class InstitutionPnPGResource {
 //    @NotBlank
     private String address;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.zipCode}", required = true)
-    @JsonProperty(required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.zipCode}", required = false)
+    @JsonProperty(required = false)
 //    @NotBlank
     private String zipCode;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}")
     private String recipientCode;
-
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
-    private List<GeographicTaxonomyResource> geographicTaxonomies;
 }

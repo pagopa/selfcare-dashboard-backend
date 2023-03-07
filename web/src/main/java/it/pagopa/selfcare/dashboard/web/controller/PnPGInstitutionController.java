@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,17 +40,18 @@ public class PnPGInstitutionController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.getInstitutions}")
-    public List<InstitutionPnPGResource> getPnPGInstitutions() {
+    public ArrayList<InstitutionPnPGResource> getPnPGInstitutions() {
 
         log.trace("getPnPGInstitution start");
         Collection<InstitutionInfo> institutions = pnPGInstitutionService.getInstitutions();
         List<InstitutionPnPGResource> result = institutions.stream()
                 .map(InstitutionPnPGMapper::toResource)
                 .collect(Collectors.toList());
+        ArrayList<InstitutionPnPGResource> resultArray = new ArrayList<>(result);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getPnPGInstitution result = {}", result);
         log.trace("getPnPGInstitution end");
 
-        return result;
+        return resultArray;
     }
 
     @GetMapping(value = "/{institutionId}/products")
