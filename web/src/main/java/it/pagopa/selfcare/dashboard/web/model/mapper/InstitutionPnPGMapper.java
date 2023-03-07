@@ -36,9 +36,9 @@ public class InstitutionPnPGMapper {
             if (model.getBilling() != null) {
                 resource.setRecipientCode(model.getBilling().getRecipientCode());
             }
-            resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
-                    .map(GeographicTaxonomyMapper::toResource)
-                    .collect(Collectors.toList()));
+//            resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
+//                    .map(GeographicTaxonomyMapper::toResource)
+//                    .collect(Collectors.toList()));
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Optional<SelfCareGrantedAuthority> selcAuthority = authentication.getAuthorities()

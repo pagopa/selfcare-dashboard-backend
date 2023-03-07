@@ -74,9 +74,4 @@ public class InstitutionPnPGResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}")
     private String recipientCode;
-
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
-    private List<GeographicTaxonomyResource> geographicTaxonomies;
 }
