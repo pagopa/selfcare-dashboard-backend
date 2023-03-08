@@ -2,9 +2,7 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
-import it.pagopa.selfcare.dashboard.connector.api.PartyRegistryProxyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.PnPGInstitutionLegalAddressData;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +21,9 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
 
     private final MsCoreConnector msCoreConnector;
 
-    private final PartyRegistryProxyConnector partyRegistryProxyConnector;
-
 
     @Autowired
-    public PnPGInstitutionServiceImpl(PartyRegistryProxyConnector partyRegistryProxyConnector,
-                                      MsCoreConnector msCoreConnector) {
-        this.partyRegistryProxyConnector = partyRegistryProxyConnector;
+    public PnPGInstitutionServiceImpl(MsCoreConnector msCoreConnector) {
         this.msCoreConnector = msCoreConnector;
     }
 
@@ -56,16 +50,6 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
         log.debug("getInstitutionProducts result = {}", listProducts);
         log.trace("getInstitutionProducts end");
         return listProducts;
-    }
-
-    @Override
-    public PnPGInstitutionLegalAddressData getInstitutionLegalAddress(String externalInstitutionId) {
-        log.trace("getInstitutionLegalAddress start");
-        log.debug("getInstitutionLegalAddress externalInstitutionId = {}", externalInstitutionId);
-        PnPGInstitutionLegalAddressData result = partyRegistryProxyConnector.getInstitutionLegalAddress(externalInstitutionId);
-        log.debug("getInstitutionLegalAddress result = {}", result);
-        log.trace("getInstitutionLegalAddress end");
-        return result;
     }
 
 }

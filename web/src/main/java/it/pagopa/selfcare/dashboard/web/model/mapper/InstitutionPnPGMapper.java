@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.web.model.InstitutionPnPGResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,9 +25,6 @@ public class InstitutionPnPGMapper {
             resource = new InstitutionPnPGResource();
             resource.setId(model.getId());
             resource.setExternalId(model.getExternalId());
-            resource.setInstitutionType("Azienda privata");
-            resource.setOrigin(model.getOrigin());
-            resource.setOriginId(model.getOriginId());
             resource.setName(model.getDescription());
             resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());

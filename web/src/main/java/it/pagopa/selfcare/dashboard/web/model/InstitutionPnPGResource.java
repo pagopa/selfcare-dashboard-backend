@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -21,14 +21,10 @@ public class InstitutionPnPGResource {
     @NotBlank
     private String externalId;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.originId}", required = true)
-    @JsonProperty(required = true)
-//    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.originId}")
     private String originId;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.origin}", required = true)
-    @JsonProperty(required = true)
-//    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.origin}")
     private String origin;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}")
@@ -47,14 +43,10 @@ public class InstitutionPnPGResource {
     @NotBlank
     private String fiscalCode;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.mailAddress}", required = true)
-    @JsonProperty(required = true)
-//    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.mailAddress}")
     private String mailAddress;
 
-    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}", required = true)
-    @JsonProperty(required = true)
-//    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
     private String userRole;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.status}", required = true)
@@ -64,19 +56,15 @@ public class InstitutionPnPGResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.address}", required = true)
     @JsonProperty(required = true)
-//    @NotBlank
+    @NotBlank
     private String address;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.zipCode}", required = true)
-    @JsonProperty(required = true)
-//    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.zipCode}")
     private String zipCode;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}")
     private String recipientCode;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.geographicTaxonomy}")
     private List<GeographicTaxonomyResource> geographicTaxonomies;
 }
