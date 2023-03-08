@@ -53,8 +53,7 @@ import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 import static java.util.Collections.singletonList;
@@ -250,6 +249,9 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData.getGeographicTaxonomies().get(0).getCode(), institutionInfo.getGeographicTaxonomies().get(0).getCode());
         assertEquals(onboardingData.getGeographicTaxonomies().get(0).getDesc(), institutionInfo.getGeographicTaxonomies().get(0).getDesc());
         assertEquals(onboardingData.getZipCode(), institutionInfo.getZipCode());
+        reflectionEqualsByName(onboardingData.getPaymentServiceProvider(), institutionInfo.getPaymentServiceProvider());
+        reflectionEqualsByName(onboardingData.getSupportContact(), institutionInfo.getSupportContact());
+        reflectionEqualsByName(onboardingData.getBilling(), institutionInfo.getBilling());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         verifyNoMoreInteractions(partyProcessRestClientMock);
@@ -289,6 +291,9 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData2.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
         assertEquals(onboardingData2.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
         assertEquals(onboardingData2.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
+        reflectionEqualsByName(onboardingData2.getPaymentServiceProvider(), institutionInfos.get(0).getPaymentServiceProvider());
+        reflectionEqualsByName(onboardingData2.getSupportContact(), institutionInfos.get(0).getSupportContact());
+        reflectionEqualsByName(onboardingData2.getBilling(), institutionInfos.get(0).getBilling());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);
@@ -328,6 +333,9 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
         assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
         assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
+        reflectionEqualsByName(onboardingData1.getPaymentServiceProvider(), institutionInfos.get(0).getPaymentServiceProvider());
+        reflectionEqualsByName(onboardingData1.getSupportContact(), institutionInfos.get(0).getSupportContact());
+        reflectionEqualsByName(onboardingData1.getBilling(), institutionInfos.get(0).getBilling());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);
@@ -372,6 +380,9 @@ class PartyConnectorImplTest {
         assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
         assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
         assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
+        reflectionEqualsByName(onboardingData1.getPaymentServiceProvider(), institutionInfos.get(0).getPaymentServiceProvider());
+        reflectionEqualsByName(onboardingData1.getSupportContact(), institutionInfos.get(0).getSupportContact());
+        reflectionEqualsByName(onboardingData1.getBilling(), institutionInfos.get(0).getBilling());
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
         verifyNoMoreInteractions(partyProcessRestClientMock);

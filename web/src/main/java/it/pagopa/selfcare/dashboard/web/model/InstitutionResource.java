@@ -80,4 +80,13 @@ public class InstitutionResource {
     @JsonProperty(required = true)
     @NotNull
     private List<GeographicTaxonomyResource> geographicTaxonomies;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData.vatNumberGroup}")
+    private Boolean vatNumberGroup;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.supportContact}")
+    private SupportContactResource supportContact;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.vatNumber}")
+    private String vatNumber;
 }
