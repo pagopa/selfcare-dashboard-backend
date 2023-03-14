@@ -49,11 +49,11 @@ ingress:
    nginx.ingress.kubernetes.io/cors-allow-headers: "*"
    nginx.ingress.kubernetes.io/cors-allow-origin: "https://selfcare.pagopa.it"
   hosts:
-    - host: ""
+    - host: "dev01.pnpg.internal.dev.selfcare.pagopa.it"
       paths:
         - path: /dashboard/v1/(.*)
           pathType: ImplementationSpecific
-  tls: []
+  #tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local

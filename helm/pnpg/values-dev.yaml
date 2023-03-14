@@ -4,6 +4,11 @@ image:
 ingress:
   annotations:
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://dev.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003"
+  className: nginx
+  tls:
+    - hosts:
+        - dev01.pnpg.internal.dev.selfcare.pagopa.it
+      secretName: dev01-pnpg-internal-dev-selfcare-pagopa-it
 
 autoscaling:
   enabled: false
