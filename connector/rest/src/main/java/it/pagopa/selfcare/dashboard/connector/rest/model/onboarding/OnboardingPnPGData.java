@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.onboarding;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.PnPGProductInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
 import lombok.Data;
 
 import java.util.List;

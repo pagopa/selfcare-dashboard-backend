@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
@@ -24,12 +25,12 @@ import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRegistryConnector userConnector;
-    private final PartyConnector partyConnector;
+    private final MsCoreConnector msCoreConnector;
 
     @Autowired
-    public UserServiceImpl(UserRegistryConnector userConnector, PartyConnector partyConnector) {
+    public UserServiceImpl(UserRegistryConnector userConnector, MsCoreConnector msCoreConnector) {
         this.userConnector = userConnector;
-        this.partyConnector = partyConnector;
+        this.msCoreConnector = msCoreConnector;
     }
 
     @Override
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
         Assert.notNull(id, "UUID is required");
         Assert.hasText(institutionId, "An institutionId is required");
         Assert.notNull(userDto, "A userDto is required");
-        Institution institution = partyConnector.getInstitution(institutionId);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
         if (institution == null) {
             throw new ResourceNotFoundException("There are no institution for given institutionId");
         }
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "saveUser institutionId = {}, userDto = {}", institutionId, userDto);
         Assert.hasText(institutionId, "An institutionId is required");
         Assert.notNull(userDto, "A userDto is required");
-        Institution institution = partyConnector.getInstitution(institutionId);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
         if (institution == null) {
             throw new ResourceNotFoundException("There are no institution for given institutionId");
         }
@@ -102,7 +103,7 @@ public class UserServiceImpl implements UserService {
     public UserInfo findByRelationshipId(String relationshipId, EnumSet<User.Fields> fieldList) {
         log.trace("findByRelationshipId start");
         log.debug("findByRelationshipId = {}", relationshipId);
-        final UserInfo userInfo = partyConnector.getUser(relationshipId);
+        final UserInfo userInfo = msCoreConnector.getUser(relationshipId);
         userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId(), fieldList));
         log.debug("findByRelationshipId result = {}", userInfo);
         log.trace("findByRelationshipId end");
@@ -114,7 +115,7 @@ public class UserServiceImpl implements UserService {
         log.trace("findByInstitutionId start");
         log.debug("findByInstitutionId institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
         Assert.hasText(institutionId, "An Institution id is required");
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter).stream()
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter).stream()
                 .peek(userInfo -> {
                     userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId(), fieldList));
                 }).collect(Collectors.toList());
