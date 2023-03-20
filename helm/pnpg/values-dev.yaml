@@ -3,7 +3,7 @@ image:
 
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://dev.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://pnpg.dev.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003"
   tls:
     - hosts:
         - dev01.pnpg.internal.dev.selfcare.pagopa.it
@@ -22,4 +22,4 @@ configEnvSpecific:
   B4F_DASHBOARD_LOG_LEVEL: "DEBUG"
   REST_CLIENT_LOGGER_LEVEL: "FULL"
   JWT_TOKEN_EXCHANGE_ISSUER: "https://dev.selfcare.pagopa.it"
-  PUBLIC_FILE_STORAGE_BASE_URL: "https://selcdcheckoutsa.z6.web.core.windows.net"
+  PUBLIC_FILE_STORAGE_BASE_URL: "https://selcdweupnpgcheckoutsa.z6.web.core.windows.net"
