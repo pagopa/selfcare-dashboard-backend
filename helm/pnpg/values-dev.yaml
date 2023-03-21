@@ -3,7 +3,7 @@ image:
 
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://pnpg.dev.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://api-pnpg.dev.selfcare.pagopa.it,https://pnpg.dev.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003"
   tls:
     - hosts:
         - dev01.pnpg.internal.dev.selfcare.pagopa.it
