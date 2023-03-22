@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.AuthoritiesRetriever;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +22,14 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
 
     private final PartyConnector partyConnector;
 
+    private final MsCoreConnector msCoreConnector;
+
 
     @Autowired
-    public PartyAuthoritiesRetriever(PartyConnector partyConnector) {
+    public PartyAuthoritiesRetriever(PartyConnector partyConnector,
+                                     MsCoreConnector msCoreConnector) {
         this.partyConnector = partyConnector;
+        this.msCoreConnector = msCoreConnector;
     }
 
 
@@ -33,7 +38,7 @@ class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
         log.trace("retrieveAuthorities start");
         Collection<GrantedAuthority> authorities = null;
 
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(null);
+        Collection<AuthInfo> authInfos = msCoreConnector.getAuthInfo(null);
 
         if (authInfos != null) {
             authorities = authInfos.stream()

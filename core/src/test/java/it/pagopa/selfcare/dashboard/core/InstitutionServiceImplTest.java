@@ -5,6 +5,7 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
@@ -75,6 +76,9 @@ class InstitutionServiceImplTest {
 
     @MockBean
     private ProductsConnector productsConnectorMock;
+
+    @MockBean
+    private MsCoreConnector msCoreConnectorMock;
 
     @Autowired
     private InstitutionServiceImpl institutionService;
@@ -482,7 +486,7 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productRole = null;
+        Optional<Set<String>> productRole = Optional.empty();
         // when
         Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
         // then
@@ -496,7 +500,7 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        Optional<SelfCareAuthority> role = null;
+        Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
         // when
         Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
@@ -560,7 +564,7 @@ class InstitutionServiceImplTest {
     @Test
     void getInstitutionProductUsers_nullAllowedStates() {
         //given
-        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(null, userRegistryConnector, partyConnectorMock, productsConnectorMock, notificationServiceMock);
+        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(null, userRegistryConnector, partyConnectorMock, productsConnectorMock, msCoreConnectorMock, notificationServiceMock);
         String institutionId = "institutionId";
         String productId = "productId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -611,7 +615,7 @@ class InstitutionServiceImplTest {
     @Test
     void emptyAllowedStates() {
         //given
-        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(new String[0], userRegistryConnector, partyConnectorMock, productsConnectorMock, notificationServiceMock);
+        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(new String[0], userRegistryConnector, partyConnectorMock, productsConnectorMock, msCoreConnectorMock, notificationServiceMock);
         String institutionId = "institutionId";
         String productId = "productId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -648,7 +652,7 @@ class InstitutionServiceImplTest {
     void getInstitutionUsers_nullProductIds() {
         // given
         String institutionId = "institutionId";
-        Optional<String> productId = null;
+        Optional<String> productId = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
 
@@ -666,7 +670,7 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         Optional<String> productId = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productRole = null;
+        Optional<Set<String>> productRole = Optional.empty();
 
         // when
         Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
@@ -681,7 +685,7 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         Optional<String> productId = Optional.empty();
-        Optional<SelfCareAuthority> role = null;
+        Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
         // when
         Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
