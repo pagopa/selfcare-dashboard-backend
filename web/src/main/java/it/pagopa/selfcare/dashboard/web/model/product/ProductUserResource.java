@@ -43,7 +43,6 @@ public class ProductUserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.email}", required = true)
     @JsonProperty(required = true)
-    @NotBlank
     @Email
     private String email;
 
