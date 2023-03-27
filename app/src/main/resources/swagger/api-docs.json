@@ -3414,7 +3414,7 @@
       },
       "ProductUserResource" : {
         "title" : "ProductUserResource",
-        "required" : [ "email", "id", "name", "product", "role", "status", "surname" ],
+        "required" : [ "id", "name", "product", "role", "status", "surname" ],
         "type" : "object",
         "properties" : {
           "email" : {
