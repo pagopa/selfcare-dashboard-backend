@@ -18,5 +18,5 @@ configEnvSpecific:
   APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL: "OFF"
   B4F_DASHBOARD_LOG_LEVEL: "DEBUG"
   REST_CLIENT_LOGGER_LEVEL: "FULL"
-  JWT_TOKEN_EXCHANGE_ISSUER: "https://uat.selfcare.pagopa.it"
+  JWT_TOKEN_EXCHANGE_ISSUER: "https://pnpg.uat.selfcare.pagopa.it"
   PUBLIC_FILE_STORAGE_BASE_URL: "https://selcucheckoutsa.z6.web.core.windows.net"
