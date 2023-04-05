@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -30,9 +29,7 @@ public class InstitutionPnPGResource {
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}")
     private String institutionType;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}")
     private String name;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.category}")
