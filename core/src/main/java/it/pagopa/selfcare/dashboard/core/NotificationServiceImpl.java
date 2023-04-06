@@ -3,8 +3,8 @@ package it.pagopa.selfcare.dashboard.core;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final Configuration freemarkerConfig;
     private final NotificationServiceConnector notificationConnector;
     private final ProductsConnector productsConnector;
-    private final PartyConnector partyConnector;
+    private final MsCoreConnector msCoreConnector;
     private final UserService userService;
     private final UserRegistryConnector userConnector;
 
@@ -55,11 +55,11 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationServiceImpl(Configuration freemarkerConfig,
                                    NotificationServiceConnector notificationConnector,
                                    ProductsConnector productsConnector,
-                                   PartyConnector partyConnector, UserService userService, UserRegistryConnector userConnector) {
+                                   MsCoreConnector msCoreConnector, UserService userService, UserRegistryConnector userConnector) {
         this.freemarkerConfig = freemarkerConfig;
         this.notificationConnector = notificationConnector;
         this.productsConnector = productsConnector;
-        this.partyConnector = partyConnector;
+        this.msCoreConnector = msCoreConnector;
         this.userService = userService;
         this.userConnector = userConnector;
     }
@@ -108,7 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
         log.debug("sendCreateNotification start");
         log.debug("sendCreateNotification institutionId = {}, productTitle = {}, email = {}", institutionId, productTitle, email);
 
-        Institution institution = partyConnector.getInstitution(institutionId);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
         Assert.notNull(institution.getDescription(), "An institution description is required");
         List<String> roleLabels = productRoles.stream()
                 .map(CreateUserDto.Role::getLabel)
@@ -204,7 +204,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         ProductInfo productInfo = user.getProducts().values().iterator().next();
         Assert.notNull(productInfo.getId(), "A product Id is required");
-        Institution institution = partyConnector.getInstitution(user.getInstitutionId());
+        Institution institution = msCoreConnector.getInstitution(user.getInstitutionId());
         Assert.notNull(institution.getDescription(), "An institution description is required");
         Product product = productsConnector.getProduct(productInfo.getId());
         Assert.notNull(product.getTitle(), A_PRODUCT_TITLE_IS_REQUIRED);

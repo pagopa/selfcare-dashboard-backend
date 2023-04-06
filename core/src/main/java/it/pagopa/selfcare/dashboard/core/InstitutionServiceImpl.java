@@ -5,7 +5,7 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
@@ -54,14 +54,14 @@ class InstitutionServiceImpl implements InstitutionService {
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
-    private final PartyConnector partyConnector;
+    private final MsCoreConnector msCoreConnector;
     private final ProductsConnector productsConnector;
     private final NotificationService notificationService;
 
 
     @Autowired
     public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
-                                  UserRegistryConnector userRegistryConnector, PartyConnector partyConnector,
+                                  UserRegistryConnector userRegistryConnector, MsCoreConnector msCoreConnector,
                                   ProductsConnector productsConnector,
                                   NotificationService notificationService) {
         this.allowedStates = allowedStates == null || allowedStates.length == 0
@@ -70,7 +70,7 @@ class InstitutionServiceImpl implements InstitutionService {
                 .map(RelationshipState::valueOf)
                 .collect(Collectors.toList())));
         this.userRegistryConnector = userRegistryConnector;
-        this.partyConnector = partyConnector;
+        this.msCoreConnector = msCoreConnector;
         this.productsConnector = productsConnector;
         this.notificationService = notificationService;
     }
@@ -80,7 +80,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public InstitutionInfo getInstitution(String institutionId) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
-        InstitutionInfo result = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo result = msCoreConnector.getOnBoardedInstitution(institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
@@ -92,7 +92,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.debug("updateInstitutionGeographicTaxonomy institutiondId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomies);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES);
-        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
+        msCoreConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         log.trace("updateInstitutionGeographicTaxonomy end");
     }
 
@@ -101,7 +101,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getGeographicTaxonomyList start");
         log.debug("getGeographicTaxonomyList externalInstitutionId = {}", institutionId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        List<GeographicTaxonomy> result = partyConnector.getGeographicTaxonomyList(institutionId);
+        List<GeographicTaxonomy> result = msCoreConnector.getGeographicTaxonomyList(institutionId);
         log.debug("getGeographicTaxonomyList result = {}", result);
         log.trace("getGeographicTaxonomyList end");
         return result;
@@ -110,7 +110,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = partyConnector.getOnBoardedInstitutions();
+        Collection<InstitutionInfo> result = msCoreConnector.getOnBoardedInstitutions();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
@@ -132,7 +132,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
             if (selcAuthority.isPresent()) {
                 Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
-                Map<String, PartyProduct> institutionsProductsMap = partyConnector.getInstitutionProducts(institutionId).stream()
+                Map<String, PartyProduct> institutionsProductsMap = msCoreConnector.getInstitutionProducts(institutionId).stream()
                         .collect(Collectors.toMap(PartyProduct::getId, Function.identity()));
 
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
@@ -212,7 +212,7 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.notNull(userInfoFilter, A_USER_INFO_FILTER_OBJECT_IS_REQUIRED);
 
 
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         Map<String, ProductTree> idToProductMap = productsConnector.getProductsTree().stream()
                 .collect(Collectors.toMap(productTree -> productTree.getNode().getId(), Function.identity()));
 
@@ -279,7 +279,7 @@ class InstitutionServiceImpl implements InstitutionService {
         userInfoFilter.setProductId(Optional.of(productId));
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedState(allowedStates);
-        Collection<UserInfo> result = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> result = msCoreConnector.getUsers(institutionId, userInfoFilter);
         result.forEach(userInfo ->
                 userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST)));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionProductUsers result = {}", result);
@@ -306,8 +306,8 @@ class InstitutionServiceImpl implements InstitutionService {
         });
 
         UserId userId = userRegistryConnector.saveUser(user.getUser());
-        partyConnector.checkExistingRelationshipRoles(institutionId, productId, user, userId.getId().toString());
-        partyConnector.createUsers(institutionId, productId, userId.getId().toString(), user);
+        msCoreConnector.checkExistingRelationshipRoles(institutionId, productId, user, userId.getId().toString());
+        msCoreConnector.createUsers(institutionId, productId, userId.getId().toString(), user);
         notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
         log.debug("createUsers result = {}", userId);
         log.trace("createUsers end");
@@ -332,7 +332,7 @@ class InstitutionServiceImpl implements InstitutionService {
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
 
-        partyConnector.createUsers(institutionId, productId, userId, user);
+        msCoreConnector.createUsers(institutionId, productId, userId, user);
         notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
         log.trace("addProductUser end");
     }
@@ -342,7 +342,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
         log.trace("getOnboardingRequestInfo start");
         log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
-        final OnboardingRequestInfo onboardingRequestInfo = partyConnector.getOnboardingRequestInfo(tokenId);
+        final OnboardingRequestInfo onboardingRequestInfo = msCoreConnector.getOnboardingRequestInfo(tokenId);
         onboardingRequestInfo.getManager().setUser(userRegistryConnector.getUserByInternalId(onboardingRequestInfo.getManager().getId(), USER_FIELD_LIST_ENHANCED));
         onboardingRequestInfo.getAdmins().forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST_ENHANCED)));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnboardingRequestInfo result = {}", onboardingRequestInfo);
@@ -355,7 +355,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("approveOnboardingRequest start");
         log.debug("approveOnboardingRequest tokenId = {}", tokenId);
         Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        partyConnector.approveOnboardingRequest(tokenId);
+        msCoreConnector.approveOnboardingRequest(tokenId);
         log.trace("approveOnboardingRequest end");
     }
 
@@ -364,7 +364,7 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("rejectOnboardingRequest start");
         log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
         Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        partyConnector.rejectOnboardingRequest(tokenId);
+        msCoreConnector.rejectOnboardingRequest(tokenId);
         log.trace("rejectOnboardingRequest end");
     }
 

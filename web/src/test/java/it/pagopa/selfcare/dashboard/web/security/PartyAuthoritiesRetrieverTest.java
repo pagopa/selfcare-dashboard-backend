@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PartyAuthoritiesRetrieverTest {
 
     @Mock
-    private PartyConnector partyConnectorMock;
+    private MsCoreConnector msCoreConnectorMock;
 
     @InjectMocks
     private PartyAuthoritiesRetriever authoritiesRetriever;
@@ -37,38 +37,38 @@ class PartyAuthoritiesRetrieverTest {
     @Test
     void retrieveAuthorities_nullAuthInfo() {
         // given
-        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+        Mockito.when(msCoreConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(null);
         // when
         Collection<GrantedAuthority> authorities = authoritiesRetriever.retrieveAuthorities();
         // then
         assertNull(authorities);
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.isNull());
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
 
     @Test
     void retrieveAuthorities_emptyAuthInfo() {
         // given
-        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+        Mockito.when(msCoreConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(Collections.emptyList());
         // when
         Collection<GrantedAuthority> authorities = authoritiesRetriever.retrieveAuthorities();
         // then
         assertNotNull(authorities);
         assertTrue(authorities.isEmpty());
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.isNull());
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
 
     @Test
     void retrieveAuthorities_notEmptyAuthInfoAndEmptyProductsRole() {
         // given
-        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+        Mockito.when(msCoreConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(Collections.singletonList(new AuthInfo() {
                 }));
         // when
@@ -76,9 +76,9 @@ class PartyAuthoritiesRetrieverTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.isNull());
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
 
@@ -87,7 +87,7 @@ class PartyAuthoritiesRetrieverTest {
         // given
         PartyRole role = MANAGER;
         String institutionId = "institutionId";
-        Mockito.when(partyConnectorMock.getAuthInfo(Mockito.any()))
+        Mockito.when(msCoreConnectorMock.getAuthInfo(Mockito.any()))
                 .thenReturn(List.of(new AuthInfo() {
                     @Override
                     public String getInstitutionId() {
@@ -148,9 +148,9 @@ class PartyAuthoritiesRetrieverTest {
             assertEquals(institutionId, ((SelfCareGrantedAuthority) grantedAuthority).getInstitutionId());
             assertEquals(ADMIN.name(), grantedAuthority.getAuthority());
         });
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .getAuthInfo(Mockito.isNull());
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
 }

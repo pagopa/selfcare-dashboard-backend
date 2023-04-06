@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "DELETE",
+    "urlPathPattern": "/relationships/\\w+"
+  },
+  "response": {
+    "status": "204",
+    "jsonBody": {},
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

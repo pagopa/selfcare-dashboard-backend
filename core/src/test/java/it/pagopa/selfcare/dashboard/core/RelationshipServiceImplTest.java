@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RelationshipServiceImplTest {
 
     @Mock
-    private PartyConnector partyConnectorMock;
+    private MsCoreConnector msCoreConnectorMock;
 
     @InjectMocks
     private RelationshipServiceImpl relationshipService;
@@ -37,7 +37,7 @@ class RelationshipServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
-        Mockito.verifyNoInteractions(partyConnectorMock);
+        Mockito.verifyNoInteractions(msCoreConnectorMock);
         Mockito.verifyNoInteractions(notificationService);
     }
 
@@ -49,11 +49,11 @@ class RelationshipServiceImplTest {
         // when
         relationshipService.suspend(relationshipId);
         // then
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .suspend(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
                 .sendSuspendedUserNotification(relationshipId);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
 
@@ -67,7 +67,7 @@ class RelationshipServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
         Mockito.verifyNoInteractions(notificationService);
-        Mockito.verifyNoInteractions(partyConnectorMock);
+        Mockito.verifyNoInteractions(msCoreConnectorMock);
     }
 
 
@@ -78,11 +78,11 @@ class RelationshipServiceImplTest {
         // when
         relationshipService.activate(relationshipId);
         // then
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .activate(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
                 .sendActivatedUserNotification(relationshipId);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
     @Test
@@ -92,13 +92,13 @@ class RelationshipServiceImplTest {
         //when
         relationshipService.delete(relationshipId);
         //then
-        Mockito.verify(partyConnectorMock, Mockito.times(1))
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1))
                 .delete(relationshipId);
         Mockito.verify(notificationService, Mockito.times(1))
                 .sendDeletedUserNotification(relationshipId);
         Mockito.verify(groupService, Mockito.times(1))
                 .deleteMembersByRelationshipId(relationshipId);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, notificationService, groupService);
+        Mockito.verifyNoMoreInteractions(msCoreConnectorMock, notificationService, groupService);
     }
     @Test
     void delete_nullRelationshipId() {
@@ -109,7 +109,7 @@ class RelationshipServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
-        Mockito.verifyNoInteractions(partyConnectorMock, groupService, partyConnectorMock);
+        Mockito.verifyNoInteractions(msCoreConnectorMock, groupService, msCoreConnectorMock);
 
     }
 }

@@ -3,8 +3,8 @@ package it.pagopa.selfcare.dashboard.core;
 import freemarker.template.Configuration;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.NotificationServiceConnector;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -66,7 +66,7 @@ class NotificationServiceImplTest {
     private Configuration freemarkerConfigSpy;
 
     @MockBean
-    private PartyConnector partyConnectorMock;
+    private MsCoreConnector msCoreConnectorMock;
 
     @MockBean
     private UserService userServiceMock;
@@ -127,7 +127,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution id is required", e.getMessage());
 
-        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
+        verifyNoInteractions(msCoreConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
     @Test
@@ -157,7 +157,7 @@ class NotificationServiceImplTest {
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("User email is required", e.getMessage());
 
-        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
+        verifyNoInteractions(msCoreConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
 
@@ -187,7 +187,7 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Title is required", e.getMessage());
-        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
+        verifyNoInteractions(msCoreConnectorMock, freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
     @Test
@@ -211,7 +211,7 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("ProductRoles are required", e.getMessage());
-        verifyNoInteractions(partyConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(msCoreConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
     }
 
 
@@ -229,7 +229,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -244,9 +244,9 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution description is required", e.getMessage());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
@@ -265,7 +265,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -280,9 +280,9 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Authentication is required", e.getMessage());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, userServiceMock);
     }
 
@@ -302,7 +302,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -317,9 +317,9 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Not SelfCareUser principal", e.getMessage());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
@@ -331,7 +331,7 @@ class NotificationServiceImplTest {
         String email = "email";
         String productTitle = "productTitle";
         Institution institutionMock = mockInstance(new Institution());
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         SelfCareUser selfCareUser = SelfCareUser.builder("id")
                 .email("test@example.com")
@@ -349,7 +349,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -363,13 +363,13 @@ class NotificationServiceImplTest {
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(MailPreparationException.class, e.getClass());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
         verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_single_role.ftlh");
         verify(notificationConnectorMock, times(1))
                 .sendNotificationToUser(any());
-        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock, notificationConnectorMock);
         verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
 
@@ -397,7 +397,7 @@ class NotificationServiceImplTest {
         roleMock1.setPartyRole(partyRole1);
 
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -406,7 +406,7 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
         verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_single_role.ftlh");
@@ -463,7 +463,7 @@ class NotificationServiceImplTest {
         roleMock3.setLabel(productLabel3);
 
         Set<CreateUserDto.Role> roles = Set.of(roleMock1, roleMock2, roleMock3);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -472,7 +472,7 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
         verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_multi_role.ftlh");
@@ -490,7 +490,7 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
-        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock, notificationConnectorMock);
         verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
 
@@ -523,7 +523,7 @@ class NotificationServiceImplTest {
         assertEquals("User workContact is required", e.getMessage());
         verify(userConnectorMock, times(1))
                 .getUserByInternalId(userId, EnumSet.of(workContacts));
-        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userConnectorMock);
     }
 
@@ -549,7 +549,7 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution id is required", e.getMessage());
-        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(userConnectorMock, msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
     }
 
     @Test
@@ -573,7 +573,7 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A product Title is required", e.getMessage());
-        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(userConnectorMock, msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
     }
 
     @Test
@@ -597,7 +597,7 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("ProductRoles are required", e.getMessage());
-        verifyNoInteractions(userConnectorMock, partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(userConnectorMock, msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
     }
 
     @Test
@@ -621,7 +621,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
@@ -638,9 +638,9 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("An institution description is required", e.getMessage());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
 
     }
@@ -666,7 +666,7 @@ class NotificationServiceImplTest {
         roleMock1.setProductRole(productRoles1);
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
@@ -683,9 +683,9 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Authentication is required", e.getMessage());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
@@ -711,7 +711,7 @@ class NotificationServiceImplTest {
         roleMock1.setPartyRole(partyRole1);
         Set<CreateUserDto.Role> roles = Set.of(roleMock1);
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(null, null));
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
@@ -728,9 +728,9 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalStateException.class, e.getClass());
         assertEquals("Not SelfCareUser principal", e.getMessage());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock, productsConnectorMock, userServiceMock);
     }
 
@@ -764,7 +764,7 @@ class NotificationServiceImplTest {
         doThrow(RuntimeException.class)
                 .when(notificationConnectorMock)
                 .sendNotificationToUser(any());
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
@@ -780,13 +780,13 @@ class NotificationServiceImplTest {
         Throwable e = throwableCaptor.getValue();
         assertNotNull(e);
         assertEquals(MailPreparationException.class, e.getClass());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
         verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_single_role.ftlh");
         verify(notificationConnectorMock, times(1))
                 .sendNotificationToUser(any());
-        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock, notificationConnectorMock);
         verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
 
@@ -825,7 +825,7 @@ class NotificationServiceImplTest {
                 .surname("surname")
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
@@ -836,7 +836,7 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
         verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_single_role.ftlh");
@@ -904,7 +904,7 @@ class NotificationServiceImplTest {
                 .surname("surname")
                 .build();
         TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(selfCareUser, null));
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         when(userConnectorMock.getUserByInternalId(any(), any()))
                 .thenReturn(userMock);
@@ -915,7 +915,7 @@ class NotificationServiceImplTest {
         };
         //then
         assertDoesNotThrow(executable);
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
         verify(freemarkerConfigSpy, times(1))
                 .getTemplate("user_added_multi_role.ftlh");
@@ -933,7 +933,7 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(selfCareUser.getUserName()));
         assertTrue(messageRequest.getContent().contains(selfCareUser.getSurname()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
-        verifyNoMoreInteractions(partyConnectorMock, notificationConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock, notificationConnectorMock);
         verifyNoInteractions(productsConnectorMock, userServiceMock);
     }
 
@@ -956,7 +956,7 @@ class NotificationServiceImplTest {
         assertNotNull(e);
         assertEquals(IllegalArgumentException.class, e.getClass());
         assertEquals("A relationship Id is required", e.getMessage());
-        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock, userServiceMock);
+        verifyNoInteractions(msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock, userServiceMock);
     }
 
 
@@ -983,7 +983,7 @@ class NotificationServiceImplTest {
         assertEquals("User workContact is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -1002,7 +1002,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -1019,7 +1019,7 @@ class NotificationServiceImplTest {
         assertEquals("An institution id is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -1040,7 +1040,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -1057,7 +1057,7 @@ class NotificationServiceImplTest {
         assertEquals("A product Id is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -1078,7 +1078,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> {
@@ -1095,10 +1095,10 @@ class NotificationServiceImplTest {
         assertEquals("An institution description is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verifyNoInteractions(productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
-        verifyNoMoreInteractions(userServiceMock, partyConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, msCoreConnectorMock);
     }
 
 
@@ -1119,7 +1119,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings", "setTitle");
         when(productsConnectorMock.getProduct(any()))
@@ -1139,12 +1139,12 @@ class NotificationServiceImplTest {
         assertEquals("A product Title is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock);
-        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, msCoreConnectorMock, productsConnectorMock);
     }
 
 
@@ -1165,7 +1165,7 @@ class NotificationServiceImplTest {
         userInfo.setInstitutionId(institutionMock.getId());
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
         productMock.setRoleMappings(new EnumMap<>(PartyRole.class));
@@ -1186,12 +1186,12 @@ class NotificationServiceImplTest {
         assertEquals("Authentication is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock);
-        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, msCoreConnectorMock, productsConnectorMock);
     }
 
 
@@ -1212,7 +1212,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
         productMock.setRoleMappings(new EnumMap<>(PartyRole.class));
@@ -1234,12 +1234,12 @@ class NotificationServiceImplTest {
         assertEquals("Not SelfCareUser principal", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
         verifyNoInteractions(freemarkerConfigSpy, notificationConnectorMock);
-        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, msCoreConnectorMock, productsConnectorMock);
     }
 
 
@@ -1261,7 +1261,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
         ProductRoleInfo productRoleInfo1 = mockInstance(new ProductRoleInfo(), 1, "setRoles");
@@ -1291,7 +1291,7 @@ class NotificationServiceImplTest {
         assertDoesNotThrow(executable);
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
@@ -1310,7 +1310,7 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains("no_role_found"));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
         verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
-        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, msCoreConnectorMock, productsConnectorMock, notificationConnectorMock);
     }
 
 
@@ -1335,7 +1335,7 @@ class NotificationServiceImplTest {
         userInfo.getUser().setWorkContacts(workContactsMap);
         when(userServiceMock.findByRelationshipId(any(), any()))
                 .thenReturn(userInfo);
-        when(partyConnectorMock.getInstitution(any()))
+        when(msCoreConnectorMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         Product productMock = mockInstance(new Product(), "setRoleMappings");
         ProductRoleInfo productRoleInfo1 = mockInstance(new ProductRoleInfo(), 1, "setRoles");
@@ -1367,7 +1367,7 @@ class NotificationServiceImplTest {
         assertDoesNotThrow(executable);
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitution(userInfo.getInstitutionId());
         verify(productsConnectorMock, times(1))
                 .getProduct(productInfoMock.getId());
@@ -1386,7 +1386,7 @@ class NotificationServiceImplTest {
         assertTrue(messageRequest.getContent().contains(role2.getLabel()));
         assertTrue(messageRequest.getContent().contains(institutionMock.getDescription()));
         verifyNoInteractions(simpleAsyncUncaughtExceptionHandler);
-        verifyNoMoreInteractions(userServiceMock, partyConnectorMock, productsConnectorMock, notificationConnectorMock);
+        verifyNoMoreInteractions(userServiceMock, msCoreConnectorMock, productsConnectorMock, notificationConnectorMock);
     }
 
     @ParameterizedTest(name = "{0}")
@@ -1421,7 +1421,7 @@ class NotificationServiceImplTest {
         assertEquals("User workContact is required", e.getMessage());
         verify(userServiceMock, times(1))
                 .findByRelationshipId(relationshipId, EnumSet.of(workContacts));
-        verifyNoInteractions(partyConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
+        verifyNoInteractions(msCoreConnectorMock, productsConnectorMock, freemarkerConfigSpy, notificationConnectorMock);
         verifyNoMoreInteractions(userServiceMock);
     }
 

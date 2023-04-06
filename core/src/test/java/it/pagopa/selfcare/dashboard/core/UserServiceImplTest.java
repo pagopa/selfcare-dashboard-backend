@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -34,7 +34,7 @@ class UserServiceImplTest {
     private UserServiceImpl userRegistryService;
 
     @Mock
-    private PartyConnector partyConnector;
+    private MsCoreConnector msCoreConnector;
 
 
     @Test
@@ -104,17 +104,17 @@ class UserServiceImplTest {
         WorkContact workContact = mockInstance(new WorkContact());
         user.setWorkContacts(Map.of(institutionId, workContact));
         Institution institutionMock = mockInstance(new Institution());
-        when(partyConnector.getInstitution(Mockito.anyString()))
+        when(msCoreConnector.getInstitution(Mockito.anyString()))
                 .thenReturn(institutionMock);
         //when
         Executable executable = () -> userRegistryService.updateUser(id, institutionId, user);
         //then
         assertDoesNotThrow(executable);
-        verify(partyConnector, times(1))
+        verify(msCoreConnector, times(1))
                 .getInstitution(institutionId);
         verify(userConnectorMock, times(1))
                 .updateUser(id, user);
-        verifyNoMoreInteractions(userConnectorMock, partyConnector);
+        verifyNoMoreInteractions(userConnectorMock, msCoreConnector);
     }
 
     @Test
@@ -223,17 +223,17 @@ class UserServiceImplTest {
         when(userConnectorMock.saveUser(any()))
                 .thenReturn(userId);
         Institution institutionMock = mockInstance(new Institution());
-        when(partyConnector.getInstitution(Mockito.anyString()))
+        when(msCoreConnector.getInstitution(Mockito.anyString()))
                 .thenReturn(institutionMock);
         //when
         UserId id = userRegistryService.saveUser(institutionId, user);
         //then
         assertEquals(userId, id);
-        verify(partyConnector, times(1))
+        verify(msCoreConnector, times(1))
                 .getInstitution(institutionId);
         verify(userConnectorMock, times(1))
                 .saveUser(user);
-        verifyNoMoreInteractions(userConnectorMock, partyConnector);
+        verifyNoMoreInteractions(userConnectorMock, msCoreConnector);
     }
 
     @Test

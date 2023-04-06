@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/institutions/institutionId2/relationships"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": [
+      {}
+    ],
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
