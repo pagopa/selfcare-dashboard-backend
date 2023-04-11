@@ -24,14 +24,10 @@ public class PnPGInstitutionMapper {
             resource = new PnPGInstitutionResource();
             resource.setId(model.getId());
             resource.setExternalId(model.getExternalId());
-            resource.setInstitutionType(model.getInstitutionType());
-            resource.setOrigin(model.getOrigin());
-            resource.setOriginId(model.getOriginId());
             resource.setName(model.getDescription());
-            resource.setCategory(model.getCategory());
             resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());
-//            resource.setStatus(model.getStatus().toString());
+            resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
             resource.setZipCode(model.getZipCode());
             if (model.getBilling() != null) {

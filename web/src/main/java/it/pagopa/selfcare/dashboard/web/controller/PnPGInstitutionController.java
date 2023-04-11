@@ -7,8 +7,8 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionPnPGResource;
-import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionPnPGMapper;
+import it.pagopa.selfcare.dashboard.web.model.PnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.mapper.PnPGInstitutionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,12 +36,12 @@ public class PnPGInstitutionController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.getInstitutions}")
-    public List<InstitutionPnPGResource> getPnPGInstitutions() {
+    public List<PnPGInstitutionResource> getPnPGInstitutions() {
 
         log.trace("getPnPGInstitution start");
         Collection<InstitutionInfo> institutions = pnPGInstitutionService.getInstitutions();
-        List<InstitutionPnPGResource> result = institutions.stream()
-                .map(InstitutionPnPGMapper::toResource)
+        List<PnPGInstitutionResource> result = institutions.stream()
+                .map(PnPGInstitutionMapper::toResource)
                 .collect(Collectors.toList());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getPnPGInstitution result = {}", result);
         log.trace("getPnPGInstitution end");
