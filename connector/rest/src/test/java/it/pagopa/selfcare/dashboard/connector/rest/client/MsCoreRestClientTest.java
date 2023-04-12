@@ -86,7 +86,7 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
     }};
 
     @Autowired
-    private PartyProcessRestClient restClient;
+    private MsCoreRestClient restClient;
 
 
     @Test
