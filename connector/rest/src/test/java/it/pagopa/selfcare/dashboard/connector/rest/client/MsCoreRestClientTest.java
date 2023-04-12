@@ -51,17 +51,10 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
     @Order(1)
     @RegisterExtension
     static WireMockExtension wm = WireMockExtension.newInstance()
-            .options(RestTestUtils.getWireMockConfiguration("stubs/party-process")
-//                    .notifier(new ConsoleNotifier(false))
-//                    .gzipDisabled(true)
-//                    .disableRequestJournal()
-//                    .useChunkedTransferEncoding(Options.ChunkedEncodingPolicy.BODY_FILE)
-            )
-//            .configureStaticDsl(true)
+            .options(RestTestUtils.getWireMockConfiguration("stubs/ms-core"))
             .build();
 
-
-    public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+    static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @SneakyThrows
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
