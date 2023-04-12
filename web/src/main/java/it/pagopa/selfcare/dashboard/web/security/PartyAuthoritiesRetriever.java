@@ -5,7 +5,6 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.web.security.AuthoritiesRetriever;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +19,11 @@ import java.util.stream.Collectors;
 @Component
 class PartyAuthoritiesRetriever implements AuthoritiesRetriever {
 
-    private final PartyConnector partyConnector;
-
     private final MsCoreConnector msCoreConnector;
 
 
     @Autowired
-    public PartyAuthoritiesRetriever(PartyConnector partyConnector,
-                                     MsCoreConnector msCoreConnector) {
-        this.partyConnector = partyConnector;
+    public PartyAuthoritiesRetriever(MsCoreConnector msCoreConnector) {
         this.msCoreConnector = msCoreConnector;
     }
 
