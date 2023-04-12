@@ -3035,16 +3035,16 @@
           },
           "fiscalCode": {
             "type": "string",
-            "description" : "User's fiscal code"
+            "description": "User's fiscal code"
           },
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
           "products" : {
             "type" : "array",
@@ -3088,16 +3088,16 @@
           },
           "id": {
             "type": "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
+          "name": {
+            "type": "string",
+            "description": "User's name"
           },
-          "products" : {
-            "type" : "array",
-            "description" : "Authorized user products",
+          "products": {
+            "type": "array",
+            "description": "Authorized user products",
             "items" : {
               "$ref" : "#/components/schemas/ProductInfoResource"
             }
@@ -3211,10 +3211,10 @@
         "required" : [ "id", "name", "surname" ],
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
           "name": {
             "type": "string",
@@ -3314,14 +3314,14 @@
             "description": "Human-readable description of this specific problem."
           },
           "instance": {
-            "type" : "string",
-            "description" : "A URI that describes where the problem occurred."
+            "type": "string",
+            "description": "A URI that describes where the problem occurred."
           },
-          "invalidParams" : {
-            "type" : "array",
-            "description" : "A list of invalid parameters details.",
-            "items" : {
-              "$ref" : "#/components/schemas/InvalidParam"
+          "invalidParams": {
+            "type": "array",
+            "description": "A list of invalid parameters details.",
+            "items": {
+              "$ref": "#/components/schemas/InvalidParam"
             }
           },
           "status" : {

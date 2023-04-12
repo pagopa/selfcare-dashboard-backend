@@ -185,7 +185,7 @@ class InstitutionServiceImplTest {
     void getInstitutions() {
         // given
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        when(partyConnectorMock.getOnBoardedInstitutions())
+        when(msCoreConnectorMock.getOnBoardedInstitutions())
                 .thenReturn(List.of(expectedInstitutionInfo));
         // when
         Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
@@ -193,9 +193,9 @@ class InstitutionServiceImplTest {
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
         assertSame(expectedInstitutionInfo, institutions.iterator().next());
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getOnBoardedInstitutions();
-        verifyNoMoreInteractions(partyConnectorMock);
+        verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
     @Test
@@ -244,7 +244,7 @@ class InstitutionServiceImplTest {
         ProductTree product = mockInstance(new ProductTree());
         when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(product));
-        when(partyConnectorMock.getInstitutionProducts(any()))
+        when(msCoreConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(Collections.emptyList());
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -257,8 +257,8 @@ class InstitutionServiceImplTest {
         Assertions.assertNotNull(products);
         Assertions.assertTrue(products.isEmpty());
         verify(productsConnectorMock, times(1)).getProductsTree();
-        verify(partyConnectorMock, times(1)).getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verify(msCoreConnectorMock, times(1)).getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -270,7 +270,7 @@ class InstitutionServiceImplTest {
         product.setChildren(List.of(children));
         when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(product));
-        when(partyConnectorMock.getInstitutionProducts(any()))
+        when(msCoreConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(Collections.emptyList());
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", product.getNode().getId());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
@@ -285,8 +285,8 @@ class InstitutionServiceImplTest {
         Assertions.assertEquals(1, products.size());
         Assertions.assertEquals(ProductOnBoardingStatus.INACTIVE, products.get(0).getNode().getOnBoardingStatus());
         verify(productsConnectorMock, times(1)).getProductsTree();
-        verify(partyConnectorMock, times(1)).getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verify(msCoreConnectorMock, times(1)).getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -308,7 +308,7 @@ class InstitutionServiceImplTest {
         PartyProduct pp4 = new PartyProduct();
         pp4.setId(p4.getNode().getId());
         pp4.setOnBoardingStatus(ProductOnBoardingStatus.PENDING);
-        when(partyConnectorMock.getInstitutionProducts(any()))
+        when(msCoreConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(OPERATOR, "productRole2", p2.getNode().getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(OPERATOR, "productRole3", p3.getNode().getId());
@@ -334,8 +334,8 @@ class InstitutionServiceImplTest {
         });
 
         verify(productsConnectorMock, times(1)).getProductsTree();
-        verify(partyConnectorMock, times(1)).getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verify(msCoreConnectorMock, times(1)).getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -357,7 +357,7 @@ class InstitutionServiceImplTest {
         PartyProduct pp4 = new PartyProduct();
         pp4.setId(p4.getNode().getId());
         pp4.setOnBoardingStatus(ProductOnBoardingStatus.PENDING);
-        when(partyConnectorMock.getInstitutionProducts(any()))
+        when(msCoreConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(List.of(pp1, pp3, pp4));
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(MANAGER, "productRole2", p2.getNode().getId());
         ProductGrantedAuthority productGrantedAuthority3 = new ProductGrantedAuthority(MANAGER, "productRole3", p3.getNode().getId());
@@ -390,9 +390,9 @@ class InstitutionServiceImplTest {
         });
         verify(productsConnectorMock, times(1))
                 .getProductsTree();
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoMoreInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -412,7 +412,7 @@ class InstitutionServiceImplTest {
         PartyProduct pp2 = new PartyProduct();
         pp2.setId(p2.getNode().getId());
         pp2.setOnBoardingStatus(ProductOnBoardingStatus.ACTIVE);
-        when(partyConnectorMock.getInstitutionProducts(any()))
+        when(msCoreConnectorMock.getInstitutionProducts(any()))
                 .thenReturn(List.of(pp1, pp2));
         ProductGrantedAuthority productGrantedAuthority1 = new ProductGrantedAuthority(OPERATOR, "productRole1", p1.getNode().getId());
         ProductGrantedAuthority productGrantedAuthority2 = new ProductGrantedAuthority(OPERATOR, "productRole2", p2.getNode().getId());
@@ -445,9 +445,9 @@ class InstitutionServiceImplTest {
         });
         verify(productsConnectorMock, times(1))
                 .getProductsTree();
-        verify(partyConnectorMock, times(1))
+        verify(msCoreConnectorMock, times(1))
                 .getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoMoreInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -486,13 +486,13 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         String productId = "productId";
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productRole = Optional.empty();
+        Optional<Set<String>> productRole = null;
         // when
         Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional product role object is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -500,7 +500,7 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<SelfCareAuthority> role = null;
         Optional<Set<String>> productRole = Optional.empty();
         // when
         Executable executable = () -> institutionService.getInstitutionProductUsers(institutionId, productId, role, productRole);
@@ -652,7 +652,7 @@ class InstitutionServiceImplTest {
     void getInstitutionUsers_nullProductIds() {
         // given
         String institutionId = "institutionId";
-        Optional<String> productId = Optional.empty();
+        Optional<String> productId = null;
         Optional<SelfCareAuthority> role = Optional.empty();
         Optional<Set<String>> productRole = Optional.empty();
 
@@ -661,7 +661,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional Product id object is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -670,7 +670,7 @@ class InstitutionServiceImplTest {
         String institutionId = "institutionId";
         Optional<String> productId = Optional.empty();
         Optional<SelfCareAuthority> role = Optional.empty();
-        Optional<Set<String>> productRole = Optional.empty();
+        Optional<Set<String>> productRole = null;
 
         // when
         Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
@@ -685,14 +685,14 @@ class InstitutionServiceImplTest {
         // given
         String institutionId = "institutionId";
         Optional<String> productId = Optional.empty();
-        Optional<SelfCareAuthority> role = Optional.empty();
+        Optional<SelfCareAuthority> role = null;
         Optional<Set<String>> productRole = Optional.empty();
         // when
         Executable executable = () -> institutionService.getInstitutionUsers(institutionId, productId, role, productRole);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Optional role object is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, partyConnectorMock);
+        verifyNoInteractions(productsConnectorMock, msCoreConnectorMock);
     }
 
     @Test
