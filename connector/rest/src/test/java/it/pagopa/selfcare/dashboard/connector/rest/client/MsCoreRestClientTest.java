@@ -8,18 +8,14 @@ import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.rest.config.MsCoreRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
@@ -28,7 +24,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
@@ -226,82 +225,6 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
 
 
     @Test
-    void putInstitution() {
-        // given
-        final String institutionIdMock = "institutionId";
-        final String institutionPutMockCode = "setCode";
-        InstitutionPut geographicTaxonomyCodesMock = TestUtils.mockInstance(new InstitutionPut());
-        geographicTaxonomyCodesMock.setGeographicTaxonomyCodes(List.of(TestUtils.mockInstance(institutionPutMockCode)));
-
-        // when
-        Executable executable = () -> restClient.updateInstitutionGeographicTaxonomy(institutionIdMock, geographicTaxonomyCodesMock);
-
-        // then
-        assertDoesNotThrow(executable);
-
-    }
-
-    @Test
-    void onboardingSubdelegates() {
-        // given
-        OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
-        onboardingUsersRequest.setInstitutionId("institutionId");
-        onboardingUsersRequest.setProductId("productId");
-        onboardingUsersRequest.setUsers(List.of(TestUtils.mockInstance(new User())));
-        // when
-        Executable executable = () -> restClient.onboardingSubdelegates(onboardingUsersRequest);
-        // then
-        assertDoesNotThrow(executable);
-    }
-
-
-    @Test
-    void onboardingOperators() {
-        // given
-        OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
-        onboardingUsersRequest.setInstitutionId("institutionId");
-        onboardingUsersRequest.setProductId("productId");
-        onboardingUsersRequest.setUsers(List.of(TestUtils.mockInstance(new User())));
-        // when
-        Executable executable = () -> restClient.onboardingOperators(onboardingUsersRequest);
-        // then
-        assertDoesNotThrow(executable);
-    }
-
-
-    @Test
-    void suspendRelationship() {
-        // given
-        String relationshipId = "relationshipId";
-        // when
-        Executable executable = () -> restClient.suspendRelationship(relationshipId);
-        // then
-        assertDoesNotThrow(executable);
-    }
-
-
-    @Test
-    void activateRelationship() {
-        // given
-        String relationshipId = "relationshipId";
-        // when
-        Executable executable = () -> restClient.activateRelationship(relationshipId);
-        // then
-        assertDoesNotThrow(executable);
-    }
-
-    @Test
-    void deleteRelationship() {
-        // given
-        String relationshipId = "relationshipId";
-        // when
-        Executable executable = () -> restClient.deleteRelationshipById(relationshipId);
-        // then
-        assertDoesNotThrow(executable);
-    }
-
-
-    @Test
     void getInstitution_fullyValued() {
         // given
         String id = testCase2instIdMap.get(TestCase.FULLY_VALUED);
@@ -328,55 +251,6 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
         assertNull(response.getExternalId());
         assertNull(response.getTaxCode());
         assertNull(response.getZipCode());
-    }
-
-
-    @Test
-    void getInstitutionByExternalId_fullyValued() {
-        // given
-        String externalId = testCase2instIdMap.get(TestCase.FULLY_VALUED);
-        // when
-        Institution response = restClient.getInstitutionByExternalId(externalId);
-        assertNotNull(response);
-        TestUtils.checkNotNullFields(response);
-        response.getAttributes().forEach(TestUtils::checkNotNullFields);
-    }
-
-
-    @Test
-    void getInstitutionByExternalId_fullyNull() {
-        // given
-        String externalId = testCase2instIdMap.get(TestCase.FULLY_NULL);
-        // when
-        Institution response = restClient.getInstitutionByExternalId(externalId);
-        assertNotNull(response);
-        assertNull(response.getAddress());
-        assertNull(response.getDescription());
-        assertNull(response.getDigitalAddress());
-        assertNull(response.getId());
-        assertNull(response.getExternalId());
-        assertNull(response.getTaxCode());
-        assertNull(response.getZipCode());
-    }
-
-    @Test
-    void approveOnboardingRequest() {
-        // given
-        String tokenId = "tokenId";
-        // when
-        Executable executable = () -> restClient.approveOnboardingRequest(tokenId);
-        // then
-        assertDoesNotThrow(executable);
-    }
-
-    @Test
-    void rejectOnboardingRequest() {
-        // given
-        String tokenId = "tokenId";
-        // when
-        Executable executable = () -> restClient.rejectOnboardingRequest(tokenId);
-        // then
-        assertDoesNotThrow(executable);
     }
 
 

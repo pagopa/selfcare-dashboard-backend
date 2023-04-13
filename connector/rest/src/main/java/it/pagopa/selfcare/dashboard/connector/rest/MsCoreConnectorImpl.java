@@ -1,30 +1,23 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
-import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
-import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.*;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
-import it.pagopa.selfcare.dashboard.connector.rest.model.token.TokenInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,10 +38,7 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 @Service
 class MsCoreConnectorImpl implements MsCoreConnector {
 
-    private static final String REQUIRED_RELATIONSHIP_MESSAGE = "A Relationship id is required";
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
-    static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
-    static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
 
     private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
         if (ACTIVE.equals(inst1.getStatus())) {
@@ -86,21 +76,6 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         return institutionInfo;
     };
 
-    static final Function<Relationship, InstitutionInfo> RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION = relationship -> {
-        InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setId(relationship.getTo().toString());
-        institutionInfo.setStatus(relationship.getState());
-        institutionInfo.setInstitutionType(relationship.getInstitutionUpdate().getInstitutionType());
-        institutionInfo.setDescription(relationship.getInstitutionUpdate().getDescription());
-        institutionInfo.setTaxCode(relationship.getInstitutionUpdate().getTaxCode());
-        institutionInfo.setDigitalAddress(relationship.getInstitutionUpdate().getDigitalAddress());
-        institutionInfo.setAddress(relationship.getInstitutionUpdate().getAddress());
-        institutionInfo.setZipCode(relationship.getInstitutionUpdate().getZipCode());
-        institutionInfo.setPaymentServiceProvider(relationship.getInstitutionUpdate().getPaymentServiceProvider());
-        institutionInfo.setDataProtectionOfficer(relationship.getInstitutionUpdate().getDataProtectionOfficer());
-        institutionInfo.setBilling(relationship.getBilling());
-        return institutionInfo;
-    };
     static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
         UserInfo userInfo = new UserInfo();
         userInfo.setId(relationshipInfo.getFrom());
@@ -162,18 +137,6 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public InstitutionInfo getOnBoardedInstitution(String institutionId) {
-        log.trace("getOnBoardedInstitution start");
-        log.debug("getOnBoardedInstitution institutionId = {}", institutionId);
-        OnBoardingInfo onBoardingInfo = msCoreRestClient.getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
-        InstitutionInfo result = parseOnBoardingInfo(onBoardingInfo).stream()
-                .findAny().orElse(null);
-        log.debug("getOnBoardedInstitution result = {}", result);
-        log.trace("getOnBoardedInstitution end");
-        return result;
-    }
-
-    @Override
     public Collection<InstitutionInfo> getOnBoardedInstitutions() {
         log.trace("getOnBoardedInstitutions start");
         OnBoardingInfo onBoardingInfo = msCoreRestClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED));
@@ -182,36 +145,6 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.trace("getOnBoardedInstitutions end");
         return result;
     }
-
-    @Override
-    public void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
-        log.trace("updateInstitutionGeographicTaxonomy start");
-        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geograpihc taxonomies = {}", institutionId, geographicTaxonomies);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE);
-        InstitutionPut geographicTaxonomiesRequest = new InstitutionPut();
-        geographicTaxonomiesRequest.setGeographicTaxonomyCodes(geographicTaxonomies.getGeographicTaxonomyList().stream().map(GeographicTaxonomy::getCode).collect(Collectors.toList()));
-        msCoreRestClient.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesRequest);
-        log.trace("updateInstitutionGeographicTaxonomy end");
-    }
-
-    @Override
-    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
-        log.trace("getGeographicTaxonomyList start");
-        log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        Institution institution = msCoreRestClient.getInstitution(institutionId);
-        List<GeographicTaxonomy> result;
-        if (institution.getGeographicTaxonomies() == null) {
-            throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionId));
-        } else {
-            result = institution.getGeographicTaxonomies();
-        }
-        log.debug("getGeographicTaxonomyList result = {}", result);
-        log.trace("getGeographicTaxonomyList end");
-        return result;
-    }
-
 
     @Override
     public UserInfo getUser(String relationshipId) {
@@ -314,113 +247,6 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         return userInfos;
     }
 
-
-    @Override
-    public void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto) {
-        log.trace("createUsers start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, userId);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        Assert.hasText(productId, "A Product id is required");
-        Assert.hasText(userId, "An User Id is required");
-        Assert.notNull(userDto, "A User is required");
-
-        OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
-        onboardingUsersRequest.setInstitutionId(institutionId);
-        onboardingUsersRequest.setProductId(productId);
-        Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
-
-        if (partyRoleToUsersMap.size() > 1) {
-            throw new ValidationException(String.format("Is not allowed to create both %s and %s users", PartyRole.SUB_DELEGATE, PartyRole.OPERATOR));
-        }
-
-        partyRoleToUsersMap.forEach((key, value) -> {
-            onboardingUsersRequest.setUsers(value);
-            switch (key) {
-                case SUB_DELEGATE:
-                    msCoreRestClient.onboardingSubdelegates(onboardingUsersRequest);
-                    break;
-                case OPERATOR:
-                    msCoreRestClient.onboardingOperators(onboardingUsersRequest);
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid Party role");
-            }
-        });
-
-        log.trace("createUsers end");
-    }
-
-
-    @Override
-    public void checkExistingRelationshipRoles(String institutionId, String productId, CreateUserDto userDto, String userId) {
-        log.trace("checkExistingRelationshipRoles start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "checkExistingRelationshipRoles institutionId = {}, productId = {}, createUserDto = {}, userId = {}", institutionId, productId, userDto, userId);
-
-        Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
-
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(Optional.of(productId));
-        userInfoFilter.setUserId(Optional.ofNullable(userId));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
-
-        RelationshipsResponse institutionRelationships = msCoreRestClient.getUserInstitutionRelationships(institutionId, EnumSet.allOf(PartyRole.class), userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
-        if (!institutionRelationships.isEmpty()) {
-            Set<PartyRole> roles = partyRoleToUsersMap.keySet();
-            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
-
-            if (!roles.contains(PartyRole.OPERATOR) || !(partyRoles.contains(PartyRole.OPERATOR))) {
-                throw new ValidationException("User role conflict");
-            }
-        }
-        log.trace("checkExistingRelationshipRoles end");
-    }
-
-
-    private Map<PartyRole, List<User>> getPartyRoleListMap(String userId, CreateUserDto userDto) {
-        return userDto.getRoles().stream()
-                .map(role -> {
-                    User user = new User();
-                    user.setName(userDto.getName());
-                    user.setSurname(userDto.getSurname());
-                    user.setTaxCode(userDto.getTaxCode());
-                    user.setEmail(userDto.getEmail());
-                    user.setId(UUID.fromString(userId));
-                    user.setProductRole(role.getProductRole());
-                    user.setRole(role.getPartyRole());
-                    return user;
-                }).collect(Collectors.groupingBy(User::getRole));
-    }
-
-
-    @Override
-    public void suspend(String relationshipId) {
-        log.trace("suspend start");
-        log.debug("suspend relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        msCoreRestClient.suspendRelationship(relationshipId);
-        log.trace("suspend end");
-    }
-
-
-    @Override
-    public void activate(String relationshipId) {
-        log.trace("activate start");
-        log.debug("activate relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        msCoreRestClient.activateRelationship(relationshipId);
-        log.trace("activate end");
-    }
-
-    @Override
-    public void delete(String relationshipId) {
-        log.trace("delete start");
-        log.debug("delete relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        msCoreRestClient.deleteRelationshipById(relationshipId);
-        log.trace("delete end");
-    }
-
-
     @Override
     public Institution getInstitution(String institutionId) {
         log.trace("getInstitution start");
@@ -430,65 +256,6 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");
         return institution;
-    }
-
-
-    @Override
-    public Institution getInstitutionByExternalId(String institutionExternalId) {
-        log.trace("getInstitutionByExternalId start");
-        log.debug("getInstitutionByExternalId institutionExternalId = {}", institutionExternalId);
-        Assert.hasText(institutionExternalId, "An Institution external id is required");
-        Institution institution = msCoreRestClient.getInstitutionByExternalId(institutionExternalId);
-        log.debug("getInstitutionByExternalId result = {}", institution);
-        log.trace("getInstitutionByExternalId end");
-        return institution;
-    }
-
-
-    @Override
-    public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
-        log.trace("getOnboardingRequestInfo start");
-        log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        final OnboardingRequestInfo onboardingRequestInfo = new OnboardingRequestInfo();
-        onboardingRequestInfo.setAdmins(new ArrayList<>());
-        final TokenInfo tokenInfo = msCoreRestClient.getToken(UUID.fromString(tokenId));
-        tokenInfo.getLegals().forEach(relationshipBinding -> {
-            final UserInfo userInfo = new UserInfo();
-            userInfo.setId(relationshipBinding.getPartyId().toString());
-            userInfo.setStatus(relationshipBinding.getRole().toString());
-            userInfo.setRole(relationshipBinding.getRole().getSelfCareAuthority());
-            if (PartyRole.MANAGER.equals(relationshipBinding.getRole())) {
-                onboardingRequestInfo.setManager(userInfo);
-                final Relationship relationship = msCoreRestClient.getRelationshipById(relationshipBinding.getRelationshipId());
-                InstitutionInfo institutionInfo = RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationship);
-                onboardingRequestInfo.setInstitutionInfo(institutionInfo);
-            } else {
-                onboardingRequestInfo.getAdmins().add(userInfo);
-            }
-
-        });
-        log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
-        log.trace("getOnboardingRequestInfo end");
-        return onboardingRequestInfo;
-    }
-
-    @Override
-    public void approveOnboardingRequest(String tokenId) {
-        log.trace("approveOnboardingRequest start");
-        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        msCoreRestClient.approveOnboardingRequest(tokenId);
-        log.trace("retrieveOnboardingRequest end");
-    }
-
-    @Override
-    public void rejectOnboardingRequest(String tokenId){
-        log.trace("rejectOnboardingRequest start");
-        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        msCoreRestClient.rejectOnboardingRequest(tokenId);
-        log.trace("rejectOnboardingRequest end");
     }
 
     @Setter(AccessLevel.PRIVATE)

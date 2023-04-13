@@ -1141,7 +1141,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "$ref": "#/components/schemas/PnPGInstitutionResource"
+                    "$ref" : "#/components/schemas/PnPGInstitutionResource"
                   }
                 }
               }
@@ -3015,36 +3015,28 @@
         }
       },
       "InstitutionUserDetailsResource" : {
-        "title": "InstitutionUserDetailsResource",
-        "required": [
-          "fiscalCode",
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's personal email",
-            "format": "email",
-            "example": "email@example.com"
+        "title" : "InstitutionUserDetailsResource",
+        "required" : [ "fiscalCode", "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "User's personal email",
+            "format" : "email",
+            "example" : "email@example.com"
           },
-          "fiscalCode": {
-            "type": "string",
-            "description": "User's fiscal code"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier",
-            "format": "uuid"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
           "products" : {
             "type" : "array",
@@ -3069,35 +3061,28 @@
         }
       },
       "InstitutionUserResource" : {
-        "title": "InstitutionUserResource",
-        "required": [
-          "id",
-          "name",
-          "products",
-          "role",
-          "status",
-          "surname"
-        ],
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "User's personal email",
-            "format": "email",
-            "example": "email@example.com"
+        "title" : "InstitutionUserResource",
+        "required" : [ "id", "name", "products", "role", "status", "surname" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "User's personal email",
+            "format" : "email",
+            "example" : "email@example.com"
           },
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier",
-            "format": "uuid"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "products": {
-            "type": "array",
-            "description": "Authorized user products",
+          "products" : {
+            "type" : "array",
+            "description" : "Authorized user products",
             "items" : {
               "$ref" : "#/components/schemas/ProductInfoResource"
             }
@@ -3211,117 +3196,109 @@
         "required" : [ "id", "name", "surname" ],
         "type" : "object",
         "properties" : {
-          "id": {
-            "type": "string",
-            "description": "User's unique identifier",
-            "format": "uuid"
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
           },
-          "name": {
-            "type": "string",
-            "description": "User's name"
+          "name" : {
+            "type" : "string",
+            "description" : "User's name"
           },
-          "surname": {
-            "type": "string",
-            "description": "User's surname"
+          "surname" : {
+            "type" : "string",
+            "description" : "User's surname"
           }
         }
       },
-      "PnPGInstitutionResource": {
-        "title": "PnPGInstitutionResource",
-        "required": [
-          "externalId",
-          "fiscalCode",
-          "id",
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "address": {
-            "type": "string",
-            "description": "Institution's physical address"
+      "PnPGInstitutionResource" : {
+        "title" : "PnPGInstitutionResource",
+        "required" : [ "externalId", "fiscalCode", "id", "status" ],
+        "type" : "object",
+        "properties" : {
+          "address" : {
+            "type" : "string",
+            "description" : "Institution's physical address"
           },
-          "category": {
-            "type": "string",
-            "description": "Institution's category"
+          "category" : {
+            "type" : "string",
+            "description" : "Institution's category"
           },
-          "externalId": {
-            "type": "string",
-            "description": "Institution's unique external identifier"
+          "externalId" : {
+            "type" : "string",
+            "description" : "Institution's unique external identifier"
           },
-          "fiscalCode": {
-            "type": "string",
-            "description": "Fiscal code corresponding to the institution"
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "Fiscal code corresponding to the institution"
           },
-          "geographicTaxonomies": {
-            "type": "array",
-            "description": "Institution's geographic taxonomy",
-            "items": {
-              "$ref": "#/components/schemas/GeographicTaxonomyResource"
+          "geographicTaxonomies" : {
+            "type" : "array",
+            "description" : "Institution's geographic taxonomy",
+            "items" : {
+              "$ref" : "#/components/schemas/GeographicTaxonomyResource"
             }
           },
-          "id": {
-            "type": "string",
-            "description": "Institution's unique internal identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "Institution's unique internal identifier"
           },
-          "institutionType": {
-            "type": "string",
-            "description": "Institution's type"
+          "institutionType" : {
+            "type" : "string",
+            "description" : "Institution's type"
           },
-          "mailAddress": {
-            "type": "string",
-            "description": "Institution's email address"
+          "mailAddress" : {
+            "type" : "string",
+            "description" : "Institution's email address"
           },
-          "name": {
-            "type": "string",
-            "description": "Institution's name"
+          "name" : {
+            "type" : "string",
+            "description" : "Institution's name"
           },
-          "origin": {
-            "type": "string",
-            "description": "Institution's data origin"
+          "origin" : {
+            "type" : "string",
+            "description" : "Institution's data origin"
           },
-          "originId": {
-            "type": "string",
-            "description": "Institution's identifier related to origin"
+          "originId" : {
+            "type" : "string",
+            "description" : "Institution's identifier related to origin"
           },
-          "recipientCode": {
-            "type": "string",
-            "description": "Billing recipient code"
+          "recipientCode" : {
+            "type" : "string",
+            "description" : "Billing recipient code"
           },
-          "status": {
-            "type": "string",
-            "description": "Institution's status"
+          "status" : {
+            "type" : "string",
+            "description" : "Institution's status"
           },
-          "userRole": {
-            "type": "string",
-            "description": "Logged user's role"
+          "userRole" : {
+            "type" : "string",
+            "description" : "Logged user's role"
           },
-          "zipCode": {
-            "type": "string",
-            "description": "Institution's zipCode"
+          "zipCode" : {
+            "type" : "string",
+            "description" : "Institution's zipCode"
           }
         }
       },
-      "Problem": {
-        "title": "Problem",
-        "required": [
-          "status",
-          "title"
-        ],
-        "type": "object",
-        "properties": {
-          "detail": {
-            "type": "string",
-            "description": "Human-readable description of this specific problem."
+      "Problem" : {
+        "title" : "Problem",
+        "required" : [ "status", "title" ],
+        "type" : "object",
+        "properties" : {
+          "detail" : {
+            "type" : "string",
+            "description" : "Human-readable description of this specific problem."
           },
-          "instance": {
-            "type": "string",
-            "description": "A URI that describes where the problem occurred."
+          "instance" : {
+            "type" : "string",
+            "description" : "A URI that describes where the problem occurred."
           },
-          "invalidParams": {
-            "type": "array",
-            "description": "A list of invalid parameters details.",
-            "items": {
-              "$ref": "#/components/schemas/InvalidParam"
+          "invalidParams" : {
+            "type" : "array",
+            "description" : "A list of invalid parameters details.",
+            "items" : {
+              "$ref" : "#/components/schemas/InvalidParam"
             }
           },
           "status" : {
