@@ -447,7 +447,7 @@ class MsCoreConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
-        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock);
+        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock, partyConnector);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
