@@ -91,6 +91,9 @@ class MsCoreConnectorImplTest {
     @Autowired
     private MsCoreConnectorImpl msCoreConnector;
 
+    @Autowired
+    private PartyConnectorImpl partyConnector;
+
     @MockBean
     private MsCoreRestClient msCoreRestClientMock;
 
