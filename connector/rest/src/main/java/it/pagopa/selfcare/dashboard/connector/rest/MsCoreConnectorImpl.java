@@ -33,20 +33,17 @@ class MsCoreConnectorImpl implements MsCoreConnector {
 
     private final MsCoreRestClient msCoreRestClient;
 
-    private final PartyConnectorImpl partyConnector;
-
 
     @Autowired
-    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, PartyConnectorImpl partyConnector) {
+    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient) {
         this.msCoreRestClient = msCoreRestClient;
-        this.partyConnector = partyConnector;
     }
 
     @Override
     public Collection<InstitutionInfo> getOnBoardedInstitutions() {
         log.trace("getOnBoardedInstitutions start");
         OnBoardingInfo onBoardingInfo = msCoreRestClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED));
-        Collection<InstitutionInfo> result = partyConnector.parseOnBoardingInfo(onBoardingInfo);
+        Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
         log.debug("getOnBoardedInstitutions result = {}", result);
         log.trace("getOnBoardedInstitutions end");
         return result;

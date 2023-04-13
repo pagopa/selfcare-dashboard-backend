@@ -91,9 +91,6 @@ class MsCoreConnectorImplTest {
     @Autowired
     private MsCoreConnectorImpl msCoreConnector;
 
-    @Autowired
-    private PartyConnectorImpl partyConnector;
-
     @MockBean
     private MsCoreRestClient msCoreRestClientMock;
 
@@ -450,7 +447,7 @@ class MsCoreConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
-        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock, partyConnector);
+        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
