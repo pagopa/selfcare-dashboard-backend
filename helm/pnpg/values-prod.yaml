@@ -5,8 +5,17 @@ image:
 
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://selfcare.pagopa.it"
-
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://pnpg.selfcare.pagopa.it"
+  tls:
+    - hosts:
+        - prod01.pnpg.internal.prod.selfcare.pagopa.it
+      secretName: prod01-pnpg-internal-prod-selfcare-pagopa-it
+  hosts:
+    - host: "prod01.pnpg.internal.prod.selfcare.pagopa.it"
+      paths:
+        - path: /dashboard/v1/(.*)
+          pathType: ImplementationSpecific
+          
 autoscaling:
   enabled: false
   minReplicas: 1
