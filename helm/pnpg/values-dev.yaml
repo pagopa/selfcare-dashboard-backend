@@ -8,6 +8,11 @@ ingress:
     - hosts:
         - dev01.pnpg.internal.dev.selfcare.pagopa.it
       secretName: dev01-pnpg-internal-dev-selfcare-pagopa-it
+  hosts:
+    - host: "dev01.pnpg.internal.dev.selfcare.pagopa.it"
+      paths:
+        - path: /dashboard/v1/(.*)
+          pathType: ImplementationSpecific
 
 autoscaling:
   enabled: false
