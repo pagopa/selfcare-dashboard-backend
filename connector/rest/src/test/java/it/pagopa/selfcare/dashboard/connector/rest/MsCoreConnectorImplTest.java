@@ -98,7 +98,7 @@ class MsCoreConnectorImplTest {
     };
 
     @Autowired
-    private MsCoreConnectorImpl partyConnector;
+    private MsCoreConnectorImpl msCoreConnector;
 
     @MockBean
     private MsCoreRestClient msCoreRestClientMock;
@@ -112,7 +112,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionId = "institutionId";
         // when
-        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo institutionInfo = msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNull(institutionInfo);
         verify(msCoreRestClientMock, times(1))
@@ -129,7 +129,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo institutionInfo = msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNull(institutionInfo);
         verify(msCoreRestClientMock, times(1))
@@ -146,7 +146,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo institutionInfo = msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNull(institutionInfo);
         verify(msCoreRestClientMock, times(1))
@@ -166,7 +166,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo institutionInfo = msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNotNull(institutionInfo);
         assertNull(institutionInfo.getCategory());
@@ -187,7 +187,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo institutionInfo = msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNotNull(institutionInfo);
         assertNull(institutionInfo.getCategory());
@@ -206,7 +206,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Executable executable = () -> partyConnector.getOnBoardedInstitution(institutionId);
+        Executable executable = () -> msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         ValidationException e = assertThrows(ValidationException.class, executable);
         assertEquals(String.format("The institution %s does not have geographic taxonomies.", onboardingData.getId()), e.getMessage());
@@ -227,7 +227,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        InstitutionInfo institutionInfo = msCoreConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNotNull(institutionInfo);
         checkNotNullFields(institutionInfo, "paymentServiceProvider", "dataProtectionOfficer");
@@ -248,7 +248,7 @@ class MsCoreConnectorImplTest {
     }
 
     @Test
-    void getOnBoardedInstitutions_toBeValidatedtoBeValidate(){
+    void getOnBoardedInstitutions_toBeValidatedtoBeValidated() {
         // given
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
@@ -264,7 +264,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<InstitutionInfo> institutions = partyConnector.getOnBoardedInstitutions();
+        Collection<InstitutionInfo> institutions = msCoreConnector.getOnBoardedInstitutions();
         // then
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
@@ -289,7 +289,7 @@ class MsCoreConnectorImplTest {
     }
 
     @Test
-    void getOnBoardedInstitutions_pendingToBeValidated(){
+    void getOnBoardedInstitutions_pendingToBeValidated() {
         // given
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
@@ -305,7 +305,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<InstitutionInfo> institutions = partyConnector.getOnBoardedInstitutions();
+        Collection<InstitutionInfo> institutions = msCoreConnector.getOnBoardedInstitutions();
         // then
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
@@ -330,7 +330,7 @@ class MsCoreConnectorImplTest {
     }
 
     @Test
-    void getOnBoardedInstitutions_activePendingToBeValidated(){
+    void getOnBoardedInstitutions_activePendingToBeValidated() {
         // given
         OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
         OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
@@ -351,7 +351,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<InstitutionInfo> institutions = partyConnector.getOnBoardedInstitutions();
+        Collection<InstitutionInfo> institutions = msCoreConnector.getOnBoardedInstitutions();
         // then
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
@@ -385,7 +385,7 @@ class MsCoreConnectorImplTest {
         Mockito.doNothing()
                 .when(msCoreRestClientMock).updateInstitutionGeographicTaxonomy(anyString(), any());
         // when
-        partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        msCoreConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
         // then
         ArgumentCaptor<InstitutionPut> argumentCaptor = ArgumentCaptor.forClass(InstitutionPut.class);
         verify(msCoreRestClientMock, times(1))
@@ -401,7 +401,7 @@ class MsCoreConnectorImplTest {
         String institutionId = null;
         GeographicTaxonomyList geographicTaxonomiesMock = new GeographicTaxonomyList();
         // when
-        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        Executable executable = () -> msCoreConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
@@ -414,7 +414,7 @@ class MsCoreConnectorImplTest {
         String institutionId = "institutionId";
         GeographicTaxonomyList geographicTaxonomiesMock = null;
         // when
-        Executable executable = () -> partyConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
+        Executable executable = () -> msCoreConnector.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomiesMock);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE, e.getMessage());
@@ -427,7 +427,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionId = "institutionId";
         // when
-        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = msCoreConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
@@ -444,7 +444,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitutionProducts(any(), any()))
                 .thenReturn(new Products());
         // when
-        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = msCoreConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
@@ -463,7 +463,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitutionProducts(any(), any()))
                 .thenReturn(products);
         // when
-        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = msCoreConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertTrue(institutionProducts.isEmpty());
@@ -482,7 +482,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitutionProducts(any(), any()))
                 .thenReturn(products);
         // when
-        List<PartyProduct> institutionProducts = partyConnector.getInstitutionProducts(institutionId);
+        List<PartyProduct> institutionProducts = msCoreConnector.getInstitutionProducts(institutionId);
         // then
         assertNotNull(institutionProducts);
         assertFalse(institutionProducts.isEmpty());
@@ -498,7 +498,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionId = "institutionId";
         // when
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(institutionId);
+        Collection<AuthInfo> authInfos = msCoreConnector.getAuthInfo(institutionId);
         // then
         assertNotNull(authInfos);
         assertTrue(authInfos.isEmpty());
@@ -516,7 +516,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(institutionId);
+        Collection<AuthInfo> authInfos = msCoreConnector.getAuthInfo(institutionId);
         // then
         assertNotNull(authInfos);
         assertTrue(authInfos.isEmpty());
@@ -535,7 +535,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(institutionId);
+        Collection<AuthInfo> authInfos = msCoreConnector.getAuthInfo(institutionId);
         // then
         assertNotNull(authInfos);
         assertTrue(authInfos.isEmpty());
@@ -555,7 +555,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(institutionId);
+        Collection<AuthInfo> authInfos = msCoreConnector.getAuthInfo(institutionId);
         // then
         assertNotNull(authInfos);
         assertTrue(authInfos.isEmpty());
@@ -580,7 +580,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Collection<AuthInfo> authInfos = partyConnector.getAuthInfo(institutionId);
+        Collection<AuthInfo> authInfos = msCoreConnector.getAuthInfo(institutionId);
         // then
         assertNotNull(authInfos);
         assertFalse(authInfos.isEmpty());
@@ -617,7 +617,7 @@ class MsCoreConnectorImplTest {
         String institutionId = null;
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         // when
-        Executable executable = () -> partyConnector.getUsers(institutionId, userInfoFilter);
+        Executable executable = () -> msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An Institution id is required", e.getMessage());
@@ -632,7 +632,7 @@ class MsCoreConnectorImplTest {
         userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         assertNotNull(users);
         assertTrue(users.isEmpty());
@@ -644,13 +644,13 @@ class MsCoreConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
-        MsCoreConnectorImpl partyConnector = new MsCoreConnectorImpl(msCoreRestClientMock);
+        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         assertNotNull(users);
         assertTrue(users.isEmpty());
@@ -668,7 +668,7 @@ class MsCoreConnectorImplTest {
         userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         assertNotNull(users);
         assertTrue(users.isEmpty());
@@ -686,7 +686,7 @@ class MsCoreConnectorImplTest {
         userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
 
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         assertNotNull(users);
         assertTrue(users.isEmpty());
@@ -704,7 +704,7 @@ class MsCoreConnectorImplTest {
         userInfoFilter.setRole(Optional.of(selfCareAuthority));
         userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
         // when
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         assertNotNull(users);
         assertTrue(users.isEmpty());
@@ -737,7 +737,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         // when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
         assertNotNull(userInfos);
         assertEquals(1, userInfos.size());
@@ -774,7 +774,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getRelationship(anyString()))
                 .thenReturn(relationshipInfo1);
         // when
-        UserInfo userInfo = partyConnector.getUser(relationshipId);
+        UserInfo userInfo = msCoreConnector.getUser(relationshipId);
         // then
         assertNotNull(userInfo);
         assertEquals(relationshipId, userInfo.getId());
@@ -834,7 +834,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         //then
         assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
@@ -856,7 +856,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         //Then
         assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
@@ -879,7 +879,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         //then
         assertEquals(1, userInfos.size());
         UserInfo userInfo = userInfos.iterator().next();
@@ -902,7 +902,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         assertNull(userInfo.getUser());
@@ -922,7 +922,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         assertNull(userInfo.getUser());
@@ -943,7 +943,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         assertNull(userInfo.getUser());
@@ -973,7 +973,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(any(), any(), any(), any(), any(), any()))
                 .thenReturn(relationshipsResponse);
         //when
-        Collection<UserInfo> userInfos = partyConnector.getUsers(institutionId, userInfoFilter);
+        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter);
         UserInfo userInfo = userInfos.iterator().next();
         //Then
         assertNull(userInfo.getUser());
@@ -991,7 +991,7 @@ class MsCoreConnectorImplTest {
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            msCoreConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1008,7 +1008,7 @@ class MsCoreConnectorImplTest {
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            msCoreConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1025,7 +1025,7 @@ class MsCoreConnectorImplTest {
         CreateUserDto createUserDto = null;
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            msCoreConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1042,7 +1042,7 @@ class MsCoreConnectorImplTest {
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            msCoreConnector.createUsers(institutionId, productId, userId, createUserDto);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1064,7 +1064,7 @@ class MsCoreConnectorImplTest {
         roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
         // when
-        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+        Executable executable = () -> msCoreConnector.createUsers(institutionId, productId, userId, createUserDto);
         // then
         switch (partyRole) {
             case SUB_DELEGATE:
@@ -1112,7 +1112,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
                 .thenReturn(mockRelationshipsResponse);
         // when
-        Executable executable = () -> partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        Executable executable = () -> msCoreConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
         // then
         ValidationException e = assertThrows(ValidationException.class, executable);
         assertEquals("User role conflict", e.getMessage());
@@ -1146,7 +1146,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
                 .thenReturn(mockRelationshipsResponse);
         // when
-        partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        msCoreConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
@@ -1177,7 +1177,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
                 .thenReturn(mockRelationshipsResponse);
         // when
-        partyConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        msCoreConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
@@ -1203,7 +1203,7 @@ class MsCoreConnectorImplTest {
         roleMock2.setPartyRole(partyRole2);
         createUserDto.setRoles(Set.of(roleMock1, roleMock2));
         // when
-        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+        Executable executable = () -> msCoreConnector.createUsers(institutionId, productId, userId, createUserDto);
         // then
         ValidationException e = assertThrows(ValidationException.class, executable);
         assertEquals("Is not allowed to create both SUB_DELEGATE and OPERATOR users", e.getMessage());
@@ -1233,7 +1233,7 @@ class MsCoreConnectorImplTest {
         // given
         String relationshipId = null;
         // when
-        Executable executable = () -> partyConnector.suspend(relationshipId);
+        Executable executable = () -> msCoreConnector.suspend(relationshipId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Relationship id is required", e.getMessage());
@@ -1245,7 +1245,7 @@ class MsCoreConnectorImplTest {
         // given
         String relationshipId = "relationshipId";
         // when
-        partyConnector.suspend(relationshipId);
+        msCoreConnector.suspend(relationshipId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .suspendRelationship(relationshipId);
@@ -1257,7 +1257,7 @@ class MsCoreConnectorImplTest {
         // given
         String relationshipId = null;
         // when
-        Executable executable = () -> partyConnector.activate(relationshipId);
+        Executable executable = () -> msCoreConnector.activate(relationshipId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Relationship id is required", e.getMessage());
@@ -1269,7 +1269,7 @@ class MsCoreConnectorImplTest {
         // given
         String relationshipId = "relationshipId";
         // when
-        partyConnector.activate(relationshipId);
+        msCoreConnector.activate(relationshipId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .activateRelationship(relationshipId);
@@ -1281,7 +1281,7 @@ class MsCoreConnectorImplTest {
         // given
         String relationshipId = null;
         // when
-        Executable executable = () -> partyConnector.delete(relationshipId);
+        Executable executable = () -> msCoreConnector.delete(relationshipId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Relationship id is required", e.getMessage());
@@ -1293,7 +1293,7 @@ class MsCoreConnectorImplTest {
         // given
         String relationshipId = "relationshipId";
         // when
-        partyConnector.delete(relationshipId);
+        msCoreConnector.delete(relationshipId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .deleteRelationshipById(relationshipId);
@@ -1329,7 +1329,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionId = null;
         // when
-        Executable executable = () -> partyConnector.getInstitution(institutionId);
+        Executable executable = () -> msCoreConnector.getInstitution(institutionId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An Institution id is required", e.getMessage());
@@ -1342,7 +1342,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionId = "institutionId";
         // when
-        Institution institution = partyConnector.getInstitution(institutionId);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
         // then
         assertNull(institution);
         verify(msCoreRestClientMock, times(1))
@@ -1362,7 +1362,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         // when
-        Institution institution = partyConnector.getInstitution(institutionId);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
         // then
         assertSame(institutionMock, institution);
         checkNotNullFields(institution);
@@ -1376,7 +1376,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionExternalId = null;
         // when
-        Executable executable = () -> partyConnector.getInstitutionByExternalId(institutionExternalId);
+        Executable executable = () -> msCoreConnector.getInstitutionByExternalId(institutionExternalId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An Institution external id is required", e.getMessage());
@@ -1389,7 +1389,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionExternalId = "institutionExternalId";
         // when
-        Institution institution = partyConnector.getInstitutionByExternalId(institutionExternalId);
+        Institution institution = msCoreConnector.getInstitutionByExternalId(institutionExternalId);
         // then
         assertNull(institution);
         verify(msCoreRestClientMock, times(1))
@@ -1409,7 +1409,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitutionByExternalId(any()))
                 .thenReturn(institutionMock);
         // when
-        Institution institution = partyConnector.getInstitutionByExternalId(institutionExternalId);
+        Institution institution = msCoreConnector.getInstitutionByExternalId(institutionExternalId);
         // then
         assertSame(institutionMock, institution);
         checkNotNullFields(institution);
@@ -1435,7 +1435,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getRelationshipById(any()))
                 .thenReturn(managerRelationshipMock);
         // when
-        final OnboardingRequestInfo result = partyConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
+        final OnboardingRequestInfo result = msCoreConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
         // then
         assertNotNull(result);
         assertNotNull(result.getInstitutionInfo());
@@ -1479,7 +1479,7 @@ class MsCoreConnectorImplTest {
         // given
         String tokenId = null;
         // when
-        Executable executable = () -> partyConnector.getOnboardingRequestInfo(tokenId);
+        Executable executable = () -> msCoreConnector.getOnboardingRequestInfo(tokenId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
@@ -1493,7 +1493,7 @@ class MsCoreConnectorImplTest {
         Mockito.doNothing()
                 .when(msCoreRestClientMock).approveOnboardingRequest(anyString());
         // when
-        partyConnector.approveOnboardingRequest(tokenId);
+        msCoreConnector.approveOnboardingRequest(tokenId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .approveOnboardingRequest(tokenId);
@@ -1505,7 +1505,7 @@ class MsCoreConnectorImplTest {
         // given
         String tokenId = null;
         // when
-        Executable executable = () -> partyConnector.approveOnboardingRequest(tokenId);
+        Executable executable = () -> msCoreConnector.approveOnboardingRequest(tokenId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
@@ -1519,7 +1519,7 @@ class MsCoreConnectorImplTest {
         Mockito.doNothing()
                 .when(msCoreRestClientMock).rejectOnboardingRequest(anyString());
         // when
-        partyConnector.rejectOnboardingRequest(tokenId);
+        msCoreConnector.rejectOnboardingRequest(tokenId);
         // then
         verify(msCoreRestClientMock, times(1))
                 .rejectOnboardingRequest(tokenId);
@@ -1531,7 +1531,7 @@ class MsCoreConnectorImplTest {
         // given
         String tokenId = null;
         // when
-        Executable executable = () -> partyConnector.rejectOnboardingRequest(tokenId);
+        Executable executable = () -> msCoreConnector.rejectOnboardingRequest(tokenId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
@@ -1543,7 +1543,7 @@ class MsCoreConnectorImplTest {
         // given
         String institutionId = null;
         // when
-        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        Executable executable = () -> msCoreConnector.getGeographicTaxonomyList(institutionId);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An Institution id is required", e.getMessage());
@@ -1559,7 +1559,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         // when
-        Executable executable = () -> partyConnector.getGeographicTaxonomyList(institutionId);
+        Executable executable = () -> msCoreConnector.getGeographicTaxonomyList(institutionId);
         // then
         ValidationException e = assertThrows(ValidationException.class, executable);
         assertEquals(String.format("The institution %s does not have geographic taxonomies.", institutionId), e.getMessage());
@@ -1580,7 +1580,7 @@ class MsCoreConnectorImplTest {
         when(msCoreRestClientMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         // when
-        List<GeographicTaxonomy> geographicTaxonomies = partyConnector.getGeographicTaxonomyList(institutionId);
+        List<GeographicTaxonomy> geographicTaxonomies = msCoreConnector.getGeographicTaxonomyList(institutionId);
         // then
         assertSame(institutionMock.getGeographicTaxonomies(), geographicTaxonomies);
         assertNotNull(geographicTaxonomies);

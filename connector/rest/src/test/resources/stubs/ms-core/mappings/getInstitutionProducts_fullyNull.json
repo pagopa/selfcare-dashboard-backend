@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/institutions/institutionId2/products"
+    "url": "/ms-core/v1/institutions/institutionId2/products"
   },
   "response": {
     "status": "200",

@@ -22,10 +22,23 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Ms-Core Rest Client
+ * Ms Core Rest Client
  */
 @FeignClient(name = "${rest-client.ms-core.serviceCode}", url = "${rest-client.ms-core.base-url}")
 public interface MsCoreRestClient {
+
+    @GetMapping(value = "${rest-client.ms-core.getOnBoardingInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @CollectionFormat(feign.CollectionFormat.CSV)
+    OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
+                                     @RequestParam(value = "institutionExternalId", required = false) String institutionExternalId,
+                                     @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
+
+    @GetMapping(value = "${rest-client.ms-core.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @CollectionFormat(feign.CollectionFormat.CSV)
+    Products getInstitutionProducts(@PathVariable("id") String institutionId,
+                                    @RequestParam(value = "states", required = false) EnumSet<ProductState> states);
 
     @GetMapping(value = "${rest-client.ms-core.getUserInstitutionRelationships.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -36,19 +49,6 @@ public interface MsCoreRestClient {
                                                           @RequestParam(value = "products", required = false) Set<String> productIds,
                                                           @RequestParam(value = "productRoles", required = false) Set<String> productRoles,
                                                           @RequestParam(value = "personId", required = false) String personId);
-
-    @GetMapping(value = "${rest-client.ms-core.getInstitutionProducts.path}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @CollectionFormat(feign.CollectionFormat.CSV)
-    Products getInstitutionProducts(@PathVariable("id") String institutionId,
-                                    @RequestParam(value = "states", required = false) EnumSet<ProductState> states);
-
-    @GetMapping(value = "${rest-client.ms-core.getOnBoardingInfo.path}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @CollectionFormat(feign.CollectionFormat.CSV)
-    OnBoardingInfo getOnBoardingInfo(@RequestParam(value = "institutionId", required = false) String institutionId,
-                                     @RequestParam(value = "institutionExternalId", required = false) String institutionExternalId,
-                                     @RequestParam(value = "states", required = false) EnumSet<RelationshipState> states);
 
     @PutMapping(value = "${rest-client.ms-core.updateInstitution.path}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

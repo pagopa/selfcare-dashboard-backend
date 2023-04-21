@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPathPattern": "/onboarding/(?:subdelegates|operators)",
+    "urlPathPattern": "/ms-core/v1/onboarding/(?:subdelegates|operators)",
     "bodyPatterns": [
       {
         "matchesJsonPath": "$.institutionId"

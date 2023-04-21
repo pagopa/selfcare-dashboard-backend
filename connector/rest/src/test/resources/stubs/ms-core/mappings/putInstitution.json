@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "PUT",
-    "urlPathPattern": "/institutions/institutionId"
+    "urlPathPattern": "/ms-core/v1/institutions/institutionId"
   },
   "response": {
     "status": "200",

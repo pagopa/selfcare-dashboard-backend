@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "DELETE",
-    "urlPathPattern": "/onboarding/reject/\\w+"
+    "urlPathPattern": "/ms-core/v1/onboarding/reject/\\w+"
   },
   "response": {
     "status": "204",

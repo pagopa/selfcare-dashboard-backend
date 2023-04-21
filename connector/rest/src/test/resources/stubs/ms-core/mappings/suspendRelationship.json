@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPathPattern": "/relationships/\\w+/suspend"
+    "urlPathPattern": "/ms-core/v1/relationships/\\w+/suspend"
   },
   "response": {
     "status": "204",

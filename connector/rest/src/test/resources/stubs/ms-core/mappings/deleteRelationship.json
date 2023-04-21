@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "DELETE",
-    "urlPathPattern": "/relationships/\\w+"
+    "urlPathPattern": "/ms-core/v1/relationships/\\w+"
   },
   "response": {
     "status": "204",

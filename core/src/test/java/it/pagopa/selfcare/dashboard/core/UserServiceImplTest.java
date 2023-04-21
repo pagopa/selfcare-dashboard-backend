@@ -13,9 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
@@ -256,6 +254,67 @@ class UserServiceImplTest {
         //then
         verify(userConnectorMock, times(1))
                 .deleteById(userId);
+    }
+
+    @Test
+    void findByRelationshipId() {
+        //given
+        String relationshipId = "relationshipId";
+        EnumSet<User.Fields> fieldList = EnumSet.of(User.Fields.workContacts);
+        UserInfo userInfo = mockInstance(new UserInfo());
+        User user = mockInstance(new User());
+        when(msCoreConnector.getUser(Mockito.anyString()))
+                .thenReturn(userInfo);
+        when(userConnectorMock.getUserByInternalId(Mockito.anyString(), Mockito.any()))
+                .thenReturn(user);
+        //when
+        UserInfo result = userRegistryService.findByRelationshipId(relationshipId, fieldList);
+        //then
+        assertSame(userInfo, result);
+        verify(msCoreConnector, times(1))
+                .getUser(relationshipId);
+        verify(userConnectorMock, times(1))
+                .getUserByInternalId(userInfo.getId(), fieldList);
+        verifyNoMoreInteractions(userConnectorMock, msCoreConnector);
+    }
+
+    @Test
+    void findByInstitutionId_nullInstitutionId() {
+        //given
+        String institutionId = null;
+        EnumSet<User.Fields> fieldList = EnumSet.of(User.Fields.workContacts);
+        UserInfo.UserInfoFilter userInfoFilter = mockInstance(new UserInfo.UserInfoFilter());
+        // when
+        Executable exe = () -> userRegistryService.findByInstitutionId(institutionId, userInfoFilter, fieldList);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, exe);
+        assertEquals("An Institution id is required", e.getMessage());
+        verifyNoInteractions(userConnectorMock, msCoreConnector);
+    }
+
+    @Test
+    void findByInstitutionId() {
+        //given
+        String institutionId = "institutionId";
+        UserInfo userInfo = mockInstance(new UserInfo());
+        Collection<UserInfo> userInfos = List.of(userInfo);
+        User user = mockInstance(new User());
+        EnumSet<User.Fields> fieldList = EnumSet.of(User.Fields.workContacts);
+        UserInfo.UserInfoFilter userInfoFilter = mockInstance(new UserInfo.UserInfoFilter());
+        when(msCoreConnector.getUsers(Mockito.anyString(), Mockito.any()))
+                .thenReturn(userInfos);
+        when(userConnectorMock.getUserByInternalId(Mockito.anyString(), Mockito.any()))
+                .thenReturn(user);
+        // when
+        Collection<UserInfo> result = userRegistryService.findByInstitutionId(institutionId, userInfoFilter, fieldList);
+        // then
+        assertEquals(userInfos.size(), result.size());
+        verify(msCoreConnector, times(1))
+                .getUsers(institutionId, userInfoFilter);
+        verify(userConnectorMock, times(1))
+                .getUserByInternalId(userInfo.getId(), fieldList);
+        verifyNoMoreInteractions(userConnectorMock, msCoreConnector);
+
     }
 
 }

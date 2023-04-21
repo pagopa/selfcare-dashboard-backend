@@ -53,7 +53,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
     static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
 
-    private static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
+    protected static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
         if (ACTIVE.equals(inst1.getStatus())) {
             return inst1;
         } else if (PENDING.equals(inst1.getStatus())) {
@@ -62,7 +62,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
             return inst2;
         }
     };
-    private static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
+    protected static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setOriginId(onboardingData.getOriginId());
         institutionInfo.setId(onboardingData.getId());
@@ -89,7 +89,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         return institutionInfo;
     };
 
-    static final Function<Relationship, InstitutionInfo> RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION = relationship -> {
+    protected static final Function<Relationship, InstitutionInfo> RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION = relationship -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setId(relationship.getTo().toString());
         institutionInfo.setStatus(relationship.getState());
@@ -104,7 +104,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         institutionInfo.setBilling(relationship.getBilling());
         return institutionInfo;
     };
-    static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
+    protected static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
         UserInfo userInfo = new UserInfo();
         userInfo.setId(relationshipInfo.getFrom());
         userInfo.setStatus(relationshipInfo.getState().toString());
@@ -127,14 +127,14 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         return userInfo;
     };
 
-    private static final Function<Product, PartyProduct> PRODUCT_INFO_TO_PRODUCT_FUNCTION = productInfo -> {
+    protected static final Function<Product, PartyProduct> PRODUCT_INFO_TO_PRODUCT_FUNCTION = productInfo -> {
         PartyProduct product = new PartyProduct();
         product.setId(productInfo.getId());
         product.setOnBoardingStatus(ProductOnBoardingStatus.valueOf(productInfo.getState().toString()));
         return product;
     };
 
-    private static final BinaryOperator<UserInfo> USER_INFO_MERGE_FUNCTION = (userInfo1, userInfo2) -> {
+    protected static final BinaryOperator<UserInfo> USER_INFO_MERGE_FUNCTION = (userInfo1, userInfo2) -> {
         String id = userInfo2.getProducts().keySet().toArray()[0].toString();
 
         if (userInfo1.getProducts().containsKey(id)) {
@@ -228,7 +228,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
 
-    private Collection<InstitutionInfo> parseOnBoardingInfo(OnBoardingInfo onBoardingInfo) {
+    protected static Collection<InstitutionInfo> parseOnBoardingInfo(OnBoardingInfo onBoardingInfo) {
         log.trace("parseOnBoardingInfo start");
         log.debug("parseOnBoardingInfo onBoardingInfo = {}", onBoardingInfo);
         Collection<InstitutionInfo> institutions = Collections.emptyList();
@@ -261,7 +261,6 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.trace("getInstitutionProducts end");
         return products;
     }
-
 
     @Override
     public Collection<AuthInfo> getAuthInfo(String institutionId) {
@@ -489,7 +488,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public void rejectOnboardingRequest(String tokenId){
+    public void rejectOnboardingRequest(String tokenId) {
         log.trace("rejectOnboardingRequest start");
         log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
         Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
@@ -498,22 +497,22 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
 
-    @Setter(AccessLevel.PRIVATE)
-    private static class PartyProductRole implements ProductRole {
+    @Setter(AccessLevel.PROTECTED)
+    protected static class PartyProductRole implements ProductRole {
         @Getter
-        private String productRole;
+        protected String productRole;
         @Getter
-        private String productId;
+        protected String productId;
         @Getter
-        private PartyRole partyRole;
+        protected PartyRole partyRole;
     }
 
 
     @Getter
-    @Setter(AccessLevel.PRIVATE)
-    private static class PartyAuthInfo implements AuthInfo {
-        private String institutionId;
-        private Collection<ProductRole> productRoles;
+    @Setter(AccessLevel.PROTECTED)
+    protected static class PartyAuthInfo implements AuthInfo {
+        protected String institutionId;
+        protected Collection<ProductRole> productRoles;
     }
 
 }

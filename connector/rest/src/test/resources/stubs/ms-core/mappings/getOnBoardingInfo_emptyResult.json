@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/onboarding/info",
+    "urlPath": "/ms-core/v1/onboarding/info",
     "queryParameters": {
       "institutionId": {
         "equalTo": "institutionId3"
@@ -15,7 +15,7 @@
     "status": "200",
     "jsonBody": {
       "person": null,
-      "institutions": [ ]
+      "institutions": []
     },
     "headers": {
       "Content-Type": "application/json"

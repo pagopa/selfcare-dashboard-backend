@@ -19,23 +19,33 @@
       }
     }
   } ],
-  "tags" : [ {
-    "name" : "institutions",
-    "description" : "Institution operations"
-  }, {
-    "name" : "onboarding",
-    "description" : "Onboarding operations"
-  }, {
-    "name" : "products",
-    "description" : "Products operations"
-  }, {
-    "name" : "relationships",
-    "description" : "Relationships operations"
-  }, {
-    "name" : "token",
-    "description" : "Token operations"
-  }, {
-    "name" : "user",
+  "tags" : [
+    {
+      "name": "institutions",
+      "description": "Institution operations"
+    },
+    {
+      "name": "onboarding",
+      "description": "Onboarding operations"
+    },
+    {
+      "name": "pnPGInstitutions",
+      "description": "PN PG Institution operations"
+    },
+    {
+      "name": "products",
+      "description": "Products operations"
+    },
+    {
+      "name": "relationships",
+      "description": "Relationships operations"
+    },
+    {
+      "name": "token",
+      "description": "Token operations"
+    },
+    {
+      "name": "user",
     "description" : "User Controller"
   }, {
     "name" : "user-groups",
@@ -856,19 +866,22 @@
     },
     "/institutions/{institutionId}/users/{userId}" : {
       "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionUser",
-        "description" : "Service to get the users with the given user id related to a specific institution ",
-        "operationId" : "getInstitutionUserUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique internal identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
+        "tags": [
+          "institutions"
+        ],
+        "summary": "getInstitutionUser",
+        "description": "Service to get the users with the given user id related to a specific institution",
+        "operationId": "getInstitutionUserUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
         }, {
           "name" : "userId",
           "in" : "path",
@@ -1068,22 +1081,178 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/OnboardingRequestResource"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingRequestResource"
                 }
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/pnPGInstitutions": {
+      "get": {
+        "tags": [
+          "pnPGInstitutions"
+        ],
+        "summary": "getPnPGInstitutions",
+        "description": "Service to get the PG institutions related to selection of logged user",
+        "operationId": "getPnPGInstitutionsUsingGET",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PnPGInstitutionResource"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": [
+              "global"
+            ]
+          }
+        ]
+      }
+    },
+    "/pnPGInstitutions/{institutionId}/products": {
+      "get": {
+        "tags": [
+          "pnPGInstitutions"
+        ],
+        "summary": "getPnPGInstitutionProducts",
+        "description": "Service to get all the products related to a specific institution",
+        "operationId": "getPnPGInstitutionProductsUsingGET",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartyProduct"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -2755,7 +2924,14 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+            "enum": [
+              "GSP",
+              "PA",
+              "PG",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -2820,7 +2996,14 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PSP", "PT", "SCP" ]
+            "enum": [
+              "GSP",
+              "PA",
+              "PG",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -2870,18 +3053,26 @@
         }
       },
       "InstitutionUserDetailsResource" : {
-        "title" : "InstitutionUserDetailsResource",
-        "required" : [ "email", "fiscalCode", "id", "name", "products", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's personal email",
-            "format" : "email",
-            "example" : "email@example.com"
+        "title": "InstitutionUserDetailsResource",
+        "required": [
+          "fiscalCode",
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "fiscalCode" : {
-            "type" : "string",
+          "fiscalCode": {
+            "type": "string",
             "description" : "User's fiscal code"
           },
           "id" : {
@@ -2916,18 +3107,25 @@
         }
       },
       "InstitutionUserResource" : {
-        "title" : "InstitutionUserResource",
-        "required" : [ "email", "id", "name", "products", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's personal email",
-            "format" : "email",
-            "example" : "email@example.com"
+        "title": "InstitutionUserResource",
+        "required": [
+          "id",
+          "name",
+          "products",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "id" : {
-            "type" : "string",
+          "id": {
+            "type": "string",
             "description" : "User's unique identifier",
             "format" : "uuid"
           },
@@ -3023,46 +3221,145 @@
           },
           "totalElements" : {
             "type" : "integer",
-            "description" : "The total amount of elements",
-            "format" : "int64"
+            "description": "The total amount of elements",
+            "format": "int64"
           },
-          "totalPages" : {
-            "type" : "integer",
-            "description" : "The number of total pages",
-            "format" : "int32"
+          "totalPages": {
+            "type": "integer",
+            "description": "The number of total pages",
+            "format": "int32"
           }
         }
       },
-      "PlainUserResource" : {
-        "title" : "PlainUserResource",
-        "required" : [ "id", "name", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "User's unique identifier",
-            "format" : "uuid"
+      "PartyProduct": {
+        "title": "PartyProduct",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
           },
-          "name" : {
-            "type" : "string",
-            "description" : "User's name"
-          },
-          "surname" : {
-            "type" : "string",
-            "description" : "User's surname"
+          "onBoardingStatus": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
           }
         }
       },
-      "Problem" : {
-        "title" : "Problem",
-        "required" : [ "status", "title" ],
-        "type" : "object",
-        "properties" : {
-          "detail" : {
-            "type" : "string",
-            "description" : "Human-readable description of this specific problem."
+      "PlainUserResource": {
+        "title": "PlainUserResource",
+        "required": [
+          "id",
+          "name",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User's unique identifier",
+            "format": "uuid"
           },
-          "instance" : {
+          "name": {
+            "type": "string",
+            "description": "User's name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "User's surname"
+          }
+        }
+      },
+      "PnPGInstitutionResource": {
+        "title": "PnPGInstitutionResource",
+        "required": [
+          "externalId",
+          "fiscalCode",
+          "id",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
+          },
+          "category": {
+            "type": "string",
+            "description": "Institution's category"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "Institution's unique external identifier"
+          },
+          "fiscalCode": {
+            "type": "string",
+            "description": "Fiscal code corresponding to the institution"
+          },
+          "geographicTaxonomies": {
+            "type": "array",
+            "description": "Institution's geographic taxonomy",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomyResource"
+            }
+          },
+          "id": {
+            "type": "string",
+            "description": "Institution's unique internal identifier"
+          },
+          "institutionType": {
+            "type": "string",
+            "description": "Institution's type"
+          },
+          "mailAddress": {
+            "type": "string",
+            "description": "Institution's email address"
+          },
+          "name": {
+            "type": "string",
+            "description": "Institution's name"
+          },
+          "origin": {
+            "type": "string",
+            "description": "Institution's data origin"
+          },
+          "originId": {
+            "type": "string",
+            "description": "Institution's identifier related to origin"
+          },
+          "recipientCode": {
+            "type": "string",
+            "description": "Billing recipient code"
+          },
+          "status": {
+            "type": "string",
+            "description": "Institution's status"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Logged user's role"
+          },
+          "zipCode": {
+            "type": "string",
+            "description": "Institution's zipCode"
+          }
+        }
+      },
+      "Problem": {
+        "title": "Problem",
+        "required": [
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "Human-readable description of this specific problem."
+          },
+          "instance": {
             "type" : "string",
             "description" : "A URI that describes where the problem occurred."
           },
@@ -3185,18 +3482,25 @@
         }
       },
       "ProductUserResource" : {
-        "title" : "ProductUserResource",
-        "required" : [ "email", "id", "name", "product", "role", "status", "surname" ],
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's personal email",
-            "format" : "email",
-            "example" : "email@example.com"
+        "title": "ProductUserResource",
+        "required": [
+          "id",
+          "name",
+          "product",
+          "role",
+          "status",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's personal email",
+            "format": "email",
+            "example": "email@example.com"
           },
-          "id" : {
-            "type" : "string",
+          "id": {
+            "type": "string",
             "description" : "User's unique identifier",
             "format" : "uuid"
           },

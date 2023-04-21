@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPathPattern": "/onboarding/approve/\\w+"
+    "urlPathPattern": "/ms-core/v1/onboarding/approve/\\w+"
   },
   "response": {
     "status": "204",

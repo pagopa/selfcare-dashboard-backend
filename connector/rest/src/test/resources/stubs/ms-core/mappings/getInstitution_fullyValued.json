@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/institutions/institutionId1"
+    "urlPath": "/ms-core/v1/institutions/institutionId1"
   },
   "response": {
     "status": "200",

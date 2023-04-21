@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/institutions/institutionId3/relationships",
+    "urlPath": "/ms-core/v1/institutions/institutionId3/relationships",
     "queryParameters": {
       "products": {
         "matches": "^\\w*(,\\w+)*$"
