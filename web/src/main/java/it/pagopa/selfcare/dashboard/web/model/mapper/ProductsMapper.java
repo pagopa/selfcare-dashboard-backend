@@ -52,6 +52,11 @@ public class ProductsMapper {
             resource.setProductOnBoardingStatus(model.getOnBoardingStatus());
             resource.setStatus(model.getStatus());
             resource.setTitle(model.getTitle());
+            resource.setImageUrl(model.getDepictImageUrl());
+            resource.setLogo(model.getLogo());
+            resource.setLogoBgColor(model.getLogoBgColor());
+            resource.setDescription(model.getDescription());
+            resource.setUrlPublic(model.getUrlPublic());
         }
         return resource;
     }

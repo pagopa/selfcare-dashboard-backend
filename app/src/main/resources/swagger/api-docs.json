@@ -3649,23 +3649,53 @@
         "required" : [ "id", "productOnBoardingStatus", "status", "title" ],
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string",
-            "description" : "Product's unique identifier"
+          "description": {
+            "type": "string",
+            "description": "Product's description"
           },
-          "productOnBoardingStatus" : {
-            "type" : "string",
-            "description" : "Product's onBoarding status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
+          "id": {
+            "type": "string",
+            "description": "Product's unique identifier"
           },
-          "status" : {
-            "type" : "string",
-            "description" : "Product's status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PHASE_OUT", "TESTING" ]
+          "imageUrl": {
+            "type": "string",
+            "description": "Product's depict image"
           },
-          "title" : {
-            "type" : "string",
-            "description" : "Product's title"
+          "logo": {
+            "type": "string",
+            "description": "Product's logo"
+          },
+          "logoBgColor": {
+            "pattern": "^#[0-9A-F]{6}$",
+            "type": "string",
+            "description": "Product logo's background color"
+          },
+          "productOnBoardingStatus": {
+            "type": "string",
+            "description": "Product's onBoarding status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Product's status",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PHASE_OUT",
+              "TESTING"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Product's title"
+          },
+          "urlPublic": {
+            "type": "string",
+            "description": "URL that redirects to the public information webpage of the product"
           }
         }
       },
