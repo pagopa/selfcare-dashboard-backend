@@ -1088,7 +1088,7 @@ class MsCoreConnectorImplTest {
 
     @ParameterizedTest
     @EnumSource(value = PartyRole.class)
-    void checkExistingRelationshipRoles_userExistingConflict(PartyRole partyRole) {
+    void checkExistingRelationshipRoles_userExistingConflict1(PartyRole partyRole) {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
@@ -1107,6 +1107,46 @@ class MsCoreConnectorImplTest {
         mockRelationshipInfo.setFrom("from");
         mockRelationshipInfo.setId("id");
         mockRelationshipInfo.setTo("to");
+        it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo productInfo = new it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo();
+        productInfo.setId("productId");
+        productInfo.setRole("Operator Api");
+        mockRelationshipInfo.setProduct(productInfo);
+        RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
+        mockRelationshipsResponse.add(mockRelationshipInfo);
+        when(msCoreRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
+                .thenReturn(mockRelationshipsResponse);
+        // when
+        Executable executable = () -> msCoreConnector.checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId);
+        // then
+        ValidationException e = assertThrows(ValidationException.class, executable);
+        assertEquals("User role conflict", e.getMessage());
+        verify(msCoreRestClientMock, times(1))
+                .getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString());
+    }
+
+    void checkExistingRelationshipRoles_userExistingConflict2(PartyRole partyRole) {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRoles = "Operator Api";
+        String userId = UUID.randomUUID().toString();
+        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
+        CreateUserDto.Role roleMock = mockInstance(new CreateUserDto.Role(), "setPartyRole");
+        roleMock.setProductRole(productRoles);
+        roleMock.setPartyRole(partyRole);
+        createUserDto.setRoles(Set.of(roleMock));
+        UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
+        mockUserInfoFilter.setProductId(Optional.of(productId));
+        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
+        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        RelationshipInfo mockRelationshipInfo = new RelationshipInfo();
+        mockRelationshipInfo.setFrom("from");
+        mockRelationshipInfo.setId("id");
+        mockRelationshipInfo.setTo("to");
+        it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo productInfo = new it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo();
+        productInfo.setId("productId");
+        productInfo.setRole("Operator security");
+        mockRelationshipInfo.setProduct(productInfo);
         RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
         mockRelationshipsResponse.add(mockRelationshipInfo);
         when(msCoreRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
@@ -1141,6 +1181,10 @@ class MsCoreConnectorImplTest {
         mockRelationshipInfo.setId("id");
         mockRelationshipInfo.setTo("to");
         mockRelationshipInfo.setRole(PartyRole.OPERATOR);
+        it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo productInfo = new it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo();
+        productInfo.setId("productId");
+        productInfo.setRole("Operator Api");
+        mockRelationshipInfo.setProduct(productInfo);
         RelationshipsResponse mockRelationshipsResponse = new RelationshipsResponse();
         mockRelationshipsResponse.add(mockRelationshipInfo);
         when(msCoreRestClientMock.getUserInstitutionRelationships(anyString(), any(), any(), any(), any(), anyString()))
