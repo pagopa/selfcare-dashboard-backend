@@ -5,6 +5,7 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
@@ -55,14 +56,17 @@ class InstitutionServiceImpl implements InstitutionService {
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
     private final PartyConnector partyConnector;
+    private final MsCoreConnector msCoreConnector;
     private final ProductsConnector productsConnector;
     private final NotificationService notificationService;
+
 
 
     @Autowired
     public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
                                   UserRegistryConnector userRegistryConnector, PartyConnector partyConnector,
                                   ProductsConnector productsConnector,
+                                  MsCoreConnector msCoreConnector,
                                   NotificationService notificationService) {
         this.allowedStates = allowedStates == null || allowedStates.length == 0
                 ? Optional.empty()
@@ -72,6 +76,7 @@ class InstitutionServiceImpl implements InstitutionService {
         this.userRegistryConnector = userRegistryConnector;
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
+        this.msCoreConnector = msCoreConnector;
         this.notificationService = notificationService;
     }
 
@@ -110,7 +115,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = partyConnector.getOnBoardedInstitutions();
+        Collection<InstitutionInfo> result = msCoreConnector.getOnBoardedInstitutions();
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
@@ -132,7 +137,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
             if (selcAuthority.isPresent()) {
                 Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
-                Map<String, PartyProduct> institutionsProductsMap = partyConnector.getInstitutionProducts(institutionId).stream()
+                Map<String, PartyProduct> institutionsProductsMap = msCoreConnector.getInstitutionProducts(institutionId).stream()
                         .collect(Collectors.toMap(PartyProduct::getId, Function.identity()));
 
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
