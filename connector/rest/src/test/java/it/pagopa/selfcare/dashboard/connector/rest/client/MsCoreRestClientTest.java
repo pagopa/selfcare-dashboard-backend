@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
@@ -254,4 +255,17 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
     }
 
 
+    @Test
+    void updateInstitutionDescription() {
+        // given
+        final String institutionId = "institutionId";
+        final String description = "description";
+
+        // when
+        Executable executable = () -> restClient.updateInstitutionDescription(institutionId, description);
+
+        // then
+        assertDoesNotThrow(executable);
+
+    }
 }

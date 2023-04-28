@@ -22,4 +22,6 @@ public interface MsCoreConnector {
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 
     Institution getInstitution(String institutionId);
+
+    void updateInstitutionDescription(String institutionId, String description);
 }

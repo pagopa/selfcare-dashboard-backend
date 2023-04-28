@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -120,6 +121,29 @@ class PnPGInstitutionControllerTest {
         assertTrue(products.isEmpty());
         verify(pnPGInstitutionServiceMock, times(1))
                 .getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(pnPGInstitutionServiceMock);
+    }
+
+    @Test
+    void updateInstitutionDescription_ok() throws Exception {
+        //given
+        String institutionId = "institutionId";
+        String description = "description";
+        Mockito.doNothing()
+                .when(pnPGInstitutionServiceMock).updateInstitutionDescription(anyString(), anyString());
+
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/" + institutionId + "/description?description=" + description)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        assertEquals("", result.getResponse().getContentAsString());
+        verify(pnPGInstitutionServiceMock, times(1))
+                .updateInstitutionDescription(institutionId, description);
         verifyNoMoreInteractions(pnPGInstitutionServiceMock);
     }
 

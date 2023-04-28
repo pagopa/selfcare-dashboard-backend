@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -62,6 +63,22 @@ public class PnPGInstitutionController {
         log.trace("getPnPGInstitutionProducts end");
 
         return result;
+    }
+
+    @PutMapping(value = "/{institutionId}/description")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.updateInstitutionDescription}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    public void updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                             @PathVariable("institutionId")
+                                             String institutionId,
+                                             @ApiParam("${swagger.dashboard.pnPGInstitutions.model.description}")
+                                             @RequestParam(value = "description")
+                                             String description) {
+        log.trace("updateInstitutionDescription start");
+        log.debug("updateInstitutionDescription institutionId = {}, description{}", institutionId, description);
+        pnPGInstitutionService.updateInstitutionDescription(institutionId, description);
+        log.trace("updateInstitutionDescription end");
     }
 
 }

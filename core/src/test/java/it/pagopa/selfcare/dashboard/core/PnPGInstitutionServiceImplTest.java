@@ -8,8 +8,10 @@ import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_DESCRIPTION_MESSAGE;
+import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_INSTITUTION_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -99,6 +103,47 @@ class PnPGInstitutionServiceImplTest {
         verify(msCoreConnectorMock, times(1))
                 .getInstitutionProducts(institutionId);
         verifyNoMoreInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void updateInstitutionDescription() {
+        // given
+        String institutionId = "institutionId";
+        String description = "description";
+        Mockito.doNothing()
+                .when(msCoreConnectorMock).updateInstitutionDescription(anyString(), anyString());
+        // when
+        pnPGInstitutionService.updateInstitutionDescription(institutionId, description);
+        // then
+        verify(msCoreConnectorMock, times(1))
+                .updateInstitutionDescription(institutionId, description);
+        verifyNoMoreInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void updateInstitutionDescription_hasNullInstitutionId() {
+        // given
+        String institutionId = null;
+        String description = "description";
+        // when
+        Executable executable = () -> pnPGInstitutionService.updateInstitutionDescription(institutionId, description);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_MESSAGE, e.getMessage());
+        verifyNoInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void updateInstitutionDescription_hasNullDescription() {
+        // given
+        String institutionId = "institutionId";
+        String description = null;
+        // when
+        Executable executable = () -> pnPGInstitutionService.updateInstitutionDescription(institutionId, description);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_DESCRIPTION_MESSAGE, e.getMessage());
+        verifyNoInteractions(msCoreConnectorMock);
     }
 
 }

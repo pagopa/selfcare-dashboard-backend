@@ -30,6 +30,7 @@ import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 class MsCoreConnectorImpl implements MsCoreConnector {
 
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE = "An Institution description is required";
 
     private final MsCoreRestClient msCoreRestClient;
 
@@ -142,6 +143,16 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");
         return institution;
+    }
+
+    @Override
+    public void updateInstitutionDescription(String institutionId, String description) {
+        log.trace("updateInstitutionDescription start");
+        log.debug("updateInstitutionDescription institutionId = {}, description = {}", institutionId, description);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+        Assert.hasText(description, REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE);
+        msCoreRestClient.updateInstitutionDescription(institutionId, description);
+        log.trace("updateInstitutionDescription end");
     }
 
 }

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/ms-core/v1/institutions/institutionId/description"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {},
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1193,6 +1193,71 @@
         } ]
       }
     },
+    "/pnPGInstitutions/{institutionId}/description" : {
+      "put" : {
+        "tags" : [ "pnPGInstitutions" ],
+        "summary" : "updateInstitutionDescription",
+        "description" : "Update institution description",
+        "operationId" : "updateInstitutionDescriptionUsingPUT",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "description",
+          "in" : "query",
+          "description" : "Institution description",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/pnPGInstitutions/{institutionId}/products" : {
       "get" : {
         "tags" : [ "pnPGInstitutions" ],
@@ -3573,53 +3638,44 @@
         "required" : [ "id", "productOnBoardingStatus", "status", "title" ],
         "type" : "object",
         "properties" : {
-          "description": {
-            "type": "string",
-            "description": "Product's description"
+          "description" : {
+            "type" : "string",
+            "description" : "Product's description"
           },
-          "id": {
-            "type": "string",
-            "description": "Product's unique identifier"
+          "id" : {
+            "type" : "string",
+            "description" : "Product's unique identifier"
           },
-          "imageUrl": {
-            "type": "string",
-            "description": "Product's depict image"
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "Product's depict image"
           },
-          "logo": {
-            "type": "string",
-            "description": "Product's logo"
+          "logo" : {
+            "type" : "string",
+            "description" : "Product's logo"
           },
-          "logoBgColor": {
-            "pattern": "^#[0-9A-F]{6}$",
-            "type": "string",
-            "description": "Product logo's background color"
+          "logoBgColor" : {
+            "pattern" : "^#[0-9A-F]{6}$",
+            "type" : "string",
+            "description" : "Product logo's background color"
           },
-          "productOnBoardingStatus": {
-            "type": "string",
-            "description": "Product's onBoarding status",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "PENDING"
-            ]
+          "productOnBoardingStatus" : {
+            "type" : "string",
+            "description" : "Product's onBoarding status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
           },
-          "status": {
-            "type": "string",
-            "description": "Product's status",
-            "enum": [
-              "ACTIVE",
-              "INACTIVE",
-              "PHASE_OUT",
-              "TESTING"
-            ]
+          "status" : {
+            "type" : "string",
+            "description" : "Product's status",
+            "enum" : [ "ACTIVE", "INACTIVE", "PHASE_OUT", "TESTING" ]
           },
-          "title": {
-            "type": "string",
-            "description": "Product's title"
+          "title" : {
+            "type" : "string",
+            "description" : "Product's title"
           },
-          "urlPublic": {
-            "type": "string",
-            "description": "URL that redirects to the public information webpage of the product"
+          "urlPublic" : {
+            "type" : "string",
+            "description" : "URL that redirects to the public information webpage of the product"
           }
         }
       },

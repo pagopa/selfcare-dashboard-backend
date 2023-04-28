@@ -32,6 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -47,6 +48,8 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
+import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -876,6 +879,48 @@ class MsCoreConnectorImplTest {
         assertEquals(relationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getPaymentServiceProvider());
         assertEquals(relationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getDataProtectionOfficer());
         assertEquals(relationshipMock.getBilling(), result.getBilling());
+    }
+
+
+    @Test
+    void updateInstitutionDescription() {
+        // given
+        String institutionId = "institutionId";
+        String description = "description";
+        Mockito.doNothing()
+                .when(msCoreRestClientMock).updateInstitutionDescription(anyString(), anyString());
+        // when
+        msCoreConnector.updateInstitutionDescription(institutionId, description);
+        // then
+        verify(msCoreRestClientMock, times(1))
+                .updateInstitutionDescription(institutionId, description);
+        verifyNoMoreInteractions(msCoreRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullInstitutionId() {
+        // given
+        String institutionId = null;
+        String description = "description";
+        // when
+        Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, description);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
+        verifyNoInteractions(msCoreRestClientMock);
+    }
+
+    @Test
+    void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
+        // given
+        String institutionId = "institutionId";
+        String description = null;
+        // when
+        Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, description);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE, e.getMessage());
+        verifyNoInteractions(msCoreRestClientMock);
     }
 
 }
