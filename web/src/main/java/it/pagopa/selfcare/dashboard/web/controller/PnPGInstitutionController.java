@@ -4,10 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
 import it.pagopa.selfcare.dashboard.web.model.PnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.UpdatePnPGInstitutionDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.PnPGInstitutionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,20 +68,22 @@ public class PnPGInstitutionController {
         return result;
     }
 
-    @PutMapping(value = "/{institutionId}/description")
+    @PutMapping(value = "/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.updateInstitutionDescription}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
-    public void updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                             @PathVariable("institutionId")
-                                             String institutionId,
-                                             @ApiParam("${swagger.dashboard.pnPGInstitutions.model.description}")
-                                             @RequestParam(value = "description")
-                                             String description) {
+    public Institution updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                    @PathVariable("institutionId")
+                                                    String institutionId,
+                                                    @RequestBody
+                                                    @Valid
+                                                    UpdatePnPGInstitutionDto institutionDto) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, description{}", institutionId, description);
-        pnPGInstitutionService.updateInstitutionDescription(institutionId, description);
+        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
+        Institution result = pnPGInstitutionService.updateInstitutionDescription(institutionId, PnPGInstitutionMapper.toUpdateResource(institutionDto));
+        log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
+        return result;
     }
 
 }

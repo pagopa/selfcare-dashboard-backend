@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
@@ -30,7 +31,7 @@ import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 class MsCoreConnectorImpl implements MsCoreConnector {
 
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
-    static final String REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE = "An Institution description is required";
+    static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution description is required";
 
     private final MsCoreRestClient msCoreRestClient;
 
@@ -146,13 +147,15 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public void updateInstitutionDescription(String institutionId, String description) {
+    public Institution updateInstitutionDescription(String institutionId, UpdatePnPGInstitutionResource updatePnPGInstitutionResource) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, description = {}", institutionId, description);
+        log.debug("updateInstitutionDescription institutionId = {}, updatePnPGInstitutionResource = {}", institutionId, updatePnPGInstitutionResource);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        Assert.hasText(description, REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE);
-        msCoreRestClient.updateInstitutionDescription(institutionId, description);
+        Assert.notNull(updatePnPGInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
+        Institution institution = msCoreRestClient.updateInstitutionDescription(institutionId, updatePnPGInstitutionResource);
+        log.debug("updateInstitutionDescription result = {}", institution);
         log.trace("updateInstitutionDescription end");
+        return institution;
     }
 
 }

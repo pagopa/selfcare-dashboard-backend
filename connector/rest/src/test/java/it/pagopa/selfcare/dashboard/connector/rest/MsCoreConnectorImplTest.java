@@ -32,7 +32,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -48,8 +47,8 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE;
 import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_UPDATE_RESOURCE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -885,15 +884,19 @@ class MsCoreConnectorImplTest {
     @Test
     void updateInstitutionDescription() {
         // given
-        String institutionId = "institutionId";
-        String description = "description";
-        Mockito.doNothing()
-                .when(msCoreRestClientMock).updateInstitutionDescription(anyString(), anyString());
+        String institutionId = "setId";
+        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        Institution institutionMock = mockInstance(new Institution());
+        when(msCoreRestClientMock.updateInstitutionDescription(anyString(), any()))
+                .thenReturn(institutionMock);
         // when
-        msCoreConnector.updateInstitutionDescription(institutionId, description);
+        Institution institution = msCoreConnector.updateInstitutionDescription(institutionId, resource);
         // then
+        assertEquals(institution.getId(), institutionId);
+        assertEquals(institution.getDescription(), resource.getDescription());
+        assertEquals(institution.getDigitalAddress(), resource.getDigitalAddress());
         verify(msCoreRestClientMock, times(1))
-                .updateInstitutionDescription(institutionId, description);
+                .updateInstitutionDescription(institutionId, resource);
         verifyNoMoreInteractions(msCoreRestClientMock);
     }
 
@@ -901,9 +904,9 @@ class MsCoreConnectorImplTest {
     void updateGeographicTaxonomy_hasNullInstitutionId() {
         // given
         String institutionId = null;
-        String description = "description";
+        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
         // when
-        Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, description);
+        Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, resource);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_INSTITUTION_ID_MESSAGE, e.getMessage());
@@ -914,12 +917,12 @@ class MsCoreConnectorImplTest {
     void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
         // given
         String institutionId = "institutionId";
-        String description = null;
+        UpdatePnPGInstitutionResource resource = null;
         // when
-        Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, description);
+        Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, resource);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_INSTITUTION_DESCRIPTION_MESSAGE, e.getMessage());
+        assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
         verifyNoInteractions(msCoreRestClientMock);
     }
 

@@ -3,7 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
@@ -11,7 +13,6 @@ import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -127,23 +128,32 @@ class PnPGInstitutionControllerTest {
     @Test
     void updateInstitutionDescription_ok() throws Exception {
         //given
-        String institutionId = "institutionId";
-        String description = "description";
-        Mockito.doNothing()
-                .when(pnPGInstitutionServiceMock).updateInstitutionDescription(anyString(), anyString());
+        String institutionId = "setId";
+        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        Institution institutionMock = mockInstance(new Institution());
+        when(pnPGInstitutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
 
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .put(BASE_URL + "/" + institutionId + "/description?description=" + description)
+                        .put(BASE_URL + "/" + institutionId)
+                        .content(objectMapper.writeValueAsString(resource))
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
 
         //then
-        assertEquals("", result.getResponse().getContentAsString());
+        Institution institutionResult = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertNotNull(institutionResult);
+        assertEquals(institutionResult.getId(), institutionId);
+        assertEquals(institutionResult.getDescription(), resource.getDescription());
+        assertEquals(institutionResult.getDigitalAddress(), resource.getDigitalAddress());
         verify(pnPGInstitutionServiceMock, times(1))
-                .updateInstitutionDescription(institutionId, description);
+                .updateInstitutionDescription(institutionId, resource);
         verifyNoMoreInteractions(pnPGInstitutionServiceMock);
     }
 

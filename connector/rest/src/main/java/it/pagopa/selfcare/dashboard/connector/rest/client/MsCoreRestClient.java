@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -55,8 +56,8 @@ public interface MsCoreRestClient {
 
     @PutMapping(value = "${rest-client.ms-core.updateInstitutionDescription.path}")
     @ResponseBody
-    void updateInstitutionDescription(@PathVariable(value = "id") String institutionId,
-                                      @RequestParam(value = "description") String description);
+    Institution updateInstitutionDescription(@PathVariable(value = "id") String institutionId,
+                                             @RequestBody UpdatePnPGInstitutionResource updateDto);
 
 
 }

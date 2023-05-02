@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.api;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 
@@ -23,5 +24,5 @@ public interface MsCoreConnector {
 
     Institution getInstitution(String institutionId);
 
-    void updateInstitutionDescription(String institutionId, String description);
+    Institution updateInstitutionDescription(String institutionId, UpdatePnPGInstitutionResource updatePnPGInstitutionResource);
 }

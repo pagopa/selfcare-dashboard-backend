@@ -2,7 +2,9 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
 
     static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
 
-    static final String REQUIRED_DESCRIPTION_MESSAGE = "An Institution description is required";
+    static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution update resource is required";
 
     private final MsCoreConnector msCoreConnector;
 
@@ -57,13 +59,15 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
     }
 
     @Override
-    public void updateInstitutionDescription(String institutionId, String description) {
+    public Institution updateInstitutionDescription(String institutionId, UpdatePnPGInstitutionResource updatePnPGInstitutionResource) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, description = {}", institutionId, description);
+        log.debug("updateInstitutionDescription institutionId = {}, updatePnPGInstitutionResource = {}", institutionId, updatePnPGInstitutionResource);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Assert.hasText(description, REQUIRED_DESCRIPTION_MESSAGE);
-        msCoreConnector.updateInstitutionDescription(institutionId, description);
+        Assert.notNull(updatePnPGInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
+        Institution institution = msCoreConnector.updateInstitutionDescription(institutionId, updatePnPGInstitutionResource);
+        log.debug("updateInstitutionDescription result = {}", institution);
         log.trace("updateInstitutionDescription end");
+        return institution;
     }
 
 }

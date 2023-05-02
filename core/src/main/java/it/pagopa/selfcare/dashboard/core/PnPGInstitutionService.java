@@ -1,6 +1,8 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 
 import java.util.Collection;
@@ -12,6 +14,6 @@ public interface PnPGInstitutionService {
 
     List<PartyProduct> getInstitutionProducts(String institutionId);
 
-    void updateInstitutionDescription(String institutionId, String description);
+    Institution updateInstitutionDescription(String institutionId, UpdatePnPGInstitutionResource updatePnPGInstitutionResource);
 
 }
