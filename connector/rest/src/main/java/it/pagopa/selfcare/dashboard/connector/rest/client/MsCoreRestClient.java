@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.client;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -11,10 +12,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
 import org.springframework.cloud.openfeign.CollectionFormat;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -55,5 +53,11 @@ public interface MsCoreRestClient {
     @GetMapping(value = "${rest-client.ms-core.getInstitution.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     Institution getInstitution(@PathVariable(value = "id") String id);
+
+    @PutMapping(value = "${rest-client.ms-core.updateInstitutionDescription.path}")
+    @ResponseBody
+    Institution updateInstitutionDescription(@PathVariable(value = "id") String institutionId,
+                                             @RequestBody UpdatePnPGInstitutionResource updateDto);
+
 
 }

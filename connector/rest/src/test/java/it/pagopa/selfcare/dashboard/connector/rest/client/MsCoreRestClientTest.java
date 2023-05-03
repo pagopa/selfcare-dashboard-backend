@@ -7,6 +7,7 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.rest.config.MsCoreRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -16,6 +17,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
@@ -254,4 +256,17 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
     }
 
 
+    @Test
+    void updateInstitutionDescription() {
+        // given
+        final String institutionId = "institutionId";
+        final UpdatePnPGInstitutionResource resource = new UpdatePnPGInstitutionResource();
+
+        // when
+        Executable executable = () -> restClient.updateInstitutionDescription(institutionId, resource);
+
+        // then
+        assertDoesNotThrow(executable);
+
+    }
 }
