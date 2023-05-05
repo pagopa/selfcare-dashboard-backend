@@ -1,10 +1,10 @@
 package it.pagopa.selfcare.dashboard.connector.model.institution;
 
 public enum RelationshipState {
-    PENDING,
     ACTIVE,
+    PENDING,
+    TOBEVALIDATED,
     SUSPENDED,
     DELETED,
-    REJECTED,
-    TOBEVALIDATED
+    REJECTED
 }

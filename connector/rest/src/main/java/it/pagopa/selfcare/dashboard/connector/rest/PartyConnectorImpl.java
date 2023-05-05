@@ -50,16 +50,7 @@ class PartyConnectorImpl implements PartyConnector {
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
     static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
-
-    protected static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> {
-        if (ACTIVE.equals(inst1.getStatus())) {
-            return inst1;
-        } else if (PENDING.equals(inst1.getStatus())) {
-            return inst1;
-        } else {
-            return inst2;
-        }
-    };
+    protected static final BinaryOperator<InstitutionInfo> MERGE_FUNCTION = (inst1, inst2) -> inst1.getStatus().compareTo(inst2.getStatus()) < 0 ? inst1 : inst2;
     protected static final Function<OnboardingData, InstitutionInfo> ONBOARDING_DATA_TO_INSTITUTION_INFO_FUNCTION = onboardingData -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setOriginId(onboardingData.getOriginId());
