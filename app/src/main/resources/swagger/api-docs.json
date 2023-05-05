@@ -1193,6 +1193,82 @@
         } ]
       }
     },
+    "/pnPGInstitutions/{institutionId}": {
+      "put": {
+        "tags": [
+          "pnPGInstitutions"
+        ],
+        "summary": "updateInstitutionDescription",
+        "description": "Update institution description",
+        "operationId": "updateInstitutionDescriptionUsingPUT",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "description": "Institution's unique internal identifier",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePnPGInstitutionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/pnPGInstitutions/{institutionId}/products" : {
       "get" : {
         "tags" : [ "pnPGInstitutions" ],
@@ -2702,16 +2778,34 @@
   },
   "components" : {
     "schemas" : {
-      "BackOfficeConfigurationsResource" : {
-        "title" : "BackOfficeConfigurationsResource",
-        "required" : [ "environment", "url" ],
-        "type" : "object",
-        "properties" : {
-          "environment" : {
-            "type" : "string",
-            "description" : "Back Office environment"
+      "Attribute": {
+        "title": "Attribute",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
           },
-          "url" : {
+          "description": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          }
+        }
+      },
+      "BackOfficeConfigurationsResource": {
+        "title": "BackOfficeConfigurationsResource",
+        "required": [
+          "environment",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "environment": {
+            "type": "string",
+            "description": "Back Office environment"
+          },
+          "url": {
             "type" : "string",
             "description" : "URL that redirects to the back-office section, where is possible to manage the product"
           }
@@ -2811,26 +2905,41 @@
             "type" : "string",
             "description" : "DPO's email",
             "format" : "email",
-            "example" : "email@example.com"
+            "example": "email@example.com"
           },
-          "pec" : {
-            "type" : "string",
-            "description" : "DPO's PEC",
-            "format" : "email",
-            "example" : "email@example.com"
+          "pec": {
+            "type": "string",
+            "description": "DPO's PEC",
+            "format": "email",
+            "example": "email@example.com"
           }
         }
       },
-      "GeographicTaxonomyDto" : {
-        "title" : "GeographicTaxonomyDto",
-        "required" : [ "code", "desc" ],
-        "type" : "object",
-        "properties" : {
-          "code" : {
-            "type" : "string",
-            "description" : "Institution's geographic taxonomy ISTAT code"
+      "GeographicTaxonomy": {
+        "title": "GeographicTaxonomy",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
           },
-          "desc" : {
+          "desc": {
+            "type": "string"
+          }
+        }
+      },
+      "GeographicTaxonomyDto": {
+        "title": "GeographicTaxonomyDto",
+        "required": [
+          "code",
+          "desc"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Institution's geographic taxonomy ISTAT code"
+          },
+          "desc": {
             "type" : "string",
             "description" : "Institution's geographic taxonomy extended name"
           }
@@ -2866,26 +2975,94 @@
         }
       },
       "IdentityTokenResource" : {
-        "title" : "IdentityTokenResource",
-        "required" : [ "token" ],
-        "type" : "object",
-        "properties" : {
-          "token" : {
-            "type" : "string",
-            "description" : "The Identity Token"
+        "title": "IdentityTokenResource",
+        "required": [
+          "token"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The Identity Token"
           }
         }
       },
-      "InstitutionInfo" : {
-        "title" : "InstitutionInfo",
-        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "recipientCode", "vatNumber", "zipCode" ],
-        "type" : "object",
-        "properties" : {
-          "address" : {
-            "type" : "string",
-            "description" : "Institution's physical address"
+      "Institution": {
+        "title": "Institution",
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
           },
-          "dpoData" : {
+          "attributes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Attribute"
+            }
+          },
+          "description": {
+            "type": "string"
+          },
+          "digitalAddress": {
+            "type": "string"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "geographicTaxonomies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeographicTaxonomy"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "institutionType": {
+            "type": "string",
+            "enum": [
+              "GSP",
+              "PA",
+              "PG",
+              "PSP",
+              "PT",
+              "SCP"
+            ]
+          },
+          "origin": {
+            "type": "string"
+          },
+          "originId": {
+            "type": "string"
+          },
+          "taxCode": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
+          }
+        }
+      },
+      "InstitutionInfo": {
+        "title": "InstitutionInfo",
+        "required": [
+          "address",
+          "fiscalCode",
+          "id",
+          "institutionType",
+          "mailAddress",
+          "name",
+          "recipientCode",
+          "vatNumber",
+          "zipCode"
+        ],
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Institution's physical address"
+          },
+          "dpoData": {
             "description" : "Data Protection Officer (DPO) specific data",
             "$ref" : "#/components/schemas/DpoData"
           },
@@ -3573,9 +3750,26 @@
         "required" : [ "id", "productOnBoardingStatus", "status", "title" ],
         "type" : "object",
         "properties" : {
+          "description" : {
+            "type" : "string",
+            "description" : "Product's description"
+          },
           "id" : {
             "type" : "string",
             "description" : "Product's unique identifier"
+          },
+          "imageUrl" : {
+            "type" : "string",
+            "description" : "Product's depict image"
+          },
+          "logo" : {
+            "type" : "string",
+            "description" : "Product's logo"
+          },
+          "logoBgColor" : {
+            "pattern" : "^#[0-9A-F]{6}$",
+            "type" : "string",
+            "description" : "Product logo's background color"
           },
           "productOnBoardingStatus" : {
             "type" : "string",
@@ -3590,6 +3784,10 @@
           "title" : {
             "type" : "string",
             "description" : "Product's title"
+          },
+          "urlPublic" : {
+            "type" : "string",
+            "description" : "URL that redirects to the public information webpage of the product"
           }
         }
       },
@@ -3597,25 +3795,39 @@
         "title" : "SupportContactResource",
         "type" : "object",
         "properties" : {
-          "supportEmail" : {
-            "type" : "string",
-            "description" : "Institution's support email contact"
+          "supportEmail": {
+            "type": "string",
+            "description": "Institution's support email contact"
           },
-          "supportPhone" : {
-            "type" : "string",
-            "description" : "Institution's support phone contact"
+          "supportPhone": {
+            "type": "string",
+            "description": "Institution's support phone contact"
           }
         }
       },
-      "UpdateUserDto" : {
-        "title" : "UpdateUserDto",
-        "type" : "object",
-        "properties" : {
-          "email" : {
-            "type" : "string",
-            "description" : "User's institutional email",
-            "format" : "email",
-            "example" : "email@example.com"
+      "UpdatePnPGInstitutionDto": {
+        "title": "UpdatePnPGInstitutionDto",
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Institution's description"
+          },
+          "digitalAddress": {
+            "type": "string",
+            "description": "Institution's email address"
+          }
+        }
+      },
+      "UpdateUserDto": {
+        "title": "UpdateUserDto",
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's institutional email",
+            "format": "email",
+            "example": "email@example.com"
           },
           "name" : {
             "type" : "string",

@@ -8,6 +8,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Data
 public class SubProductResource {
@@ -31,4 +32,20 @@ public class SubProductResource {
     @JsonProperty(required = true)
     @NotNull
     private ProductStatus status;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.imageUrl}")
+    private String imageUrl;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.logo}")
+    private String logo;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.logoBgColor}")
+    @Pattern(regexp = "^#[0-9A-F]{6}$")
+    private String logoBgColor;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.description}")
+    private String description;
+
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.urlPublic}")
+    private String urlPublic;
 }
