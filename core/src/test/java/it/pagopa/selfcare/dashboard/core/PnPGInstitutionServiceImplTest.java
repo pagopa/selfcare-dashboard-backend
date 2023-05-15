@@ -3,7 +3,7 @@ package it.pagopa.selfcare.dashboard.core;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
@@ -110,7 +110,7 @@ class PnPGInstitutionServiceImplTest {
     void updateInstitutionDescription() {
         // given
         String institutionId = "setId";
-        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
         Institution institutionMock = mockInstance(new Institution());
         when(msCoreConnectorMock.updateInstitutionDescription(anyString(), any()))
                 .thenReturn(institutionMock);
@@ -129,7 +129,7 @@ class PnPGInstitutionServiceImplTest {
     void updateInstitutionDescription_hasNullInstitutionId() {
         // given
         String institutionId = null;
-        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
         // when
         Executable executable = () -> pnPGInstitutionService.updateInstitutionDescription(institutionId, resource);
         // then
@@ -142,7 +142,7 @@ class PnPGInstitutionServiceImplTest {
     void updateInstitutionDescription_hasNullDescription() {
         // given
         String institutionId = "institutionId";
-        UpdatePnPGInstitutionResource resource = null;
+        UpdateInstitutionResource resource = null;
         // when
         Executable executable = () -> pnPGInstitutionService.updateInstitutionDescription(institutionId, resource);
         // then

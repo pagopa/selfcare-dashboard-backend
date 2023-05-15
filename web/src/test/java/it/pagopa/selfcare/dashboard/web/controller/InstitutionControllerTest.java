@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
@@ -497,6 +495,38 @@ class InstitutionControllerTest {
         capturedUser.getRoles().forEach(role -> {
             assertTrue(productRoles.getProductRoles().contains(role.getProductRole()));
         });
+    }
+
+    @Test
+    void updateInstitutionDescription_ok() throws Exception {
+        //given
+        String institutionId = "setId";
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        Institution institutionMock = mockInstance(new Institution());
+        when(institutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
+
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/" + institutionId)
+                        .content(objectMapper.writeValueAsString(resource))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        Institution institutionResult = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertNotNull(institutionResult);
+        assertEquals(institutionResult.getId(), institutionId);
+        assertEquals(institutionResult.getDescription(), resource.getDescription());
+        assertEquals(institutionResult.getDigitalAddress(), resource.getDigitalAddress());
+        verify(institutionServiceMock, times(1))
+                .updateInstitutionDescription(institutionId, resource);
+        verifyNoMoreInteractions(institutionServiceMock);
     }
 
 }

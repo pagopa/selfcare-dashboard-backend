@@ -10,10 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User.Fields;
@@ -49,7 +46,10 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
-import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.*;
+import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES;
+import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_TOKEN_ID_MESSAGE;
+import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_INSTITUTION_MESSAGE;
+import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_UPDATE_RESOURCE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -1417,5 +1417,50 @@ class InstitutionServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
         verifyNoMoreInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void updateInstitutionDescription() {
+        // given
+        String institutionId = "setId";
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        Institution institutionMock = mockInstance(new Institution());
+        when(msCoreConnectorMock.updateInstitutionDescription(anyString(), any()))
+                .thenReturn(institutionMock);
+        // when
+        Institution institution = institutionService.updateInstitutionDescription(institutionId, resource);
+        // then
+        assertEquals(institution.getId(), institutionId);
+        assertEquals(institution.getDescription(), resource.getDescription());
+        assertEquals(institution.getDigitalAddress(), resource.getDigitalAddress());
+        verify(msCoreConnectorMock, times(1))
+                .updateInstitutionDescription(institutionId, resource);
+        verifyNoMoreInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void updateInstitutionDescription_hasNullInstitutionId() {
+        // given
+        String institutionId = null;
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        // when
+        Executable executable = () -> institutionService.updateInstitutionDescription(institutionId, resource);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_INSTITUTION_MESSAGE, e.getMessage());
+        verifyNoInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void updateInstitutionDescription_hasNullDescription() {
+        // given
+        String institutionId = "institutionId";
+        UpdateInstitutionResource resource = null;
+        // when
+        Executable executable = () -> institutionService.updateInstitutionDescription(institutionId, resource);
+        // then
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
+        verifyNoInteractions(msCoreConnectorMock);
     }
 }

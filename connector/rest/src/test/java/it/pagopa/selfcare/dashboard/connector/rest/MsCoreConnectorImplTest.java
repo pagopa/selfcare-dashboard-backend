@@ -885,7 +885,7 @@ class MsCoreConnectorImplTest {
     void updateInstitutionDescription() {
         // given
         String institutionId = "setId";
-        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
         Institution institutionMock = mockInstance(new Institution());
         when(msCoreRestClientMock.updateInstitutionDescription(anyString(), any()))
                 .thenReturn(institutionMock);
@@ -904,7 +904,7 @@ class MsCoreConnectorImplTest {
     void updateGeographicTaxonomy_hasNullInstitutionId() {
         // given
         String institutionId = null;
-        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
         // when
         Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, resource);
         // then
@@ -917,7 +917,7 @@ class MsCoreConnectorImplTest {
     void updateGeographicTaxonomy_hasNullGeographicTaxonomies() {
         // given
         String institutionId = "institutionId";
-        UpdatePnPGInstitutionResource resource = null;
+        UpdateInstitutionResource resource = null;
         // when
         Executable executable = () -> msCoreConnector.updateInstitutionDescription(institutionId, resource);
         // then

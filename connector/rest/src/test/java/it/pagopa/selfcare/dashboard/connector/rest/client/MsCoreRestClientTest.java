@@ -7,7 +7,7 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.rest.config.MsCoreRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -260,7 +260,7 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
     void updateInstitutionDescription() {
         // given
         final String institutionId = "institutionId";
-        final UpdatePnPGInstitutionResource resource = new UpdatePnPGInstitutionResource();
+        final UpdateInstitutionResource resource = new UpdateInstitutionResource();
 
         // when
         Executable executable = () -> restClient.updateInstitutionDescription(institutionId, resource);
