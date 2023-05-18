@@ -3150,7 +3150,7 @@
       },
       "InstitutionResource" : {
         "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
+        "required" : [ "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
         "type" : "object",
         "properties" : {
           "address" : {
