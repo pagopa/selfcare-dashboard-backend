@@ -383,10 +383,14 @@ class PartyConnectorImpl implements PartyConnector {
     }
 
     private boolean checkUserRole(CreateUserDto userDto, RelationshipsResponse institutionRelationships) {
-        List<ProductInfo> productInfo = institutionRelationships.stream().map(RelationshipInfo::getProduct).collect(Collectors.toList());
+        Set<String> productRoles = institutionRelationships.stream()
+                .map(RelationshipInfo::getProduct)
+                .map(ProductInfo::getRole)
+                .collect(Collectors.toSet());
+
         return userDto.getRoles().stream()
-                .anyMatch(userProductRole -> productInfo.stream()
-                        .anyMatch(productInfoRole -> userProductRole.getProductRole().equals(productInfoRole.getRole())));
+                .map(CreateUserDto.Role::getProductRole)
+                .anyMatch(productRoles::contains);
     }
 
 
