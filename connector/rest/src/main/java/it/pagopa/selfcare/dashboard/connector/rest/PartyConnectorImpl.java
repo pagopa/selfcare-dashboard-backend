@@ -23,6 +23,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingDa
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
 import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
 import it.pagopa.selfcare.dashboard.connector.rest.model.token.TokenInfo;
@@ -367,11 +368,26 @@ class PartyConnectorImpl implements PartyConnector {
             Set<PartyRole> roles = partyRoleToUsersMap.keySet();
             List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
 
+            if(checkUserRole(userDto, institutionRelationships)){
+                throw new ValidationException("User role conflict");
+            }
+
             if (!roles.contains(PartyRole.OPERATOR) || !(partyRoles.contains(PartyRole.OPERATOR))) {
                 throw new ValidationException("User role conflict");
             }
         }
         log.trace("checkExistingRelationshipRoles end");
+    }
+
+    private boolean checkUserRole(CreateUserDto userDto, RelationshipsResponse institutionRelationships) {
+        Set<String> productRoles = institutionRelationships.stream()
+                .map(RelationshipInfo::getProduct)
+                .map(ProductInfo::getRole)
+                .collect(Collectors.toSet());
+
+        return userDto.getRoles().stream()
+                .map(CreateUserDto.Role::getProductRole)
+                .anyMatch(productRoles::contains);
     }
 
 
