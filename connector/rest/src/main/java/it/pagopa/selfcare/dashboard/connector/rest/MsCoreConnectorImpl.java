@@ -5,7 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
@@ -147,7 +147,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public Institution updateInstitutionDescription(String institutionId, UpdatePnPGInstitutionResource updatePnPGInstitutionResource) {
+    public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource) {
         log.trace("updateInstitutionDescription start");
         log.debug("updateInstitutionDescription institutionId = {}, updatePnPGInstitutionResource = {}", institutionId, updatePnPGInstitutionResource);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);

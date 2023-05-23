@@ -3,7 +3,9 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -61,6 +63,20 @@ public class InstitutionMapper {
                         });
             }
 
+        }
+
+        return resource;
+    }
+
+    public static UpdateInstitutionResource toUpdateResource(UpdateInstitutionDto dto) {
+        UpdateInstitutionResource resource;
+
+        if (dto == null) {
+            resource = null;
+        } else {
+            resource = new UpdateInstitutionResource();
+            resource.setDescription(dto.getDescription());
+            resource.setDigitalAddress(dto.getDigitalAddress());
         }
 
         return resource;

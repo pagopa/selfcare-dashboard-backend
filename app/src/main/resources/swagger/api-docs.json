@@ -182,6 +182,76 @@
         "security" : [ {
           "bearerAuth" : [ "global" ]
         } ]
+      },
+      "put" : {
+        "tags" : [ "institutions" ],
+        "summary" : "updateInstitutionDescription",
+        "description" : "Update institution description",
+        "operationId" : "updateInstitutionDescriptionUsingPUT",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateInstitutionDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Institution"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
       }
     },
     "/institutions/{institutionId}/geographicTaxonomy" : {
@@ -1198,7 +1268,7 @@
         "tags" : [ "pnPGInstitutions" ],
         "summary" : "updateInstitutionDescription",
         "description" : "Update institution description",
-        "operationId" : "updateInstitutionDescriptionUsingPUT",
+        "operationId" : "updateInstitutionDescriptionUsingPUT_1",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
@@ -1213,7 +1283,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/UpdatePnPGInstitutionDto"
+                "$ref" : "#/components/schemas/UpdateInstitutionDto"
               }
             }
           }
@@ -3080,7 +3150,7 @@
       },
       "InstitutionResource" : {
         "title" : "InstitutionResource",
-        "required" : [ "address", "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole", "zipCode" ],
+        "required" : [ "externalId", "fiscalCode", "geographicTaxonomies", "id", "mailAddress", "name", "origin", "originId", "status", "userRole" ],
         "type" : "object",
         "properties" : {
           "address" : {
@@ -3776,8 +3846,8 @@
           }
         }
       },
-      "UpdatePnPGInstitutionDto" : {
-        "title" : "UpdatePnPGInstitutionDto",
+      "UpdateInstitutionDto" : {
+        "title" : "UpdateInstitutionDto",
         "type" : "object",
         "properties" : {
           "description" : {

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UpdatePnPGInstitutionResource {
+public class UpdateInstitutionResource {
 
     private String description;
     private String digitalAddress;

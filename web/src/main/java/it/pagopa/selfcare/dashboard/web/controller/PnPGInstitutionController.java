@@ -9,7 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
 import it.pagopa.selfcare.dashboard.web.model.PnPGInstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.UpdatePnPGInstitutionDto;
+import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.PnPGInstitutionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +77,7 @@ public class PnPGInstitutionController {
                                                     String institutionId,
                                                     @RequestBody
                                                     @Valid
-                                                    UpdatePnPGInstitutionDto institutionDto) {
+                                                    UpdateInstitutionDto institutionDto) {
         log.trace("updateInstitutionDescription start");
         log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
         Institution result = pnPGInstitutionService.updateInstitutionDescription(institutionId, PnPGInstitutionMapper.toUpdateResource(institutionDto));
