@@ -10,10 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
@@ -49,9 +46,9 @@ class InstitutionServiceImpl implements InstitutionService {
     private static final String AN_OPTIONAL_ROLE_OBJECT_IS_REQUIRED = "An Optional role object is required";
     private static final String AN_OPTIONAL_PRODUCT_ROLE_OBJECT_IS_REQUIRED = "An Optional product role object is required";
     private static final String A_USER_INFO_FILTER_OBJECT_IS_REQUIRED = "A UserInfoFilter object is required";
-
     static final String REQUIRED_GEOGRAPHIC_TAXONOMIES = "An object of geographic taxonomy list is required";
     static final String REQUIRED_TOKEN_ID_MESSAGE = "A tokenId is required";
+    static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution update resource is required";
 
     private final Optional<EnumSet<RelationshipState>> allowedStates;
     private final UserRegistryConnector userRegistryConnector;
@@ -371,6 +368,18 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
         partyConnector.rejectOnboardingRequest(tokenId);
         log.trace("rejectOnboardingRequest end");
+    }
+
+    @Override
+    public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updateInstitutionResource) {
+        log.trace("updateInstitutionDescription start");
+        log.debug("updateInstitutionDescription institutionId = {}, updateInstitutionResource = {}", institutionId, updateInstitutionResource);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Assert.notNull(updateInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
+        Institution institution = msCoreConnector.updateInstitutionDescription(institutionId, updateInstitutionResource);
+        log.debug("updateInstitutionDescription result = {}", institution);
+        log.trace("updateInstitutionDescription end");
+        return institution;
     }
 
 }

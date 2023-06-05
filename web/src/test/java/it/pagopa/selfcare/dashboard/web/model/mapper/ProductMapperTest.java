@@ -51,6 +51,11 @@ class ProductMapperTest {
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
         assertEquals(product.getChildren().get(0).getOnBoardingStatus(), resource.getChildren().get(0).getProductOnBoardingStatus());
         assertEquals(product.getChildren().get(0).getStatus(), resource.getChildren().get(0).getStatus());
+        assertEquals(product.getChildren().get(0).getDepictImageUrl(), resource.getChildren().get(0).getImageUrl());
+        assertEquals(product.getChildren().get(0).getLogo(), resource.getChildren().get(0).getLogo());
+        assertEquals(product.getChildren().get(0).getLogoBgColor(), resource.getChildren().get(0).getLogoBgColor());
+        assertEquals(product.getChildren().get(0).getDescription(), resource.getChildren().get(0).getDescription());
+        assertEquals(product.getChildren().get(0).getUrlPublic(), resource.getChildren().get(0).getUrlPublic());
         reflectionEqualsByName(product, resource);
     }
 

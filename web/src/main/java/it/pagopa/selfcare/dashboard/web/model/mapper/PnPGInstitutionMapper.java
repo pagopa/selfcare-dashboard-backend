@@ -3,7 +3,11 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.PnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -13,6 +17,7 @@ import java.util.stream.Collectors;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.TOBEVALIDATED;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PnPGInstitutionMapper {
 
     public static PnPGInstitutionResource toResource(InstitutionInfo model) {
@@ -24,6 +29,8 @@ public class PnPGInstitutionMapper {
             resource = new PnPGInstitutionResource();
             resource.setId(model.getId());
             resource.setExternalId(model.getExternalId());
+            resource.setOrigin(model.getOrigin());
+            resource.setOriginId(model.getOriginId());
             resource.setName(model.getDescription());
             resource.setFiscalCode(model.getTaxCode());
             resource.setMailAddress(model.getDigitalAddress());
@@ -51,6 +58,20 @@ public class PnPGInstitutionMapper {
                             }
                         });
             }
+        }
+
+        return resource;
+    }
+
+    public static UpdateInstitutionResource toUpdateResource(UpdateInstitutionDto dto) {
+        UpdateInstitutionResource resource;
+
+        if (dto == null) {
+            resource = null;
+        } else {
+            resource = new UpdateInstitutionResource();
+            resource.setDescription(dto.getDescription());
+            resource.setDigitalAddress(dto.getDigitalAddress());
         }
 
         return resource;

@@ -3,7 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
@@ -120,6 +122,38 @@ class PnPGInstitutionControllerTest {
         assertTrue(products.isEmpty());
         verify(pnPGInstitutionServiceMock, times(1))
                 .getInstitutionProducts(institutionId);
+        verifyNoMoreInteractions(pnPGInstitutionServiceMock);
+    }
+
+    @Test
+    void updateInstitutionDescription_ok() throws Exception {
+        //given
+        String institutionId = "setId";
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        Institution institutionMock = mockInstance(new Institution());
+        when(pnPGInstitutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
+
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/" + institutionId)
+                        .content(objectMapper.writeValueAsString(resource))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        Institution institutionResult = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertNotNull(institutionResult);
+        assertEquals(institutionResult.getId(), institutionId);
+        assertEquals(institutionResult.getDescription(), resource.getDescription());
+        assertEquals(institutionResult.getDigitalAddress(), resource.getDigitalAddress());
+        verify(pnPGInstitutionServiceMock, times(1))
+                .updateInstitutionDescription(institutionId, resource);
         verifyNoMoreInteractions(pnPGInstitutionServiceMock);
     }
 
