@@ -3,9 +3,9 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.PnPGInstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.UpdatePnPGInstitutionDto;
+import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -63,13 +63,13 @@ public class PnPGInstitutionMapper {
         return resource;
     }
 
-    public static UpdatePnPGInstitutionResource toUpdateResource(UpdatePnPGInstitutionDto dto) {
-        UpdatePnPGInstitutionResource resource;
+    public static UpdateInstitutionResource toUpdateResource(UpdateInstitutionDto dto) {
+        UpdateInstitutionResource resource;
 
         if (dto == null) {
             resource = null;
         } else {
-            resource = new UpdatePnPGInstitutionResource();
+            resource = new UpdateInstitutionResource();
             resource.setDescription(dto.getDescription());
             resource.setDigitalAddress(dto.getDigitalAddress());
         }

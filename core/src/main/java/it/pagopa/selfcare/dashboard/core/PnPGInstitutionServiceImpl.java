@@ -4,7 +4,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
     }
 
     @Override
-    public Institution updateInstitutionDescription(String institutionId, UpdatePnPGInstitutionResource updatePnPGInstitutionResource) {
+    public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource) {
         log.trace("updateInstitutionDescription start");
         log.debug("updateInstitutionDescription institutionId = {}, updatePnPGInstitutionResource = {}", institutionId, updatePnPGInstitutionResource);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);

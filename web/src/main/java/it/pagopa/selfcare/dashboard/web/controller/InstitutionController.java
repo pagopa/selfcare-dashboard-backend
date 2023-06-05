@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
@@ -299,6 +300,24 @@ public class InstitutionController {
         log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
         institutionService.addUserProductRoles(institutionId, productId, userId, UserMapper.toCreateUserDto(userProductRoles));
         log.trace("addUserProductRoles end");
+    }
+
+    @PutMapping(value = "/{institutionId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionDescription}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    public Institution updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                    @PathVariable("institutionId")
+                                                    String institutionId,
+                                                    @RequestBody
+                                                    @Valid
+                                                    UpdateInstitutionDto institutionDto) {
+        log.trace("updateInstitutionDescription start");
+        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
+        Institution result = institutionService.updateInstitutionDescription(institutionId, InstitutionMapper.toUpdateResource(institutionDto));
+        log.debug("updateInstitutionDescription result = {}", result);
+        log.trace("updateInstitutionDescription end");
+        return result;
     }
 
 }

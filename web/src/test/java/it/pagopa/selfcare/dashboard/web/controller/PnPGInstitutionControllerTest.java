@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdatePnPGInstitutionResource;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.core.PnPGInstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
@@ -129,7 +129,7 @@ class PnPGInstitutionControllerTest {
     void updateInstitutionDescription_ok() throws Exception {
         //given
         String institutionId = "setId";
-        UpdatePnPGInstitutionResource resource = mockInstance(new UpdatePnPGInstitutionResource());
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
         Institution institutionMock = mockInstance(new Institution());
         when(pnPGInstitutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
 
