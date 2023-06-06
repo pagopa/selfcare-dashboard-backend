@@ -114,7 +114,7 @@ public class InstitutionController {
     @PutMapping("/{institutionId}/geographicTaxonomy")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public void updateInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                     @PathVariable("institutionId")
                                                     String institutionId,
@@ -305,7 +305,7 @@ public class InstitutionController {
     @PutMapping(value = "/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionDescription}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public Institution updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                     @PathVariable("institutionId")
                                                     String institutionId,
