@@ -58,16 +58,4 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
         return listProducts;
     }
 
-    @Override
-    public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource) {
-        log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, updatePnPGInstitutionResource = {}", institutionId, updatePnPGInstitutionResource);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Assert.notNull(updatePnPGInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
-        Institution institution = msCoreConnector.updateInstitutionDescription(institutionId, updatePnPGInstitutionResource);
-        log.debug("updateInstitutionDescription result = {}", institution);
-        log.trace("updateInstitutionDescription end");
-        return institution;
-    }
-
 }

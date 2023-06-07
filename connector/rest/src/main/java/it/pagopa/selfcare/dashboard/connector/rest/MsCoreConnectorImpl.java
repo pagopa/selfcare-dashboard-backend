@@ -147,12 +147,12 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource) {
+    public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updateInstitutionResource) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, updatePnPGInstitutionResource = {}", institutionId, updatePnPGInstitutionResource);
+        log.debug("updateInstitutionDescription institutionId = {}, updateInstitutionResource = {}", institutionId, updateInstitutionResource);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        Assert.notNull(updatePnPGInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
-        Institution institution = msCoreRestClient.updateInstitutionDescription(institutionId, updatePnPGInstitutionResource);
+        Assert.notNull(updateInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
+        Institution institution = msCoreRestClient.updateInstitutionDescription(institutionId, updateInstitutionResource);
         log.debug("updateInstitutionDescription result = {}", institution);
         log.trace("updateInstitutionDescription end");
         return institution;

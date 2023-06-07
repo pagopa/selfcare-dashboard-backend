@@ -106,49 +106,4 @@ class PnPGInstitutionServiceImplTest {
         verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
-    @Test
-    void updateInstitutionDescription() {
-        // given
-        String institutionId = "setId";
-        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        Institution institutionMock = mockInstance(new Institution());
-        when(msCoreConnectorMock.updateInstitutionDescription(anyString(), any()))
-                .thenReturn(institutionMock);
-        // when
-        Institution institution = pnPGInstitutionService.updateInstitutionDescription(institutionId, resource);
-        // then
-        assertEquals(institution.getId(), institutionId);
-        assertEquals(institution.getDescription(), resource.getDescription());
-        assertEquals(institution.getDigitalAddress(), resource.getDigitalAddress());
-        verify(msCoreConnectorMock, times(1))
-                .updateInstitutionDescription(institutionId, resource);
-        verifyNoMoreInteractions(msCoreConnectorMock);
-    }
-
-    @Test
-    void updateInstitutionDescription_hasNullInstitutionId() {
-        // given
-        String institutionId = null;
-        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        // when
-        Executable executable = () -> pnPGInstitutionService.updateInstitutionDescription(institutionId, resource);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_INSTITUTION_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
-    }
-
-    @Test
-    void updateInstitutionDescription_hasNullDescription() {
-        // given
-        String institutionId = "institutionId";
-        UpdateInstitutionResource resource = null;
-        // when
-        Executable executable = () -> pnPGInstitutionService.updateInstitutionDescription(institutionId, resource);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
-    }
-
 }

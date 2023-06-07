@@ -68,22 +68,4 @@ public class PnPGInstitutionController {
         return result;
     }
 
-    @PutMapping(value = "/{institutionId}")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.updateInstitutionDescription}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
-    public Institution updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                    @PathVariable("institutionId")
-                                                    String institutionId,
-                                                    @RequestBody
-                                                    @Valid
-                                                    UpdateInstitutionDto institutionDto) {
-        log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
-        Institution result = pnPGInstitutionService.updateInstitutionDescription(institutionId, PnPGInstitutionMapper.toUpdateResource(institutionDto));
-        log.debug("updateInstitutionDescription result = {}", result);
-        log.trace("updateInstitutionDescription end");
-        return result;
-    }
-
 }
