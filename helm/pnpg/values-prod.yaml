@@ -5,7 +5,7 @@ image:
 
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://pnpg.selfcare.pagopa.it"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://api-pnpg.selfcare.pagopa.it,https://pnpg.selfcare.pagopa.it"
   tls:
     - hosts:
         - prod01.pnpg.internal.prod.selfcare.pagopa.it
