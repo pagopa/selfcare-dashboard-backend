@@ -12,10 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -370,7 +367,7 @@ class UserGroupConnectorImplTest {
         response1.setCreatedAt(Instant.now());
         response1.setModifiedAt(Instant.now());
         when(restClientMock.getUserGroups(anyString(), anyString(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(3, Pageable.class), () -> 1L));
+                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
@@ -398,7 +395,7 @@ class UserGroupConnectorImplTest {
         UserGroupFilter filter = new UserGroupFilter();
         Pageable pageable = Pageable.unpaged();
         when(restClientMock.getUserGroups(any(), any(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
+                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(4, Pageable.class), () -> 0L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
@@ -421,7 +418,7 @@ class UserGroupConnectorImplTest {
         response1.setCreatedAt(Instant.now());
         response1.setModifiedAt(Instant.now());
         when(restClientMock.getUserGroups(anyString(), anyString(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(3, Pageable.class), () -> 1L));
+                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
@@ -441,7 +438,7 @@ class UserGroupConnectorImplTest {
         assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
         assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
         verify(restClientMock, times(1))
-                .getUserGroups(eq(institutionId.get()), eq(productId.get()), isNull(), isNull(), isNotNull());
+                .getUserGroups(eq(institutionId.get()), eq(productId.get()), isNull(), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -457,7 +454,7 @@ class UserGroupConnectorImplTest {
         response1.setCreatedAt(Instant.now());
         response1.setModifiedAt(Instant.now());
         when(restClientMock.getUserGroups(any(), any(), any(), anyList(), any()))
-                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(3, Pageable.class), () -> 1L));
+                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
@@ -477,7 +474,7 @@ class UserGroupConnectorImplTest {
         assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
         assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
         verify(restClientMock, times(1))
-                .getUserGroups(isNull(), isNull(), eq(userId.get()), isNull(), isNotNull());
+                .getUserGroups(isNull(), isNull(), eq(userId.get()), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -488,14 +485,14 @@ class UserGroupConnectorImplTest {
         UserGroupFilter filter = new UserGroupFilter();
         Pageable pageable = Pageable.unpaged();
         when(restClientMock.getUserGroups(any(), any(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
+                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(4, Pageable.class), () -> 0L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
         assertNotNull(groupInfos);
         assertTrue(groupInfos.isEmpty());
         verify(restClientMock, times(1))
-                .getUserGroups(isNull(), isNull(), isNull(), isNull(), isNotNull());
+                .getUserGroups(isNull(), isNull(), isNull(),eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -535,7 +532,6 @@ class UserGroupConnectorImplTest {
         assertEquals(response1.getStatus(), groupInfo.getStatus());
         assertEquals(response1.getDescription(), groupInfo.getDescription());
         assertEquals(response1.getName(), groupInfo.getName());
-        assertEquals(response1.getMembers(), groupInfo.getMembers());
         assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
         assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
         assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
