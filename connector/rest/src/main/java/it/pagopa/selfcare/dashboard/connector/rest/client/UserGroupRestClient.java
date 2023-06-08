@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @FeignClient(name = "${rest-client.user-groups.serviceCode}", url = "${rest-client.user-groups.base-url}")
@@ -59,5 +61,6 @@ public interface UserGroupRestClient {
     Page<UserGroupResponse> getUserGroups(@RequestParam(value = "institutionId", required = false) String institutionId,
                                           @RequestParam(value = "productId", required = false) String productId,
                                           @RequestParam(value = "userId", required = false) UUID memberId,
+                                          @RequestParam(value = "status", required = false) List<UserGroupStatus> status,
                                           Pageable pageable);
 }
