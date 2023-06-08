@@ -170,7 +170,11 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     public Page<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", filter.getInstitutionId(), filter.getProductId(), filter.getUserId(), pageable);
-        final Page<UserGroupInfo> userGroups = restClient.getUserGroups(filter.getInstitutionId().orElse(null), filter.getProductId().orElse(null), filter.getUserId().orElse(null), pageable)
+        final Page<UserGroupInfo> userGroups = restClient.getUserGroups(filter.getInstitutionId().orElse(null),
+                        filter.getProductId().orElse(null),
+                        filter.getUserId().orElse(null),
+                        List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED),
+                        pageable)
                 .map(GROUP_RESPONSE_TO_GROUP_INFO);
         log.debug("getUserGroups result = {}", userGroups);
         log.trace("getUserGroups end");
