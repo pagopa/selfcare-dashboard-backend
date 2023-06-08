@@ -14,6 +14,4 @@ public interface PnPGInstitutionService {
 
     List<PartyProduct> getInstitutionProducts(String institutionId);
 
-    Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource);
-
 }
