@@ -26,6 +26,10 @@ public class InstitutionInfo {
     private List<GeographicTaxonomy> geographicTaxonomies;
     private SupportContact supportContact;
 
+    private String subunitCode;
+    private String subunitType;
+    private String aooParentCode;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

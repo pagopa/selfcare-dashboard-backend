@@ -85,4 +85,14 @@ public class InstitutionResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.vatNumber}")
     private String vatNumber;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.subunitCode}")
+    private String subunitCode;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.subunitType}")
+    private String subunitType;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.aooParentCode}")
+    private String aooParentCode;
+
 }
