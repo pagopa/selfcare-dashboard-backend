@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,7 @@ class InstitutionServiceImpl implements InstitutionService {
     private final ProductsConnector productsConnector;
     private final NotificationService notificationService;
 
+    protected static final BinaryOperator<PartyProduct> MERGE_FUNCTION = (inst1, inst2) -> inst1.getOnBoardingStatus().compareTo(inst2.getOnBoardingStatus()) < 0 ? inst1 : inst2;
 
 
     @Autowired
@@ -135,7 +137,7 @@ class InstitutionServiceImpl implements InstitutionService {
             if (selcAuthority.isPresent()) {
                 Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
                 Map<String, PartyProduct> institutionsProductsMap = msCoreConnector.getInstitutionProducts(institutionId).stream()
-                        .collect(Collectors.toMap(PartyProduct::getId, Function.identity()));
+                        .collect(Collectors.toMap(PartyProduct::getId, Function.identity(), MERGE_FUNCTION));
 
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
                     productTrees = productTrees.stream()
