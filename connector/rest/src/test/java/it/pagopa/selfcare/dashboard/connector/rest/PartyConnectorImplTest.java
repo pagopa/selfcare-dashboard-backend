@@ -57,6 +57,7 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -215,10 +216,12 @@ class PartyConnectorImplTest {
         when(partyProcessRestClientMock.getOnBoardingInfo(any(), any(), any()))
                 .thenReturn(onBoardingInfo);
         // when
-        Executable executable = () -> partyConnector.getOnBoardedInstitution(institutionId);
+
         // then
-        ValidationException e = assertThrows(ValidationException.class, executable);
-        assertEquals(String.format("The institution %s does not have geographic taxonomies.", onboardingData.getId()), e.getMessage());
+        InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
+        assertNotNull(institutionInfo.getGeographicTaxonomies());
+        assertTrue(institutionInfo.getGeographicTaxonomies().isEmpty());
+
         verify(partyProcessRestClientMock, times(1))
                 .getOnBoardingInfo(institutionId, null, EnumSet.of(ACTIVE));
         verifyNoMoreInteractions(partyProcessRestClientMock);
