@@ -66,16 +66,20 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setAddress(onboardingData.getAddress());
         institutionInfo.setZipCode(onboardingData.getZipCode());
         institutionInfo.setBilling(onboardingData.getBilling());
-        if (onboardingData.getGeographicTaxonomies() == null) {
-            throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionInfo.getId()));
-        } else {
-            institutionInfo.setGeographicTaxonomies(onboardingData.getGeographicTaxonomies());
-        }
+        institutionInfo.setGeographicTaxonomies(Optional
+                .ofNullable(onboardingData.getGeographicTaxonomies())
+                .orElse(List.of()));
+
         if (onboardingData.getAttributes() != null && !onboardingData.getAttributes().isEmpty()) {
             institutionInfo.setCategory(onboardingData.getAttributes().get(0).getDescription());
         }
         institutionInfo.setSupportContact(onboardingData.getSupportContact());
         institutionInfo.setPaymentServiceProvider(onboardingData.getPaymentServiceProvider());
+
+        institutionInfo.setSubunitCode(onboardingData.getSubunitCode());
+        institutionInfo.setSubunitType(onboardingData.getSubunitType());
+        institutionInfo.setAooParentCode(onboardingData.getAooParentCode());
+
         return institutionInfo;
     };
 

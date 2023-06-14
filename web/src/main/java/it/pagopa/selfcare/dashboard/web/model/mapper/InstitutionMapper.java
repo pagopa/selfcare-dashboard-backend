@@ -36,6 +36,11 @@ public class InstitutionMapper {
             resource.setStatus(model.getStatus().toString());
             resource.setAddress(model.getAddress());
             resource.setZipCode(model.getZipCode());
+
+            resource.setSubunitCode(model.getSubunitCode());
+            resource.setSubunitType(model.getSubunitType());
+            resource.setAooParentCode(model.getAooParentCode());
+
             if (model.getBilling() != null) {
                 resource.setRecipientCode(model.getBilling().getRecipientCode());
                 resource.setVatNumber(model.getBilling().getVatNumber());

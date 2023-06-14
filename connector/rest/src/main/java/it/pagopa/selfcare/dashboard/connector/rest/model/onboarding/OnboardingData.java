@@ -30,4 +30,8 @@ public class OnboardingData {
     private SupportContact supportContact;
     private PaymentServiceProvider paymentServiceProvider;
 
+    private String subunitCode;
+    private String subunitType;
+    private String aooParentCode;
+
 }
