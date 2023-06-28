@@ -3085,6 +3085,10 @@
             "type" : "string",
             "description" : "Institution's physical address"
           },
+          "aooParentCode" : {
+            "type" : "string",
+            "description" : "UO's parent AOO code"
+          },
           "category" : {
             "type" : "string",
             "description" : "Institution's category"
@@ -3136,6 +3140,14 @@
           "status" : {
             "type" : "string",
             "description" : "Institution's status"
+          },
+          "subunitCode" : {
+            "type" : "string",
+            "description" : "AOO o UO unique code"
+          },
+          "subunitType" : {
+            "type" : "string",
+            "description" : "Institution's subunit type"
           },
           "supportContact" : {
             "description" : "'Institution's assistance contacts'",
@@ -3921,7 +3933,7 @@
           "status" : {
             "type" : "string",
             "description" : "Users group's status",
-            "enum" : [ "ACTIVE", "SUSPENDED" ]
+            "enum" : [ "ACTIVE", "DELETED", "SUSPENDED" ]
           }
         }
       },
@@ -3978,7 +3990,7 @@
           "status" : {
             "type" : "string",
             "description" : "Users group's status",
-            "enum" : [ "ACTIVE", "SUSPENDED" ]
+            "enum" : [ "ACTIVE", "DELETED", "SUSPENDED" ]
           }
         }
       },
