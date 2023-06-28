@@ -60,6 +60,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
     protected static final BinaryOperator<PartyProduct> MERGE_FUNCTION = (inst1, inst2) -> inst1.getOnBoardingStatus().compareTo(inst2.getOnBoardingStatus()) < 0 ? inst1 : inst2;
 
+
     @Autowired
     public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
                                   UserRegistryConnector userRegistryConnector, PartyConnector partyConnector,

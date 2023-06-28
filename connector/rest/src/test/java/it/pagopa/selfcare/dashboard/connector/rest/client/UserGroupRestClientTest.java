@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserGroupRestClientTestConfig;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
@@ -201,7 +202,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         UUID userId = null;
         Pageable pageable = Pageable.unpaged();
         // when
-        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
+        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED), pageable);
         //then
         assertNotNull(response);
         assertEquals(0, response.getNumber());
@@ -229,7 +230,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         UUID userId = null;
         Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
         // when
-        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, pageable);
+        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED), pageable);
         //then
         assertNotNull(response);
         assertEquals(0, response.getNumber());

@@ -196,7 +196,7 @@ class PartyProcessRestClientTest extends BaseFeignRestClientTest {
         assertNotNull(response.getInstitutions());
         assertFalse(response.getInstitutions().isEmpty());
         response.getInstitutions().forEach(onboardingData -> {
-            TestUtils.checkNotNullFields(onboardingData);
+            TestUtils.checkNotNullFields(onboardingData, "subunitCode", "subunitType", "aooParentCode");
             assertNotNull(onboardingData.getAttributes());
             assertFalse(onboardingData.getAttributes().isEmpty());
             onboardingData.getAttributes().forEach(attribute -> {
