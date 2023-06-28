@@ -8,10 +8,10 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://imprese.notifichedigitali.it,https://api-pnpg.selfcare.pagopa.it,https://pnpg.selfcare.pagopa.it"
   tls:
     - hosts:
-        - prod01.pnpg.internal.prod.selfcare.pagopa.it
-      secretName: prod01-pnpg-internal-prod-selfcare-pagopa-it
+        - prod01.pnpg.internal.selfcare.pagopa.it
+      secretName: prod01-pnpg-internal-selfcare-pagopa-it
   hosts:
-    - host: "prod01.pnpg.internal.prod.selfcare.pagopa.it"
+    - host: "prod01.pnpg.internal.selfcare.pagopa.it"
       paths:
         - path: /dashboard/v1/(.*)
           pathType: ImplementationSpecific
