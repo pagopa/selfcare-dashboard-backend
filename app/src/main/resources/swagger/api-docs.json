@@ -3857,7 +3857,6 @@
       },
       "UserGroupPlainResource" : {
         "title" : "UserGroupPlainResource",
-        "required" : [ "description", "id", "institutionId", "membersCount", "name", "productId", "status" ],
         "type" : "object",
         "properties" : {
           "createdAt" : {
@@ -3914,7 +3913,6 @@
       },
       "UserGroupResource" : {
         "title" : "UserGroupResource",
-        "required" : [ "description", "id", "institutionId", "members", "name", "productId", "status" ],
         "type" : "object",
         "properties" : {
           "createdAt" : {
