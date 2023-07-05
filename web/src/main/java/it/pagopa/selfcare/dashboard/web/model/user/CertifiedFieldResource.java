@@ -4,18 +4,14 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-
 @Data
 @NoArgsConstructor
 public class CertifiedFieldResource<T> {
 
-    @ApiModelProperty(value = "${swagger.model.certifiedField.certified}", required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.model.certifiedField.certified}")
     private boolean certified;
 
-    @ApiModelProperty(value = "${swagger.model.certifiedField.value}", required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.model.certifiedField.value}")
     private T value;
 
 }

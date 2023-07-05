@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProductsResourceTest {
@@ -62,16 +61,6 @@ class ProductsResourceTest {
                 })
                 .collect(Collectors.toList());
         assertTrue(filteredViolations.isEmpty());
-    }
-
-    @Test
-    void validateRegExViolation() {
-        //given
-        ProductsResource productsResource = TestUtils.mockInstance(new ProductsResource());
-        //when
-        Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);
-        // then
-        assertFalse(violations.isEmpty());
     }
 
     @Test

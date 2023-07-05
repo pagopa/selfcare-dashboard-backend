@@ -12,55 +12,36 @@
 
 package it.pagopa.selfcare.dashboard.web.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductInfoResource;
 import lombok.Data;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 public class InstitutionUserResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.id}")
     private UUID id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
     private String name;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
     private String surname;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.email}")
-    @Email
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
     private SelfCareAuthority role;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.status}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.status}")
     private String status;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.products}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
-    @Valid
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.products}")
     private List<ProductInfoResource> products;
 
 }

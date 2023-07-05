@@ -1,38 +1,26 @@
 package it.pagopa.selfcare.dashboard.web.model.product;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
 public class ProductRoleMappingsResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.partyRole}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.partyRole}")
     private PartyRole partyRole;
 
-    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.selcRole}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.selcRole}")
     private SelfCareAuthority selcRole;
 
-    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.multiroleAllowed}", required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.multiroleAllowed}")
     private boolean multiroleAllowed;
 
-    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.productRoles}", required = true)
-    @JsonProperty(required = true)
-    @NotEmpty
-    @Valid
+    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.productRoles}")
     private List<ProductRoleResource> productRoles;
 
 
@@ -40,20 +28,15 @@ public class ProductRoleMappingsResource {
     @EqualsAndHashCode(of = "code")
     public static class ProductRoleResource {
 
-        @ApiModelProperty(value = "${swagger.dashboard.product-role.model.code}", required = true)
-        @JsonProperty(required = true)
-        @NotBlank
+        @ApiModelProperty(value = "${swagger.dashboard.product-role.model.code}")
         private String code;
 
-        @ApiModelProperty(value = "${swagger.dashboard.product-role.model.label}", required = true)
-        @JsonProperty(required = true)
-        @NotBlank
+        @ApiModelProperty(value = "${swagger.dashboard.product-role.model.label}")
         private String label;
 
-        @ApiModelProperty(value = "${swagger.dashboard.product-role.model.description}", required = true)
-        @JsonProperty(required = true)
-        @NotBlank
+        @ApiModelProperty(value = "${swagger.dashboard.product-role.model.description}")
         private String description;
+        
     }
 
 }

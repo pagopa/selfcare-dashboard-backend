@@ -1,36 +1,23 @@
 package it.pagopa.selfcare.dashboard.web.model.product;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
 @Data
 public class SubProductResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.id}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.id}")
     private String id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.title}", required = true)
-    @JsonProperty(required = true)
-    @NotBlank
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.title}")
     private String title;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.productOnBoardingStatus}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.productOnBoardingStatus}")
     private ProductOnBoardingStatus productOnBoardingStatus;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}", required = true)
-    @JsonProperty(required = true)
-    @NotNull
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}")
     private ProductStatus status;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.imageUrl}")
@@ -40,7 +27,6 @@ public class SubProductResource {
     private String logo;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.logoBgColor}")
-    @Pattern(regexp = "^#[0-9A-F]{6}$")
     private String logoBgColor;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.description}")
@@ -48,4 +34,5 @@ public class SubProductResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.urlPublic}")
     private String urlPublic;
+
 }
