@@ -4,7 +4,7 @@ image:
 
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/cors-allow-origin: "https://api-pnpg.uat.selfcare.pagopa.it,https://pnpg.uat.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://imprese.uat.notifichedigitali.it,https://api-pnpg.uat.selfcare.pagopa.it,https://pnpg.uat.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002"
   tls:
     - hosts:
         - uat01.pnpg.internal.uat.selfcare.pagopa.it
@@ -28,4 +28,4 @@ configEnvSpecific:
   B4F_DASHBOARD_LOG_LEVEL: "DEBUG"
   REST_CLIENT_LOGGER_LEVEL: "FULL"
   JWT_TOKEN_EXCHANGE_ISSUER: "https://pnpg.uat.selfcare.pagopa.it"
-  PUBLIC_FILE_STORAGE_BASE_URL: "https://selcucheckoutsa.z6.web.core.windows.net"
+  PUBLIC_FILE_STORAGE_BASE_URL: "https://selcuweupnpgcheckoutsa.z6.web.core.windows.net"
