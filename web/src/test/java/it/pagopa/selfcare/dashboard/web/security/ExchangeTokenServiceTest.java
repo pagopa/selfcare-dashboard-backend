@@ -521,6 +521,7 @@ class ExchangeTokenServiceTest {
             institution.setSubUnitType(o.get("subUnitType").toString());
             institution.setAooParent(o.get("aooParent").toString());
             institution.setParentDescription(o.get("parentDescription").toString());
+            institution.setOriginId(o.get("ipaCode").toString());
             return institution;
         }
 

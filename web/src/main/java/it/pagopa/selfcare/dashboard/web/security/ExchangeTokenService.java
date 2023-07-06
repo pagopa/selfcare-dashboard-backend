@@ -106,6 +106,7 @@ public class ExchangeTokenService {
         institution.setSubUnitCode(institutionInfo.getSubunitCode());
         institution.setAooParent(institutionInfo.getAooParentCode());
         institution.setParentDescription(institutionInfo.getParentDescription());
+        institution.setOriginId(institutionInfo.getOriginId());
         institution.setRoles(productGrantedAuthority.getProductRoles().stream()
                 .map(productRoleCode -> {
                     Role role = new Role();
@@ -197,6 +198,8 @@ public class ExchangeTokenService {
         private String subUnitType;
         private String aooParent;
         private String parentDescription;
+        @JsonProperty("ipaCode")
+        private String originId;
     }
 
     @Data
