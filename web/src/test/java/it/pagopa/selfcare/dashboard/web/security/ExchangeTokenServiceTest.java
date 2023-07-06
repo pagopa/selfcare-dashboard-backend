@@ -510,18 +510,18 @@ class ExchangeTokenServiceTest {
         }
 
         public ExchangeTokenService.Institution getInstitution() {
-            LinkedHashMap<String, Object> o = (LinkedHashMap) get(INSTITUTION);
+            LinkedHashMap<String, Object> organizationClaim = (LinkedHashMap) get(INSTITUTION);
             ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
-            institution.setId(o.get("id").toString());
-            institution.setRoles((List<ExchangeTokenService.Role>) o.get("roles"));
-            institution.setName(o.get("name").toString());
-            institution.setTaxCode(o.get("fiscal_code").toString());
-            institution.setGroups((List<String>) o.get("groups"));
-            institution.setSubUnitCode(o.get("subUnitCode").toString());
-            institution.setSubUnitType(o.get("subUnitType").toString());
-            institution.setAooParent(o.get("aooParent").toString());
-            institution.setParentDescription(o.get("parentDescription").toString());
-            institution.setOriginId(o.get("ipaCode").toString());
+            institution.setId(organizationClaim.get("id").toString());
+            institution.setRoles((List<ExchangeTokenService.Role>) organizationClaim.get("roles"));
+            institution.setName(organizationClaim.get("name").toString());
+            institution.setTaxCode(organizationClaim.get("fiscal_code").toString());
+            institution.setGroups((List<String>) organizationClaim.get("groups"));
+            institution.setSubUnitCode(organizationClaim.get("subUnitCode").toString());
+            institution.setSubUnitType(organizationClaim.get("subUnitType").toString());
+            institution.setAooParent(organizationClaim.get("aooParent").toString());
+            institution.setParentDescription(organizationClaim.get("parentDescription").toString());
+            institution.setOriginId(organizationClaim.get("ipaCode").toString());
             return institution;
         }
 
