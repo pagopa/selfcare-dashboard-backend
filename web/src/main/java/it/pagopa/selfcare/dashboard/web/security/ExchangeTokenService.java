@@ -102,6 +102,10 @@ public class ExchangeTokenService {
         institution.setId(institutionId);
         institution.setName(institutionInfo.getDescription());
         institution.setTaxCode(institutionInfo.getTaxCode());
+        institution.setSubUnitType(institutionInfo.getSubunitType());
+        institution.setSubUnitCode(institutionInfo.getSubunitCode());
+        institution.setAooParent(institutionInfo.getAooParentCode());
+        institution.setParentDescription(institutionInfo.getParentDescription());
         institution.setRoles(productGrantedAuthority.getProductRoles().stream()
                 .map(productRoleCode -> {
                     Role role = new Role();
@@ -189,6 +193,10 @@ public class ExchangeTokenService {
         private List<Role> roles;
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private List<String> groups;
+        private String subUnitCode;
+        private String subUnitType;
+        private String aooParent;
+        private String parentDescription;
     }
 
     @Data

@@ -47,6 +47,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -465,6 +466,7 @@ class ExchangeTokenServiceTest {
         assertNotNull(institution);
         assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
+        checkNotNullFields(institution);
         assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
@@ -515,6 +517,10 @@ class ExchangeTokenServiceTest {
             institution.setName(o.get("name").toString());
             institution.setTaxCode(o.get("fiscal_code").toString());
             institution.setGroups((List<String>) o.get("groups"));
+            institution.setSubUnitCode(o.get("subUnitCode").toString());
+            institution.setSubUnitType(o.get("subUnitType").toString());
+            institution.setAooParent(o.get("aooParent").toString());
+            institution.setParentDescription(o.get("parentDescription").toString());
             return institution;
         }
 
