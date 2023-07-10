@@ -47,6 +47,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -465,6 +466,7 @@ class ExchangeTokenServiceTest {
         assertNotNull(institution);
         assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
+        checkNotNullFields(institution);
         assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
@@ -508,13 +510,18 @@ class ExchangeTokenServiceTest {
         }
 
         public ExchangeTokenService.Institution getInstitution() {
-            LinkedHashMap<String, Object> o = (LinkedHashMap) get(INSTITUTION);
+            LinkedHashMap<String, Object> organizationClaim = (LinkedHashMap) get(INSTITUTION);
             ExchangeTokenService.Institution institution = new ExchangeTokenService.Institution();
-            institution.setId(o.get("id").toString());
-            institution.setRoles((List<ExchangeTokenService.Role>) o.get("roles"));
-            institution.setName(o.get("name").toString());
-            institution.setTaxCode(o.get("fiscal_code").toString());
-            institution.setGroups((List<String>) o.get("groups"));
+            institution.setId(organizationClaim.get("id").toString());
+            institution.setRoles((List<ExchangeTokenService.Role>) organizationClaim.get("roles"));
+            institution.setName(organizationClaim.get("name").toString());
+            institution.setTaxCode(organizationClaim.get("fiscal_code").toString());
+            institution.setGroups((List<String>) organizationClaim.get("groups"));
+            institution.setSubUnitCode(organizationClaim.get("subUnitCode").toString());
+            institution.setSubUnitType(organizationClaim.get("subUnitType").toString());
+            institution.setAooParent(organizationClaim.get("aooParent").toString());
+            institution.setParentDescription(organizationClaim.get("parentDescription").toString());
+            institution.setOriginId(organizationClaim.get("ipaCode").toString());
             return institution;
         }
 
