@@ -3127,6 +3127,10 @@
             "type" : "string",
             "description" : "Institution's identifier related to origin"
           },
+          "parentDescription" : {
+            "type" : "string",
+            "description" : "Sub unit institution parent Description"
+          },
           "recipientCode" : {
             "type" : "string",
             "description" : "Billing recipient code"
