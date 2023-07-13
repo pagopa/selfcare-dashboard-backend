@@ -3,9 +3,14 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
+import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
+import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
+import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -27,21 +34,27 @@ public class ProductController {
 
     private final ProductService productService;
     private final ExchangeTokenService exchangeTokenService;
-
+    private final BrokerService brokerService;
+    private final BrokerMapper brokerMapper;
+    private static final String PAGO_PA_PRODUCT_ID = "prod-pagopa";
 
     @Autowired
-    public ProductController(ProductService productService, ExchangeTokenService exchangeTokenService) {
+    public ProductController(ProductService productService,
+                             ExchangeTokenService exchangeTokenService,
+                             BrokerService brokerService,
+                             BrokerMapper brokerMapper) {
         this.productService = productService;
         this.exchangeTokenService = exchangeTokenService;
+        this.brokerService = brokerService;
+        this.brokerMapper = brokerMapper;
     }
-
 
     @GetMapping(value = "/{productId}/roles")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductRoles}")
     public Collection<ProductRoleMappingsResource> getProductRoles(@ApiParam("${swagger.dashboard.products.model.id}")
                                                                    @PathVariable("productId")
-                                                                           String productId) {
+                                                                   String productId) {
         log.trace("getProductRoles start");
         log.debug("productId = {}", productId);
         Collection<ProductRoleMappingsResource> result = ProductsMapper.toProductRoleMappingsResource(productService.getProductRoles(productId));
@@ -51,21 +64,19 @@ public class ProductController {
         return result;
     }
 
-
     @GetMapping(value = "/{productId}/back-office")
-
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
     public URI retrieveProductBackoffice(@ApiParam("${swagger.dashboard.products.model.id}")
                                          @PathVariable("productId")
-                                                 String productId,
+                                         String productId,
                                          @ApiParam("${swagger.dashboard.institutions.model.id}")
                                          @RequestParam("institutionId")
-                                                 String institutionId,
+                                         String institutionId,
                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
                                          @RequestParam(value = "environment", required = false)
-                                                 Optional<String> environment) {
+                                         Optional<String> environment) {
         log.trace("accessProductBackoffice start");
         log.debug("accessProductBackoffice institutionId = {}, productId = {}", institutionId, productId);
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, environment);
@@ -73,6 +84,29 @@ public class ProductController {
         log.trace("accessProductBackoffice end");
         return location;
 
+    }
+
+    @GetMapping(value = "/{productId}/brokers/{institutionType}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductBrokers}")
+    public Collection<BrokerResource> getProductBrokers(@ApiParam("${swagger.dashboard.products.model.id}")
+                                                        @PathVariable("productId")
+                                                        String productId,
+                                                        @ApiParam("${swagger.dashboard.products.model.institutionType}")
+                                                        @PathVariable("institutionType")
+                                                        InstitutionType institutionType) {
+        log.trace("getProductBrokers start");
+        log.debug("productId = {}, institutionType = {}", productId, institutionType);
+        Collection<BrokerResource> result = Collections.emptyList();
+        if(PAGO_PA_PRODUCT_ID.equals(productId)) {
+            List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(institutionType.name());
+            result = brokerMapper.toResourceList(brokers);
+        } else {
+            //TODO retrieve data from ms-core
+        }
+        log.debug("getProductBrokers result = {}", result);
+        log.trace("getProductBrokers end");
+        return result;
     }
 
 }

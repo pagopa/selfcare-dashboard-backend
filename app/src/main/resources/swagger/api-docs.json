@@ -1431,6 +1431,92 @@
         } ]
       }
     },
+    "/products/{productId}/brokers/{institutionType}" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "getProductBrokers",
+        "description" : "Service to get list of partners",
+        "operationId" : "getProductBrokersUsingGET",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionType",
+          "in" : "path",
+          "description" : "Institution Type",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "GSP", "PA", "PG", "PSP", "PT", "SCP" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BrokerResource"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/products/{productId}/roles" : {
       "get" : {
         "tags" : [ "products" ],
@@ -2798,6 +2884,25 @@
           "url" : {
             "type" : "string",
             "description" : "URL that redirects to the back-office section, where is possible to manage the product"
+          }
+        }
+      },
+      "BrokerResource" : {
+        "title" : "BrokerResource",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "Partner's code"
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Partner's description"
+          },
+          "enabled" : {
+            "type" : "boolean",
+            "description" : "Partner's enabling",
+            "example" : false
           }
         }
       },
