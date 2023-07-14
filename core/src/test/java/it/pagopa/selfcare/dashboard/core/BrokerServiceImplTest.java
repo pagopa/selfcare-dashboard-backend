@@ -58,7 +58,7 @@ class BrokerServiceImplTest {
 
     private List<BrokerInfo> buildBrokerInfos() {
         BrokerInfo brokerInfo = new BrokerInfo();
-        brokerInfo.setBrokerCode("code");
+        brokerInfo.setCode("code");
         List<BrokerInfo> brokersMocked = new ArrayList<>();
         brokersMocked.add(brokerInfo);
         return brokersMocked;

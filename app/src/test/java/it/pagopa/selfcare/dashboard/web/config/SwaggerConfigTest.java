@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.core.*;
-import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerMapperImpl;
+import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(classes = {
         SwaggerConfig.class,
         WebConfig.class,
-        BrokerMapperImpl.class
+        BrokerResourceMapperImpl.class
 })
 @EnableOpenApi
 @EnableWebMvc

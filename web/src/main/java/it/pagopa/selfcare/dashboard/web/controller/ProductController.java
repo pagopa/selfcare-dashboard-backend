@@ -8,7 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
 import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
-import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
@@ -35,18 +35,18 @@ public class ProductController {
     private final ProductService productService;
     private final ExchangeTokenService exchangeTokenService;
     private final BrokerService brokerService;
-    private final BrokerMapper brokerMapper;
+    private final BrokerResourceMapper brokerResourceMapper;
     private static final String PAGO_PA_PRODUCT_ID = "prod-pagopa";
 
     @Autowired
     public ProductController(ProductService productService,
                              ExchangeTokenService exchangeTokenService,
                              BrokerService brokerService,
-                             BrokerMapper brokerMapper) {
+                             BrokerResourceMapper brokerResourceMapper) {
         this.productService = productService;
         this.exchangeTokenService = exchangeTokenService;
         this.brokerService = brokerService;
-        this.brokerMapper = brokerMapper;
+        this.brokerResourceMapper = brokerResourceMapper;
     }
 
     @GetMapping(value = "/{productId}/roles")
@@ -100,7 +100,7 @@ public class ProductController {
         Collection<BrokerResource> result = Collections.emptyList();
         if(PAGO_PA_PRODUCT_ID.equals(productId)) {
             List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(institutionType.name());
-            result = brokerMapper.toResourceList(brokers);
+            result = brokerResourceMapper.toResourceList(brokers);
         } else {
             //TODO retrieve data from ms-core
         }

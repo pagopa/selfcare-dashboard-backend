@@ -7,8 +7,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BrokerInfo {
 
-    private String brokerCode;
-    private String brokerPspCode;
+    private String code;
     private String description;
     private Boolean enabled;
     private Boolean extendedFaultBean;

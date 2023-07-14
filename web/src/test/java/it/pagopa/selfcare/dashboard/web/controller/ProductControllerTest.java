@@ -9,7 +9,7 @@ import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
-import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerMapperImpl;
+import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
@@ -37,7 +37,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {ProductController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {ProductController.class, WebTestConfig.class, BrokerMapperImpl.class})
+@ContextConfiguration(classes = {ProductController.class, WebTestConfig.class, BrokerResourceMapperImpl.class})
 class ProductControllerTest {
 
     private static final String BASE_URL = "/products";
@@ -118,7 +118,9 @@ class ProductControllerTest {
     void getProductBrokers() throws Exception {
         // given
         BrokerInfo brokerInfo = new BrokerInfo();
-        brokerInfo.setBrokerCode("code");
+        brokerInfo.setCode("code");
+        brokerInfo.setDescription("description");
+
         String productId = "prod-pagopa";
         String institutionType = "PSP";
         when(brokerServiceMock.findAllByInstitutionType(anyString()))
@@ -133,10 +135,15 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         // then
-        Collection<BrokerResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+        List<BrokerResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
                 });
+
         assertNotNull(resources);
+        assertEquals(1, resources.size());
+        assertEquals(brokerInfo.getCode(), resources.get(0).getCode());
+        assertEquals(brokerInfo.getDescription(), resources.get(0).getDescription());
+
         verify(brokerServiceMock, times(1))
                 .findAllByInstitutionType(institutionType);
         verifyNoMoreInteractions(brokerServiceMock);

@@ -7,7 +7,8 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper
-public interface BrokerMapper {
+public interface BrokerResourceMapper {
+
     BrokerResource toResource(BrokerInfo brokerInfo);
     List<BrokerResource> toResourceList(List<BrokerInfo> brokerInfos);
     
