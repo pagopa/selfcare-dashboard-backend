@@ -3620,6 +3620,11 @@
               "$ref" : "#/components/schemas/SubProductResource"
             }
           },
+          "delegable" : {
+            "type" : "boolean",
+            "description" : "If a product is delegable to a technical partner ",
+            "example" : false
+          },
           "description" : {
             "type" : "string",
             "description" : "Product's description"
@@ -3711,6 +3716,11 @@
         "title" : "SubProductResource",
         "type" : "object",
         "properties" : {
+          "delegable" : {
+            "type" : "boolean",
+            "description" : "If a product is delegable to a technical partner ",
+            "example" : false
+          },
           "description" : {
             "type" : "string",
             "description" : "Product's description"
