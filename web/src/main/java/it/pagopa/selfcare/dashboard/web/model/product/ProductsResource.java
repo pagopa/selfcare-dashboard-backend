@@ -50,6 +50,9 @@ public class ProductsResource {
     @ApiModelProperty(value = "${swagger.dashboard.products.model.status}")
     private ProductStatus status;
 
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.delegable}")
+    private boolean delegable;
+
     @ApiModelProperty(value = "${swagger.dashboard.products.model.children}")
     private List<SubProductResource> children;
 

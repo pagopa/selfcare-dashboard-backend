@@ -20,6 +20,9 @@ public class SubProductResource {
     @ApiModelProperty(value = "${swagger.dashboard.products.model.status}")
     private ProductStatus status;
 
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.delegable}")
+    private boolean delegable;
+
     @ApiModelProperty(value = "${swagger.dashboard.products.model.imageUrl}")
     private String imageUrl;
 
