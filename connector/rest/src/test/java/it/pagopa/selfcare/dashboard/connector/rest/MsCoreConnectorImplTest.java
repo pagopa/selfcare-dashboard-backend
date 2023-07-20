@@ -11,6 +11,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -924,6 +926,20 @@ class MsCoreConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
         verifyNoInteractions(msCoreRestClientMock);
+    }
+
+    @Test
+    void createDelegation() {
+        // given
+        Delegation delegation = new Delegation();
+        delegation.setId("id");
+        DelegationId delegationId = new DelegationId();
+        delegationId.setId("id");
+        when(msCoreRestClientMock.createDelegation(any()))
+                .thenReturn(delegationId);
+        DelegationId response = msCoreConnector.createDelegation(delegation);
+        assertNotNull(response);
+        assertEquals(response.getId(), delegationId.getId());
     }
 
 }

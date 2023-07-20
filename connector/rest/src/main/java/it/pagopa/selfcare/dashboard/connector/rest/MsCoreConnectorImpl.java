@@ -3,6 +3,8 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -156,6 +158,16 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.debug("updateInstitutionDescription result = {}", institution);
         log.trace("updateInstitutionDescription end");
         return institution;
+    }
+
+    @Override
+    public DelegationId createDelegation(Delegation delegation) {
+        log.trace("createDelegation start");
+        log.debug("createDelegation request = {}", delegation.toString());
+        DelegationId result = msCoreRestClient.createDelegation(delegation);
+        log.debug("updateInstitutionDescription result = {}", result);
+        log.trace("updateInstitutionDescription end");
+        return result;
     }
 
 }

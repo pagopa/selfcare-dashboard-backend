@@ -20,6 +20,9 @@
     }
   } ],
   "tags" : [ {
+    "name" : "delegations",
+    "description" : "Delegation Controller"
+  }, {
     "name" : "institutions",
     "description" : "Institution operations"
   }, {
@@ -45,6 +48,68 @@
     "description" : "UserGroups operations"
   } ],
   "paths" : {
+    "/delegations" : {
+      "post" : {
+        "tags" : [ "delegations" ],
+        "summary" : "createDelegation",
+        "description" : "Service to create association between institution and technical partner",
+        "operationId" : "createDelegationUsingPOST",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/DelegationRequestDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DelegationIdResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/institutions" : {
       "get" : {
         "tags" : [ "institutions" ],
@@ -2878,6 +2943,44 @@
           "productId" : {
             "type" : "string",
             "description" : "Users group's productId"
+          }
+        }
+      },
+      "DelegationIdResource" : {
+        "title" : "DelegationIdResource",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "description" : "Delegation's unique identifier"
+          }
+        }
+      },
+      "DelegationRequestDto" : {
+        "title" : "DelegationRequestDto",
+        "required" : [ "from", "institutionFromName", "productId", "to", "type" ],
+        "type" : "object",
+        "properties" : {
+          "from" : {
+            "type" : "string",
+            "description" : "Institution's identifier"
+          },
+          "institutionFromName" : {
+            "type" : "string",
+            "description" : "Institution's name"
+          },
+          "productId" : {
+            "type" : "string",
+            "description" : "Product's identifier"
+          },
+          "to" : {
+            "type" : "string",
+            "description" : "Technical partner's identifier"
+          },
+          "type" : {
+            "type" : "string",
+            "description" : "Delegation type",
+            "enum" : [ "AOO", "PT" ]
           }
         }
       },
