@@ -17,7 +17,7 @@ public interface InstitutionService {
 
     InstitutionInfo getInstitution(String institutionId);
 
-    Collection<InstitutionInfo> getInstitutions();
+    Collection<InstitutionInfo> getInstitutions(String userId);
 
     void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 

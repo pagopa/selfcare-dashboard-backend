@@ -51,6 +51,47 @@
         "summary" : "getInstitutions",
         "description" : "Service to get all the institutions related to logged user",
         "operationId" : "getInstitutionsUsingGET",
+        "parameters" : [ {
+          "name" : "authenticated",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "authorities[0].authority",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "credentials",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "details",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "principal",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        } ],
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -1147,72 +1188,6 @@
               "application/json" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/OnboardingRequestResource"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      }
-    },
-    "/pnPGInstitutions" : {
-      "get" : {
-        "tags" : [ "pnPGInstitutions" ],
-        "summary" : "getPnPGInstitutions",
-        "description" : "Service to get the PG institutions related to selection of logged user",
-        "operationId" : "getPnPGInstitutionsUsingGET",
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/PnPGInstitutionResource"
-                  }
                 }
               }
             }
@@ -3357,75 +3332,6 @@
           "surname" : {
             "type" : "string",
             "description" : "User's surname"
-          }
-        }
-      },
-      "PnPGInstitutionResource" : {
-        "title" : "PnPGInstitutionResource",
-        "type" : "object",
-        "properties" : {
-          "address" : {
-            "type" : "string",
-            "description" : "Institution's physical address"
-          },
-          "category" : {
-            "type" : "string",
-            "description" : "Institution's category"
-          },
-          "externalId" : {
-            "type" : "string",
-            "description" : "Institution's unique external identifier"
-          },
-          "fiscalCode" : {
-            "type" : "string",
-            "description" : "Fiscal code corresponding to the institution"
-          },
-          "geographicTaxonomies" : {
-            "type" : "array",
-            "description" : "Institution's geographic taxonomy",
-            "items" : {
-              "$ref" : "#/components/schemas/GeographicTaxonomyResource"
-            }
-          },
-          "id" : {
-            "type" : "string",
-            "description" : "Institution's unique internal identifier"
-          },
-          "institutionType" : {
-            "type" : "string",
-            "description" : "Institution's type"
-          },
-          "mailAddress" : {
-            "type" : "string",
-            "description" : "Institution's email address"
-          },
-          "name" : {
-            "type" : "string",
-            "description" : "Institution's name"
-          },
-          "origin" : {
-            "type" : "string",
-            "description" : "Institution's data origin"
-          },
-          "originId" : {
-            "type" : "string",
-            "description" : "Institution's identifier related to origin"
-          },
-          "recipientCode" : {
-            "type" : "string",
-            "description" : "Billing recipient code"
-          },
-          "status" : {
-            "type" : "string",
-            "description" : "Institution's status"
-          },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
-          },
-          "zipCode" : {
-            "type" : "string",
-            "description" : "Institution's zipCode"
           }
         }
       },
