@@ -23,6 +23,8 @@ public interface InstitutionService {
 
     List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId);
 
+    Collection<InstitutionInfo> getInstitutions();
+
     List<ProductTree> getInstitutionProducts(String institutionId);
 
     /**

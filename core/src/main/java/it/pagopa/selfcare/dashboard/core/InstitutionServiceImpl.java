@@ -120,6 +120,16 @@ class InstitutionServiceImpl implements InstitutionService {
         return result;
     }
 
+    @Deprecated
+    @Override
+    public Collection<InstitutionInfo> getInstitutions() {
+        log.trace("getInstitutions start");
+        Collection<InstitutionInfo> result = msCoreConnector.getOnBoardedInstitutions();
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
+        log.trace("getInstitutions end");
+        return result;
+    }
+
     @Override
     public List<ProductTree> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");

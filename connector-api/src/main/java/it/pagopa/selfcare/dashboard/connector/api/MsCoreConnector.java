@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface MsCoreConnector {
 
+    Collection<InstitutionInfo> getOnBoardedInstitutions();
+
     List<InstitutionInfo> getUserProducts(String userId);
 
     UserInfo getUser(String relationshipId);

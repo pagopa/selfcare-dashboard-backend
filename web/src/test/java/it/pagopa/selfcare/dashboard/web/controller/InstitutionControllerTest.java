@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
+import it.pagopa.selfcare.dashboard.web.model.GET_INSTITUTION_MODE;
 import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
@@ -169,16 +170,14 @@ class InstitutionControllerTest {
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/")
+                .get(BASE_URL + "?mode=" + GET_INSTITUTION_MODE.BASE.name())
                 .principal(authentication)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
         // then
-        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
+        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
         verify(institutionServiceMock, times(1))
