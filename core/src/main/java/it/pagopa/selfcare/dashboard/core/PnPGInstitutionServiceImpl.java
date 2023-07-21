@@ -2,14 +2,11 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,16 +28,6 @@ class PnPGInstitutionServiceImpl implements PnPGInstitutionService {
     @Autowired
     public PnPGInstitutionServiceImpl(MsCoreConnector msCoreConnector) {
         this.msCoreConnector = msCoreConnector;
-    }
-
-
-    @Override
-    public Collection<InstitutionInfo> getInstitutions() {
-        log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = msCoreConnector.getOnBoardedInstitutions();
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
-        log.trace("getInstitutions end");
-        return result;
     }
 
     @Override

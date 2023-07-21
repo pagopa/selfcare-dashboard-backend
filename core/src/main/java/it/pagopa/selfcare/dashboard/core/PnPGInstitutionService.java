@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface PnPGInstitutionService {
 
-    Collection<InstitutionInfo> getInstitutions();
-
     List<PartyProduct> getInstitutionProducts(String institutionId);
 
 }

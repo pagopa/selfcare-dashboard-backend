@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -14,10 +15,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.model.*;
-import it.pagopa.selfcare.dashboard.web.model.mapper.GeographicTaxonomyMapper;
-import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
-import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.*;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
@@ -27,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,12 +45,14 @@ public class InstitutionController {
 
     private final FileStorageService storageService;
     private final InstitutionService institutionService;
+    private final InstitutionResourceMapper institutionResourceMapper;
 
 
     @Autowired
-    public InstitutionController(FileStorageService storageService, InstitutionService institutionService) {
+    public InstitutionController(FileStorageService storageService, InstitutionService institutionService, InstitutionResourceMapper institutionResourceMapper) {
         this.storageService = storageService;
         this.institutionService = institutionService;
+        this.institutionResourceMapper = institutionResourceMapper;
     }
 
 
@@ -77,13 +78,13 @@ public class InstitutionController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
-    public List<InstitutionResource> getInstitutions() {
+    public List<InstitutionResource> getInstitutions(Authentication authentication) {
 
         log.trace("getInstitutions start");
-
-        Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
+        String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
+        Collection<InstitutionInfo> institutions = institutionService.getInstitutions(userId);
         List<InstitutionResource> result = institutions.stream()
-                .map(InstitutionMapper::toResource)
+                .map(institutionResourceMapper::toResource)
                 .collect(Collectors.toList());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
