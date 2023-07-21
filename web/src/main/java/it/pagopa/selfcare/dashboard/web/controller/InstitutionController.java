@@ -78,11 +78,15 @@ public class InstitutionController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
-    public List<InstitutionResource> getInstitutions(Authentication authentication) {
+    public List<InstitutionResource> getInstitutions(Authentication authentication,
+                                                     @RequestParam(value = "mode", required = false)
+                                                     Optional<GET_INSTITUTION_MODE> optMode) {
 
         log.trace("getInstitutions start");
         String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<InstitutionInfo> institutions = institutionService.getInstitutions(userId);
+        Collection<InstitutionInfo> institutions = optMode.isPresent() && optMode.get().equals(GET_INSTITUTION_MODE.BASE)
+                ? institutionService.getInstitutions(userId)
+                : institutionService.getInstitutions();
         List<InstitutionResource> result = institutions.stream()
                 .map(institutionResourceMapper::toResource)
                 .collect(Collectors.toList());
