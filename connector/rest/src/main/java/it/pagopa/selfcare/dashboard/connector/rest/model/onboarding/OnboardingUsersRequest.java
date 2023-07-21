@@ -20,7 +20,7 @@ import java.util.List;
 public class OnboardingUsersRequest {
 
     private String productId;
+    private String productTitle;
     private List<User> users;
     private String institutionId;
-
 }
