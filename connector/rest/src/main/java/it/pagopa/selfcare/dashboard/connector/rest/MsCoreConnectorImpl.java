@@ -51,12 +51,19 @@ class MsCoreConnectorImpl implements MsCoreConnector {
 
     @Deprecated
     @Override
-    public Collection<InstitutionInfo> getOnBoardedInstitutions() {
-        log.trace("getOnBoardedInstitutions start");
-        OnBoardingInfo onBoardingInfo = msCoreRestClient.getOnBoardingInfo(null, null, EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED));
-        Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
-        log.debug("getOnBoardedInstitutions result = {}", result);
-        log.trace("getOnBoardedInstitutions end");
+    public List<InstitutionInfo> getUserProducts(String userId) {
+        log.trace("getUserProducts start");
+        UserProductsResponse productsInfoUsingGET = msCoreUserApiRestClient._getUserProductsInfoUsingGET(userId, null,
+                String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+
+        if(Objects.isNull(productsInfoUsingGET) ||
+                Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
+
+        List<InstitutionInfo> result = productsInfoUsingGET.getBindings().stream()
+                .map(institutionMapper::toInstitutionInfo)
+                .collect(Collectors.toList());
+        log.debug("getUserProducts result = {}", result);
+        log.trace("getUserProducts end");
         return result;
     }
 

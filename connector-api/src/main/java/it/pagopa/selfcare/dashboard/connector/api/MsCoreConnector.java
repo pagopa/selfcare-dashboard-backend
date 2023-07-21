@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface MsCoreConnector {
 
-    Collection<InstitutionInfo> getOnBoardedInstitutions();
+    List<InstitutionInfo> getUserProducts(String userId);
 
     List<InstitutionInfo> getUserProducts(String userId);
 

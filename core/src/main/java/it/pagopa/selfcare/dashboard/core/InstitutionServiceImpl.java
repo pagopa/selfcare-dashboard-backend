@@ -124,7 +124,7 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = msCoreConnector.getOnBoardedInstitutions();
+        Collection<InstitutionInfo> result = msCoreConnector.getUserProducts(userId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
