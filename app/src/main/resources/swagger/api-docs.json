@@ -91,6 +91,16 @@
           "schema" : {
             "type" : "object"
           }
+        }, {
+          "name" : "mode",
+          "in" : "query",
+          "description" : "mode",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "BASE", "FULLY" ]
+          }
         } ],
         "responses" : {
           "200" : {
