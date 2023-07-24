@@ -2,12 +2,11 @@ package it.pagopa.selfcare.dashboard.connector.model.delegation;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
+import javax.validation.constraints.NotBlank;
 
 @Data
 public class DelegationId {
-    @NotNull
+    @NotBlank
     private String id;
 
 }
