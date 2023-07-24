@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.core.*;
 import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,9 @@ class SwaggerConfigTest {
 
     @MockBean
     private DelegationMapper delegationMapperImpl;
+
+    @MockBean
+    private InstitutionResourceMapper institutionResourceMapper;
 
     @Autowired
     WebApplicationContext context;

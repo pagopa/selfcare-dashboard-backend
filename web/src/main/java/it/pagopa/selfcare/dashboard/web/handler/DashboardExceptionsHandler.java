@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.handler;
 
 import it.pagopa.selfcare.commons.web.model.Problem;
 import it.pagopa.selfcare.commons.web.model.mapper.ProblemMapper;
+import it.pagopa.selfcare.dashboard.connector.exception.InternalGatewayErrorException;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
@@ -11,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * Exception handler for dashboard controllers
@@ -40,4 +40,10 @@ public class DashboardExceptionsHandler {
         return ProblemMapper.toResponseEntity(new Problem(NOT_FOUND, e.getMessage()));
     }
 
+
+    @ExceptionHandler({InternalGatewayErrorException.class})
+    ResponseEntity<Problem> handleInternalGatewayErrorException(InternalGatewayErrorException e) {
+        log.warn(e.toString());
+        return ProblemMapper.toResponseEntity(new Problem(BAD_GATEWAY, e.getMessage()));
+    }
 }
