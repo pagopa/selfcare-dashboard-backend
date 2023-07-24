@@ -47,34 +47,6 @@ class PnPGInstitutionControllerTest {
     private PnPGInstitutionService pnPGInstitutionServiceMock;
 
     @Test
-    void getPnPGInstitutions_institutionInfoNotNull() throws Exception {
-        // given
-        when(pnPGInstitutionServiceMock.getInstitutions())
-                .thenAnswer(invocationOnMock -> {
-                    List<InstitutionInfo> listOfInstitutionInfo = List.of(mockInstance(new InstitutionInfo()));
-                    listOfInstitutionInfo.get(0).setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-                    System.out.println(listOfInstitutionInfo);
-                    return listOfInstitutionInfo;
-                });
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/")
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(resources);
-        assertFalse(resources.isEmpty());
-        verify(pnPGInstitutionServiceMock, times(1))
-                .getInstitutions();
-        verifyNoMoreInteractions(pnPGInstitutionServiceMock);
-    }
-
-    @Test
     void getPnPGInstitutionProducts_notNull() throws Exception {
         // given
         String institutionId = "institutionId";

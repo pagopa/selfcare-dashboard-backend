@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
@@ -11,9 +12,11 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutio
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
@@ -36,13 +39,19 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution description is required";
 
     private final MsCoreRestClient msCoreRestClient;
+    private final MsCoreUserApiRestClient msCoreUserApiRestClient;
+
+    private final InstitutionMapper institutionMapper;
 
 
     @Autowired
-    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient) {
+    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper) {
         this.msCoreRestClient = msCoreRestClient;
+        this.msCoreUserApiRestClient = msCoreUserApiRestClient;
+        this.institutionMapper = institutionMapper;
     }
 
+    @Deprecated
     @Override
     public Collection<InstitutionInfo> getOnBoardedInstitutions() {
         log.trace("getOnBoardedInstitutions start");
@@ -50,6 +59,22 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         Collection<InstitutionInfo> result = parseOnBoardingInfo(onBoardingInfo);
         log.debug("getOnBoardedInstitutions result = {}", result);
         log.trace("getOnBoardedInstitutions end");
+        return result;
+    }
+    @Override
+    public List<InstitutionInfo> getUserProducts(String userId) {
+        log.trace("getUserProducts start");
+        UserProductsResponse productsInfoUsingGET = msCoreUserApiRestClient._getUserProductsInfoUsingGET(userId, null,
+                String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+
+        if(Objects.isNull(productsInfoUsingGET) ||
+                Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
+
+        List<InstitutionInfo> result = productsInfoUsingGET.getBindings().stream()
+                .map(institutionMapper::toInstitutionInfo)
+                .collect(Collectors.toList());
+        log.debug("getUserProducts result = {}", result);
+        log.trace("getUserProducts end");
         return result;
     }
 

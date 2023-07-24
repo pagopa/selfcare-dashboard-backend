@@ -14,7 +14,10 @@ import java.util.List;
 
 public interface MsCoreConnector {
 
+    @Deprecated
     Collection<InstitutionInfo> getOnBoardedInstitutions();
+
+    List<InstitutionInfo> getUserProducts(String userId);
 
     UserInfo getUser(String relationshipId);
 
