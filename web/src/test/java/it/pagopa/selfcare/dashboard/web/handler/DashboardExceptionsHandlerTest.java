@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.handler;
 
 import it.pagopa.selfcare.commons.web.model.Problem;
+import it.pagopa.selfcare.dashboard.connector.exception.InternalGatewayErrorException;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
@@ -12,8 +13,7 @@ import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 class DashboardExceptionsHandlerTest {
 
@@ -66,6 +66,26 @@ class DashboardExceptionsHandlerTest {
         assertNotNull(responseEntity.getBody());
         assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
         assertEquals(NOT_FOUND.value(), responseEntity.getBody().getStatus());
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {
+            InternalGatewayErrorException.class
+    })
+    void handleInternalGatewayErrorException(Class<?> clazz) {
+        // given
+        InternalGatewayErrorException exceptionMock = (InternalGatewayErrorException) Mockito.mock(clazz);
+        Mockito.when(exceptionMock.getMessage())
+                .thenReturn(DETAIL_MESSAGE);
+        // when
+        ResponseEntity<Problem> responseEntity = handler.handleInternalGatewayErrorException(exceptionMock);
+        // then
+        assertNotNull(responseEntity);
+        assertEquals(BAD_GATEWAY, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
+        assertEquals(BAD_GATEWAY.value(), responseEntity.getBody().getStatus());
     }
 
 }

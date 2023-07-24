@@ -37,22 +37,6 @@ public class PnPGInstitutionController {
         this.pnPGInstitutionService = pnPGInstitutionService;
     }
 
-    @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.pnPGInstitutions.api.getInstitutions}")
-    public List<PnPGInstitutionResource> getPnPGInstitutions() {
-
-        log.trace("getPnPGInstitution start");
-        Collection<InstitutionInfo> institutions = pnPGInstitutionService.getInstitutions();
-        List<PnPGInstitutionResource> result = institutions.stream()
-                .map(PnPGInstitutionMapper::toResource)
-                .collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getPnPGInstitution result = {}", result);
-        log.trace("getPnPGInstitution end");
-
-        return result;
-    }
-
     @GetMapping(value = "/{institutionId}/products")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
