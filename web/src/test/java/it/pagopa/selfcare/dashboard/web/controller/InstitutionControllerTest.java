@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
@@ -13,9 +14,11 @@ import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
+import it.pagopa.selfcare.dashboard.web.model.GET_INSTITUTION_MODE;
 import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.junit.jupiter.api.Assertions;
@@ -31,6 +34,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -75,6 +79,9 @@ class InstitutionControllerTest {
 
     @MockBean
     private InstitutionService institutionServiceMock;
+
+    @MockBean
+    private InstitutionResourceMapper institutionResourceMapperMock;
 
 
     @Test
@@ -151,16 +158,20 @@ class InstitutionControllerTest {
     @Test
     void getInstitutions_institutionInfoNotNull() throws Exception {
         // given
-        when(institutionServiceMock.getInstitutions())
+        String userId = "userId";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
+
+        when(institutionServiceMock.getInstitutions(userId))
                 .thenAnswer(invocationOnMock -> {
                     List<InstitutionInfo> listOfInstitutionInfo = List.of(mockInstance(new InstitutionInfo()));
                     listOfInstitutionInfo.get(0).setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-                    System.out.println(listOfInstitutionInfo);
                     return listOfInstitutionInfo;
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/")
+                .get(BASE_URL + "?mode=" + GET_INSTITUTION_MODE.BASE.name())
+                .principal(authentication)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
@@ -172,7 +183,7 @@ class InstitutionControllerTest {
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
         verify(institutionServiceMock, times(1))
-                .getInstitutions();
+                .getInstitutions(userId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 

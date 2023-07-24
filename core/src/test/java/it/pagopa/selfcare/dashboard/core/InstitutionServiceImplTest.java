@@ -181,17 +181,18 @@ class InstitutionServiceImplTest {
     @Test
     void getInstitutions() {
         // given
+        String userId = "userId";
         InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
-        when(msCoreConnectorMock.getOnBoardedInstitutions())
+        when(msCoreConnectorMock.getUserProducts(userId))
                 .thenReturn(List.of(expectedInstitutionInfo));
         // when
-        Collection<InstitutionInfo> institutions = institutionService.getInstitutions();
+        Collection<InstitutionInfo> institutions = institutionService.getInstitutions(userId);
         // then
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
         assertSame(expectedInstitutionInfo, institutions.iterator().next());
         verify(msCoreConnectorMock, times(1))
-                .getOnBoardedInstitutions();
+                .getUserProducts(userId);
         verifyNoMoreInteractions(msCoreConnectorMock);
     }
 

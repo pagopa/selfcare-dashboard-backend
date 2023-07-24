@@ -17,11 +17,14 @@ public interface InstitutionService {
 
     InstitutionInfo getInstitution(String institutionId);
 
-    Collection<InstitutionInfo> getInstitutions();
+    Collection<InstitutionInfo> getInstitutions(String userId);
 
     void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 
     List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId);
+
+    @Deprecated
+    Collection<InstitutionInfo> getInstitutions();
 
     List<ProductTree> getInstitutionProducts(String institutionId);
 
