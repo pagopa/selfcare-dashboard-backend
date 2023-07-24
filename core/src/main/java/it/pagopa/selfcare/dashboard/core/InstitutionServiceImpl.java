@@ -117,7 +117,11 @@ class InstitutionServiceImpl implements InstitutionService {
         return result;
     }
 
-    @Deprecated
+    /**
+     * @deprecated method has been deprecated because a new method has been implemented.
+     * Remove the query from the repository
+     */
+    @Deprecated(forRemoval = true)
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
