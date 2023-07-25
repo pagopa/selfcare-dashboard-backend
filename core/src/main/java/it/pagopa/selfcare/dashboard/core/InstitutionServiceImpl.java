@@ -112,6 +112,16 @@ class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
+    public Collection<InstitutionInfo> getInstitutions(String userId) {
+        log.trace("getInstitutions start");
+        Collection<InstitutionInfo> result = msCoreConnector.getUserProducts(userId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
+        log.trace("getInstitutions end");
+        return result;
+    }
+
+    @Deprecated
+    @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
         Collection<InstitutionInfo> result = msCoreConnector.getOnBoardedInstitutions();
@@ -119,7 +129,6 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getInstitutions end");
         return result;
     }
-
     @Override
     public List<ProductTree> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");

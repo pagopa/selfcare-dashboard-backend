@@ -25,6 +25,7 @@ public class Product {
     private String userRole;
     private ProductOnBoardingStatus onBoardingStatus;
     private ProductStatus status;
+    private boolean delegable;
     private String identityTokenAudience;
     private EnumMap<PartyRole, ProductRoleInfo> roleMappings;
     private Map<String, BackOfficeConfigurations> backOfficeEnvironmentConfigurations;

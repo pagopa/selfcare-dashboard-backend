@@ -10,7 +10,11 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionProducts;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -18,9 +22,12 @@ import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
@@ -37,6 +44,8 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -58,12 +67,24 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = {
-                MsCoreConnectorImpl.class
+                MsCoreConnectorImpl.class, InstitutionMapperImpl.class
         }
 )
 class MsCoreConnectorImplTest {
 
     private final ObjectMapper mapper;
+
+    @Autowired
+    private MsCoreConnectorImpl msCoreConnector;
+
+    @MockBean
+    private MsCoreRestClient msCoreRestClientMock;
+
+    @MockBean
+    private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
+
+    @Captor
+    private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
 
     public MsCoreConnectorImplTest() {
         mapper = new ObjectMapper();
@@ -105,131 +126,62 @@ class MsCoreConnectorImplTest {
     private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
 
     @Test
-    void getOnBoardedInstitutions_toBeValidatedtoBeValidate() {
+    void getUserProducts_shouldGetEmptyData() {
         // given
-        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
-        onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData1.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onboardingData1.setState(RelationshipState.TOBEVALIDATED);
-        OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
-        onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData2.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onboardingData2.setState(RelationshipState.TOBEVALIDATED);
-        onboardingData2.setId(onboardingData1.getId());
-        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2));
-        when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
-                .thenReturn(onBoardingInfo);
+        String userId = "userId";
+
+        UserProductsResponse userProductsResponse = new UserProductsResponse();
+        userProductsResponse.setId(userId);
+        userProductsResponse.setBindings(List.of());
+
+        ResponseEntity<UserProductsResponse> userProductsResponseResponseEntity = mock(ResponseEntity.class);
+        when(userProductsResponseResponseEntity.getBody()).thenReturn(userProductsResponse);
+
+        when(msCoreUserApiRestClientMock._getUserProductsInfoUsingGET(any(), any(), any()))
+                .thenReturn(userProductsResponseResponseEntity);
         // when
-        Collection<InstitutionInfo> institutions = msCoreConnector.getOnBoardedInstitutions();
+        List<InstitutionInfo> institutions = msCoreConnector.getUserProducts(userId);
         // then
         assertNotNull(institutions);
-        assertEquals(1, institutions.size());
-        Map<RelationshipState, List<InstitutionInfo>> map = institutions.stream()
-                .collect(Collectors.groupingBy(InstitutionInfo::getStatus));
-        List<InstitutionInfo> institutionInfos = map.get(RelationshipState.TOBEVALIDATED);
-        assertEquals(1, institutionInfos.size());
-        assertEquals(onboardingData2.getDescription(), institutionInfos.get(0).getDescription());
-        assertEquals(onboardingData2.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData2.getExternalId(), institutionInfos.get(0).getExternalId());
-        assertEquals(onboardingData2.getState(), institutionInfos.get(0).getStatus());
-        assertEquals(onboardingData2.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
-        assertEquals(onboardingData2.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData2.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
-        assertEquals(onboardingData2.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
-        reflectionEqualsByName(onboardingData2.getPaymentServiceProvider(), institutionInfos.get(0).getPaymentServiceProvider());
-        reflectionEqualsByName(onboardingData2.getSupportContact(), institutionInfos.get(0).getSupportContact());
-        reflectionEqualsByName(onboardingData2.getBilling(), institutionInfos.get(0).getBilling());
-        verify(msCoreRestClientMock, times(1))
-                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
-        verifyNoMoreInteractions(msCoreRestClientMock);
+        assertEquals(0, institutions.size());
+        
+        verify(msCoreUserApiRestClientMock, times(1))
+                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())));
+        verifyNoMoreInteractions(msCoreUserApiRestClientMock);
     }
 
     @Test
-    void getOnBoardedInstitutions_pendingToBeValidated() {
+    void getUserProducts_shouldGetData() {
         // given
-        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
-        onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData1.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onboardingData1.setState(RelationshipState.PENDING);
-        OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
-        onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData2.setState(RelationshipState.TOBEVALIDATED);
-        onboardingData2.setId(onboardingData1.getId());
-        onboardingData2.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2));
-        when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
-                .thenReturn(onBoardingInfo);
-        // when
-        Collection<InstitutionInfo> institutions = msCoreConnector.getOnBoardedInstitutions();
-        // then
-        assertNotNull(institutions);
-        assertEquals(1, institutions.size());
-        Map<RelationshipState, List<InstitutionInfo>> map = institutions.stream()
-                .collect(Collectors.groupingBy(InstitutionInfo::getStatus));
-        List<InstitutionInfo> institutionInfos = map.get(RelationshipState.PENDING);
-        assertEquals(1, institutionInfos.size());
-        assertEquals(onboardingData1.getDescription(), institutionInfos.get(0).getDescription());
-        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData1.getExternalId(), institutionInfos.get(0).getExternalId());
-        assertEquals(onboardingData1.getState(), institutionInfos.get(0).getStatus());
-        assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
-        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
-        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
-        reflectionEqualsByName(onboardingData1.getPaymentServiceProvider(), institutionInfos.get(0).getPaymentServiceProvider());
-        reflectionEqualsByName(onboardingData1.getSupportContact(), institutionInfos.get(0).getSupportContact());
-        reflectionEqualsByName(onboardingData1.getBilling(), institutionInfos.get(0).getBilling());
-        verify(msCoreRestClientMock, times(1))
-                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
-        verifyNoMoreInteractions(msCoreRestClientMock);
-    }
+        String userId = "userId";
 
-    @Test
-    void getOnBoardedInstitutions_activePendingToBeValidated() {
-        // given
-        OnBoardingInfo onBoardingInfo = new OnBoardingInfo();
-        OnboardingData onboardingData1 = mockInstance(new OnboardingData(), 1, "setState");
-        onboardingData1.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData1.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onboardingData1.setState(RelationshipState.ACTIVE);
-        OnboardingData onboardingData2 = mockInstance(new OnboardingData(), 2, "setState", "setId");
-        onboardingData2.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData2.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onboardingData2.setState(RelationshipState.PENDING);
-        onboardingData2.setId(onboardingData1.getId());
-        OnboardingData onboardingData3 = mockInstance(new OnboardingData(), 3, "setState", "setId");
-        onboardingData3.setAttributes(List.of(mockInstance(new Attribute())));
-        onboardingData3.setState(RelationshipState.TOBEVALIDATED);
-        onboardingData3.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        onboardingData3.setId(onboardingData1.getId());
-        onBoardingInfo.setInstitutions(List.of(onboardingData1, onboardingData2, onboardingData3));
-        when(msCoreRestClientMock.getOnBoardingInfo(any(), any(), any()))
-                .thenReturn(onBoardingInfo);
+        UserProductsResponse userProductsResponse = new UserProductsResponse();
+        userProductsResponse.setId(userId);
+        InstitutionProducts institutionProducts = new InstitutionProducts();
+        institutionProducts.setInstitutionId("institutionId");
+        institutionProducts.setProducts(List.of(it.pagopa.selfcare.core.generated.openapi.v1.dto.Product.builder()
+                        .status(it.pagopa.selfcare.core.generated.openapi.v1.dto.Product.StatusEnum.ACTIVE)
+                .build()));
+        userProductsResponse.setBindings(List.of(institutionProducts));
+
+        ResponseEntity<UserProductsResponse> userProductsResponseResponseEntity = mock(ResponseEntity.class);
+        when(userProductsResponseResponseEntity.getBody()).thenReturn(userProductsResponse);
+
+        when(msCoreUserApiRestClientMock._getUserProductsInfoUsingGET(any(), any(), any()))
+                .thenReturn(userProductsResponseResponseEntity);
         // when
-        Collection<InstitutionInfo> institutions = msCoreConnector.getOnBoardedInstitutions();
+        List<InstitutionInfo> institutions = msCoreConnector.getUserProducts(userId);
         // then
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
-        Map<RelationshipState, List<InstitutionInfo>> map = institutions.stream()
-                .collect(Collectors.groupingBy(InstitutionInfo::getStatus));
-        List<InstitutionInfo> institutionInfos = map.get(RelationshipState.ACTIVE);
-        assertEquals(1, institutionInfos.size());
-        assertEquals(onboardingData1.getDescription(), institutionInfos.get(0).getDescription());
-        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData1.getExternalId(), institutionInfos.get(0).getExternalId());
-        assertEquals(onboardingData1.getState(), institutionInfos.get(0).getStatus());
-        assertEquals(onboardingData1.getAttributes().get(0).getDescription(), institutionInfos.get(0).getCategory());
-        assertEquals(onboardingData1.getDigitalAddress(), institutionInfos.get(0).getDigitalAddress());
-        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getCode(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getCode());
-        assertEquals(onboardingData1.getGeographicTaxonomies().get(0).getDesc(), institutionInfos.get(0).getGeographicTaxonomies().get(0).getDesc());
-        reflectionEqualsByName(onboardingData1.getPaymentServiceProvider(), institutionInfos.get(0).getPaymentServiceProvider());
-        reflectionEqualsByName(onboardingData1.getSupportContact(), institutionInfos.get(0).getSupportContact());
-        reflectionEqualsByName(onboardingData1.getBilling(), institutionInfos.get(0).getBilling());
-        verify(msCoreRestClientMock, times(1))
-                .getOnBoardingInfo(isNull(), isNull(), eq(EnumSet.of(ACTIVE, PENDING, TOBEVALIDATED)));
-        verifyNoMoreInteractions(msCoreRestClientMock);
+
+        assertEquals(userProductsResponse.getBindings().get(0).getInstitutionName(), institutions.get(0).getDescription());
+        assertEquals(userProductsResponse.getBindings().get(0).getInstitutionRootName(), institutions.get(0).getParentDescription());
+        assertEquals(userProductsResponse.getBindings().get(0).getInstitutionId(), institutions.get(0).getId());
+
+        verify(msCoreUserApiRestClientMock, times(1))
+                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())));
+        verifyNoMoreInteractions(msCoreUserApiRestClientMock);
     }
 
     @Test
@@ -932,6 +884,17 @@ class MsCoreConnectorImplTest {
     }
 
     @Test
+    void createDelegation() {
+        // given
+        Delegation delegation = new Delegation();
+        delegation.setId("id");
+        DelegationId delegationId = new DelegationId();
+        delegationId.setId("id");
+        when(msCoreRestClientMock.createDelegation(any()))
+                .thenReturn(delegationId);
+        DelegationId response = msCoreConnector.createDelegation(delegation);
+        assertNotNull(response);
+        assertEquals(response.getId(), delegationId.getId());
     void findInstitutionsByProductIdAndType() {
         // given
         final String productId = "prod";

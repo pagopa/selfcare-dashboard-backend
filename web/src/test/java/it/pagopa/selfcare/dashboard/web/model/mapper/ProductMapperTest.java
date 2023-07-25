@@ -46,6 +46,7 @@ class ProductMapperTest {
         assertEquals(product.getNode().getOnBoardingStatus(), resource.getProductOnBoardingStatus());
         assertEquals(product.getNode().isAuthorized(), resource.isAuthorized());
         assertEquals(product.getNode().getUserRole(), resource.getUserRole());
+        assertEquals(product.getNode().isDelegable(), resource.isDelegable());
         assertNotNull(resource.getBackOfficeEnvironmentConfigurations());
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
