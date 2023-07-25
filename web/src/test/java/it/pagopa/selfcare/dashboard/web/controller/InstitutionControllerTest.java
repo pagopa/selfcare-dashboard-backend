@@ -19,6 +19,7 @@ import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -57,7 +59,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class, DashboardExceptionsHandler.class})
+@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class, DashboardExceptionsHandler.class, InstitutionResourceMapperImpl.class})
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
@@ -79,9 +81,6 @@ class InstitutionControllerTest {
 
     @MockBean
     private InstitutionService institutionServiceMock;
-
-    @MockBean
-    private InstitutionResourceMapper institutionResourceMapperMock;
 
 
     @Test
@@ -162,12 +161,12 @@ class InstitutionControllerTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
 
-        when(institutionServiceMock.getInstitutions(userId))
-                .thenAnswer(invocationOnMock -> {
-                    List<InstitutionInfo> listOfInstitutionInfo = List.of(mockInstance(new InstitutionInfo()));
-                    listOfInstitutionInfo.get(0).setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-                    return listOfInstitutionInfo;
-                });
+        InstitutionInfo expectedInstitution = mockInstance(new InstitutionInfo());
+        expectedInstitution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+        List<InstitutionInfo> expectedInstitutionInfos = new ArrayList<>();
+        expectedInstitutionInfos.add(expectedInstitution);
+
+        when(institutionServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "?mode=" + GET_INSTITUTION_MODE.BASE.name())
@@ -182,6 +181,8 @@ class InstitutionControllerTest {
                 });
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
+        assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus().name());
+        assertNotNull(resources.get(0).getUserRole());
         verify(institutionServiceMock, times(1))
                 .getInstitutions(userId);
         verifyNoMoreInteractions(institutionServiceMock);
