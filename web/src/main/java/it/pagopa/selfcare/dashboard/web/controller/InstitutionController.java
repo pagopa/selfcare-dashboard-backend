@@ -318,5 +318,4 @@ public class InstitutionController {
         log.trace("updateInstitutionDescription end");
         return result;
     }
-
 }

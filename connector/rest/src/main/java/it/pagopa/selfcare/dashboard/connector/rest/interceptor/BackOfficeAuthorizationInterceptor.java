@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class BackOfficeAuthorizationInterceptor implements RequestInterceptor {
-    @Value("${authorization.pagopa.subscriptionKey}")
-    private String pagoPApiSubscriptionKey;
+    @Value("${backoffice.pago-pa.subscriptionKey}")
+    private String pagoPAApiSubscriptionKey;
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header("Ocp-Apim-Subscription-Key", pagoPApiSubscriptionKey);
+        template.header("Ocp-Apim-Subscription-Key", pagoPAApiSubscriptionKey);
     }
 }

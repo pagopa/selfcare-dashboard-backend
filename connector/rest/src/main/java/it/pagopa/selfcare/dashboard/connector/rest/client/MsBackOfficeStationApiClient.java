@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 /**
  * PagoPa Ms Backoffice Rest Client
  */
-@FeignClient(name = "${rest-client.pago-pa-backoffice-api.serviceCode}", url = "${rest-client.pago-pa-backoffice.base-url}")
+@FeignClient(name = "${rest-client.pago-pa-backoffice-stations-api.serviceCode}", url = "${rest-client.pago-pa-backoffice.base-url}")
 public interface MsBackOfficeStationApiClient extends StationsApi {
 }
 

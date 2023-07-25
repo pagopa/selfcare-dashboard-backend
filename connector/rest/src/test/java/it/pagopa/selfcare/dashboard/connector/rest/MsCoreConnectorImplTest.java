@@ -20,6 +20,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
@@ -95,6 +96,9 @@ class MsCoreConnectorImplTest {
 
     @MockBean
     private MsCoreRestClient msCoreRestClientMock;
+
+    @MockBean
+    private BrokerMapper brokerMapper;
 
     @Captor
     private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
@@ -449,7 +453,7 @@ class MsCoreConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
-        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock);
+        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock, brokerMapper);
 
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();

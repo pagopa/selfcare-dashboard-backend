@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -53,6 +54,10 @@ public interface MsCoreRestClient {
     @GetMapping(value = "${rest-client.ms-core.getInstitution.path}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     Institution getInstitution(@PathVariable(value = "id") String id);
+
+    @GetMapping(value = "${rest-client.ms-core.getInstitutions.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    List<Institution> getInstitutionsByProductAndType(@PathVariable(value = "productId") String productId, @PathVariable(value = "type") String type);
 
     @PutMapping(value = "${rest-client.ms-core.updateInstitutionDescription.path}")
     @ResponseBody

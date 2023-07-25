@@ -97,13 +97,13 @@ public class ProductController {
                                                         InstitutionType institutionType) {
         log.trace("getProductBrokers start");
         log.debug("productId = {}, institutionType = {}", productId, institutionType);
-        Collection<BrokerResource> result = Collections.emptyList();
+        List<BrokerInfo> brokers;
         if(PAGO_PA_PRODUCT_ID.equals(productId)) {
-            List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(institutionType.name());
-            result = brokerResourceMapper.toResourceList(brokers);
+            brokers = brokerService.findAllByInstitutionType(institutionType.name());
         } else {
-            //TODO retrieve data from ms-core
+            brokers = brokerService.findInstitutionsByProductAndType(productId, institutionType.name());
         }
+        Collection<BrokerResource>  result = brokerResourceMapper.toResourceList(brokers);
         log.debug("getProductBrokers result = {}", result);
         log.trace("getProductBrokers end");
         return result;
