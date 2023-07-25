@@ -198,6 +198,8 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
         return result;
+    }
+
     public List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type) {
         log.trace("findInstitutionsByProductAndType start");
         log.debug("findInstitutionsByProductAndType productId = {}, type = {}", productId, type);
