@@ -11,6 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -928,6 +929,31 @@ class MsCoreConnectorImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
         verifyNoInteractions(msCoreRestClientMock);
+    }
+
+    @Test
+    void findInstitutionsByProductIdAndType() {
+        // given
+        final String productId = "prod";
+        final String type = "PT";
+        Institution institution = new Institution();
+        institution.setId("id");
+        institution.setDescription("description");
+        BrokerInfo brokerInfo = new BrokerInfo();
+        brokerInfo.setCode("id");
+        brokerInfo.setDescription("description");
+        when(brokerMapper.fromInstitutions(anyList())).thenReturn(List.of(brokerInfo));
+        when(msCoreRestClientMock.getInstitutionsByProductAndType(any(), any()))
+                .thenReturn(List.of(institution));
+        // when
+        List<BrokerInfo> response = msCoreConnector.findInstitutionsByProductAndType(productId, type);
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertNotNull(response.get(0));
+        assertEquals(response.get(0).getCode(), institution.getId());
+        assertEquals(response.get(0).getDescription(), institution.getDescription());
+
     }
 
 }
