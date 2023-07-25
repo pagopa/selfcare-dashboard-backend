@@ -83,6 +83,9 @@ class MsCoreConnectorImplTest {
     @MockBean
     private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
 
+    @MockBean
+    private BrokerMapper brokerMapper;
+
     @Captor
     private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
 
@@ -112,18 +115,6 @@ class MsCoreConnectorImplTest {
         }
         return selfCareRole;
     };
-
-    @Autowired
-    private MsCoreConnectorImpl msCoreConnector;
-
-    @MockBean
-    private MsCoreRestClient msCoreRestClientMock;
-
-    @MockBean
-    private BrokerMapper brokerMapper;
-
-    @Captor
-    private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
 
     @Test
     void getUserProducts_shouldGetEmptyData() {
@@ -406,8 +397,6 @@ class MsCoreConnectorImplTest {
     @Test
     void getUsers_nullResponse() {
         // given
-        MsCoreConnectorImpl msCoreConnector = new MsCoreConnectorImpl(msCoreRestClientMock, brokerMapper);
-
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
@@ -895,6 +884,8 @@ class MsCoreConnectorImplTest {
         DelegationId response = msCoreConnector.createDelegation(delegation);
         assertNotNull(response);
         assertEquals(response.getId(), delegationId.getId());
+    }
+    @Test
     void findInstitutionsByProductIdAndType() {
         // given
         final String productId = "prod";
