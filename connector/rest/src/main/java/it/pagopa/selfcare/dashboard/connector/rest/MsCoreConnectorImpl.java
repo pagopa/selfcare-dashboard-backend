@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -17,6 +18,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
@@ -36,19 +38,22 @@ import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 class MsCoreConnectorImpl implements MsCoreConnector {
 
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_PRODUCT_ID_MESSAGE = "A Product id is required";
+    static final String REQUIRED_INSTITUTION_TYPE_MESSAGE = "An Institution type is required";
     static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution description is required";
 
     private final MsCoreRestClient msCoreRestClient;
     private final MsCoreUserApiRestClient msCoreUserApiRestClient;
-
+    private final BrokerMapper brokerMapper;
     private final InstitutionMapper institutionMapper;
 
 
     @Autowired
-    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper) {
+    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper, BrokerMapper brokerMapper) {
         this.msCoreRestClient = msCoreRestClient;
         this.msCoreUserApiRestClient = msCoreUserApiRestClient;
         this.institutionMapper = institutionMapper;
+        this.brokerMapper = brokerMapper;
     }
 
     @Deprecated
@@ -193,6 +198,18 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
         return result;
+    }
+
+    public List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type) {
+        log.trace("findInstitutionsByProductAndType start");
+        log.debug("findInstitutionsByProductAndType productId = {}, type = {}", productId, type);
+        Assert.hasText(productId, REQUIRED_PRODUCT_ID_MESSAGE);
+        Assert.hasText(type, REQUIRED_INSTITUTION_TYPE_MESSAGE);
+        List<Institution> institutions = msCoreRestClient.getInstitutionsByProductAndType(productId, type);
+        List<BrokerInfo> brokers = brokerMapper.fromInstitutions(institutions);
+        log.debug("findInstitutionsByProductAndType result = {}", brokers);
+        log.trace("findInstitutionsByProductAndType end");
+        return brokers;
     }
 
 }

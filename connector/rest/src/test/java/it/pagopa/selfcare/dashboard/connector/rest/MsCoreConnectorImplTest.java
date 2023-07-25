@@ -15,6 +15,7 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
@@ -27,6 +28,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
@@ -80,6 +82,9 @@ class MsCoreConnectorImplTest {
 
     @MockBean
     private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
+
+    @MockBean
+    private BrokerMapper brokerMapper;
 
     @Captor
     private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
@@ -879,6 +884,30 @@ class MsCoreConnectorImplTest {
         DelegationId response = msCoreConnector.createDelegation(delegation);
         assertNotNull(response);
         assertEquals(response.getId(), delegationId.getId());
+    }
+    @Test
+    void findInstitutionsByProductIdAndType() {
+        // given
+        final String productId = "prod";
+        final String type = "PT";
+        Institution institution = new Institution();
+        institution.setId("id");
+        institution.setDescription("description");
+        BrokerInfo brokerInfo = new BrokerInfo();
+        brokerInfo.setCode("id");
+        brokerInfo.setDescription("description");
+        when(brokerMapper.fromInstitutions(anyList())).thenReturn(List.of(brokerInfo));
+        when(msCoreRestClientMock.getInstitutionsByProductAndType(any(), any()))
+                .thenReturn(List.of(institution));
+        // when
+        List<BrokerInfo> response = msCoreConnector.findInstitutionsByProductAndType(productId, type);
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertNotNull(response.get(0));
+        assertEquals(response.get(0).getCode(), institution.getId());
+        assertEquals(response.get(0).getDescription(), institution.getDescription());
+
     }
 
 }
