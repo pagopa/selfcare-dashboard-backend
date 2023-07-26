@@ -10,25 +10,28 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionProducts;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
-import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
-import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapperImpl;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
@@ -44,7 +47,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 
@@ -52,11 +55,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.commons.utils.TestUtils.*;
+import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
 import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_UPDATE_RESOURCE_MESSAGE;
@@ -67,7 +70,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = {
-                MsCoreConnectorImpl.class, InstitutionMapperImpl.class
+                MsCoreConnectorImpl.class, InstitutionMapperImpl.class, DelegationRestClientMapperImpl.class
         }
 )
 class MsCoreConnectorImplTest {
@@ -82,6 +85,9 @@ class MsCoreConnectorImplTest {
 
     @MockBean
     private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
+
+    @MockBean
+    private MsCoreInstitutionApiRestClient msCoreInstitutionApiRestClient;
 
     @MockBean
     private BrokerMapper brokerMapper;
@@ -908,6 +914,82 @@ class MsCoreConnectorImplTest {
         assertEquals(response.get(0).getCode(), institution.getId());
         assertEquals(response.get(0).getDescription(), institution.getDescription());
 
+    }
+
+    @Test
+    void getDelegation_shouldGetData() {
+        // given
+        DelegationResponse delegationResponse = dummyDelegationResponse();
+        List<DelegationResponse> delegationResponseList = new ArrayList<>();
+        delegationResponseList.add(delegationResponse);
+        ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
+        Delegation delegation = dummyDelegation();
+
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any()))
+                .thenReturn(delegationResponseEntity);
+
+
+        // when
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getProductId());
+        // then
+        assertNotNull(delegationList);
+        assertEquals(1, delegationList.size());
+
+        assertEquals(delegationResponseList.get(0).getId(), delegationList.get(0).getId());
+        assertEquals(delegationResponseList.get(0).getFrom(), delegationList.get(0).getFrom());
+        assertEquals(delegationResponseList.get(0).getTo(), delegationList.get(0).getTo());
+        assertEquals(delegationResponseList.get(0).getProductId(), delegationList.get(0).getProductId());
+        assertEquals(delegationResponseList.get(0).getType().toString(), delegationList.get(0).getType().toString());
+        assertEquals(delegationResponseList.get(0).getInstitutionFromName(), delegationList.get(0).getInstitutionFromName());
+
+        verify(msCoreInstitutionApiRestClient, times(1))
+                ._getDelegationsUsingGET(any(), any());
+        verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
+    }
+
+    @Test
+    void getDelegation_shouldGetEmptyData() {
+        // given
+        List<DelegationResponse> delegationResponseList = new ArrayList<>();
+        ResponseEntity<List<DelegationResponse>> delegationResponseEntity = mock(ResponseEntity.class);
+        Delegation delegation = dummyDelegation();
+
+        when(delegationResponseEntity.getBody()).thenReturn(null);
+
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any()))
+                .thenReturn(delegationResponseEntity);
+
+
+        // when
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getProductId());
+        // then
+        assertNotNull(delegationList);
+        assertEquals(0, delegationList.size());
+
+        verify(msCoreInstitutionApiRestClient, times(1))
+                ._getDelegationsUsingGET(any(), any());
+        verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
+    }
+    private DelegationResponse dummyDelegationResponse() {
+        DelegationResponse delegationResponse = new DelegationResponse();
+        delegationResponse.setFrom("from");
+        delegationResponse.setTo("to");
+        delegationResponse.setId("setId");
+        delegationResponse.setProductId("setProductId");
+        delegationResponse.setType(DelegationResponse.TypeEnum.PT);
+        delegationResponse.setInstitutionFromName("setInstitutionFromName");
+        return delegationResponse;
+    }
+
+    private Delegation dummyDelegation() {
+        Delegation delegation = new Delegation();
+        delegation.setFrom("from");
+        delegation.setTo("to");
+        delegation.setId("setId");
+        delegation.setProductId("setProductId");
+        delegation.setType(DelegationType.PT);
+        delegation.setInstitutionFromName("setInstitutionFromName");
+        return delegation;
     }
 
 }

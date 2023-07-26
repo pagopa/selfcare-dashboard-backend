@@ -12,9 +12,11 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.*;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -46,13 +49,18 @@ public class InstitutionController {
     private final FileStorageService storageService;
     private final InstitutionService institutionService;
     private final InstitutionResourceMapper institutionResourceMapper;
+    private final DelegationService delegationService;
+
+    private final DelegationMapper delegationMapper;
 
 
     @Autowired
-    public InstitutionController(FileStorageService storageService, InstitutionService institutionService, InstitutionResourceMapper institutionResourceMapper) {
+    public InstitutionController(FileStorageService storageService, InstitutionService institutionService, InstitutionResourceMapper institutionResourceMapper, DelegationService delegationService, DelegationMapper delegationMapper) {
         this.storageService = storageService;
         this.institutionService = institutionService;
         this.institutionResourceMapper = institutionResourceMapper;
+        this.delegationService = delegationService;
+        this.delegationMapper = delegationMapper;
     }
 
 
@@ -322,5 +330,32 @@ public class InstitutionController {
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
         return result;
+    }
+
+    /**
+     * The function get institution's delegation
+     *
+     * @param institutionId String
+     * @return InstitutionResponse
+     * * Code: 200, Message: successful operation, DataType: List<DelegationResponse>
+     * * Code: 404, Message: Institution data not found, DataType: Problem
+     * * Code: 400, Message: Bad Request, DataType: Problem
+     */
+    @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
+    @GetMapping(value = "/{institutionId}/delegations")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    public ResponseEntity<List<DelegationResource>> getDelegations(@ApiParam("${swagger.dashboard.delegation.model.from}")
+                                                                   @PathVariable("institutionId") String institutionId,
+                                                                   @ApiParam("${swagger.dashboard.delegation.model.productId}")
+                                                                   @RequestParam(name = "productId", required = false) String productId) {
+        log.trace("getDelegations start");
+        log.debug("getDelegations institutionId = {}, institutionDto{}", institutionId, productId);
+        ResponseEntity result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, productId).stream()
+                .map(delegationMapper::toDelegationResource)
+                .collect(Collectors.toList()));
+        log.debug("getDelegations result = {}", result);
+        log.trace("getDelegations end");
+        return result;
+
     }
 }
