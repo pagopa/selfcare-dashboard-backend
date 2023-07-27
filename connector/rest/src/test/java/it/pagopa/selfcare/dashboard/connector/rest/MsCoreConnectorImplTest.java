@@ -23,7 +23,7 @@ import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreInstitutionApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
@@ -87,7 +87,7 @@ class MsCoreConnectorImplTest {
     private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
 
     @MockBean
-    private MsCoreInstitutionApiRestClient msCoreInstitutionApiRestClient;
+    private MsCoreDelegationApiRestClient msCoreInstitutionApiRestClient;
 
     @MockBean
     private BrokerMapper brokerMapper;
@@ -917,7 +917,7 @@ class MsCoreConnectorImplTest {
     }
 
     @Test
-    void getDelegation_shouldGetData() {
+    void getDelegationUsingFrom_shouldGetData() {
         // given
         DelegationResponse delegationResponse = dummyDelegationResponse();
         List<DelegationResponse> delegationResponseList = new ArrayList<>();
@@ -925,12 +925,12 @@ class MsCoreConnectorImplTest {
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
         Delegation delegation = dummyDelegation();
 
-        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any()))
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getProductId());
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
         // then
         assertNotNull(delegationList);
         assertEquals(1, delegationList.size());
@@ -941,14 +941,15 @@ class MsCoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getProductId(), delegationList.get(0).getProductId());
         assertEquals(delegationResponseList.get(0).getType().toString(), delegationList.get(0).getType().toString());
         assertEquals(delegationResponseList.get(0).getInstitutionFromName(), delegationList.get(0).getInstitutionFromName());
+        assertEquals(delegationResponseList.get(0).getInstitutionToName(), delegationList.get(0).getInstitutionToName());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(any(), any());
+                ._getDelegationsUsingGET(any(), any(), any());
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
     @Test
-    void getDelegation_shouldGetEmptyData() {
+    void getDelegationUsingFrom_shouldGetEmptyData() {
         // given
         List<DelegationResponse> delegationResponseList = new ArrayList<>();
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = mock(ResponseEntity.class);
@@ -956,20 +957,22 @@ class MsCoreConnectorImplTest {
 
         when(delegationResponseEntity.getBody()).thenReturn(null);
 
-        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any()))
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getProductId());
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
         // then
         assertNotNull(delegationList);
         assertEquals(0, delegationList.size());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(any(), any());
+                ._getDelegationsUsingGET(any(), any(), any());
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
+
+
     private DelegationResponse dummyDelegationResponse() {
         DelegationResponse delegationResponse = new DelegationResponse();
         delegationResponse.setFrom("from");

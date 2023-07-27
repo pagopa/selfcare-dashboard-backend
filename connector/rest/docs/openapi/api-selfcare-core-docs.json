@@ -711,6 +711,78 @@
       }
     },
     "/delegations" : {
+      "get" : {
+        "tags" : [ "Delegation" ],
+        "summary" : "Retrieve institution's delegations",
+        "description" : "Retrieve institution's delegations",
+        "operationId" : "getDelegationsUsingGET",
+        "parameters" : [ {
+          "name" : "from",
+          "in" : "query",
+          "description" : "The internal identifier of the institution",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "to",
+          "in" : "query",
+          "description" : "The internal identifier of the institution",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DelegationResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      },
       "post" : {
         "tags" : [ "Delegation" ],
         "summary" : "Create an association between institution id and technical partner",
@@ -2224,71 +2296,6 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/delegations" : {
-      "get" : {
-        "tags" : [ "Institution" ],
-        "summary" : "Retrieve institution's delegations",
-        "description" : "Retrieve institution's delegations",
-        "operationId" : "getDelegationsUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "The internal identifier of the institution",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "productId",
-          "in" : "query",
-          "description" : "Product's unique identifier",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/DelegationResponse"
-                  }
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      }
-    },
     "/institutions/{institutionId}/onboardings" : {
       "get" : {
         "tags" : [ "Institution" ],
@@ -2402,6 +2409,72 @@
           },
           "403" : {
             "description" : "Forbidden",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/institutions/{productId}/brokers/{institutionType}" : {
+      "get" : {
+        "tags" : [ "Institution" ],
+        "summary" : "Retrieve institution brokers",
+        "description" : "${swagger.mscore.institutions.getInstitutionBrokers}",
+        "operationId" : "getInstitutionBrokersUsingGET",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionType",
+          "in" : "path",
+          "description" : "Institution's type",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "GSP", "PA", "PG", "PSP", "PT", "SCP" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/BrokerResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -4451,6 +4524,22 @@
           }
         }
       },
+      "BrokerResponse" : {
+        "title" : "BrokerResponse",
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "numberOfDelegations" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
       "BulkInstitution" : {
         "title" : "BulkInstitution",
         "type" : "object",
@@ -4670,6 +4759,9 @@
           "institutionFromName" : {
             "type" : "string"
           },
+          "institutionToName" : {
+            "type" : "string"
+          },
           "productId" : {
             "type" : "string"
           },
@@ -4696,6 +4788,9 @@
             "type" : "string"
           },
           "institutionFromRootName" : {
+            "type" : "string"
+          },
+          "institutionToName" : {
             "type" : "string"
           },
           "productId" : {

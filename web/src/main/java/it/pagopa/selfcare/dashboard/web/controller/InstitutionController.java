@@ -341,20 +341,47 @@ public class InstitutionController {
      * * Code: 404, Message: Institution data not found, DataType: Problem
      * * Code: 400, Message: Bad Request, DataType: Problem
      */
-    @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
-    @GetMapping(value = "/{institutionId}/delegations")
+    @ApiOperation(value = "${swagger.dashboard.institutions.partners}", notes = "${swagger.dashboard.institutions.partners}")
+    @GetMapping(value = "/{institutionId}/partners")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
-    public ResponseEntity<List<DelegationResource>> getDelegations(@ApiParam("${swagger.dashboard.delegation.model.from}")
+    public ResponseEntity<List<DelegationResource>> getDelegationsUsingFrom(@ApiParam("${swagger.dashboard.delegation.model.from}")
                                                                    @PathVariable("institutionId") String institutionId,
                                                                    @ApiParam("${swagger.dashboard.delegation.model.productId}")
                                                                    @RequestParam(name = "productId", required = false) String productId) {
-        log.trace("getDelegations start");
-        log.debug("getDelegations institutionId = {}, institutionDto{}", institutionId, productId);
-        ResponseEntity result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, productId).stream()
+        log.trace("getDelegationsUsingFrom start");
+        log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", institutionId, productId);
+        ResponseEntity result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, null, productId).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
-        log.debug("getDelegations result = {}", result);
-        log.trace("getDelegations end");
+        log.debug("getDelegationsUsingFrom result = {}", result);
+        log.trace("getDelegationsUsingFrom end");
+        return result;
+
+    }
+
+    /**
+     * The function get the list of delegation by the partners
+     *
+     * @param institutionId String
+     * @return InstitutionResponse
+     * * Code: 200, Message: successful operation, DataType: List<DelegationResponse>
+     * * Code: 404, Message: Institution data not found, DataType: Problem
+     * * Code: 400, Message: Bad Request, DataType: Problem
+     */
+    @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
+    @GetMapping(value = "/{institutionId}/institutions")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    public ResponseEntity<List<DelegationResource>> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
+                                                                   @PathVariable("institutionId") String institutionId,
+                                                                   @ApiParam("${swagger.dashboard.delegation.model.productId}")
+                                                                   @RequestParam(name = "productId", required = false) String productId) {
+        log.trace("getDelegationsUsingTo start");
+        log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
+        ResponseEntity result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId, productId).stream()
+                .map(delegationMapper::toDelegationResource)
+                .collect(Collectors.toList()));
+        log.debug("getDelegationsUsingTo result = {}", result);
+        log.trace("getDelegationsUsingTo end");
         return result;
 
     }

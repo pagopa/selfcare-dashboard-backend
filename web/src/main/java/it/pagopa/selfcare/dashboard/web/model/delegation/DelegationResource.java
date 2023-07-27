@@ -10,8 +10,10 @@ public class DelegationResource {
 
         private String id;
         private String from;
-        private String institutionFromName;
+
+        private String institutionName;
         private String institutionFromRootName;
+        private String partnerName;
         private DelegationType type;
         private String to;
         private String productId;

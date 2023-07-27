@@ -33,12 +33,14 @@ class DelegationServiceImpl implements DelegationService {
     }
 
     @Override
-    public List<Delegation> getDelegations(String from, String productId) {
+    public List<Delegation> getDelegations(String from, String to, String productId) {
         log.trace("getDelegations start");
         log.debug("getDelegations request = {}", from, productId);
-        List<Delegation> result = msCoreConnector.getDelegations(from, productId);
+        List<Delegation> result = msCoreConnector.getDelegations(from, to, productId);
         log.debug("getDelegations result = {}", result);
         log.trace("getDelegations end");
         return result;
     }
+
+
 }

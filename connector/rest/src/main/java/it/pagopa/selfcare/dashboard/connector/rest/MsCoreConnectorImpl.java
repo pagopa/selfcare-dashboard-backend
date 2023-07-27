@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
@@ -12,7 +13,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreInstitutionApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
@@ -49,18 +50,18 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     private final BrokerMapper brokerMapper;
     private final InstitutionMapper institutionMapper;
 
-    private final MsCoreInstitutionApiRestClient msCoreInstitutionApiRestClient;
+    private final MsCoreDelegationApiRestClient msCoreDelegationApiRestClient;
 
    private final DelegationRestClientMapper delegationMapper;
 
 
     @Autowired
-    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper, BrokerMapper brokerMapper, it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreInstitutionApiRestClient msCoreInstitutionApiRestClient, DelegationRestClientMapper delegationMapper) {
+    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper, BrokerMapper brokerMapper, MsCoreDelegationApiRestClient msCoreInstitutionApiRestClient, DelegationRestClientMapper delegationMapper) {
         this.msCoreRestClient = msCoreRestClient;
         this.msCoreUserApiRestClient = msCoreUserApiRestClient;
         this.institutionMapper = institutionMapper;
         this.brokerMapper = brokerMapper;
-        this.msCoreInstitutionApiRestClient = msCoreInstitutionApiRestClient;
+        this.msCoreDelegationApiRestClient = msCoreInstitutionApiRestClient;
         this.delegationMapper = delegationMapper;
     }
 
@@ -221,10 +222,10 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public List<Delegation> getDelegations(String from, String productId) {
+    public List<Delegation> getDelegations(String from, String to, String productId) {
         log.trace("getDelegations start");
         log.debug("getDelegations productId = {}, type = {}", from, productId);
-        List<it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse> delegationsResponse = msCoreInstitutionApiRestClient._getDelegationsUsingGET(from, productId).getBody();
+        List<DelegationResponse> delegationsResponse = msCoreDelegationApiRestClient._getDelegationsUsingGET(from, to, productId).getBody();
 
         if(Objects.isNull(delegationsResponse))
             return List.of();

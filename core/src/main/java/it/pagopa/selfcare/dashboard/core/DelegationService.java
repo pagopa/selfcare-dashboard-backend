@@ -9,5 +9,6 @@ public interface DelegationService {
 
     DelegationId createDelegation(Delegation delegation);
 
-    List<Delegation> getDelegations(String from, String productId);
+    List<Delegation> getDelegations(String from, String to, String productId);
+
 }
