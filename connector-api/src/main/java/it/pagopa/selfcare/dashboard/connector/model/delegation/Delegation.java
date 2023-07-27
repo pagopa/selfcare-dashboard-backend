@@ -9,5 +9,6 @@ public class Delegation {
     private String to;
     private String productId;
     private String institutionFromName;
+    private String institutionToName;
     private DelegationType type;
 }
