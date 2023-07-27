@@ -71,5 +71,7 @@ public class InstitutionResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.aooParentCode}")
     private String aooParentCode;
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.parentDescription}")
+    private String parentDescription;
 
 }

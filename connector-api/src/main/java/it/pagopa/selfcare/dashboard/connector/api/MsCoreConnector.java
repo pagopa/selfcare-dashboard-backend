@@ -2,6 +2,8 @@ package it.pagopa.selfcare.dashboard.connector.api;
 
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -13,7 +15,10 @@ import java.util.List;
 
 public interface MsCoreConnector {
 
+    @Deprecated
     Collection<InstitutionInfo> getOnBoardedInstitutions();
+
+    List<InstitutionInfo> getUserProducts(String userId);
 
     UserInfo getUser(String relationshipId);
 
@@ -27,5 +32,6 @@ public interface MsCoreConnector {
 
     Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource);
 
+    DelegationId createDelegation(Delegation delegation);
     List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type);
 }
