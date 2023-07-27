@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.handler;
 import it.pagopa.selfcare.commons.web.model.Problem;
 import it.pagopa.selfcare.dashboard.connector.exception.BadGatewayException;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.exception.SupportException;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
@@ -84,6 +85,25 @@ class DashboardExceptionsHandlerTest {
         assertNotNull(responseEntity.getBody());
         assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
         assertEquals(BAD_GATEWAY.value(), responseEntity.getBody().getStatus());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {
+            SupportException.class
+    })
+    void handleSupportException(Class<?> clazz) {
+        // given
+        Exception exceptionMock = (Exception) Mockito.mock(clazz);
+        Mockito.when(exceptionMock.getMessage())
+                .thenReturn(DETAIL_MESSAGE);
+        // when
+        ResponseEntity<Problem> responseEntity = handler.handleSupportException(exceptionMock);
+        // then
+        assertNotNull(responseEntity);
+        assertEquals(INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
+        assertEquals(INTERNAL_SERVER_ERROR.value(), responseEntity.getBody().getStatus());
     }
 
 }
