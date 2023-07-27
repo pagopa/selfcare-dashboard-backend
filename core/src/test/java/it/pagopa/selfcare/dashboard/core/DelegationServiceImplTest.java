@@ -58,7 +58,7 @@ class DelegationServiceImplTest {
         assertNotNull(delegationList.getClass());
         assertEquals(1, delegationList.size());
         verify(delegationConnector, times(1))
-                .getDelegations(any(), any(),any());
+                .getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
         verifyNoMoreInteractions(delegationConnector);
     }
 

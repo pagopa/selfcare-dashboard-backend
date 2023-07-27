@@ -944,7 +944,7 @@ class MsCoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getInstitutionToName(), delegationList.get(0).getInstitutionToName());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(any(), any(), any());
+                ._getDelegationsUsingGET(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
@@ -968,7 +968,7 @@ class MsCoreConnectorImplTest {
         assertEquals(0, delegationList.size());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(any(), any(), any());
+                ._getDelegationsUsingGET(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
