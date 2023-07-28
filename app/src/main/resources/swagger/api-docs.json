@@ -3154,7 +3154,7 @@
       },
       "DelegationRequestDto" : {
         "title" : "DelegationRequestDto",
-        "required" : [ "from", "institutionFromName", "productId", "to", "type" ],
+        "required" : [ "from", "institutionFromName", "institutionToName", "productId", "to", "type" ],
         "type" : "object",
         "properties" : {
           "from" : {
@@ -3164,6 +3164,10 @@
           "institutionFromName" : {
             "type" : "string",
             "description" : "Institution's name"
+          },
+          "institutionToName" : {
+            "type" : "string",
+            "description" : "Partner's name"
           },
           "productId" : {
             "type" : "string",
