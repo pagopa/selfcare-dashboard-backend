@@ -8,11 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 class DelegationServiceImpl implements DelegationService {
 
     private final MsCoreConnector msCoreConnector;
+
 
     @Autowired
     public DelegationServiceImpl(MsCoreConnector msCoreConnector) {
@@ -28,4 +31,16 @@ class DelegationServiceImpl implements DelegationService {
         log.trace("createDelegation end");
         return result;
     }
+
+    @Override
+    public List<Delegation> getDelegations(String from, String to, String productId) {
+        log.trace("getDelegations start");
+        log.debug("getDelegations request = {}", from, productId);
+        List<Delegation> result = msCoreConnector.getDelegations(from, to, productId);
+        log.debug("getDelegations result = {}", result);
+        log.trace("getDelegations end");
+        return result;
+    }
+
+
 }
