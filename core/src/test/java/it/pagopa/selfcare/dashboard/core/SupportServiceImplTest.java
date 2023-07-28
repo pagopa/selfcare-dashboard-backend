@@ -29,10 +29,10 @@ class SupportServiceImplTest {
      * Method under test: {@link SupportServiceImpl#sendRequest(SupportRequest)}
      */
     @Test
-    void testRequestWithMalformedApiKey() {
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("pp");
+    void testRequestWithMalformedEmptyKey() {
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("");
         SupportException exception = assertThrows(SupportException.class, () -> supportServiceImpl.sendRequest(this.dummySupportRequest()));
-        assertEquals("The secret length must be at least 256 bits", exception.getMessage());
+        assertEquals("secret key byte array cannot be null or empty.", exception.getMessage());
     }
 
     private SupportRequest dummySupportRequest() {

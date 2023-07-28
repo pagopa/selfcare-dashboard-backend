@@ -1,8 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.JWTClaimsSet;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import it.pagopa.selfcare.dashboard.connector.exception.SupportException;
 import it.pagopa.selfcare.dashboard.connector.model.support.SupportRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -32,34 +31,25 @@ public class SupportServiceImpl implements SupportService {
 
         log.trace("sendRequest start");
         log.debug("sendRequest request = {}", supportRequest);
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
-        JWTClaimsSet jwtClaims = buildJwtClaims(supportRequest);
-        JWSObject jwsObject = new JWSObject(header, new Payload(jwtClaims.toJSONObject()));
-
+        String jwtString;
         try {
-            JWSSigner signer = new MACSigner(supportApiKey.getBytes());
-            jwsObject.sign(signer);
+            jwtString = Jwts.builder()
+                    .setIssuedAt(new Date())
+                    .setId(UUID.randomUUID().toString())
+                    .claim("name", supportRequest.getName())
+                    .claim("email", supportRequest.getEmail())
+                    .claim("organization", ZENDESK_ORGANIZATION)
+                    .claim("user_fields", supportRequest.getUserFields())
+                    .signWith(SignatureAlgorithm.HS256,supportApiKey.getBytes())
+                    .compact();
         } catch(Exception e) {
-            log.error("Error signing JWT: {}", e.getMessage(), e);
+            log.error("Impossible to sign zendesk jwt. Error: {}", e.getMessage(), e);
             throw new SupportException(e.getMessage());
         }
-
-        String jwtString = jwsObject.serialize();
         String  redirectUrl = "https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + jwtString;
         log.debug("sendRequest result = {}", redirectUrl);
         log.trace("sendRequest end");
         return redirectUrl.concat("&return_to=" + URLEncoder.encode(RETURN_TO, StandardCharsets.UTF_8));
-    }
 
-    private JWTClaimsSet buildJwtClaims(SupportRequest supportRequest) {
-        return new JWTClaimsSet.Builder()
-                .jwtID(UUID.randomUUID().toString())
-                .issueTime(new Date())
-                .claim("name", supportRequest.getName())
-                .claim("email", supportRequest.getEmail())
-                .claim("organization", ZENDESK_ORGANIZATION)
-                .claim("user_fields", supportRequest.getUserFields())
-                .build();
     }
-
 }
