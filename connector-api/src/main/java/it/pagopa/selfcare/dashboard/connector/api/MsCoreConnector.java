@@ -33,5 +33,8 @@ public interface MsCoreConnector {
     Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource);
 
     DelegationId createDelegation(Delegation delegation);
+
     List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type);
+    List<Delegation> getDelegations(String from, String to, String productId);
+
 }

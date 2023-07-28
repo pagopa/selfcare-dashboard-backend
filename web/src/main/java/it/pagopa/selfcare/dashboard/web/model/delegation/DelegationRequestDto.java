@@ -35,4 +35,9 @@ public class DelegationRequestDto {
     @NotBlank
     private String institutionFromName;
 
+    @ApiModelProperty(value = "${swagger.dashboard.delegation.model.institutionToName}", required = true)
+    @JsonProperty(required = true)
+    @NotBlank
+    private String institutionToName;
+
 }
