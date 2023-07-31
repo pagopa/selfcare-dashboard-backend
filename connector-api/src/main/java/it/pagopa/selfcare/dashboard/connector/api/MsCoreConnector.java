@@ -35,4 +35,6 @@ public interface MsCoreConnector {
     DelegationId createDelegation(Delegation delegation);
 
     List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type);
+    List<Delegation> getDelegations(String from, String to, String productId);
+
 }
