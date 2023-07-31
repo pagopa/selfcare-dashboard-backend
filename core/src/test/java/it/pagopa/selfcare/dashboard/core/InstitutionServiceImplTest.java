@@ -72,9 +72,6 @@ class InstitutionServiceImplTest {
     private UserRegistryConnector userRegistryConnector;
 
     @MockBean
-    private NotificationService notificationServiceMock;
-
-    @MockBean
     private ProductsConnector productsConnectorMock;
 
     @MockBean
@@ -565,7 +562,7 @@ class InstitutionServiceImplTest {
     @Test
     void getInstitutionProductUsers_nullAllowedStates() {
         //given
-        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(null, userRegistryConnector, partyConnectorMock, productsConnectorMock, msCoreConnectorMock, notificationServiceMock);
+        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(null, userRegistryConnector, partyConnectorMock, productsConnectorMock, msCoreConnectorMock);
         String institutionId = "institutionId";
         String productId = "productId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -616,7 +613,7 @@ class InstitutionServiceImplTest {
     @Test
     void emptyAllowedStates() {
         //given
-        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(new String[0], userRegistryConnector, partyConnectorMock, productsConnectorMock, msCoreConnectorMock, notificationServiceMock);
+        InstitutionServiceImpl institutionService = new InstitutionServiceImpl(new String[0], userRegistryConnector, partyConnectorMock, productsConnectorMock, msCoreConnectorMock);
         String institutionId = "institutionId";
         String productId = "productId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -1020,7 +1017,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An Institution id is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock, userRegistryConnector);
     }
 
     @Test
@@ -1034,7 +1031,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Product id is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock, userRegistryConnector);
     }
 
     @Test
@@ -1048,7 +1045,7 @@ class InstitutionServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("An User is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, partyConnectorMock, notificationServiceMock, userRegistryConnector);
+        verifyNoInteractions(productsConnectorMock, partyConnectorMock, userRegistryConnector);
     }
 
     @ParameterizedTest
@@ -1111,9 +1108,7 @@ class InstitutionServiceImplTest {
             verify(userRegistryConnector, times(1))
                     .saveUser(createUserDto.getUser());
             verify(partyConnectorMock, times(1))
-                    .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(id.toString()), createUserDtoCaptor.capture());
-            verify(notificationServiceMock, times(1)).
-                    sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
+                    .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(id.toString()), createUserDtoCaptor.capture(), eq("setTitle"));
             createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
                 createUserDto.getRoles().forEach(role -> {
                     if (role.getLabel().equals(role1.getLabel())) {
@@ -1125,8 +1120,6 @@ class InstitutionServiceImplTest {
                 }
             });
             TestUtils.reflectionEqualsByName(createUserDtoCaptor.getValue(), createUserDto);
-            verify(partyConnectorMock, times(1))
-                    .createUsers(institutionId, productId, userId.getId().toString(), createUserDto);
         } else {
             InvalidProductRoleException e = assertThrows(InvalidProductRoleException.class, executable);
             createUserDto.getRoles().forEach(role -> {
@@ -1177,12 +1170,10 @@ class InstitutionServiceImplTest {
         verify(partyConnectorMock, times(1))
                 .checkExistingRelationshipRoles(institutionId, productId, createUserDto, userId.getId().toString());
         verify(partyConnectorMock, times(1))
-                .createUsers(institutionId, productId, userId.getId().toString(), createUserDto);
-        verify(notificationServiceMock, times(1)).
-                sendCreatedUserNotification(institutionId, product.getTitle(), createUserDto.getEmail(), createUserDto.getRoles());
+                .createUsers(institutionId, productId, userId.getId().toString(), createUserDto, "setTitle");
         verify(productsConnectorMock, times(1))
                 .getProduct(productId);
-        verifyNoMoreInteractions(userRegistryConnector, partyConnectorMock, notificationServiceMock);
+        verifyNoMoreInteractions(userRegistryConnector, partyConnectorMock);
     }
 
     @Test
@@ -1197,7 +1188,7 @@ class InstitutionServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An Institution id is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+        verifyNoInteractions(productsConnectorMock);
     }
 
     @Test
@@ -1212,7 +1203,7 @@ class InstitutionServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product id is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+        verifyNoInteractions(productsConnectorMock);
     }
 
     @Test
@@ -1227,7 +1218,7 @@ class InstitutionServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A User id is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+        verifyNoInteractions(productsConnectorMock);
     }
 
     @Test
@@ -1242,7 +1233,7 @@ class InstitutionServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An User is required", e.getMessage());
-        verifyNoInteractions(productsConnectorMock, notificationServiceMock);
+        verifyNoInteractions(productsConnectorMock);
     }
 
     @ParameterizedTest
@@ -1299,10 +1290,8 @@ class InstitutionServiceImplTest {
         if (PartyRole.SUB_DELEGATE.equals(partyRole) || OPERATOR.equals(partyRole)) {
             assertDoesNotThrow(executable);
             verify(partyConnectorMock, times(1))
-                    .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(userId), createUserDtoCaptor.capture());
-            verify(notificationServiceMock, times(1)).
-                    sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, createUserDto.getRoles());
-            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
+                    .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(userId), createUserDtoCaptor.capture(), eq("setTitle"));
+           createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
                 createUserDto.getRoles().forEach(role -> {
                     if (role.getLabel().equals(role1.getLabel())) {
                         Assertions.assertEquals(role.getPartyRole(), role1.getPartyRole());
