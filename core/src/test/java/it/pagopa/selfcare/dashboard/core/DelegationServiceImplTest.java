@@ -51,25 +51,25 @@ class DelegationServiceImplTest {
         when(delegationConnector.getDelegations(any(),any(),any())).thenReturn(delegationList);
 
         //when
-        delegationList = delegationServiceImpl.getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
+        delegationList = delegationServiceImpl.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
 
         //then
         assertNotNull(delegationList);
         assertNotNull(delegationList.getClass());
         assertEquals(1, delegationList.size());
         verify(delegationConnector, times(1))
-                .getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
+                .getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
         verifyNoMoreInteractions(delegationConnector);
     }
 
     private Delegation dummyDelegation() {
         Delegation delegation = new Delegation();
-        delegation.setFrom("from");
-        delegation.setTo("to");
+        delegation.setInstitutionId("from");
+        delegation.setBrokerId("to");
         delegation.setId("setId");
         delegation.setProductId("setProductId");
         delegation.setType(DelegationType.PT);
-        delegation.setInstitutionFromName("setInstitutionFromName");
+        delegation.setInstitutionName("setInstitutionFromName");
         return delegation;
     }
 

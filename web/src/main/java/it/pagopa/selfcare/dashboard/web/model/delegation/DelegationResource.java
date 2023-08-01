@@ -9,13 +9,13 @@ import lombok.Data;
 public class DelegationResource {
 
         private String id;
-        private String from;
+        private String institutionId;
 
         private String institutionName;
-        private String institutionFromRootName;
-        private String partnerName;
+        private String institutionRootName;
+        private String brokerName;
         private DelegationType type;
-        private String to;
+        private String brokerId;
         private String productId;
 
 }

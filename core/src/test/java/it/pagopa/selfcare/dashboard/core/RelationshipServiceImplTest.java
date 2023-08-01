@@ -22,9 +22,6 @@ class RelationshipServiceImplTest {
     private RelationshipServiceImpl relationshipService;
 
     @Mock
-    private NotificationService notificationService;
-
-    @Mock
     private UserGroupService groupService;
 
 
@@ -38,7 +35,6 @@ class RelationshipServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
         Mockito.verifyNoInteractions(partyConnectorMock);
-        Mockito.verifyNoInteractions(notificationService);
     }
 
 
@@ -51,8 +47,6 @@ class RelationshipServiceImplTest {
         // then
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .suspend(relationshipId);
-        Mockito.verify(notificationService, Mockito.times(1))
-                .sendSuspendedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -66,7 +60,6 @@ class RelationshipServiceImplTest {
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("A Relationship id is required", e.getMessage());
-        Mockito.verifyNoInteractions(notificationService);
         Mockito.verifyNoInteractions(partyConnectorMock);
     }
 
@@ -80,8 +73,6 @@ class RelationshipServiceImplTest {
         // then
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .activate(relationshipId);
-        Mockito.verify(notificationService, Mockito.times(1))
-                .sendActivatedUserNotification(relationshipId);
         Mockito.verifyNoMoreInteractions(partyConnectorMock);
     }
 
@@ -94,11 +85,9 @@ class RelationshipServiceImplTest {
         //then
         Mockito.verify(partyConnectorMock, Mockito.times(1))
                 .delete(relationshipId);
-        Mockito.verify(notificationService, Mockito.times(1))
-                .sendDeletedUserNotification(relationshipId);
         Mockito.verify(groupService, Mockito.times(1))
                 .deleteMembersByRelationshipId(relationshipId);
-        Mockito.verifyNoMoreInteractions(partyConnectorMock, notificationService, groupService);
+        Mockito.verifyNoMoreInteractions(partyConnectorMock, groupService);
     }
     @Test
     void delete_nullRelationshipId() {
