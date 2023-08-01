@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
@@ -67,6 +68,47 @@ public class InstitutionMapper {
                             }
                         });
             }
+
+        }
+
+        return resource;
+    }
+
+    public static InstitutionResource toResource(Institution model) {
+        InstitutionResource resource;
+
+        if (model == null) {
+            resource = null;
+        } else {
+            resource = new InstitutionResource();
+            resource.setId(model.getId());
+            resource.setExternalId(model.getExternalId());
+            resource.setInstitutionType(model.getInstitutionType());
+            resource.setOrigin(model.getOrigin());
+            resource.setOriginId(model.getOriginId());
+            resource.setName(model.getDescription());
+            resource.setCategory(model.getCategory());
+            resource.setFiscalCode(model.getTaxCode());
+            resource.setMailAddress(model.getDigitalAddress());
+            resource.setAddress(model.getAddress());
+            resource.setZipCode(model.getZipCode());
+            if (model.getBilling() != null) {
+                resource.setRecipientCode(model.getBilling().getRecipientCode());
+                resource.setVatNumber(model.getBilling().getVatNumber());
+            }
+            if (model.getPaymentServiceProvider() != null) {
+                resource.setVatNumberGroup(model.getPaymentServiceProvider().getVatNumberGroup());
+            }
+            if (model.getAttributes() != null && !model.getAttributes().isEmpty()) {
+                resource.setCategory(model.getAttributes().get(0).getDescription());
+            }
+            if(model.getOnboarding() != null && !model.getOnboarding().isEmpty()){
+                resource.setProducts(model.getOnboarding());
+            }
+            resource.setSupportContact(SupportContactMapper.toResource(model.getSupportContact()));
+            resource.setGeographicTaxonomies(model.getGeographicTaxonomies().stream()
+                    .map(GeographicTaxonomyMapper::toResource)
+                    .collect(Collectors.toList()));
 
         }
 

@@ -216,7 +216,7 @@ class InstitutionMapperTest {
     @Test
     void toResourceNull() {
         // given and when
-        InstitutionResource institutionResource = InstitutionMapper.toResource(null);
+        InstitutionResource institutionResource = InstitutionMapper.toResource((InstitutionInfo) null);
         // then
         assertNull(institutionResource);
     }

@@ -107,9 +107,8 @@ public class InstitutionController {
 
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
-
-        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
-        InstitutionResource result = InstitutionMapper.toResource(institutionInfo);
+        Institution institution = institutionService.findInstitutionById(institutionId);
+        InstitutionResource result = InstitutionMapper.toResource(institution);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
 

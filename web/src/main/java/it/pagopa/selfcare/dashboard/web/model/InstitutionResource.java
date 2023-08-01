@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
+import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
 import lombok.Data;
 
 import java.util.List;
@@ -71,7 +72,11 @@ public class InstitutionResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.aooParentCode}")
     private String aooParentCode;
+
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.parentDescription}")
     private String parentDescription;
+
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.products}")
+    private List<OnboardedProduct> products;
 
 }
