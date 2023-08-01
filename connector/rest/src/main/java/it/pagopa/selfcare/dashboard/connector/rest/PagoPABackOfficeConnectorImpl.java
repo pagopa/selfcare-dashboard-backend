@@ -23,7 +23,6 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     private final MsBackOfficeChannelApiClient backofficeChannelApiClient;
     private final BrokerMapper brokerMapper;
     private static final String DEFAULT_ORDER_DIRECTION = "ASC";
-    private static final String DEFAULT_ORDER_BY = "description";
 
     public PagoPABackOfficeConnectorImpl(MsBackOfficeStationApiClient backofficeStationApiClient,
                                          MsBackOfficeChannelApiClient backofficeChannelApiClient,
