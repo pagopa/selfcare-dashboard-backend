@@ -569,7 +569,7 @@ class InstitutionControllerTest {
 
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/partners?productId={productId}", expectedDelegation.getFrom(), expectedDelegation.getProductId()))
+                        .get(BASE_URL + "/{institutionId}/partners?productId={productId}", expectedDelegation.getInstitutionId(), expectedDelegation.getProductId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
@@ -581,14 +581,14 @@ class InstitutionControllerTest {
         assertThat(resource.size()).isEqualTo(1);
         DelegationResource actual = resource.get(0);
         assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
-        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionFromName());
-        assertThat(actual.getPartnerName()).isEqualTo(expectedDelegation.getInstitutionToName());
-        assertThat(actual.getTo()).isEqualTo(expectedDelegation.getTo());
+        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
+        assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
         assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
-        assertThat(actual.getFrom()).isEqualTo(expectedDelegation.getFrom());
+        assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(expectedDelegation.getFrom(), null, expectedDelegation.getProductId());
+                .getDelegations(expectedDelegation.getInstitutionId(), null, expectedDelegation.getProductId());
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -605,7 +605,7 @@ class InstitutionControllerTest {
 
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}", expectedDelegation.getTo(), expectedDelegation.getProductId()))
+                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}", expectedDelegation.getBrokerId(), expectedDelegation.getProductId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
@@ -617,25 +617,25 @@ class InstitutionControllerTest {
         assertThat(resource.size()).isEqualTo(1);
         DelegationResource actual = resource.get(0);
         assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
-        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionFromName());
-        assertThat(actual.getPartnerName()).isEqualTo(expectedDelegation.getInstitutionToName());
-        assertThat(actual.getTo()).isEqualTo(expectedDelegation.getTo());
+        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
+        assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
         assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
-        assertThat(actual.getFrom()).isEqualTo(expectedDelegation.getFrom());
+        assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(null, expectedDelegation.getTo(), expectedDelegation.getProductId());
+                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId());
         verifyNoMoreInteractions(delegationService);
     }
 
     private Delegation dummyDelegation() {
         Delegation delegation = new Delegation();
-        delegation.setFrom("from");
-        delegation.setTo("to");
+        delegation.setInstitutionId("from");
+        delegation.setBrokerId("to");
         delegation.setId("setId");
         delegation.setProductId("setProductId");
         delegation.setType(DelegationType.PT);
-        delegation.setInstitutionFromName("setInstitutionFromName");
+        delegation.setInstitutionName("setInstitutionFromName");
         return delegation;
     }
 

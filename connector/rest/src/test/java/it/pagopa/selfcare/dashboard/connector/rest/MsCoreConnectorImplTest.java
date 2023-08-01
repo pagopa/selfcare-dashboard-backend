@@ -930,21 +930,21 @@ class MsCoreConnectorImplTest {
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
         // then
         assertNotNull(delegationList);
         assertEquals(1, delegationList.size());
 
         assertEquals(delegationResponseList.get(0).getId(), delegationList.get(0).getId());
-        assertEquals(delegationResponseList.get(0).getFrom(), delegationList.get(0).getFrom());
-        assertEquals(delegationResponseList.get(0).getTo(), delegationList.get(0).getTo());
+        assertEquals(delegationResponseList.get(0).getInstitutionId(), delegationList.get(0).getInstitutionId());
+        assertEquals(delegationResponseList.get(0).getBrokerId(), delegationList.get(0).getBrokerId());
         assertEquals(delegationResponseList.get(0).getProductId(), delegationList.get(0).getProductId());
         assertEquals(delegationResponseList.get(0).getType().toString(), delegationList.get(0).getType().toString());
-        assertEquals(delegationResponseList.get(0).getInstitutionFromName(), delegationList.get(0).getInstitutionFromName());
-        assertEquals(delegationResponseList.get(0).getInstitutionToName(), delegationList.get(0).getInstitutionToName());
+        assertEquals(delegationResponseList.get(0).getInstitutionName(), delegationList.get(0).getInstitutionName());
+        assertEquals(delegationResponseList.get(0).getBrokerName(), delegationList.get(0).getBrokerName());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
@@ -962,36 +962,37 @@ class MsCoreConnectorImplTest {
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
         // then
         assertNotNull(delegationList);
         assertEquals(0, delegationList.size());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getFrom(), delegation.getTo(), delegation.getProductId());
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
 
     private DelegationResponse dummyDelegationResponse() {
         DelegationResponse delegationResponse = new DelegationResponse();
-        delegationResponse.setFrom("from");
-        delegationResponse.setTo("to");
+        delegationResponse.setInstitutionId("from");
+        delegationResponse.setBrokerId("to");
         delegationResponse.setId("setId");
         delegationResponse.setProductId("setProductId");
         delegationResponse.setType(DelegationResponse.TypeEnum.PT);
-        delegationResponse.setInstitutionFromName("setInstitutionFromName");
+        delegationResponse.setInstitutionName("setInstitutionFromName");
+        delegationResponse.setBrokerName("brokerName");
         return delegationResponse;
     }
 
     private Delegation dummyDelegation() {
         Delegation delegation = new Delegation();
-        delegation.setFrom("from");
-        delegation.setTo("to");
+        delegation.setInstitutionId("from");
+        delegation.setBrokerId("to");
         delegation.setId("setId");
         delegation.setProductId("setProductId");
         delegation.setType(DelegationType.PT);
-        delegation.setInstitutionFromName("setInstitutionFromName");
+        delegation.setInstitutionName("setInstitutionFromName");
         return delegation;
     }
 
