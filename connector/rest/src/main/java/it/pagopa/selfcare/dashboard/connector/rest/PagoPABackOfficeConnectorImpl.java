@@ -23,7 +23,6 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     private final MsBackOfficeChannelApiClient backofficeChannelApiClient;
     private final BrokerMapper brokerMapper;
     private static final String DEFAULT_ORDER_DIRECTION = "ASC";
-    private static final String DEFAULT_ORDER_BY = "description";
 
     public PagoPABackOfficeConnectorImpl(MsBackOfficeStationApiClient backofficeStationApiClient,
                                          MsBackOfficeChannelApiClient backofficeChannelApiClient,
@@ -36,7 +35,7 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     @Override
     public List<BrokerInfo> getBrokersEC(int page, int limit) {
         log.trace("getBrokersEC start");
-        ResponseEntity<BrokersResource> responseBrokersEC = backofficeStationApiClient._getBrokersECUsingGET(page, limit, null, null, DEFAULT_ORDER_BY, DEFAULT_ORDER_DIRECTION);
+        ResponseEntity<BrokersResource> responseBrokersEC = backofficeStationApiClient._getBrokersECUsingGET(page, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
         log.debug("getBrokersEC result = {}", responseBrokersEC.getBody());
         List<BrokerInfo> brokers = this.parseBrokersEC(responseBrokersEC.getBody());
         log.trace("getBrokersEC end");
@@ -46,7 +45,7 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     @Override
     public List<BrokerInfo> getBrokersPSP(int page, int limit) {
         log.trace("getBrokersPSP start");
-        ResponseEntity<BrokersPspResource> responseBrokersPSP = backofficeChannelApiClient._getBrokersPspUsingGET(page, limit, null, null, DEFAULT_ORDER_BY, DEFAULT_ORDER_DIRECTION);
+        ResponseEntity<BrokersPspResource> responseBrokersPSP = backofficeChannelApiClient._getBrokersPspUsingGET(page, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
         log.debug("getBrokersPSP result = {}", responseBrokersPSP.getBody());
         List<BrokerInfo> brokers = this.parseBrokersPSP(responseBrokersPSP.getBody());
         log.trace("getBrokersPSP end");
