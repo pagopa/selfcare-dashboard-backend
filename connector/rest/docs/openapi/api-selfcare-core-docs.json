@@ -717,7 +717,7 @@
         "description" : "Retrieve institution's delegations",
         "operationId" : "getDelegationsUsingGET",
         "parameters" : [ {
-          "name" : "from",
+          "name" : "institutionId",
           "in" : "query",
           "description" : "The internal identifier of the institution",
           "required" : false,
@@ -726,7 +726,7 @@
             "type" : "string"
           }
         }, {
-          "name" : "to",
+          "name" : "brokerId",
           "in" : "query",
           "description" : "The internal identifier of the institution",
           "required" : false,
