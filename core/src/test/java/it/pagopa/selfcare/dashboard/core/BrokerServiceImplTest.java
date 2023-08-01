@@ -41,7 +41,7 @@ class BrokerServiceImplTest {
         // then
         Assertions.assertSame(brokersMocked, brokers);
         Mockito.verify(backOfficeConnectorMock, Mockito.times(1))
-                .getBrokersEC(1,1000);
+                .getBrokersEC(0,1000);
         Mockito.verifyNoMoreInteractions(backOfficeConnectorMock);
 
     }
@@ -58,7 +58,7 @@ class BrokerServiceImplTest {
         // then
         Assertions.assertSame(brokersMocked, brokers);
         Mockito.verify(backOfficeConnectorMock, Mockito.times(1))
-                .getBrokersPSP(1,1000);
+                .getBrokersPSP(0,1000);
         Mockito.verifyNoMoreInteractions(backOfficeConnectorMock);
 
     }
