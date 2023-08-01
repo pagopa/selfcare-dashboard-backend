@@ -717,7 +717,7 @@
         "description" : "Retrieve institution's delegations",
         "operationId" : "getDelegationsUsingGET",
         "parameters" : [ {
-          "name" : "from",
+          "name" : "institutionId",
           "in" : "query",
           "description" : "The internal identifier of the institution",
           "required" : false,
@@ -726,7 +726,7 @@
             "type" : "string"
           }
         }, {
-          "name" : "to",
+          "name" : "brokerId",
           "in" : "query",
           "description" : "The internal identifier of the institution",
           "required" : false,
@@ -4778,25 +4778,25 @@
         "title" : "DelegationResponse",
         "type" : "object",
         "properties" : {
-          "from" : {
+          "brokerId" : {
+            "type" : "string"
+          },
+          "brokerName" : {
             "type" : "string"
           },
           "id" : {
             "type" : "string"
           },
-          "institutionFromName" : {
+          "institutionId" : {
             "type" : "string"
           },
-          "institutionFromRootName" : {
+          "institutionName" : {
             "type" : "string"
           },
-          "institutionToName" : {
+          "institutionRootName" : {
             "type" : "string"
           },
           "productId" : {
-            "type" : "string"
-          },
-          "to" : {
             "type" : "string"
           },
           "type" : {
@@ -6186,6 +6186,9 @@
           "productId" : {
             "type" : "string"
           },
+          "productTitle" : {
+            "type" : "string"
+          },
           "users" : {
             "type" : "array",
             "items" : {
@@ -6424,6 +6427,9 @@
           "role" : {
             "type" : "string",
             "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
+          },
+          "roleLabel" : {
+            "type" : "string"
           },
           "surname" : {
             "type" : "string"
@@ -6814,6 +6820,9 @@
           "role" : {
             "type" : "string",
             "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
+          },
+          "roleLabel" : {
+            "type" : "string"
           },
           "surname" : {
             "type" : "string"

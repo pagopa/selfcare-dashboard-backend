@@ -3358,25 +3358,25 @@
         "title" : "DelegationResource",
         "type" : "object",
         "properties" : {
-          "from" : {
+          "brokerId" : {
+            "type" : "string"
+          },
+          "brokerName" : {
             "type" : "string"
           },
           "id" : {
             "type" : "string"
           },
-          "institutionFromRootName" : {
+          "institutionId" : {
             "type" : "string"
           },
           "institutionName" : {
             "type" : "string"
           },
-          "partnerName" : {
+          "institutionRootName" : {
             "type" : "string"
           },
           "productId" : {
-            "type" : "string"
-          },
-          "to" : {
             "type" : "string"
           },
           "type" : {
