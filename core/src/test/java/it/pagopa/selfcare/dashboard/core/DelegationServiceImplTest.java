@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.core;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,14 +27,14 @@ class DelegationServiceImplTest {
     private DelegationServiceImpl delegationServiceImpl;
 
     /**
-     * Method under test: {@link DelegationServiceImpl#createDelegation(Delegation)}
+     * Method under test: {@link DelegationServiceImpl#createDelegation(DelegationRequest)}
      */
     @Test
     void testCreateDelegation() {
         DelegationId delegationId = new DelegationId();
         delegationId.setId("id");
         when(delegationConnector.createDelegation(any())).thenReturn(delegationId);
-        Delegation delegation = new Delegation();
+        DelegationRequest delegation = new DelegationRequest();
         delegation.setId("id");
         DelegationId response = delegationServiceImpl.createDelegation(delegation);
         verify(delegationConnector).createDelegation(any());

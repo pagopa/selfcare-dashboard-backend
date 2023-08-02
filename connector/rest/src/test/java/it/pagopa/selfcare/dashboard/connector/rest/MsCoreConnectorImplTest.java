@@ -17,6 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
@@ -881,7 +882,7 @@ class MsCoreConnectorImplTest {
     @Test
     void createDelegation() {
         // given
-        Delegation delegation = new Delegation();
+        DelegationRequest delegation = new DelegationRequest();
         delegation.setId("id");
         DelegationId delegationId = new DelegationId();
         delegationId.setId("id");
