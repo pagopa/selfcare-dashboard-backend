@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ class DelegationServiceImpl implements DelegationService {
     }
 
     @Override
-    public DelegationId createDelegation(Delegation delegation) {
+    public DelegationId createDelegation(DelegationRequest delegation) {
         log.trace("createDelegation start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createDelegation request = {}", delegation);
         DelegationId result = msCoreConnector.createDelegation(delegation);
@@ -35,7 +36,7 @@ class DelegationServiceImpl implements DelegationService {
     @Override
     public List<Delegation> getDelegations(String from, String to, String productId) {
         log.trace("getDelegations start");
-        log.debug("getDelegations request = {}", from, productId);
+        log.debug("getDelegations from = {}, to = {}, productId = {}", from, to, productId);
         List<Delegation> result = msCoreConnector.getDelegations(from, to, productId);
         log.debug("getDelegations result = {}", result);
         log.trace("getDelegations end");
