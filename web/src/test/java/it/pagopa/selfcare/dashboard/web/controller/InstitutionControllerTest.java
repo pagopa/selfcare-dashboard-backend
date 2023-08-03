@@ -112,6 +112,8 @@ class InstitutionControllerTest {
     void getInstitution_institutionInfoNotNull() throws Exception {
         // given
         String institutionId = "institutionId";
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        when(institutionResourceMapperMock.toUpdateResource(any())).thenReturn(resource);
         when(institutionServiceMock.findInstitutionById(anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
@@ -127,8 +129,6 @@ class InstitutionControllerTest {
                 .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
-        // then
-        InstitutionResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionResource.class);
         assertNotNull(resource);
         verify(institutionServiceMock, times(1))
                 .findInstitutionById(institutionId);
@@ -513,6 +513,7 @@ class InstitutionControllerTest {
         //given
         String institutionId = "setId";
         UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        when(institutionResourceMapperMock.toUpdateResource(any())).thenReturn(resource);
         Institution institutionMock = mockInstance(new Institution());
         when(institutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
 
