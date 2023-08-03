@@ -94,10 +94,6 @@ class InstitutionControllerTest {
     @MockBean
     private DelegationService delegationService;
 
-
-
-
-
     @Test
     void saveInstitutionLogo() throws Exception {
         // given
@@ -127,7 +123,6 @@ class InstitutionControllerTest {
         // given
         String institutionId = "institutionId";
         UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        when(institutionResourceMapperMock.toUpdateResource(any())).thenReturn(resource);
         when(institutionServiceMock.findInstitutionById(anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
@@ -180,7 +175,6 @@ class InstitutionControllerTest {
         expectedInstitution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         List<InstitutionInfo> expectedInstitutionInfos = new ArrayList<>();
         expectedInstitutionInfos.add(expectedInstitution);
-
         when(institutionServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -194,6 +188,7 @@ class InstitutionControllerTest {
         List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
                 });
+
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
         assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus().name());
@@ -529,7 +524,6 @@ class InstitutionControllerTest {
         //given
         String institutionId = "setId";
         UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        when(institutionResourceMapperMock.toUpdateResource(any())).thenReturn(resource);
         Institution institutionMock = mockInstance(new Institution());
         when(institutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
 
