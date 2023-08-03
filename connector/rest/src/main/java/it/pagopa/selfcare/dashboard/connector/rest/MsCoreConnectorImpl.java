@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -75,6 +76,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.trace("getOnBoardedInstitutions end");
         return result;
     }
+
     @Override
     public List<InstitutionInfo> getUserProducts(String userId) {
         log.trace("getUserProducts start");
@@ -200,7 +202,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public DelegationId createDelegation(Delegation delegation) {
+    public DelegationId createDelegation(DelegationRequest delegation) {
         log.trace("createDelegation start");
         log.debug("createDelegation request = {}", delegation.toString());
         DelegationId result = msCoreRestClient.createDelegation(delegation);

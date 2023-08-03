@@ -24,7 +24,7 @@ public class BrokerServiceImpl implements BrokerService {
     }
 
     private static final int DEFAULT_LIMIT = 1000;
-    private static final int START_PAGE = 1;
+    private static final int START_PAGE = 0;
 
     @Override
     public List<BrokerInfo> findAllByInstitutionType(String institutionType) {

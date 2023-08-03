@@ -68,5 +68,4 @@ class FeignErrorDecoderTest {
         //then
         assertDoesNotThrow(executable);
     }
-
 }
