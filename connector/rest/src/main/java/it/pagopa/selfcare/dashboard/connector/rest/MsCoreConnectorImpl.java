@@ -1,21 +1,27 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
@@ -36,19 +42,28 @@ import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 class MsCoreConnectorImpl implements MsCoreConnector {
 
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_PRODUCT_ID_MESSAGE = "A Product id is required";
+    static final String REQUIRED_INSTITUTION_TYPE_MESSAGE = "An Institution type is required";
     static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution description is required";
 
     private final MsCoreRestClient msCoreRestClient;
     private final MsCoreUserApiRestClient msCoreUserApiRestClient;
-
+    private final BrokerMapper brokerMapper;
     private final InstitutionMapper institutionMapper;
+
+    private final MsCoreDelegationApiRestClient msCoreDelegationApiRestClient;
+
+   private final DelegationRestClientMapper delegationMapper;
 
 
     @Autowired
-    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper) {
+    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper, BrokerMapper brokerMapper, MsCoreDelegationApiRestClient msCoreInstitutionApiRestClient, DelegationRestClientMapper delegationMapper) {
         this.msCoreRestClient = msCoreRestClient;
         this.msCoreUserApiRestClient = msCoreUserApiRestClient;
         this.institutionMapper = institutionMapper;
+        this.brokerMapper = brokerMapper;
+        this.msCoreDelegationApiRestClient = msCoreInstitutionApiRestClient;
+        this.delegationMapper = delegationMapper;
     }
 
     @Deprecated
@@ -61,6 +76,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
         log.trace("getOnBoardedInstitutions end");
         return result;
     }
+
     @Override
     public List<InstitutionInfo> getUserProducts(String userId) {
         log.trace("getUserProducts start");
@@ -186,13 +202,42 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public DelegationId createDelegation(Delegation delegation) {
+    public DelegationId createDelegation(DelegationRequest delegation) {
         log.trace("createDelegation start");
         log.debug("createDelegation request = {}", delegation.toString());
         DelegationId result = msCoreRestClient.createDelegation(delegation);
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
         return result;
+    }
+
+    public List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type) {
+        log.trace("findInstitutionsByProductAndType start");
+        log.debug("findInstitutionsByProductAndType productId = {}, type = {}", productId, type);
+        Assert.hasText(productId, REQUIRED_PRODUCT_ID_MESSAGE);
+        Assert.hasText(type, REQUIRED_INSTITUTION_TYPE_MESSAGE);
+        List<Institution> institutions = msCoreRestClient.getInstitutionsByProductAndType(productId, type);
+        List<BrokerInfo> brokers = brokerMapper.fromInstitutions(institutions);
+        log.debug("findInstitutionsByProductAndType result = {}", brokers);
+        log.trace("findInstitutionsByProductAndType end");
+        return brokers;
+    }
+
+    @Override
+    public List<Delegation> getDelegations(String from, String to, String productId) {
+        log.trace("getDelegations start");
+        log.debug("getDelegations productId = {}, type = {}", from, productId);
+        List<DelegationResponse> delegationsResponse = msCoreDelegationApiRestClient._getDelegationsUsingGET(from, to, productId).getBody();
+
+        if(Objects.isNull(delegationsResponse))
+            return List.of();
+
+        List<Delegation> delegations = delegationsResponse.stream()
+            .map(delegationMapper::toDelegations)
+            .collect(Collectors.toList());
+        log.debug("getDelegations result = {}", delegations);
+        log.trace("getDelegations end");
+            return delegations;
     }
 
 }

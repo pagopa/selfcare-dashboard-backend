@@ -40,7 +40,11 @@ spec:
             - secretRef:
                 name: b4f-dashboard
             - secretRef:
+                name: support-secrets
+            - secretRef:
                 name: common-secrets
+            - secretRef:
+                name: pagopa-backoffice-secrets
             - configMapRef:
                 name: inner-service-url
             - configMapRef:

@@ -4,7 +4,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
 @TestConfiguration
-@Import(NotificationManagerRestClientConfig.class)
-public class NotificationManagerRestClientTestConfig {
-
+@Import(PagoPABackOfficeRestClientConfig.class)
+public class PagoPABackOfficeRestClientTestConfig {
 }
