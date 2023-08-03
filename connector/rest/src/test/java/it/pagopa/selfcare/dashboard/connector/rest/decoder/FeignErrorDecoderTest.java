@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.decoder;
 
 import feign.Request;
 import feign.Response;
-import it.pagopa.selfcare.dashboard.connector.exception.InternalGatewayErrorException;
+import it.pagopa.selfcare.dashboard.connector.exception.BadGatewayException;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FeignErrorDecoderTest {
-
     FeignErrorDecoder feignDecoder = new FeignErrorDecoder();
 
     private Map<String, Collection<String>> headers = new LinkedHashMap<>();
@@ -39,18 +38,19 @@ class FeignErrorDecoderTest {
     }
 
     @Test
-    void testDecodeToServerError() throws Throwable {
+    void testDecodeToBadGateway() throws Throwable {
         //given
         Response response = Response.builder()
                 .status(500)
-                .reason("ResourceNotFound")
+                .reason("Bad Gateway")
                 .request(Request.create(Request.HttpMethod.GET, "/api", Collections.emptyMap(), null, UTF_8))
                 .headers(headers)
+                .body("hello world", UTF_8)
                 .build();
         //when
         Executable executable = () -> feignDecoder.decode("", response);
         //then
-        assertThrows(InternalGatewayErrorException.class, executable);
+        assertThrows(BadGatewayException.class, executable);
     }
 
     @Test
@@ -68,5 +68,4 @@ class FeignErrorDecoderTest {
         //then
         assertDoesNotThrow(executable);
     }
-
 }

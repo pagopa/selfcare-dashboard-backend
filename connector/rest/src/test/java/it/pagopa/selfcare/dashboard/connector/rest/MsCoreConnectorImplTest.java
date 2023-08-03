@@ -10,22 +10,28 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionProducts;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
+import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
-import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
@@ -42,7 +48,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 
@@ -50,11 +56,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.commons.utils.TestUtils.*;
+import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
 import static it.pagopa.selfcare.dashboard.connector.rest.MsCoreConnectorImpl.REQUIRED_UPDATE_RESOURCE_MESSAGE;
@@ -65,7 +71,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = {
-                MsCoreConnectorImpl.class, InstitutionMapperImpl.class
+                MsCoreConnectorImpl.class, InstitutionMapperImpl.class, DelegationRestClientMapperImpl.class
         }
 )
 class MsCoreConnectorImplTest {
@@ -80,6 +86,12 @@ class MsCoreConnectorImplTest {
 
     @MockBean
     private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
+
+    @MockBean
+    private MsCoreDelegationApiRestClient msCoreInstitutionApiRestClient;
+
+    @MockBean
+    private BrokerMapper brokerMapper;
 
     @Captor
     private ArgumentCaptor<OnboardingUsersRequest> onboardingRequestCaptor;
@@ -870,7 +882,7 @@ class MsCoreConnectorImplTest {
     @Test
     void createDelegation() {
         // given
-        Delegation delegation = new Delegation();
+        DelegationRequest delegation = new DelegationRequest();
         delegation.setId("id");
         DelegationId delegationId = new DelegationId();
         delegationId.setId("id");
@@ -879,6 +891,110 @@ class MsCoreConnectorImplTest {
         DelegationId response = msCoreConnector.createDelegation(delegation);
         assertNotNull(response);
         assertEquals(response.getId(), delegationId.getId());
+    }
+    @Test
+    void findInstitutionsByProductIdAndType() {
+        // given
+        final String productId = "prod";
+        final String type = "PT";
+        Institution institution = new Institution();
+        institution.setId("id");
+        institution.setDescription("description");
+        BrokerInfo brokerInfo = new BrokerInfo();
+        brokerInfo.setCode("id");
+        brokerInfo.setDescription("description");
+        when(brokerMapper.fromInstitutions(anyList())).thenReturn(List.of(brokerInfo));
+        when(msCoreRestClientMock.getInstitutionsByProductAndType(any(), any()))
+                .thenReturn(List.of(institution));
+        // when
+        List<BrokerInfo> response = msCoreConnector.findInstitutionsByProductAndType(productId, type);
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertNotNull(response.get(0));
+        assertEquals(response.get(0).getCode(), institution.getId());
+        assertEquals(response.get(0).getDescription(), institution.getDescription());
+
+    }
+
+    @Test
+    void getDelegationUsingFrom_shouldGetData() {
+        // given
+        DelegationResponse delegationResponse = dummyDelegationResponse();
+        List<DelegationResponse> delegationResponseList = new ArrayList<>();
+        delegationResponseList.add(delegationResponse);
+        ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
+        Delegation delegation = dummyDelegation();
+
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any()))
+                .thenReturn(delegationResponseEntity);
+
+
+        // when
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        // then
+        assertNotNull(delegationList);
+        assertEquals(1, delegationList.size());
+
+        assertEquals(delegationResponseList.get(0).getId(), delegationList.get(0).getId());
+        assertEquals(delegationResponseList.get(0).getInstitutionId(), delegationList.get(0).getInstitutionId());
+        assertEquals(delegationResponseList.get(0).getBrokerId(), delegationList.get(0).getBrokerId());
+        assertEquals(delegationResponseList.get(0).getProductId(), delegationList.get(0).getProductId());
+        assertEquals(delegationResponseList.get(0).getType().toString(), delegationList.get(0).getType().toString());
+        assertEquals(delegationResponseList.get(0).getInstitutionName(), delegationList.get(0).getInstitutionName());
+        assertEquals(delegationResponseList.get(0).getBrokerName(), delegationList.get(0).getBrokerName());
+
+        verify(msCoreInstitutionApiRestClient, times(1))
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
+    }
+
+    @Test
+    void getDelegationUsingFrom_shouldGetEmptyData() {
+        // given
+        List<DelegationResponse> delegationResponseList = new ArrayList<>();
+        ResponseEntity<List<DelegationResponse>> delegationResponseEntity = mock(ResponseEntity.class);
+        Delegation delegation = dummyDelegation();
+
+        when(delegationResponseEntity.getBody()).thenReturn(null);
+
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any()))
+                .thenReturn(delegationResponseEntity);
+
+
+        // when
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        // then
+        assertNotNull(delegationList);
+        assertEquals(0, delegationList.size());
+
+        verify(msCoreInstitutionApiRestClient, times(1))
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
+    }
+
+
+    private DelegationResponse dummyDelegationResponse() {
+        DelegationResponse delegationResponse = new DelegationResponse();
+        delegationResponse.setInstitutionId("from");
+        delegationResponse.setBrokerId("to");
+        delegationResponse.setId("setId");
+        delegationResponse.setProductId("setProductId");
+        delegationResponse.setType(DelegationResponse.TypeEnum.PT);
+        delegationResponse.setInstitutionName("setInstitutionFromName");
+        delegationResponse.setBrokerName("brokerName");
+        return delegationResponse;
+    }
+
+    private Delegation dummyDelegation() {
+        Delegation delegation = new Delegation();
+        delegation.setInstitutionId("from");
+        delegation.setBrokerId("to");
+        delegation.setId("setId");
+        delegation.setProductId("setProductId");
+        delegation.setType(DelegationType.PT);
+        delegation.setInstitutionName("setInstitutionFromName");
+        return delegation;
     }
 
 }

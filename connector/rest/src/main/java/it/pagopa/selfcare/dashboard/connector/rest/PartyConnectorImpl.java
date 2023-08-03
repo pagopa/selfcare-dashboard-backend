@@ -322,7 +322,7 @@ class PartyConnectorImpl implements PartyConnector {
 
 
     @Override
-    public void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto) {
+    public void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto, String productTitle) {
         log.trace("createUsers start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createUsers institutionId = {}, productId = {}, createUserDto = {}", institutionId, productId, userId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
@@ -333,6 +333,7 @@ class PartyConnectorImpl implements PartyConnector {
         OnboardingUsersRequest onboardingUsersRequest = new OnboardingUsersRequest();
         onboardingUsersRequest.setInstitutionId(institutionId);
         onboardingUsersRequest.setProductId(productId);
+        onboardingUsersRequest.setProductTitle(productTitle);
         Map<PartyRole, List<User>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
 
         if (partyRoleToUsersMap.size() > 1) {
@@ -408,6 +409,7 @@ class PartyConnectorImpl implements PartyConnector {
                     user.setId(UUID.fromString(userId));
                     user.setProductRole(role.getProductRole());
                     user.setRole(role.getPartyRole());
+                    user.setRoleLabel(role.getLabel());
                     return user;
                 }).collect(Collectors.groupingBy(User::getRole));
     }

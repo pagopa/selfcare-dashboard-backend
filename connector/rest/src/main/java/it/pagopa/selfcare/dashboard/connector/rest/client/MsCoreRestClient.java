@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -56,6 +57,10 @@ public interface MsCoreRestClient {
     @ResponseBody
     Institution getInstitution(@PathVariable(value = "id") String id);
 
+    @GetMapping(value = "${rest-client.ms-core.getInstitutions.path}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    List<Institution> getInstitutionsByProductAndType(@PathVariable(value = "productId") String productId, @PathVariable(value = "type") String type);
+
     @PutMapping(value = "${rest-client.ms-core.updateInstitutionDescription.path}")
     @ResponseBody
     Institution updateInstitutionDescription(@PathVariable(value = "id") String institutionId,
@@ -63,7 +68,7 @@ public interface MsCoreRestClient {
 
     @PostMapping(value = "${rest-client.ms-core.createDelegation.path}")
     @ResponseBody
-    DelegationId createDelegation(@RequestBody Delegation delegation);
+    DelegationId createDelegation(@RequestBody DelegationRequest delegation);
 
 
 }

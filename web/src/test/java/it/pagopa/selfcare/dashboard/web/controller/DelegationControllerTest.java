@@ -58,6 +58,7 @@ class DelegationControllerTest {
         delegationRequest.setFrom("111111");
         delegationRequest.setTo("2222222");
         delegationRequest.setInstitutionFromName("Test name");
+        delegationRequest.setInstitutionToName("Test to name");
         delegationRequest.setProductId("productId");
         delegationRequest.setType(DelegationType.PT);
         String content = (new ObjectMapper()).writeValueAsString(delegationRequest);

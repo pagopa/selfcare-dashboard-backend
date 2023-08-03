@@ -31,7 +31,7 @@ public interface PartyConnector {
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 
-    void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto);
+    void createUsers(String institutionId, String productId, String userId, CreateUserDto userDto, String productTitle);
 
     void checkExistingRelationshipRoles(String institutionId, String productId, CreateUserDto userDto, String userId);
 
