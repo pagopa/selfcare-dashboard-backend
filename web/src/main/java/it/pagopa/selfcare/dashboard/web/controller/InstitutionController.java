@@ -108,7 +108,7 @@ public class InstitutionController {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
         Institution institution = institutionService.findInstitutionById(institutionId);
-        InstitutionResource result = InstitutionMapper.toResource(institution);
+        InstitutionResource result = institutionResourceMapper.toResource(institution);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
 
@@ -317,7 +317,7 @@ public class InstitutionController {
                                                     UpdateInstitutionDto institutionDto) {
         log.trace("updateInstitutionDescription start");
         log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
-        Institution result = institutionService.updateInstitutionDescription(institutionId, InstitutionMapper.toUpdateResource(institutionDto));
+        Institution result = institutionService.updateInstitutionDescription(institutionId, institutionResourceMapper.toUpdateResource(institutionDto));
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
         return result;
