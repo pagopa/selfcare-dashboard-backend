@@ -48,4 +48,12 @@ public class DashboardExceptionsHandler {
         return ProblemMapper.toResponseEntity(new Problem(BAD_GATEWAY, e.getMessage()));
     }
 
+    @ExceptionHandler({
+            RuntimeException.class,
+    })
+    ResponseEntity<Problem> handleRuntimeException(RuntimeException e) {
+        log.warn(e.toString());
+        return ProblemMapper.toResponseEntity(new Problem(INTERNAL_SERVER_ERROR, e.getMessage()));
+    }
+
 }
