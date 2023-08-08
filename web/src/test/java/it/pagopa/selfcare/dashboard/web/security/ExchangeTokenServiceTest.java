@@ -522,6 +522,9 @@ class ExchangeTokenServiceTest {
             institution.setAooParent(organizationClaim.get("aooParent").toString());
             institution.setParentDescription(organizationClaim.get("parentDescription").toString());
             institution.setOriginId(organizationClaim.get("ipaCode").toString());
+            ExchangeTokenService.RootParent rootParent = new ExchangeTokenService.RootParent();
+            rootParent.setDescription(organizationClaim.get("parentDescription").toString());
+            institution.setRootParent(rootParent);
             return institution;
         }
 

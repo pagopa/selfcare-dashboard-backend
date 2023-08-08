@@ -50,9 +50,10 @@ public class DashboardExceptionsHandler {
     }
 
     @ExceptionHandler({
-            SupportException.class,
+            RuntimeException.class,
+            SupportException.class
     })
-    ResponseEntity<Problem> handleSupportException(Exception e) {
+    ResponseEntity<Problem> handleRuntimeException(Exception e) {
         log.warn(e.toString());
         return ProblemMapper.toResponseEntity(new Problem(INTERNAL_SERVER_ERROR, e.getMessage()));
     }
