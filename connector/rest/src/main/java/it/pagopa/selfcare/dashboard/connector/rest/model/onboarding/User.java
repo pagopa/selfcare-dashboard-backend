@@ -27,5 +27,6 @@ public class User {
     private PartyRole role;
     private String email;
     private String productRole;
+    private String roleLabel;
 
 }

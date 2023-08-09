@@ -57,7 +57,6 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.*;
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -1029,11 +1028,12 @@ class PartyConnectorImplTest {
         // given
         String institutionId = null;
         String productId = "productId";
+        String productTitle = "productTitle";
         String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto, productTitle);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1045,12 +1045,13 @@ class PartyConnectorImplTest {
     void createUsers_nullProductId() {
         // given
         String institutionId = "institutionId";
+        String productTitle = "productTitle";
         String productId = null;
         String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto, productTitle);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1063,11 +1064,12 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String productTitle = "productTitle";
         String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = null;
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto, productTitle);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1080,11 +1082,12 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String productTitle = "productTitle";
         String userId = null;
         CreateUserDto createUserDto = new CreateUserDto();
         // when
         Executable executable = () -> {
-            partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+            partyConnector.createUsers(institutionId, productId, userId, createUserDto, productTitle);
         };
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
@@ -1098,6 +1101,7 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String productTitle = "productTitle";
         String productRoles = "Operator Api";
         String userId = UUID.randomUUID().toString();
         CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRoles");
@@ -1106,7 +1110,7 @@ class PartyConnectorImplTest {
         roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
         // when
-        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto, productTitle);
         // then
         switch (partyRole) {
             case SUB_DELEGATE:
@@ -1166,6 +1170,7 @@ class PartyConnectorImplTest {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String productTitle = "productTitle";
         String productRoles1 = "Operator Api";
         String productRoles2 = "Operator Security";
         PartyRole partyRole1 = PartyRole.OPERATOR;
@@ -1181,7 +1186,7 @@ class PartyConnectorImplTest {
         roleMock2.setPartyRole(partyRole2);
         createUserDto.setRoles(Set.of(roleMock1, roleMock2));
         // when
-        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto);
+        Executable executable = () -> partyConnector.createUsers(institutionId, productId, userId, createUserDto, productTitle);
         // then
         ValidationException e = assertThrows(ValidationException.class, executable);
         assertEquals("Is not allowed to create both SUB_DELEGATE and OPERATOR users", e.getMessage());

@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
@@ -18,20 +21,21 @@ import it.pagopa.selfcare.dashboard.web.model.GET_INSTITUTION_MODE;
 import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
-import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
+import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -42,6 +46,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
 
 import java.util.*;
@@ -49,6 +54,7 @@ import java.util.*;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.Collections.singletonList;
 import static java.util.UUID.randomUUID;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,7 +65,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {InstitutionController.class, WebTestConfig.class, DashboardExceptionsHandler.class, InstitutionResourceMapperImpl.class})
+@ContextConfiguration(classes = {InstitutionController.class, DelegationMapperImpl.class, WebTestConfig.class, DashboardExceptionsHandler.class, InstitutionResourceMapperImpl.class})
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/institutions";
@@ -76,11 +82,20 @@ class InstitutionControllerTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @InjectMocks
+    private InstitutionController institutionController;
+
     @MockBean
     private FileStorageService storageServiceMock;
 
     @MockBean
     private InstitutionService institutionServiceMock;
+
+    @MockBean
+    private DelegationService delegationService;
+
+
+
 
 
     @Test
@@ -539,6 +554,89 @@ class InstitutionControllerTest {
         verify(institutionServiceMock, times(1))
                 .updateInstitutionDescription(institutionId, resource);
         verifyNoMoreInteractions(institutionServiceMock);
+    }
+
+    /**
+     * Method under test: {@link InstitutionController#getDelegationsUsingFrom(String, String)}
+     */
+    @Test
+    void getDelegationsUsingFrom_shouldGetData() throws Exception {
+        // Given
+        Delegation expectedDelegation = dummyDelegation();
+
+        when(delegationService.getDelegations(any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        // When
+
+        MvcResult result = mvc
+                .perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/partners?productId={productId}", expectedDelegation.getInstitutionId(), expectedDelegation.getProductId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andReturn();
+
+        List<DelegationResource> resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        // Then
+        assertThat(resource).isNotNull();
+        assertThat(resource.size()).isEqualTo(1);
+        DelegationResource actual = resource.get(0);
+        assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
+        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
+        assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
+        assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
+        assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
+
+        verify(delegationService, times(1))
+                .getDelegations(expectedDelegation.getInstitutionId(), null, expectedDelegation.getProductId());
+        verifyNoMoreInteractions(delegationService);
+    }
+
+    /**
+     * Method under test: {@link InstitutionController#getDelegationsUsingTo(String, String)}
+     */
+    @Test
+    void getDelegationsUsingTo_shouldGetData() throws Exception {
+        // Given
+        Delegation expectedDelegation = dummyDelegation();
+
+        when(delegationService.getDelegations(any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        // When
+
+        MvcResult result = mvc
+                .perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}", expectedDelegation.getBrokerId(), expectedDelegation.getProductId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andReturn();
+
+        List<DelegationResource> resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        // Then
+        assertThat(resource).isNotNull();
+        assertThat(resource.size()).isEqualTo(1);
+        DelegationResource actual = resource.get(0);
+        assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
+        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
+        assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
+        assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
+        assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
+
+        verify(delegationService, times(1))
+                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId());
+        verifyNoMoreInteractions(delegationService);
+    }
+
+    private Delegation dummyDelegation() {
+        Delegation delegation = new Delegation();
+        delegation.setInstitutionId("from");
+        delegation.setBrokerId("to");
+        delegation.setId("setId");
+        delegation.setProductId("setProductId");
+        delegation.setType(DelegationType.PT);
+        delegation.setInstitutionName("setInstitutionFromName");
+        return delegation;
     }
 
 }

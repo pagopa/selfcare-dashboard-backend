@@ -56,7 +56,6 @@ class InstitutionServiceImpl implements InstitutionService {
     private final PartyConnector partyConnector;
     private final MsCoreConnector msCoreConnector;
     private final ProductsConnector productsConnector;
-    private final NotificationService notificationService;
 
     protected static final BinaryOperator<PartyProduct> MERGE_FUNCTION = (inst1, inst2) -> inst1.getOnBoardingStatus().compareTo(inst2.getOnBoardingStatus()) < 0 ? inst1 : inst2;
 
@@ -65,8 +64,7 @@ class InstitutionServiceImpl implements InstitutionService {
     public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
                                   UserRegistryConnector userRegistryConnector, PartyConnector partyConnector,
                                   ProductsConnector productsConnector,
-                                  MsCoreConnector msCoreConnector,
-                                  NotificationService notificationService) {
+                                  MsCoreConnector msCoreConnector) {
         this.allowedStates = allowedStates == null || allowedStates.length == 0
                 ? Optional.empty()
                 : Optional.of(EnumSet.copyOf(Arrays.stream(allowedStates)
@@ -76,7 +74,6 @@ class InstitutionServiceImpl implements InstitutionService {
         this.partyConnector = partyConnector;
         this.productsConnector = productsConnector;
         this.msCoreConnector = msCoreConnector;
-        this.notificationService = notificationService;
     }
 
 
@@ -120,7 +117,11 @@ class InstitutionServiceImpl implements InstitutionService {
         return result;
     }
 
-    @Deprecated
+    /**
+     * @deprecated method has been deprecated because a new method has been implemented.
+     * Remove the query from the repository
+     */
+    @Deprecated(forRemoval = true)
     @Override
     public Collection<InstitutionInfo> getInstitutions() {
         log.trace("getInstitutions start");
@@ -320,8 +321,7 @@ class InstitutionServiceImpl implements InstitutionService {
 
         UserId userId = userRegistryConnector.saveUser(user.getUser());
         partyConnector.checkExistingRelationshipRoles(institutionId, productId, user, userId.getId().toString());
-        partyConnector.createUsers(institutionId, productId, userId.getId().toString(), user);
-        notificationService.sendCreatedUserNotification(institutionId, product.getTitle(), user.getEmail(), user.getRoles());
+        partyConnector.createUsers(institutionId, productId, userId.getId().toString(), user, product.getTitle());
         log.debug("createUsers result = {}", userId);
         log.trace("createUsers end");
         return userId;
@@ -345,8 +345,7 @@ class InstitutionServiceImpl implements InstitutionService {
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
 
-        partyConnector.createUsers(institutionId, productId, userId, user);
-        notificationService.sendAddedProductRoleNotification(institutionId, product.getTitle(), userId, user.getRoles());
+        partyConnector.createUsers(institutionId, productId, userId, user, product.getTitle());
         log.trace("addProductUser end");
     }
 

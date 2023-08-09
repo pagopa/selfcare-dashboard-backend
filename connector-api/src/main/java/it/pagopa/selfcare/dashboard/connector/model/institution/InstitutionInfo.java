@@ -25,7 +25,6 @@ public class InstitutionInfo {
     private DataProtectionOfficer dataProtectionOfficer;
     private List<GeographicTaxonomy> geographicTaxonomies;
     private SupportContact supportContact;
-
     private String subunitCode;
     private String subunitType;
     private String aooParentCode;

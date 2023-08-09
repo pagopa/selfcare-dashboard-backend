@@ -5,9 +5,10 @@ import lombok.Data;
 @Data
 public class Delegation {
     private String id;
-    private String from;
-    private String to;
+    private String institutionId;
+    private String brokerId;
     private String productId;
-    private String institutionFromName;
+    private String institutionName;
+    private String brokerName;
     private DelegationType type;
 }

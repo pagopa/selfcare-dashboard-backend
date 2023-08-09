@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.web.model.Problem;
 import it.pagopa.selfcare.commons.web.model.mapper.ProblemMapper;
 import it.pagopa.selfcare.dashboard.connector.exception.BadGatewayException;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.exception.SupportException;
 import it.pagopa.selfcare.dashboard.core.exception.FileValidationException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
@@ -48,6 +49,14 @@ public class DashboardExceptionsHandler {
         return ProblemMapper.toResponseEntity(new Problem(BAD_GATEWAY, e.getMessage()));
     }
 
+    @ExceptionHandler({
+            SupportException.class,
+    })
+    ResponseEntity<Problem> handleSupportException(Exception e) {
+        log.warn(e.toString());
+        return ProblemMapper.toResponseEntity(new Problem(INTERNAL_SERVER_ERROR, e.getMessage()));
+    }
+  
     @ExceptionHandler({
             RuntimeException.class,
     })

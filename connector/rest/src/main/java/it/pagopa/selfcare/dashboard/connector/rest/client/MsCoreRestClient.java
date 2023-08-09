@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -68,7 +68,7 @@ public interface MsCoreRestClient {
 
     @PostMapping(value = "${rest-client.ms-core.createDelegation.path}")
     @ResponseBody
-    DelegationId createDelegation(@RequestBody Delegation delegation);
+    DelegationId createDelegation(@RequestBody DelegationRequest delegation);
 
 
 }

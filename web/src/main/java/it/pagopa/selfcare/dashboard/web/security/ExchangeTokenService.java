@@ -106,6 +106,9 @@ public class ExchangeTokenService {
         institution.setSubUnitCode(institutionInfo.getSubunitCode());
         institution.setAooParent(institutionInfo.getAooParentCode());
         institution.setParentDescription(institutionInfo.getParentDescription());
+        RootParent rootParent = new RootParent();
+        rootParent.setDescription(institutionInfo.getParentDescription());
+        institution.setRootParent(rootParent);
         institution.setOriginId(institutionInfo.getOriginId());
         institution.setRoles(productGrantedAuthority.getProductRoles().stream()
                 .map(productRoleCode -> {
@@ -197,9 +200,17 @@ public class ExchangeTokenService {
         private String subUnitCode;
         private String subUnitType;
         private String aooParent;
+        @Deprecated
         private String parentDescription;
+        private RootParent rootParent;
         @JsonProperty("ipaCode")
         private String originId;
+    }
+
+    @Data
+    static class RootParent implements Serializable {
+        private String id;
+        private String description;
     }
 
     @Data
