@@ -51,4 +51,6 @@ public interface InstitutionService {
     void rejectOnboardingRequest(String tokenId);
 
     Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource);
+
+    Institution findInstitutionById(String institutionId);
 }

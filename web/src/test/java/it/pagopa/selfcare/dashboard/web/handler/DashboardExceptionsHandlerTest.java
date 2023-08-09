@@ -97,7 +97,7 @@ class DashboardExceptionsHandlerTest {
         Mockito.when(exceptionMock.getMessage())
                 .thenReturn(DETAIL_MESSAGE);
         // when
-        ResponseEntity<Problem> responseEntity = handler.handleSupportException(exceptionMock);
+        ResponseEntity<Problem> responseEntity = handler.handleRuntimeException(exceptionMock);
         // then
         assertNotNull(responseEntity);
         assertEquals(INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());

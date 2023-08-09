@@ -94,10 +94,6 @@ class InstitutionControllerTest {
     @MockBean
     private DelegationService delegationService;
 
-
-
-
-
     @Test
     void saveInstitutionLogo() throws Exception {
         // given
@@ -126,13 +122,14 @@ class InstitutionControllerTest {
     void getInstitution_institutionInfoNotNull() throws Exception {
         // given
         String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitution(anyString()))
+        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
+        when(institutionServiceMock.findInstitutionById(anyString()))
                 .thenAnswer(invocationOnMock -> {
                     String id = invocationOnMock.getArgument(0, String.class);
-                    InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo(), "setExternalId");
-                    institutionInfo.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-                    institutionInfo.setExternalId(id);
-                    return institutionInfo;
+                    Institution institution = mockInstance(new Institution(), "setExternalId");
+                    institution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
+                    institution.setExternalId(id);
+                    return institution;
                 });
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -141,11 +138,9 @@ class InstitutionControllerTest {
                 .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn();
-        // then
-        InstitutionResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionResource.class);
         assertNotNull(resource);
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .findInstitutionById(institutionId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 
@@ -165,7 +160,7 @@ class InstitutionControllerTest {
         // then
         assertEquals("", result.getResponse().getContentAsString());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .findInstitutionById(institutionId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 
@@ -180,7 +175,6 @@ class InstitutionControllerTest {
         expectedInstitution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         List<InstitutionInfo> expectedInstitutionInfos = new ArrayList<>();
         expectedInstitutionInfos.add(expectedInstitution);
-
         when(institutionServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -194,6 +188,7 @@ class InstitutionControllerTest {
         List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
                 });
+
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
         assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus().name());
