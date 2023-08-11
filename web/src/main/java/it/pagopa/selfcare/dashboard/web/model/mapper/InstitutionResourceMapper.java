@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
 import org.mapstruct.Mapper;
@@ -20,13 +21,8 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 public interface InstitutionResourceMapper {
 
     @Mapping(target = "name", source = "description")
-    @Mapping(target = "fiscalCode", source = "taxCode")
-    @Mapping(target = "mailAddress", source = "digitalAddress")
-    @Mapping(target = "recipientCode", source = "billing.recipientCode")
-    @Mapping(target = "vatNumber", source = "billing.vatNumber")
-    @Mapping(target = "vatNumberGroup", source = "paymentServiceProvider.vatNumberGroup")
     @Mapping(target = "userRole", expression = "java(toUserRole(model.getId(), model.getStatus()))")
-    InstitutionResource toResource(InstitutionInfo model);
+    InstitutionBaseResource toResource(InstitutionInfo model);
 
     @Mapping(target = "name", source = "description")
     @Mapping(target = "fiscalCode", source = "taxCode")

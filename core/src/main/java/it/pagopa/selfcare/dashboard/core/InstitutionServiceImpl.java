@@ -130,6 +130,16 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getInstitutions end");
         return result;
     }
+
+    @Override
+    public List<ProductTree> getProductsTree(){
+        log.trace("getProductsTree start");
+        List<ProductTree> productTrees = productsConnector.getProductsTree();
+        log.debug("getInstitutionProducts result = {}", productTrees);
+        log.trace("getInstitutionProducts end");
+        return productTrees;
+    }
+
     @Override
     public List<ProductTree> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");

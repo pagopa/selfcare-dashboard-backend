@@ -197,6 +197,36 @@ class InstitutionServiceImplTest {
     }
 
     @Test
+    void getProductsTree_emptyProducts() {
+        when(productsConnectorMock.getProductsTree())
+                .thenReturn(Collections.emptyList());
+        //when
+        List<ProductTree> products = institutionService.getProductsTree();
+        //then
+        Assertions.assertNotNull(products);
+        Assertions.assertTrue(products.isEmpty());
+        verify(productsConnectorMock, times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void getProductsTree() {
+        ProductTree product = mockInstance(new ProductTree());
+        List<ProductTree> productList = List.of(product);
+        when(productsConnectorMock.getProductsTree())
+                .thenReturn(productList);
+        //when
+        List<ProductTree> products = institutionService.getProductsTree();
+        //then
+        Assertions.assertNotNull(products);
+        Assertions.assertTrue(products.size() == 1);
+        verify(productsConnectorMock, times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
+    }
+
+    @Test
     void getInstitutionProducts_emptyProducts() {
         //given
         String institutionId = "institutionId";
