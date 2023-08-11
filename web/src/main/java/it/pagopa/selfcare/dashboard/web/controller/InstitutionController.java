@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
+import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.*;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.*;
@@ -86,16 +87,13 @@ public class InstitutionController {
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
-    public List<InstitutionResource> getInstitutions(Authentication authentication,
-                                                     @RequestParam(value = "mode", required = false)
-                                                     Optional<GET_INSTITUTION_MODE> optMode) {
+    public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
 
         log.trace("getInstitutions start");
         String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<InstitutionInfo> institutions = optMode.isPresent() && optMode.get().equals(GET_INSTITUTION_MODE.BASE)
-                ? institutionService.getInstitutions(userId)
-                : institutionService.getInstitutions();
-        List<InstitutionResource> result = institutions.stream()
+        Collection<InstitutionInfo> institutions =  institutionService.getInstitutions(userId);
+
+        List<InstitutionBaseResource> result = institutions.stream()
                 .map(institutionResourceMapper::toResource)
                 .collect(Collectors.toList());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
@@ -213,7 +211,7 @@ public class InstitutionController {
         return result;
     }
 
-
+    @Deprecated
     @GetMapping(value = "/{institutionId}/products")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
@@ -234,6 +232,23 @@ public class InstitutionController {
         return result;
     }
 
+    @GetMapping(value = "/products")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    public List<ProductsResource> getProductsTree() {
+        log.trace("getInstitutionProducts start");
+        log.debug("getInstitutionProducts start");
+
+        List<ProductTree> products = institutionService.getProductsTree();
+        List<ProductsResource> result = products.stream()
+                .map(ProductsMapper::toResource)
+                .collect(Collectors.toList());
+        log.debug("getInstitutionProducts result = {}", result);
+        log.trace("getInstitutionProducts end");
+
+        return result;
+    }
 
     @GetMapping(value = "/{institutionId}/products/{productId}/users")
     @ResponseStatus(HttpStatus.OK)
