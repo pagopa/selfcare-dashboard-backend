@@ -565,9 +565,7 @@ class InstitutionControllerTest {
         assertEquals("", capturedUser.getName());
         assertEquals("", capturedUser.getSurname());
         assertEquals("", capturedUser.getTaxCode());
-        capturedUser.getRoles().forEach(role -> {
-            assertTrue(productRoles.getProductRoles().contains(role.getProductRole()));
-        });
+        capturedUser.getRoles().forEach(role -> assertTrue(productRoles.getProductRoles().contains(role.getProductRole())));
     }
 
     @Test
@@ -624,7 +622,7 @@ class InstitutionControllerTest {
                 result.getResponse().getContentAsString(), new TypeReference<>() {});
         // Then
         assertThat(resource).isNotNull();
-        assertThat(resource.size()).isEqualTo(1);
+        org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
         DelegationResource actual = resource.get(0);
         assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
         assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
@@ -660,7 +658,7 @@ class InstitutionControllerTest {
                 result.getResponse().getContentAsString(), new TypeReference<>() {});
         // Then
         assertThat(resource).isNotNull();
-        assertThat(resource.size()).isEqualTo(1);
+        org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
         DelegationResource actual = resource.get(0);
         assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
         assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());

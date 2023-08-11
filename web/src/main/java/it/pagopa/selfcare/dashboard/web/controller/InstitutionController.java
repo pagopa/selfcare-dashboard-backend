@@ -211,7 +211,10 @@ public class InstitutionController {
         return result;
     }
 
-    @Deprecated
+    /**
+     * @deprecated method has been deprecated because a new Api has been implemented.
+     */
+    @Deprecated(forRemoval = true, since = "1.5")
     @GetMapping(value = "/{institutionId}/products")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
@@ -235,17 +238,17 @@ public class InstitutionController {
     @GetMapping(value = "/products")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public List<ProductsResource> getProductsTree() {
-        log.trace("getInstitutionProducts start");
-        log.debug("getInstitutionProducts start");
+        log.trace("getProducts start");
+        log.debug("getProducts start");
 
         List<ProductTree> products = institutionService.getProductsTree();
         List<ProductsResource> result = products.stream()
                 .map(ProductsMapper::toResource)
                 .collect(Collectors.toList());
-        log.debug("getInstitutionProducts result = {}", result);
-        log.trace("getInstitutionProducts end");
+        log.debug("getProducts result = {}", result);
+        log.debug("getProducts result = {}", result);
+        log.trace("getProducts end");
 
         return result;
     }
@@ -364,7 +367,7 @@ public class InstitutionController {
                                                                    @RequestParam(name = "productId", required = false) String productId) {
         log.trace("getDelegationsUsingFrom start");
         log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", institutionId, productId);
-        ResponseEntity result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, null, productId).stream()
+        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, null, productId).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
         log.debug("getDelegationsUsingFrom result = {}", result);
@@ -391,7 +394,7 @@ public class InstitutionController {
                                                                    @RequestParam(name = "productId", required = false) String productId) {
         log.trace("getDelegationsUsingTo start");
         log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
-        ResponseEntity result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId, productId).stream()
+        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId, productId).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
         log.debug("getDelegationsUsingTo result = {}", result);
