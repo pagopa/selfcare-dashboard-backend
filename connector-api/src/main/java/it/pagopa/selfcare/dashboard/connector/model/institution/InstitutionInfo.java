@@ -29,6 +29,7 @@ public class InstitutionInfo {
     private String subunitType;
     private String aooParentCode;
     private String parentDescription;
+    private String rootParentId;
 
     @Override
     public boolean equals(Object o) {
