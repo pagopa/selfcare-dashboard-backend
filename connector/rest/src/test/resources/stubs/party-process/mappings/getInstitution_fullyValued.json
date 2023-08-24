@@ -22,6 +22,7 @@
       "taxCode": "string",
       "origin": "IPA",
       "institutionType": "PA",
+      "rootParentId": "97c0f418-bcb3-48d4-825a-fe8b29ae6823",
       "attributes": [
         {
           "origin": "string",
