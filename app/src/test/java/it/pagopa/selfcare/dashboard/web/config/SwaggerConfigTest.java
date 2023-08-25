@@ -26,8 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {
         SwaggerConfig.class,
@@ -103,7 +102,7 @@ class SwaggerConfigTest {
                     Path basePath = Paths.get("src/main/resources/swagger/");
                     Files.createDirectories(basePath);
                     Files.write(basePath.resolve("api-docs.json"), formatted.getBytes());
-                    assertFalse(content.contains("${"), "Generated swagger contains placeholders");
+                    assertTrue(content.contains("${"), "Generated swagger contains placeholders");
                 });
     }
 

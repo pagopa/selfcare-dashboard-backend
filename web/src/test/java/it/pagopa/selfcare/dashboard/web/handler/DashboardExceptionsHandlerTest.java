@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 
+import javax.validation.ValidationException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.HttpStatus.*;
@@ -31,7 +33,8 @@ class DashboardExceptionsHandlerTest {
     @ParameterizedTest
     @ValueSource(classes = {
             FileValidationException.class,
-            InvalidProductRoleException.class
+            InvalidProductRoleException.class,
+            ValidationException.class
     })
     void handleBadRequestException(Class<?> clazz) {
         // given

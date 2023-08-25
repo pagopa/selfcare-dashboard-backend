@@ -130,6 +130,16 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getInstitutions end");
         return result;
     }
+
+    @Override
+    public List<ProductTree> getProductsTree(){
+        log.trace("getProductsTree start");
+        List<ProductTree> productTrees = productsConnector.getProductsTree();
+        log.debug("getInstitutionProducts result = {}", productTrees);
+        log.trace("getInstitutionProducts end");
+        return productTrees;
+    }
+
     @Override
     public List<ProductTree> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");
@@ -389,6 +399,44 @@ class InstitutionServiceImpl implements InstitutionService {
         Institution institution = msCoreConnector.updateInstitutionDescription(institutionId, updateInstitutionResource);
         log.debug("updateInstitutionDescription result = {}", institution);
         log.trace("updateInstitutionDescription end");
+        return institution;
+    }
+
+    @Override
+    public Institution findInstitutionById(String institutionId) {
+        log.trace("findInstitutionById start");
+        log.debug("findInstitutionById institutionId = {}", institutionId);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
+        if (institution != null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
+                    .stream()
+                    .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
+                    .map(SelfCareGrantedAuthority.class::cast)
+                    .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
+                    .findAny();
+
+            if (selcAuthority.isPresent()) {
+                Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
+
+                if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
+                    institution.setOnboarding(institution.getOnboarding().stream()
+                            .filter(product -> userAuthProducts.containsKey(product.getProductId()))
+                            .peek(product -> product.setAuthorized(true))
+                            .peek(product -> product.setUserRole(LIMITED.name()))
+                            .collect(Collectors.toList()));
+                } else {
+                    institution.getOnboarding().forEach(product -> {
+                        product.setAuthorized(userAuthProducts.containsKey(product.getProductId()));
+                        Optional.ofNullable(userAuthProducts.get(product.getProductId()))
+                                .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null));
+                    });
+                }
+            }
+        }
+        log.debug("findInstitutionById result = {}", institution);
+        log.trace("findInstitutionById end");
         return institution;
     }
 

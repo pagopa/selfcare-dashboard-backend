@@ -197,6 +197,36 @@ class InstitutionServiceImplTest {
     }
 
     @Test
+    void getProductsTree_emptyProducts() {
+        when(productsConnectorMock.getProductsTree())
+                .thenReturn(Collections.emptyList());
+        //when
+        List<ProductTree> products = institutionService.getProductsTree();
+        //then
+        Assertions.assertNotNull(products);
+        Assertions.assertTrue(products.isEmpty());
+        verify(productsConnectorMock, times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void getProductsTree() {
+        ProductTree product = mockInstance(new ProductTree());
+        List<ProductTree> productList = List.of(product);
+        when(productsConnectorMock.getProductsTree())
+                .thenReturn(productList);
+        //when
+        List<ProductTree> products = institutionService.getProductsTree();
+        //then
+        Assertions.assertNotNull(products);
+        Assertions.assertTrue(products.size() == 1);
+        verify(productsConnectorMock, times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
+    }
+
+    @Test
     void getInstitutionProducts_emptyProducts() {
         //given
         String institutionId = "institutionId";
@@ -1452,5 +1482,43 @@ class InstitutionServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
         verifyNoInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void findInstitutionByIdTest2(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+        Institution institutionResponse = institutionService.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+    }
+
+    @Test
+    void findInstitutionByIdTest(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+        Institution institutionResponse = institutionService.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
     }
 }
