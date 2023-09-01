@@ -15,7 +15,7 @@ public class SupportRequestDto {
     @Email @NotBlank
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.support.model.productId}", required = false)
+    @ApiModelProperty(value = "${swagger.dashboard.support.model.productId}")
     private String productId;
 
 }
