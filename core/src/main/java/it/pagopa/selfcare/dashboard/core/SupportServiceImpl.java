@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.connector.model.support.SupportRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +50,11 @@ public class SupportServiceImpl implements SupportService {
         String  redirectUrl = "https://" + SUBDOMAIN + ".zendesk.com/access/jwt?jwt=" + jwtString;
         log.debug("sendRequest result = {}", redirectUrl);
         log.trace("sendRequest end");
-        return redirectUrl.concat("&return_to=" + URLEncoder.encode(RETURN_TO, StandardCharsets.UTF_8));
 
+        String returnUrl = StringUtils.hasText(supportRequest.getProductId()) ?
+                URLEncoder.encode(RETURN_TO.concat("?product=" + supportRequest.getProductId()), StandardCharsets.UTF_8) :
+                URLEncoder.encode(RETURN_TO, StandardCharsets.UTF_8);
+
+        return redirectUrl.concat("&return_to=" + returnUrl);
     }
 }
