@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/channels/brokerspsp?limit=10&page=1"
+    "url": "/channels/getBrokersPsp?limit=10&page=1"
   },
   "response": {
     "status": "200",
