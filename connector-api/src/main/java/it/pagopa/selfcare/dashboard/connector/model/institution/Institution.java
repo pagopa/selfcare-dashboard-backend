@@ -27,5 +27,9 @@ public class Institution {
     private DataProtectionOfficer dataProtectionOfficer;
     private SupportContact supportContact;
     private List<OnboardedProduct> onboarding;
+    private RootParentResponse rootParent;
+    private String subunitCode;
+    private String subunitType;
+    private String aooParentCode;
 
 }

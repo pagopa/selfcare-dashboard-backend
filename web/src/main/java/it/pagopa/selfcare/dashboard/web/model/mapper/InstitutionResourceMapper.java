@@ -31,6 +31,7 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "vatNumber", source = "billing.vatNumber")
     @Mapping(target = "vatNumberGroup", source = "paymentServiceProvider.vatNumberGroup")
     @Mapping(target = "products", source = "onboarding")
+    @Mapping(target = "parentDescription", source = "rootParent.description")
     InstitutionResource toResource(Institution model);
 
     UpdateInstitutionResource toUpdateResource(UpdateInstitutionDto dto);

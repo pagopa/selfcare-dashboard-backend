@@ -15,6 +15,12 @@
       "zipCode": "20100",
       "taxCode": "string",
       "origin": "IPA",
+      "subunitCode": "subunitCode",
+      "aooParentCode": "aooParentCode",
+      "subunitType": "subunitType",
+      "rootParent": {
+        "description": "rootParentDescription"
+      },
       "institutionType": "PA",
       "attributes": [
         {

@@ -13,6 +13,12 @@
       "category": "category",
       "onboarding": [],
       "billing": {},
+      "subunitCode": "subunitCode",
+      "aooParentCode": "aooParentCode",
+      "subunitType": "subunitType",
+      "rootParent": {
+        "description": "rootParentDescription"
+      },
       "paymentServiceProvider": {},
       "dataProtectionOfficer": {},
       "supportContact": {},
