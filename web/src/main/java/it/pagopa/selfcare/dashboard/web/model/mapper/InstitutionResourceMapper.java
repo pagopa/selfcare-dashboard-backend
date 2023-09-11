@@ -11,7 +11,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
@@ -31,9 +33,19 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "vatNumber", source = "billing.vatNumber")
     @Mapping(target = "vatNumberGroup", source = "paymentServiceProvider.vatNumberGroup")
     @Mapping(target = "products", source = "onboarding")
+    @Mapping(target = "parentDescription", source = "rootParent.description")
+    @Mapping(target = "category", expression = "java(retrieveCategory(model.getAttributes()))")
     InstitutionResource toResource(Institution model);
 
     UpdateInstitutionResource toUpdateResource(UpdateInstitutionDto dto);
+
+    @Named("retrieveCategory")
+    default String retrieveCategory(List<Attribute> attributes){
+        if(!CollectionUtils.isEmpty(attributes)){
+            return attributes.get(0).getDescription();
+        }
+        return null;
+    }
 
     @Named("toUserRole")
     default String toUserRole(String institutionId,  RelationshipState status) {
