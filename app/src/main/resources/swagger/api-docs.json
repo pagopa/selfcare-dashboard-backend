@@ -3571,6 +3571,9 @@
           "address" : {
             "type" : "string"
           },
+          "aooParentCode" : {
+            "type" : "string"
+          },
           "attributes" : {
             "type" : "array",
             "items" : {
@@ -3622,6 +3625,15 @@
           },
           "paymentServiceProvider" : {
             "$ref" : "#/components/schemas/PaymentServiceProvider"
+          },
+          "rootParent" : {
+            "$ref" : "#/components/schemas/RootParentResponse"
+          },
+          "subunitCode" : {
+            "type" : "string"
+          },
+          "subunitType" : {
+            "type" : "string"
           },
           "supportContact" : {
             "$ref" : "#/components/schemas/SupportContact"
@@ -4342,6 +4354,18 @@
             "type" : "boolean",
             "description" : "PSP's Vat Number group",
             "example" : false
+          }
+        }
+      },
+      "RootParentResponse" : {
+        "title" : "RootParentResponse",
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string"
+          },
+          "id" : {
+            "type" : "string"
           }
         }
       },
