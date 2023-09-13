@@ -256,7 +256,8 @@ class InstitutionServiceImpl implements InstitutionService {
                         .anyMatch(key::equals)) {
                     productsIterator.remove();
                 } else {
-                    throw new IllegalArgumentException(String.format("No matching product found with id %s", key));
+                    productsIterator.remove();
+                    log.warn("No matching product found with id {}", key);
                 }
             }
         });
