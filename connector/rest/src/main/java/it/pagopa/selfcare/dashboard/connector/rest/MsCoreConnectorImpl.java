@@ -240,4 +240,13 @@ class MsCoreConnectorImpl implements MsCoreConnector {
             return delegations;
     }
 
+    @Override
+    public void updateUser(String userId, String institutionId) {
+        log.trace("updateUser start");
+        log.debug("updateUser userId = {}, institutionId = {}", userId, institutionId);
+        msCoreRestClient.updateUserById(userId, institutionId);
+        log.trace("updateUser end");
+    }
+
+
 }
