@@ -39,4 +39,6 @@ public interface MsCoreConnector {
 
     List<Delegation> getDelegations(String from, String to, String productId);
 
+    void updateUser(String userId, String institutionId);
+
 }
