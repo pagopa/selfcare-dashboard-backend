@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ValidationException;
+
 import static org.springframework.http.HttpStatus.*;
 
 /**
@@ -24,7 +26,8 @@ public class DashboardExceptionsHandler {
 
     @ExceptionHandler({
             FileValidationException.class,
-            InvalidProductRoleException.class
+            InvalidProductRoleException.class,
+            ValidationException.class
     })
     ResponseEntity<Problem> handleBadRequestException(Exception e) {
         log.warn(e.toString());
@@ -61,7 +64,7 @@ public class DashboardExceptionsHandler {
             RuntimeException.class,
     })
     ResponseEntity<Problem> handleRuntimeException(RuntimeException e) {
-        log.warn(e.toString());
+        log.error(e.toString());
         return ProblemMapper.toResponseEntity(new Problem(INTERNAL_SERVER_ERROR, e.getMessage()));
     }
 

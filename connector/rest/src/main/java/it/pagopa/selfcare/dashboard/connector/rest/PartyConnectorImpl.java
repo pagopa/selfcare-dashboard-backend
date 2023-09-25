@@ -82,6 +82,7 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setSubunitType(onboardingData.getSubunitType());
         institutionInfo.setAooParentCode(onboardingData.getAooParentCode());
         institutionInfo.setParentDescription(onboardingData.getParentDescription());
+        institutionInfo.setRootParentId(onboardingData.getRootParentId());
         return institutionInfo;
     };
 

@@ -21,5 +21,15 @@ public class Institution {
     private InstitutionType institutionType;
     private List<Attribute> attributes;
     private List<GeographicTaxonomy> geographicTaxonomies;
+    private String category;
+    private Billing billing;
+    private PaymentServiceProvider paymentServiceProvider;
+    private DataProtectionOfficer dataProtectionOfficer;
+    private SupportContact supportContact;
+    private List<OnboardedProduct> onboarding;
+    private RootParentResponse rootParent;
+    private String subunitCode;
+    private String subunitType;
+    private String aooParentCode;
 
 }

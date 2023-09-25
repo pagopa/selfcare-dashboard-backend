@@ -13,8 +13,20 @@
       "digitalAddress": "email@pec.mail.org",
       "address": "via del campo",
       "zipCode": "20100",
+      "category": "category",
+      "onboarding": [],
+      "billing": {},
+      "paymentServiceProvider": {},
+      "dataProtectionOfficer": {},
+      "supportContact": {},
       "taxCode": "string",
       "origin": "IPA",
+      "subunitCode": "subunitCode",
+      "aooParentCode": "aooParentCode",
+      "subunitType": "subunitType",
+      "rootParent": {
+        "description": "rootParentDescription"
+      },
       "institutionType": "PA",
       "attributes": [
         {

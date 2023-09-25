@@ -10,6 +10,18 @@
       "externalId": "c_f205",
       "originId": "c_f205",
       "description": "AGENCY X",
+      "category": "category",
+      "onboarding": [],
+      "billing": {},
+      "subunitCode": "subunitCode",
+      "aooParentCode": "aooParentCode",
+      "subunitType": "subunitType",
+      "rootParent": {
+        "description": "rootParentDescription"
+      },
+      "paymentServiceProvider": {},
+      "dataProtectionOfficer": {},
+      "supportContact": {},
       "digitalAddress": "email@pec.mail.org",
       "address": "via del campo",
       "zipCode": "20100",

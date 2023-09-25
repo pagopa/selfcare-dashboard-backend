@@ -1346,6 +1346,7 @@ class PartyConnectorImplTest {
         Attribute attribute = mockInstance(new Attribute());
         institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         institutionMock.setAttributes(List.of(attribute));
+        institutionMock.setOnboarding(Collections.emptyList());
         when(partyProcessRestClientMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         // when
@@ -1395,6 +1396,7 @@ class PartyConnectorImplTest {
         Attribute attribute = mockInstance(new Attribute());
         institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         institutionMock.setAttributes(List.of(attribute));
+        institutionMock.setOnboarding(Collections.emptyList());
         when(partyProcessRestClientMock.getInstitutionByExternalId(any()))
                 .thenReturn(institutionMock);
         // when

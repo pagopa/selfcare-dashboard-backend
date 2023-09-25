@@ -58,7 +58,6 @@ class PagoPABackOfficeRestClientTest extends BaseFeignRestClientTest {
         }
     }
 
-
     @Test
     void getBrokersEC() {
         // given and when

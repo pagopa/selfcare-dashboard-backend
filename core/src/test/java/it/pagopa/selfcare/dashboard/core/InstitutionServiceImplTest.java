@@ -197,6 +197,36 @@ class InstitutionServiceImplTest {
     }
 
     @Test
+    void getProductsTree_emptyProducts() {
+        when(productsConnectorMock.getProductsTree())
+                .thenReturn(Collections.emptyList());
+        //when
+        List<ProductTree> products = institutionService.getProductsTree();
+        //then
+        Assertions.assertNotNull(products);
+        Assertions.assertTrue(products.isEmpty());
+        verify(productsConnectorMock, times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
+    }
+
+    @Test
+    void getProductsTree() {
+        ProductTree product = mockInstance(new ProductTree());
+        List<ProductTree> productList = List.of(product);
+        when(productsConnectorMock.getProductsTree())
+                .thenReturn(productList);
+        //when
+        List<ProductTree> products = institutionService.getProductsTree();
+        //then
+        Assertions.assertNotNull(products);
+        assertEquals(1, products.size());
+        verify(productsConnectorMock, times(1)).getProductsTree();
+        verifyNoMoreInteractions(productsConnectorMock);
+        verifyNoInteractions(partyConnectorMock);
+    }
+
+    @Test
     void getInstitutionProducts_emptyProducts() {
         //given
         String institutionId = "institutionId";
@@ -821,30 +851,49 @@ class InstitutionServiceImplTest {
         userInfoFilter.setUserId(userId);
         UserInfo userInfoMock = mockInstance(new UserInfo(), "setProducts");
         final ProductInfo productInfoMock = mockInstance(new ProductInfo(), 1, "setRoleInfos");
-        userInfoMock.setProducts(Map.of(productInfoMock.getId(), productInfoMock));
+        Map<String, ProductInfo> map = new HashMap<>();
+        map.put(productInfoMock.getId(), productInfoMock);
+        userInfoMock.setProducts(map);
         when(partyConnectorMock.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock));
         final ProductTree productTree = mockInstance(new ProductTree(), 2, "setChildren");
         productTree.setChildren(Collections.emptyList());
         when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(productTree));
+        User user = new User();
+        user.setId("id");
+        CertifiedField<String> nameCert = new CertifiedField<>();
+        nameCert.setValue("name");
+        user.setName(nameCert);
+        CertifiedField<String> surnameCert = new CertifiedField<>();
+        surnameCert.setValue("surname");
+        user.setFamilyName(surnameCert);
+        user.setFiscalCode("fiscalCode");
+        CertifiedField<String> mailCert = new CertifiedField<>();
+        mailCert.setValue("surname");
+        user.setEmail(mailCert);
+        user.setWorkContacts(new HashMap<>());
+        when(userRegistryConnector.getUserByInternalId(any(), any())).thenReturn(user);
         // when
-        Executable executable = () -> institutionService.getInstitutionUser(institutionId, userId.get());
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("No matching product found with id " + productInfoMock.getId(), e.getMessage());
-        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
+        UserInfo userInfo = institutionService.getInstitutionUser(institutionId, userId.get());
+
+        Assertions.assertNotNull(userInfo.getProducts());
+        Assertions.assertEquals(0, userInfo.getProducts().size());
+        TestUtils.checkNotNullFields(userInfo);
+        TestUtils.checkNotNullFields(userInfo.getUser());
         verify(partyConnectorMock, times(1))
-                .getUsers(Mockito.eq(institutionId), filterCaptor.capture());
-        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(Optional.empty(), capturedFilter.getProductId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(userId, capturedFilter.getUserId());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+                .getUsers(Mockito.eq(institutionId), any(UserInfo.UserInfoFilter.class));
         verify(productsConnectorMock, times(1))
                 .getProductsTree();
-        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock, userRegistryConnector);
+        ArgumentCaptor<EnumSet<Fields>> fieldsCaptor = ArgumentCaptor.forClass(EnumSet.class);
+        verify(userRegistryConnector, times(1))
+                .getUserByInternalId(any(), fieldsCaptor.capture());
+        EnumSet<Fields> capturedFields = fieldsCaptor.getValue();
+        assertTrue(capturedFields.contains(name));
+        assertTrue(capturedFields.contains(familyName));
+        assertTrue(capturedFields.contains(workContacts));
+        assertTrue(capturedFields.contains(fiscalCode));
+        verifyNoMoreInteractions(partyConnectorMock, productsConnectorMock);
     }
 
 
@@ -1452,5 +1501,43 @@ class InstitutionServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
         verifyNoInteractions(msCoreConnectorMock);
+    }
+
+    @Test
+    void findInstitutionByIdTest2(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+        Institution institutionResponse = institutionService.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+    }
+
+    @Test
+    void findInstitutionByIdTest(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+        Institution institutionResponse = institutionService.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
     }
 }

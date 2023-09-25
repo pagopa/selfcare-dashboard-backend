@@ -802,6 +802,7 @@ class MsCoreConnectorImplTest {
         Attribute attribute = mockInstance(new Attribute());
         institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
         institutionMock.setAttributes(List.of(attribute));
+        institutionMock.setOnboarding(Collections.emptyList());
         when(msCoreRestClientMock.getInstitution(any()))
                 .thenReturn(institutionMock);
         // when

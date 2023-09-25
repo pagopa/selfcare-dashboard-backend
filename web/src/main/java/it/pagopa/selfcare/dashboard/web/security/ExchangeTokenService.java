@@ -107,6 +107,7 @@ public class ExchangeTokenService {
         institution.setAooParent(institutionInfo.getAooParentCode());
         institution.setParentDescription(institutionInfo.getParentDescription());
         RootParent rootParent = new RootParent();
+        rootParent.setId(institutionInfo.getRootParentId());
         rootParent.setDescription(institutionInfo.getParentDescription());
         institution.setRootParent(rootParent);
         institution.setOriginId(institutionInfo.getOriginId());

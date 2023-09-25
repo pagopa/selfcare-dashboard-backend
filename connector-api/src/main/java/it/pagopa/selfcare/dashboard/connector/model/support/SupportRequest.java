@@ -6,6 +6,7 @@ import lombok.Data;
 public class SupportRequest {
 
     private String email;
+    private String productId;
     private String name;
     private UserField userFields;
 
