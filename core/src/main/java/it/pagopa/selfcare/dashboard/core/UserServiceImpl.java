@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -58,6 +57,7 @@ public class UserServiceImpl implements UserService {
         if (institution == null) {
             throw new ResourceNotFoundException("There are no institution for given institutionId");
         }
+        msCoreConnector.updateUser(id.toString(), institutionId);
         userConnector.updateUser(id, userDto);
         log.trace("updateUser end");
     }

@@ -998,4 +998,16 @@ class MsCoreConnectorImplTest {
         return delegation;
     }
 
+    @Test
+    void updateUser(){
+        //given
+        String userId = UUID.randomUUID().toString();
+        String institutionId = UUID.randomUUID().toString();
+        //when
+        Executable executable = () -> msCoreConnector.updateUser(userId, institutionId);
+        //then
+        assertDoesNotThrow(executable);
+        verify(msCoreRestClientMock, times(1)).updateUserById(userId, institutionId);
+    }
+
 }
