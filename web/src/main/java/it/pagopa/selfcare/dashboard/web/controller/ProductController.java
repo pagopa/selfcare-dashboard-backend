@@ -3,8 +3,8 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
 import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
