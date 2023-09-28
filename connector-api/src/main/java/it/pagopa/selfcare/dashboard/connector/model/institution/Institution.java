@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.model.institution;
 
+import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

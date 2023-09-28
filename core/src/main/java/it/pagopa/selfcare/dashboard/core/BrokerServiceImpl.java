@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType.PSP;
+import static it.pagopa.selfcare.commons.base.utils.InstitutionType.PSP;
+
 
 @Slf4j
 @Service
