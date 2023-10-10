@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -66,6 +67,12 @@ public class DashboardExceptionsHandler {
     ResponseEntity<Problem> handleRuntimeException(RuntimeException e) {
         log.error(e.toString());
         return ProblemMapper.toResponseEntity(new Problem(INTERNAL_SERVER_ERROR, e.getMessage()));
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    ResponseEntity<Problem> handleAccessDeniedException(AccessDeniedException e) {
+        log.warn(e.toString());
+        return ProblemMapper.toResponseEntity(new Problem(FORBIDDEN, e.getMessage()));
     }
 
 }
