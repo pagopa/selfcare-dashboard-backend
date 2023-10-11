@@ -112,6 +112,7 @@ class UserServiceImplTest {
                 .getInstitution(institutionId);
         verify(userConnectorMock, times(1))
                 .updateUser(id, user);
+        verify(msCoreConnectorMock, times(1)).updateUser(id.toString(), institutionId);
         verifyNoMoreInteractions(userConnectorMock, msCoreConnectorMock);
     }
 
@@ -140,7 +141,7 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("An institutionId is required", e.getMessage());
-        verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -154,7 +155,7 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("UUID is required", e.getMessage());
-        verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock, msCoreConnectorMock);
     }
 
     @Test
@@ -168,7 +169,7 @@ class UserServiceImplTest {
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userDto is required", e.getMessage());
-        verifyNoInteractions(userConnectorMock);
+        verifyNoInteractions(userConnectorMock, msCoreConnectorMock);
     }
 
     @Test

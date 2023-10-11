@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionType;
+import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import lombok.Data;
 
 import java.util.List;

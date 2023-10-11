@@ -70,5 +70,9 @@ public interface MsCoreRestClient {
     @ResponseBody
     DelegationId createDelegation(@RequestBody DelegationRequest delegation);
 
+    @PostMapping(value = "${rest-client.ms-core.updateUser.path}")
+    @ResponseBody
+    void updateUserById(@PathVariable(value = "id")String userId,
+                        @RequestParam(value = "institutionId")String institutionId);
 
 }
