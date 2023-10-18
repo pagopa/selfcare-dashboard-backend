@@ -14,8 +14,10 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import lombok.Data;
@@ -54,6 +56,7 @@ public class ExchangeTokenService {
     private final String kid;
     private final InstitutionService institutionService;
     private final UserGroupService groupService;
+    public final UserService userService;
     private final ProductsConnector productsConnector;
     private final String issuer;
 
@@ -61,7 +64,7 @@ public class ExchangeTokenService {
                                 InstitutionService institutionService,
                                 UserGroupService groupService,
                                 ProductsConnector productConnector,
-                                ExchangeTokenProperties properties) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                ExchangeTokenProperties properties, UserService userService) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.jwtService = jwtService;
         this.productsConnector = productConnector;
         this.institutionService = institutionService;
@@ -70,6 +73,7 @@ public class ExchangeTokenService {
         this.issuer = properties.getIssuer();
         this.duration = Duration.parse(properties.getDuration());
         this.kid = properties.getKid();
+        this.userService = userService;
     }
 
 
@@ -98,6 +102,9 @@ public class ExchangeTokenService {
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setIssuer(issuer);
+        User user = userService.getUserByInternalId(UUID.fromString(principal.getId()));
+        String email = user.getWorkContact(institutionId).getEmail().getValue();
+        claims.setEmail(email);
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setName(institutionInfo.getDescription());
@@ -225,6 +232,7 @@ public class ExchangeTokenService {
     static class TokenExchangeClaims extends DefaultClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
+        public static final String EMAIL = "email";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
@@ -237,6 +245,11 @@ public class ExchangeTokenService {
 
         public Claims setInstitution(Institution institution) {
             setValue(INSTITUTION, institution);
+            return this;
+        }
+
+        public Claims setEmail(String email){
+            setValue(EMAIL, email);
             return this;
         }
 
