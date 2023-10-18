@@ -13,9 +13,13 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import lombok.Getter;
@@ -331,7 +335,18 @@ class ExchangeTokenServiceTest {
         environmentVariables.set("JWT_TOKEN_EXCHANGE_ISSUER", "https://dev.selfcare.pagopa.it");
         String issuer = "https://dev.selfcare.pagopa.it";
         properties.setIssuer(issuer);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
+        UserService userService = mock(UserService.class);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        WorkContact contact = new WorkContact();
+        CertifiedField<String> email =  new CertifiedField<>();
+        email.setValue("email");
+        contact.setEmail(email);
+        workContactMap.put(institutionId, contact);
+        user.setWorkContacts(workContactMap);
+        when(userService.getUserByInternalId(any())).thenReturn(user);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
         // when
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
@@ -401,6 +416,7 @@ class ExchangeTokenServiceTest {
                         .setIssuedAt(iat)
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        UserService userService = mock(UserService.class);
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
@@ -437,7 +453,17 @@ class ExchangeTokenServiceTest {
         properties.setKid(kid);
         properties.setDuration("PT5S");
         properties.setIssuer(issuer);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
+        User pdvUser = new User();
+        pdvUser.setId(UUID.randomUUID().toString());
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        WorkContact contact = new WorkContact();
+        CertifiedField<String> email =  new CertifiedField<>();
+        email.setValue("email");
+        contact.setEmail(email);
+        workContactMap.put(institutionId, contact);
+        pdvUser.setWorkContacts(workContactMap);
+        when(userService.getUserByInternalId(any())).thenReturn(pdvUser);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
         // when
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
