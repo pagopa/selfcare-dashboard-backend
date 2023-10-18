@@ -75,7 +75,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties);
+        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("Illegal base64"));
@@ -91,7 +91,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties);
+        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties, null);
         // then
         assertThrows(InvalidKeySpecException.class, executable);
     }
@@ -106,7 +106,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties);
+        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("failed to construct sequence from byte[]"));
@@ -122,7 +122,7 @@ class ExchangeTokenServiceTest {
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
         // when
         Executable executable = () -> exchangeTokenService.exchange(null, null, null);
         // then
@@ -143,7 +143,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
@@ -166,7 +166,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("differentInstitutionId", roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -191,7 +191,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "differentProductId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -218,7 +218,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = mock(JwtService.class);
         when(jwtServiceMock.getClaims(any()))
                 .thenReturn(null);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -258,7 +258,7 @@ class ExchangeTokenServiceTest {
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -331,7 +331,7 @@ class ExchangeTokenServiceTest {
         environmentVariables.set("JWT_TOKEN_EXCHANGE_ISSUER", "https://dev.selfcare.pagopa.it");
         String issuer = "https://dev.selfcare.pagopa.it";
         properties.setIssuer(issuer);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
         // when
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
@@ -437,7 +437,7 @@ class ExchangeTokenServiceTest {
         properties.setKid(kid);
         properties.setDuration("PT5S");
         properties.setIssuer(issuer);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
         // when
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
