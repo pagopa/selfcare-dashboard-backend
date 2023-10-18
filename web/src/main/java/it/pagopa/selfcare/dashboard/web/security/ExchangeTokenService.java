@@ -251,7 +251,7 @@ public class ExchangeTokenService {
         public Claims setEmail(String email){
             setValue(EMAIL, email);
             return this;
-        };
+        }
 
     }
 
