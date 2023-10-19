@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 import javax.validation.ValidationException;
 
@@ -107,6 +108,25 @@ class DashboardExceptionsHandlerTest {
         assertNotNull(responseEntity.getBody());
         assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
         assertEquals(INTERNAL_SERVER_ERROR.value(), responseEntity.getBody().getStatus());
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {
+            AccessDeniedException.class
+    })
+    void handleAccessDeniedException(Class<?> clazz) {
+        // given
+        AccessDeniedException exceptionMock = (AccessDeniedException) Mockito.mock(clazz);
+        Mockito.when(exceptionMock.getMessage())
+                .thenReturn(DETAIL_MESSAGE);
+        // when
+        ResponseEntity<Problem> responseEntity = handler.handleAccessDeniedException(exceptionMock);
+        // then
+        assertNotNull(responseEntity);
+        assertEquals(FORBIDDEN, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(DETAIL_MESSAGE, responseEntity.getBody().getDetail());
+        assertEquals(FORBIDDEN.value(), responseEntity.getBody().getStatus());
     }
 
 }
