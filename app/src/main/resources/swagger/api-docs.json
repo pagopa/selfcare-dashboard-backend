@@ -3988,7 +3988,7 @@
             "$ref" : "#/components/schemas/InstitutionInfo"
           },
           "manager" : {
-            "description" : "Manager specific data",
+            "description" : "Manager specific data. It's required when institutionType is not PT",
             "$ref" : "#/components/schemas/UserInfo"
           },
           "status" : {
