@@ -5,10 +5,7 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -489,6 +486,11 @@ class PartyConnectorImpl implements PartyConnector {
         Institution institution = partyProcessRestClient.getInstitution(tokenInfo.getInstitutionId());
         InstitutionInfo institutionInfo = INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institution);
         institutionInfo.setStatus(tokenInfo.getStatus());
+        OnboardedProduct onboardedProduct = institution.getOnboarding().stream()
+                .filter(onboarding -> onboarding.getProductId().equals(tokenInfo.getProductId()))
+                .findFirst().orElse(null);
+        if(Objects.nonNull(onboardedProduct))
+            institutionInfo.setBilling(onboardedProduct.getBilling());
         onboardingRequestInfo.setInstitutionInfo(institutionInfo);
         log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
         log.trace("getOnboardingRequestInfo end");

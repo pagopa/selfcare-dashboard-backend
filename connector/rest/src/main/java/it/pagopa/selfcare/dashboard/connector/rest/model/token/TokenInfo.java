@@ -16,5 +16,6 @@ public class TokenInfo {
     private List<RelationshipBinding> legals;
     private RelationshipState status;
     private String institutionId;
+    private String productId;
 
 }

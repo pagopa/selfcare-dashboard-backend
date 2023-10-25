@@ -1416,6 +1416,7 @@ class PartyConnectorImplTest {
         // given
         final TokenInfo tokenInfoMock = mockInstance(new TokenInfo(), "setId", "setLegals");
         final Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setOnboarding(List.of());
         tokenInfoMock.setId(UUID.randomUUID());
         final RelationshipBinding managerRelationshipBinding = mockInstance(new RelationshipBinding(), "setRole");
         managerRelationshipBinding.setRole(PartyRole.MANAGER);
