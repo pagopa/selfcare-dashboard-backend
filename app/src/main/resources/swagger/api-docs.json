@@ -3973,7 +3973,7 @@
       },
       "OnboardingRequestResource" : {
         "title" : "OnboardingRequestResource",
-        "required" : [ "institutionInfo", "status" ],
+        "required" : [ "institutionInfo", "manager", "status" ],
         "type" : "object",
         "properties" : {
           "admins" : {
