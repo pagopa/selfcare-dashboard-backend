@@ -5,10 +5,7 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -28,7 +25,6 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.User;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
 import it.pagopa.selfcare.dashboard.connector.rest.model.token.TokenInfo;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -86,19 +82,18 @@ class PartyConnectorImpl implements PartyConnector {
         return institutionInfo;
     };
 
-    protected static final Function<Relationship, InstitutionInfo> RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION = relationship -> {
+    protected static final Function<Institution, InstitutionInfo> INSTITUTION_TO_INSTITUTION_INFO_FUNCTION = institution -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
-        institutionInfo.setId(relationship.getTo().toString());
-        institutionInfo.setStatus(relationship.getState());
-        institutionInfo.setInstitutionType(relationship.getInstitutionUpdate().getInstitutionType());
-        institutionInfo.setDescription(relationship.getInstitutionUpdate().getDescription());
-        institutionInfo.setTaxCode(relationship.getInstitutionUpdate().getTaxCode());
-        institutionInfo.setDigitalAddress(relationship.getInstitutionUpdate().getDigitalAddress());
-        institutionInfo.setAddress(relationship.getInstitutionUpdate().getAddress());
-        institutionInfo.setZipCode(relationship.getInstitutionUpdate().getZipCode());
-        institutionInfo.setPaymentServiceProvider(relationship.getInstitutionUpdate().getPaymentServiceProvider());
-        institutionInfo.setDataProtectionOfficer(relationship.getInstitutionUpdate().getDataProtectionOfficer());
-        institutionInfo.setBilling(relationship.getBilling());
+        institutionInfo.setId(institution.getId());
+        institutionInfo.setInstitutionType(institution.getInstitutionType());
+        institutionInfo.setDescription(institution.getDescription());
+        institutionInfo.setTaxCode(institution.getTaxCode());
+        institutionInfo.setDigitalAddress(institution.getDigitalAddress());
+        institutionInfo.setAddress(institution.getAddress());
+        institutionInfo.setZipCode(institution.getZipCode());
+        institutionInfo.setPaymentServiceProvider(institution.getPaymentServiceProvider());
+        institutionInfo.setDataProtectionOfficer(institution.getDataProtectionOfficer());
+        institutionInfo.setBilling(institution.getBilling());
         return institutionInfo;
     };
     protected static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
@@ -484,14 +479,19 @@ class PartyConnectorImpl implements PartyConnector {
             userInfo.setRole(relationshipBinding.getRole().getSelfCareAuthority());
             if (PartyRole.MANAGER.equals(relationshipBinding.getRole())) {
                 onboardingRequestInfo.setManager(userInfo);
-                final Relationship relationship = partyManagementRestClient.getRelationshipById(relationshipBinding.getRelationshipId());
-                InstitutionInfo institutionInfo = RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationship);
-                onboardingRequestInfo.setInstitutionInfo(institutionInfo);
             } else {
                 onboardingRequestInfo.getAdmins().add(userInfo);
             }
-
         });
+        Institution institution = partyProcessRestClient.getInstitution(tokenInfo.getInstitutionId());
+        InstitutionInfo institutionInfo = INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institution);
+        institutionInfo.setStatus(tokenInfo.getStatus());
+        OnboardedProduct onboardedProduct = institution.getOnboarding().stream()
+                .filter(onboarding -> onboarding.getProductId().equals(tokenInfo.getProductId()))
+                .findFirst().orElse(null);
+        if(Objects.nonNull(onboardedProduct))
+            institutionInfo.setBilling(onboardedProduct.getBilling());
+        onboardingRequestInfo.setInstitutionInfo(institutionInfo);
         log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
         log.trace("getOnboardingRequestInfo end");
         return onboardingRequestInfo;
