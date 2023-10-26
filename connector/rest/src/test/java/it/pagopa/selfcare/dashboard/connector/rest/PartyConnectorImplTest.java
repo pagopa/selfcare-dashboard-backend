@@ -1415,6 +1415,8 @@ class PartyConnectorImplTest {
     void getOnboardingRequestInfo() {
         // given
         final TokenInfo tokenInfoMock = mockInstance(new TokenInfo(), "setId", "setLegals");
+        final Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setOnboarding(List.of());
         tokenInfoMock.setId(UUID.randomUUID());
         final RelationshipBinding managerRelationshipBinding = mockInstance(new RelationshipBinding(), "setRole");
         managerRelationshipBinding.setRole(PartyRole.MANAGER);
@@ -1423,17 +1425,13 @@ class PartyConnectorImplTest {
         tokenInfoMock.setLegals(List.of(managerRelationshipBinding, adminRelationshipBinding));
         when(partyManagementRestClientMock.getToken(any()))
                 .thenReturn(tokenInfoMock);
+        when(partyProcessRestClientMock.getInstitution(any())).thenReturn(institutionMock);
         final Relationship managerRelationshipMock = mockInstance(new Relationship());
-        when(partyManagementRestClientMock.getRelationshipById(any()))
-                .thenReturn(managerRelationshipMock);
         // when
         final OnboardingRequestInfo result = partyConnector.getOnboardingRequestInfo(tokenInfoMock.getId().toString());
         // then
         assertNotNull(result);
         assertNotNull(result.getInstitutionInfo());
-        assertEquals(managerRelationshipMock.getTo().toString(), result.getInstitutionInfo().getId());
-        assertEquals(managerRelationshipMock.getState(), result.getInstitutionInfo().getStatus());
-        assertEquals(managerRelationshipMock.getBilling(), result.getInstitutionInfo().getBilling());
         assertNotNull(result.getManager());
         assertEquals(managerRelationshipBinding.getPartyId().toString(), result.getManager().getId());
         assertEquals(ADMIN, result.getManager().getRole());
@@ -1443,28 +1441,25 @@ class PartyConnectorImplTest {
         assertEquals(ADMIN, result.getAdmins().get(0).getRole());
         verify(partyManagementRestClientMock, times(1))
                 .getToken(tokenInfoMock.getId());
-        verify(partyManagementRestClientMock, times(1))
-                .getRelationshipById(managerRelationshipBinding.getRelationshipId());
         verifyNoMoreInteractions(partyManagementRestClientMock);
-        verifyNoInteractions(partyProcessRestClientMock);
     }
 
     @Test
-    void relationshipToInstitutionInfoFunction() {
+    void institutionToInstitutionInfoFunction() {
         // given
-        Relationship relationshipMock = mockInstance(new Relationship());
+        Institution institutionMock = mockInstance(new Institution());
         // when
-        final InstitutionInfo result = PartyConnectorImpl.RELATIONSHIP_TO_INSTITUTION_INFO_FUNCTION.apply(relationshipMock);
+        final InstitutionInfo result = PartyConnectorImpl.INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institutionMock);
         // then
-        assertEquals(relationshipMock.getInstitutionUpdate().getInstitutionType(), result.getInstitutionType());
-        assertEquals(relationshipMock.getInstitutionUpdate().getDescription(), result.getDescription());
-        assertEquals(relationshipMock.getInstitutionUpdate().getTaxCode(), result.getTaxCode());
-        assertEquals(relationshipMock.getInstitutionUpdate().getDigitalAddress(), result.getDigitalAddress());
-        assertEquals(relationshipMock.getInstitutionUpdate().getAddress(), result.getAddress());
-        assertEquals(relationshipMock.getInstitutionUpdate().getZipCode(), result.getZipCode());
-        assertEquals(relationshipMock.getInstitutionUpdate().getPaymentServiceProvider(), result.getPaymentServiceProvider());
-        assertEquals(relationshipMock.getInstitutionUpdate().getDataProtectionOfficer(), result.getDataProtectionOfficer());
-        assertEquals(relationshipMock.getBilling(), result.getBilling());
+        assertEquals(institutionMock.getInstitutionType(), result.getInstitutionType());
+        assertEquals(institutionMock.getDescription(), result.getDescription());
+        assertEquals(institutionMock.getTaxCode(), result.getTaxCode());
+        assertEquals(institutionMock.getDigitalAddress(), result.getDigitalAddress());
+        assertEquals(institutionMock.getAddress(), result.getAddress());
+        assertEquals(institutionMock.getZipCode(), result.getZipCode());
+        assertEquals(institutionMock.getPaymentServiceProvider(), result.getPaymentServiceProvider());
+        assertEquals(institutionMock.getDataProtectionOfficer(), result.getDataProtectionOfficer());
+        assertEquals(institutionMock.getBilling(), result.getBilling());
     }
 
     @Test

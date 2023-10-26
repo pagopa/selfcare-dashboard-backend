@@ -1737,7 +1737,7 @@
           "style" : "simple",
           "schema" : {
             "type" : "string",
-            "enum" : [ "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
           }
         } ],
         "responses" : {
@@ -3609,7 +3609,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
           },
           "onboarding" : {
             "type" : "array",
@@ -3696,7 +3696,7 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -3762,7 +3762,7 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -3988,7 +3988,7 @@
             "$ref" : "#/components/schemas/InstitutionInfo"
           },
           "manager" : {
-            "description" : "Manager specific data",
+            "description" : "Manager specific data. It's required when institutionType is not PT",
             "$ref" : "#/components/schemas/UserInfo"
           },
           "status" : {
