@@ -51,6 +51,9 @@ public class OnboardingRequestMapper {
                     resource.setFiscalCode(model.getTaxCode());
                     resource.setMailAddress(model.getDigitalAddress());
                     resource.setAddress(model.getAddress());
+                    resource.setCity(model.getCity());
+                    resource.setCountry(model.getCountry());
+                    resource.setCounty(model.getCounty());
                     resource.setZipCode(model.getZipCode());
                     Optional.ofNullable(model.getBilling())
                             .ifPresent(billing -> {

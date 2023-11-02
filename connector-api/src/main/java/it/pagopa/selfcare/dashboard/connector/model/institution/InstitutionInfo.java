@@ -17,6 +17,9 @@ public class InstitutionInfo {
     private String description;
     private String address;
     private String zipCode;
+    private String city;
+    private String country;
+    private String county;
     private String taxCode;
     private String digitalAddress;
     private RelationshipState status;
