@@ -10,11 +10,14 @@ import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.web.model.onboarding.OnboardingRequestResource;
 import it.pagopa.selfcare.dashboard.web.model.onboarding.OnboardingStatus;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor(access = AccessLevel.NONE)
 public class OnboardingRequestMapper {
 
     public static OnboardingRequestResource toResource(OnboardingRequestInfo model) {

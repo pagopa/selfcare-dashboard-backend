@@ -519,13 +519,11 @@ class PartyConnectorImpl implements PartyConnector {
     }
 
 
+    @Getter
     @Setter(AccessLevel.PROTECTED)
     protected static class PartyProductRole implements ProductRole {
-        @Getter
         protected String productRole;
-        @Getter
         protected String productId;
-        @Getter
         protected PartyRole partyRole;
     }
 
