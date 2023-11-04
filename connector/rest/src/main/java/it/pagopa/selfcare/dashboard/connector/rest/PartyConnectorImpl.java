@@ -90,6 +90,9 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setTaxCode(institution.getTaxCode());
         institutionInfo.setDigitalAddress(institution.getDigitalAddress());
         institutionInfo.setAddress(institution.getAddress());
+        institutionInfo.setCity(institutionInfo.getCity());
+        institutionInfo.setCountry(institutionInfo.getCountry());
+        institutionInfo.setCounty(institutionInfo.getCounty());
         institutionInfo.setZipCode(institution.getZipCode());
         institutionInfo.setPaymentServiceProvider(institution.getPaymentServiceProvider());
         institutionInfo.setDataProtectionOfficer(institution.getDataProtectionOfficer());
@@ -516,13 +519,11 @@ class PartyConnectorImpl implements PartyConnector {
     }
 
 
+    @Getter
     @Setter(AccessLevel.PROTECTED)
     protected static class PartyProductRole implements ProductRole {
-        @Getter
         protected String productRole;
-        @Getter
         protected String productId;
-        @Getter
         protected PartyRole partyRole;
     }
 

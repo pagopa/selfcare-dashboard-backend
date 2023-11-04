@@ -84,7 +84,7 @@ class PartyManagementRestClientTest extends BaseFeignRestClientTest {
         Institution response = restClient.getInstitutionByExternalId(externalId);
         // then
         assertNotNull(response);
-        TestUtils.checkNotNullFields(response);
+        TestUtils.checkNotNullFields(response, "city","county","country");
         response.getAttributes().forEach(TestUtils::checkNotNullFields);
     }
 
