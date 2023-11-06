@@ -90,9 +90,9 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setTaxCode(institution.getTaxCode());
         institutionInfo.setDigitalAddress(institution.getDigitalAddress());
         institutionInfo.setAddress(institution.getAddress());
-        institutionInfo.setCity(institutionInfo.getCity());
-        institutionInfo.setCountry(institutionInfo.getCountry());
-        institutionInfo.setCounty(institutionInfo.getCounty());
+        institutionInfo.setCity(institution.getCity());
+        institutionInfo.setCountry(institution.getCountry());
+        institutionInfo.setCounty(institution.getCounty());
         institutionInfo.setZipCode(institution.getZipCode());
         institutionInfo.setPaymentServiceProvider(institution.getPaymentServiceProvider());
         institutionInfo.setDataProtectionOfficer(institution.getDataProtectionOfficer());
