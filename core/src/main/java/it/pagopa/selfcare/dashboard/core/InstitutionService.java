@@ -47,7 +47,6 @@ public interface InstitutionService {
 
     void addUserProductRoles(String institutionId, String productId, String userId, CreateUserDto dto);
 
-
     OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
 
     void approveOnboardingRequest(String tokenId);
