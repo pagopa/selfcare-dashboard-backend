@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.security.KeyFactory;
@@ -103,8 +104,15 @@ public class ExchangeTokenService {
         claims.setId(UUID.randomUUID().toString());
         claims.setIssuer(issuer);
         User user = userService.getUserByInternalId(UUID.fromString(principal.getId()));
-        String email = user.getWorkContact(institutionId).getEmail().getValue();
+
+        String email = Optional.ofNullable(user.getWorkContact(institutionId))
+                .map(workContract -> Objects.nonNull(workContract.getEmail())
+                    ? workContract.getEmail().getValue()
+                    : ""
+                )
+                .orElse(null);
         claims.setEmail(email);
+
         Institution institution = new Institution();
         institution.setId(institutionId);
         institution.setName(institutionInfo.getDescription());
