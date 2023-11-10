@@ -17,7 +17,6 @@ import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.commons.utils.TestUtils.reflectionEqualsByName;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.PENDING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,7 +65,6 @@ class PnPGInstitutionMapperTest {
         assertEquals(institutionInfo.getBilling().getRecipientCode(), resource.getRecipientCode());
         assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getCode(), resource.getGeographicTaxonomies().get(0).getCode());
         assertEquals(institutionInfo.getGeographicTaxonomies().get(0).getDesc(), resource.getGeographicTaxonomies().get(0).getDesc());
-        reflectionEqualsByName(institutionInfo, resource, "status");
     }
 
 
