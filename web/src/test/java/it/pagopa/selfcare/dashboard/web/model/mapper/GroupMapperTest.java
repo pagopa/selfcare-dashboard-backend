@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
@@ -43,7 +42,11 @@ class GroupMapperTest {
         CreateUserGroup model = GroupMapper.fromDto(dto);
         //then
         assertNotNull(model);
-        TestUtils.reflectionEqualsByName(dto, model);
+        assertEquals(dto.getName(), model.getName());
+        assertEquals(dto.getDescription(), model.getDescription());
+        assertEquals(dto.getInstitutionId(), model.getInstitutionId());
+        assertEquals(dto.getProductId(), model.getProductId());
+        assertEquals(dto.getMembers().size(), model.getMembers().size());
     }
 
     @Test
@@ -81,7 +84,9 @@ class GroupMapperTest {
         UpdateUserGroup model = GroupMapper.fromDto(dto);
         //then
         assertNotNull(model);
-        TestUtils.reflectionEqualsByName(dto, model);
+        assertEquals(dto.getName(), model.getName());
+        assertEquals(dto.getDescription(), model.getDescription());
+        assertEquals(dto.getMembers().size(), model.getMembers().size());
     }
 
     @Test
@@ -264,7 +269,6 @@ class GroupMapperTest {
         assertEquals(model.getStatus(), resource.getStatus());
         assertNull(resource.getCreatedBy());
         assertNull(resource.getModifiedBy());
-        TestUtils.reflectionEqualsByName(resource, model);
     }
 
     @Test

@@ -3586,6 +3586,15 @@
           "category" : {
             "type" : "string"
           },
+          "city" : {
+            "type" : "string"
+          },
+          "country" : {
+            "type" : "string"
+          },
+          "county" : {
+            "type" : "string"
+          },
           "dataProtectionOfficer" : {
             "$ref" : "#/components/schemas/DataProtectionOfficer"
           },
@@ -3681,6 +3690,18 @@
             "type" : "string",
             "description" : "Institution's physical address"
           },
+          "city" : {
+            "type" : "string",
+            "description" : "Institution's city"
+          },
+          "country" : {
+            "type" : "string",
+            "description" : "Institution's country"
+          },
+          "county" : {
+            "type" : "string",
+            "description" : "Institution's county"
+          },
           "dpoData" : {
             "description" : "Data Protection Officer (DPO) specific data",
             "$ref" : "#/components/schemas/DpoData"
@@ -3739,6 +3760,18 @@
           "category" : {
             "type" : "string",
             "description" : "Institution's category"
+          },
+          "city" : {
+            "type" : "string",
+            "description" : "Institution's city"
+          },
+          "country" : {
+            "type" : "string",
+            "description" : "Institution's country"
+          },
+          "county" : {
+            "type" : "string",
+            "description" : "Institution's county"
           },
           "externalId" : {
             "type" : "string",

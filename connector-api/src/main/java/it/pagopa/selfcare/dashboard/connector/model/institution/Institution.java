@@ -32,5 +32,8 @@ public class Institution {
     private String subunitCode;
     private String subunitType;
     private String aooParentCode;
+    private String city;
+    private String country;
+    private String county;
 
 }

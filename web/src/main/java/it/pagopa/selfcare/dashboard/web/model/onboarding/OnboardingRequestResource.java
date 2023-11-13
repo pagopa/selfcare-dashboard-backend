@@ -55,6 +55,15 @@ public class OnboardingRequestResource {
         @JsonProperty(required = true)
         private String zipCode;
 
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.city}")
+        private String city;
+
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.country}")
+        private String country;
+
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.county}")
+        private String county;
+
         @ApiModelProperty(value = "${swagger.dashboard.institutions.model.mailAddress}", required = true)
         @JsonProperty(required = true)
         private String mailAddress;
