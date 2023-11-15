@@ -4311,7 +4311,7 @@
           },
           "delegable" : {
             "type" : "boolean",
-            "description" : "If a product is delegable to a technical partner ",
+            "description" : "If a product is delegable to a technical partner",
             "example" : false
           },
           "description" : {
@@ -4325,6 +4325,11 @@
           "imageUrl" : {
             "type" : "string",
             "description" : "Product's depict image"
+          },
+          "invoiceable" : {
+            "type" : "boolean",
+            "description" : "If a product is invoiceable",
+            "example" : false
           },
           "logo" : {
             "type" : "string",
@@ -4419,7 +4424,7 @@
         "properties" : {
           "delegable" : {
             "type" : "boolean",
-            "description" : "If a product is delegable to a technical partner ",
+            "description" : "If a product is delegable to a technical partner",
             "example" : false
           },
           "description" : {
@@ -4433,6 +4438,11 @@
           "imageUrl" : {
             "type" : "string",
             "description" : "Product's depict image"
+          },
+          "invoiceable" : {
+            "type" : "boolean",
+            "description" : "If a product is invoiceable",
+            "example" : false
           },
           "logo" : {
             "type" : "string",
