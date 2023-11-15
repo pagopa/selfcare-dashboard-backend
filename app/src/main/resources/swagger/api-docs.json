@@ -4326,6 +4326,11 @@
             "type" : "string",
             "description" : "Product's depict image"
           },
+          "invoiceable" : {
+            "type" : "boolean",
+            "description" : "${swagger.dashboard.products.model.invoiceable}",
+            "example" : false
+          },
           "logo" : {
             "type" : "string",
             "description" : "Product's logo"
@@ -4433,6 +4438,11 @@
           "imageUrl" : {
             "type" : "string",
             "description" : "Product's depict image"
+          },
+          "invoiceable" : {
+            "type" : "boolean",
+            "description" : "${swagger.dashboard.products.model.invoiceable}",
+            "example" : false
           },
           "logo" : {
             "type" : "string",

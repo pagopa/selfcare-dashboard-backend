@@ -46,6 +46,7 @@ class ProductMapperTest {
         assertEquals(product.getNode().isAuthorized(), resource.isAuthorized());
         assertEquals(product.getNode().getUserRole(), resource.getUserRole());
         assertEquals(product.getNode().isDelegable(), resource.isDelegable());
+        assertEquals(product.getNode().isInvoiceable(), resource.isInvoiceable());
         assertNotNull(resource.getBackOfficeEnvironmentConfigurations());
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
@@ -56,6 +57,7 @@ class ProductMapperTest {
         assertEquals(product.getChildren().get(0).getLogoBgColor(), resource.getChildren().get(0).getLogoBgColor());
         assertEquals(product.getChildren().get(0).getDescription(), resource.getChildren().get(0).getDescription());
         assertEquals(product.getChildren().get(0).getUrlPublic(), resource.getChildren().get(0).getUrlPublic());
+        assertEquals(product.getChildren().get(0).isInvoiceable(),resource.getChildren().get(0).isInvoiceable());
     }
 
 
