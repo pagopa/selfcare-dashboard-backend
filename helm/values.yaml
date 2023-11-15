@@ -92,3 +92,5 @@ config:
   REST_CLIENT_READ_TIMEOUT: "30000"
   REST_CLIENT_CONNECT_TIMEOUT: "30000"
   USER_STATES_FILTER: "ACTIVE,SUSPENDED"
+  SUPPORT_API_ZENDESK_REDIRECT_URI: "https://selfcare.assistenza.pagopa.it/hc/it/requests/new"
+  SUPPORT_API_ZENDESK_ORGANIZATION: "_users_hc_selfcare"

@@ -19,12 +19,16 @@ import java.util.UUID;
 public class SupportServiceImpl implements SupportService {
 
     private final String supportApiKey;
+    private final String zendeskOrganization;
+    private final String returnTo;
     private static final String SUBDOMAIN  = "pagopa";
-    private static final String ZENDESK_ORGANIZATION = "_users_hc_selfcare";
-    private static final String RETURN_TO = "https://selfcare.assistenza.pagopa.it/hc/it/requests/new";
 
-    public SupportServiceImpl(@Value("${support.api.key}") String supportApiKey) {
+    public SupportServiceImpl(@Value("${support.api.key}") String supportApiKey,
+                              @Value("${support.api.zendesk.redirectUri") String returnTo,
+                              @Value("${support.api.zendesk.organization") String zendeskOrganization) {
         this.supportApiKey = supportApiKey;
+        this.returnTo = returnTo;
+        this.zendeskOrganization = zendeskOrganization;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class SupportServiceImpl implements SupportService {
                     .setId(UUID.randomUUID().toString())
                     .claim("name", supportRequest.getName())
                     .claim("email", supportRequest.getEmail())
-                    .claim("organization", ZENDESK_ORGANIZATION)
+                    .claim("organization", zendeskOrganization)
                     .claim("user_fields", supportRequest.getUserFields())
                     .signWith(SignatureAlgorithm.HS256,supportApiKey.getBytes())
                     .compact();
@@ -52,8 +56,8 @@ public class SupportServiceImpl implements SupportService {
         log.trace("sendRequest end");
 
         String returnUrl = StringUtils.hasText(supportRequest.getProductId()) ?
-                URLEncoder.encode(RETURN_TO.concat("?product=" + supportRequest.getProductId()), StandardCharsets.UTF_8) :
-                URLEncoder.encode(RETURN_TO, StandardCharsets.UTF_8);
+                URLEncoder.encode(returnTo.concat("?product=" + supportRequest.getProductId()), StandardCharsets.UTF_8) :
+                URLEncoder.encode(returnTo, StandardCharsets.UTF_8);
 
         return redirectUrl.concat("&return_to=" + returnUrl);
     }
