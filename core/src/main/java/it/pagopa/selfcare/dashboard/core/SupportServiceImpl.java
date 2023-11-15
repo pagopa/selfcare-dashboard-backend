@@ -24,8 +24,8 @@ public class SupportServiceImpl implements SupportService {
     private static final String SUBDOMAIN  = "pagopa";
 
     public SupportServiceImpl(@Value("${support.api.key}") String supportApiKey,
-                              @Value("${support.api.zendesk.redirectUri") String returnTo,
-                              @Value("${support.api.zendesk.organization") String zendeskOrganization) {
+                              @Value("${support.api.zendesk.redirectUri}") String returnTo,
+                              @Value("${support.api.zendesk.organization}") String zendeskOrganization) {
         this.supportApiKey = supportApiKey;
         this.returnTo = returnTo;
         this.zendeskOrganization = zendeskOrganization;
