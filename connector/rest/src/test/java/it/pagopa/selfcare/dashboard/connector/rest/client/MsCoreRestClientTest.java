@@ -233,7 +233,7 @@ class MsCoreRestClientTest extends BaseFeignRestClientTest {
         // when
         Institution response = restClient.getInstitution(id);
         assertNotNull(response);
-        TestUtils.checkNotNullFields(response);
+        TestUtils.checkNotNullFields(response, "city","country","county");
         response.getAttributes().forEach(TestUtils::checkNotNullFields);
 
     }

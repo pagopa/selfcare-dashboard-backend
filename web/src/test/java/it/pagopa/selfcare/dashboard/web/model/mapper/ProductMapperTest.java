@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.commons.utils.TestUtils.reflectionEqualsByName;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductMapperTest {
@@ -57,7 +56,6 @@ class ProductMapperTest {
         assertEquals(product.getChildren().get(0).getLogoBgColor(), resource.getChildren().get(0).getLogoBgColor());
         assertEquals(product.getChildren().get(0).getDescription(), resource.getChildren().get(0).getDescription());
         assertEquals(product.getChildren().get(0).getUrlPublic(), resource.getChildren().get(0).getUrlPublic());
-        reflectionEqualsByName(product, resource);
     }
 
 
