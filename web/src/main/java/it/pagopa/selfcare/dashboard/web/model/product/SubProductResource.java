@@ -38,4 +38,7 @@ public class SubProductResource {
     @ApiModelProperty(value = "${swagger.dashboard.products.model.urlPublic}")
     private String urlPublic;
 
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.invoiceable}")
+    private boolean invoiceable;
+
 }
