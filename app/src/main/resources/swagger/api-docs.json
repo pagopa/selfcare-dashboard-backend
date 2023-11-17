@@ -2269,7 +2269,8 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/IdentityTokenResource"
+                  "type" : "string",
+                  "format" : "uri"
                 }
               }
             }

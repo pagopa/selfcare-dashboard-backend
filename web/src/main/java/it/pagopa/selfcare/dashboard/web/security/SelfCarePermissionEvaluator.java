@@ -31,7 +31,7 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
             result = authentication.getAuthorities()
                     .stream()
                     .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
-                    .map(grantedAuthority -> (SelfCareGrantedAuthority) grantedAuthority)
+                    .map(SelfCareGrantedAuthority.class::cast)
                     .filter(grantedAuthority -> grantedAuthority.getInstitutionId().equals(productAclDomain.getInstitutionId()))
                     .filter(grantedAuthority -> grantedAuthority.getRoleOnProducts().containsKey(productAclDomain.getProductId()))
                     .map(grantedAuthority -> grantedAuthority.getRoleOnProducts().get(productAclDomain.getProductId()))
@@ -59,7 +59,7 @@ public class SelfCarePermissionEvaluator implements PermissionEvaluator {
             result = authentication.getAuthorities()
                     .stream()
                     .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
-                    .map(grantedAuthority -> (SelfCareGrantedAuthority) grantedAuthority)
+                    .map(SelfCareGrantedAuthority.class::cast)
                     .filter(grantedAuthority -> targetId.toString().equals(grantedAuthority.getInstitutionId()))
                     .anyMatch(grantedAuthority -> ANY_PERMISSION.equals(permission) || permission.equals(grantedAuthority.getAuthority()));
         }

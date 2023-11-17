@@ -27,8 +27,6 @@ public interface UserGroupService {
     UserGroupInfo getUserGroupById(String groupId, Optional<String> institutionId);
 
     Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable);
-
-    Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<UUID> userId, Pageable pageable);
     void deleteMembersByRelationshipId(String relationshipId);
 
 }

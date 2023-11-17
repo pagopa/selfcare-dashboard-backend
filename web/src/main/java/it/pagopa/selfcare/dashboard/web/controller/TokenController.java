@@ -73,7 +73,8 @@ public class TokenController {
 
         log.trace("billing exchange start");
         log.debug("billing exchange institutionId = {}", institutionId);
-        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId, environment);
+        log.info("env parameter: {}", environment);
+        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "billing exchange result = {}", location);
         log.trace("billing exchange end");
