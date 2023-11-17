@@ -24,13 +24,13 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.security.KeyFactory;
@@ -51,6 +51,8 @@ public class ExchangeTokenService {
     private static final String PRIVATE_KEY_HEADER_TEMPLATE = "-----BEGIN %s-----";
     private static final String PRIVATE_KEY_FOOTER_TEMPLATE = "-----END %s-----";
 
+    private final String billingBoUrl;
+    private final String billingAudience;
     private final PrivateKey jwtSigningKey;
     private final JwtService jwtService;
     private final Duration duration;
@@ -61,11 +63,16 @@ public class ExchangeTokenService {
     private final ProductsConnector productsConnector;
     private final String issuer;
 
-    public ExchangeTokenService(JwtService jwtService,
+    public ExchangeTokenService(@Value("${core.billing.url}") String billingBoUrl,
+                                @Value("${core.billing.audience}") String billingAudience,
+                                JwtService jwtService,
                                 InstitutionService institutionService,
                                 UserGroupService groupService,
                                 ProductsConnector productConnector,
-                                ExchangeTokenProperties properties, UserService userService) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                ExchangeTokenProperties properties,
+                                UserService userService) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        this.billingBoUrl = billingBoUrl;
+        this.billingAudience = billingAudience;
         this.jwtService = jwtService;
         this.productsConnector = productConnector;
         this.institutionService = institutionService;
@@ -107,8 +114,8 @@ public class ExchangeTokenService {
 
         String email = Optional.ofNullable(user.getWorkContact(institutionId))
                 .map(workContract -> Objects.nonNull(workContract.getEmail())
-                    ? workContract.getEmail().getValue()
-                    : ""
+                        ? workContract.getEmail().getValue()
+                        : ""
                 )
                 .orElse(null);
         claims.setEmail(email);
@@ -167,6 +174,129 @@ public class ExchangeTokenService {
                 .orElse(product.getUrlBO());
         log.trace("exchange end");
         return new ExchangedToken(jwts, urlBO);
+    }
+
+    public ExchangedToken retrieveBillingExchangedToken(String institutionId, Optional<String> environment) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException("Authentication is required");
+        }
+
+        List<Product> tempList = new ArrayList<>();
+        productsConnector.getProductsTree()
+                .forEach(productTree -> {
+                    tempList.add(productTree.getNode());
+                    tempList.addAll(productTree.getChildren());
+                });
+
+        List<String> productList = tempList.stream()
+                .filter(Product::isInvoiceable)
+                .map(Product::getId)
+                .toList();
+
+        final List<ProductGrantedAuthority> productGrantedAuthorities = new ArrayList<>();
+
+        authentication.getAuthorities()
+                .stream()
+                .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
+                .map(SelfCareGrantedAuthority.class::cast)
+                .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
+                .map(SelfCareGrantedAuthority::getRoleOnProducts)
+                .forEach(stringProductGrantedAuthorityMap -> checkIfIsInvoiceable(stringProductGrantedAuthorityMap, productList, productGrantedAuthorities));
+
+        Claims selcClaims = jwtService.getClaims(authentication.getCredentials().toString());
+        Assert.notNull(selcClaims, "Session token claims is required");
+        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
+        Assert.notNull(institutionInfo, "Institution info is required");
+        SelfCareUser principal = (SelfCareUser) authentication.getPrincipal();
+        TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
+        claims.setId(UUID.randomUUID().toString());
+        claims.setIssuer(issuer);
+        User user = userService.getUserByInternalId(UUID.fromString(principal.getId()));
+
+        String email = Optional.ofNullable(user.getWorkContact(institutionId))
+                .map(workContract -> Objects.nonNull(workContract.getEmail())
+                        ? workContract.getEmail().getValue()
+                        : ""
+                )
+                .orElse(null);
+        claims.setEmail(email);
+
+        Institution institution = new Institution();
+        institution.setId(institutionId);
+        institution.setName(institutionInfo.getDescription());
+        institution.setTaxCode(institutionInfo.getTaxCode());
+        institution.setSubUnitType(institutionInfo.getSubunitType());
+        institution.setSubUnitCode(institutionInfo.getSubunitCode());
+        institution.setAooParent(institutionInfo.getAooParentCode());
+        institution.setParentDescription(institutionInfo.getParentDescription());
+        RootParent rootParent = new RootParent();
+        rootParent.setId(institutionInfo.getRootParentId());
+        rootParent.setDescription(institutionInfo.getParentDescription());
+        institution.setRootParent(rootParent);
+        institution.setOriginId(institutionInfo.getOriginId());
+
+        institution.setRoles(retrieveInstitutionRoles(productGrantedAuthorities));
+
+
+        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
+                Optional.of(UUID.fromString(principal.getId())),
+                Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
+        if (groupInfos.hasNext()) {
+            log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s. The Identity Token will contain only the first 100 records",
+                    principal.getId(),
+                    institutionId));
+        }
+        if (!groupInfos.isEmpty()) {
+            institution.setGroups(groupInfos.stream()
+                    .map(UserGroupInfo::getId)
+                    .collect(Collectors.toList()));
+        }
+        claims.setInstitution(institution);
+
+        claims.setAudience(billingAudience);
+        claims.setDesiredExpiration(claims.getExpiration());
+        claims.setIssuedAt(new Date());
+        claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        String jwts = Jwts.builder()
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
+                .setHeaderParam(JwsHeader.KEY_ID, kid)
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .compact();
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
+        log.trace("exchange end");
+        return new ExchangedToken(jwts, billingBoUrl);
+    }
+
+    private List<Role> retrieveInstitutionRoles(List<ProductGrantedAuthority> productGrantedAuthorities) {
+        List<Role> roles = new ArrayList<>();
+
+        for (ProductGrantedAuthority authority : productGrantedAuthorities) {
+            roles.addAll(constructRole(authority));
+        }
+        return roles;
+    }
+
+    private List<Role> constructRole(ProductGrantedAuthority productGrantedAuthority) {
+        return productGrantedAuthority.getProductRoles().stream()
+                .map(productRoleCode -> {
+                    Role role = new Role();
+                    role.setPartyRole(productGrantedAuthority.getPartyRole());
+                    role.setProductRole(productRoleCode);
+                    role.setProductId(productGrantedAuthority.getProductId());
+                    return role;
+                }).collect(Collectors.toList());
+    }
+
+
+    private void checkIfIsInvoiceable(Map<String, ProductGrantedAuthority> map, List<String> productList, List<ProductGrantedAuthority> productGrantedAuthorities) {
+        map.keySet()
+                .forEach(key -> productList.stream().filter(key::equalsIgnoreCase)
+                        .findFirst()
+                        .ifPresent(productId -> productGrantedAuthorities.add(map.get(key))));
     }
 
 
@@ -234,6 +364,7 @@ public class ExchangeTokenService {
         private PartyRole partyRole;
         @JsonProperty("role")
         private String productRole;
+        private String productId;
     }
 
 
@@ -256,7 +387,7 @@ public class ExchangeTokenService {
             return this;
         }
 
-        public Claims setEmail(String email){
+        public Claims setEmail(String email) {
             setValue(EMAIL, email);
             return this;
         }

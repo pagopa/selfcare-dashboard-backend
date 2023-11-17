@@ -219,6 +219,11 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
+    public Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<UUID> userId, Pageable pageable) {
+        return null;
+    }
+
+    @Override
     @Async
     public void deleteMembersByRelationshipId(String relationshipId) {
         log.trace("deleteMembers start");

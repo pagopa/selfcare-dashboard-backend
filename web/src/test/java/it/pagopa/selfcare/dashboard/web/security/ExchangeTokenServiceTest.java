@@ -62,8 +62,14 @@ import static org.springframework.data.support.PageableExecutionUtils.getPage;
 @ExtendWith({MockitoExtension.class, SystemStubsExtension.class})
 class ExchangeTokenServiceTest {
 
+    private final String billingBoUrl;
+
     @SystemStub
     private EnvironmentVariables environmentVariables;
+
+    ExchangeTokenServiceTest(String billingBoUrl) {
+        this.billingBoUrl = billingBoUrl;
+    }
 
 
     @BeforeEach
@@ -79,7 +85,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties, null);
+        Executable executable = () -> new ExchangeTokenService(billingBoUrl, billingAudience, null, null, null, null, properties, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("Illegal base64"));
@@ -95,7 +101,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties, null);
+        Executable executable = () -> new ExchangeTokenService(billingBoUrl, billingAudience, null, null, null, null, properties, null);
         // then
         assertThrows(InvalidKeySpecException.class, executable);
     }
@@ -110,7 +116,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenService(null, null, null, null, properties, null);
+        Executable executable = () -> new ExchangeTokenService(billingBoUrl, billingAudience, null, null, null, null, properties, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("failed to construct sequence from byte[]"));
@@ -126,7 +132,7 @@ class ExchangeTokenServiceTest {
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, null, null, null, properties, null);
         // when
         Executable executable = () -> exchangeTokenService.exchange(null, null, null);
         // then
@@ -147,7 +153,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, null, null, null, properties, null);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password");
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
@@ -170,7 +176,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("differentInstitutionId", roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -195,7 +201,7 @@ class ExchangeTokenServiceTest {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "differentProductId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -222,7 +228,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = mock(JwtService.class);
         when(jwtServiceMock.getClaims(any()))
                 .thenReturn(null);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -262,7 +268,7 @@ class ExchangeTokenServiceTest {
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
@@ -346,7 +352,7 @@ class ExchangeTokenServiceTest {
         workContactMap.put(institutionId, contact);
         user.setWorkContacts(workContactMap);
         when(userService.getUserByInternalId(any())).thenReturn(user);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
         // when
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
@@ -463,7 +469,7 @@ class ExchangeTokenServiceTest {
         workContactMap.put(institutionId, contact);
         pdvUser.setWorkContacts(workContactMap);
         when(userService.getUserByInternalId(any())).thenReturn(pdvUser);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(billingBoUrl, billingAudience, jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
         // when
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, Optional.empty());
         // then
