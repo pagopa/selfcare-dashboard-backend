@@ -18,7 +18,7 @@ class SupportServiceImplTest {
      */
     @Test
     void testSendRequest() {
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26");
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "test-organization");
         String url = supportServiceImpl.sendRequest(this.dummySupportRequest());
         assertNotNull(url);
         assertTrue(url.contains("jwt"));
@@ -30,7 +30,7 @@ class SupportServiceImplTest {
      */
     @Test
     void testSendRequestWithProductId() {
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26");
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "");
         SupportRequest supportRequest = this.dummySupportRequest();
         supportRequest.setProductId("prodottoDiTest");
         String url = supportServiceImpl.sendRequest(supportRequest);
@@ -45,7 +45,7 @@ class SupportServiceImplTest {
      */
     @Test
     void testRequestWithMalformedEmptyKey() {
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("");
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("", "", "test");
         SupportException exception = assertThrows(SupportException.class, () -> supportServiceImpl.sendRequest(this.dummySupportRequest()));
         assertEquals("secret key byte array cannot be null or empty.", exception.getMessage());
     }
