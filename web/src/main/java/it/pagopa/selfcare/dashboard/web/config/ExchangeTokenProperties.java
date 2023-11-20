@@ -10,4 +10,6 @@ public class ExchangeTokenProperties {
     private String duration;
     private String kid;
     private String issuer;
+    private String billingUrl;
+    private String billingAudience;
 }
