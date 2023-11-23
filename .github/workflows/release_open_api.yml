@@ -1,0 +1,58 @@
+name: Swagger Update
+on:
+  pull_request:
+    branches:
+      - release-dev
+    types: [ opened ]
+  workflow_dispatch: #allow to run github action manually
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    #if: github.event.pull_request.merged == true
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Check out HEAD revision
+      uses: actions/checkout@v2
+      with:
+          ref: ${{ github.head_ref }}
+          path: head
+    - name: Check out BASE revision
+      uses: actions/checkout@v2
+      with:
+          ref: release-dev
+          path: base
+    - name: Build with Maven
+      run: mvn test -Dtest=SwaggerConfigTest#swaggerSpringPlugin -DfailIfNoTests=false
+    - name: Run OpenAPI Diff (from HEAD revision)
+      uses: LimeFlight/openapi-diff-action@master
+      with:
+            head_spec: head/app/src/main/resources/swagger/api-docs.json
+            base_spec: base/app/src/main/resources/swagger/api-docs.json
+            output_path: ./output
+            github_token: ${{ github.token }}
+    - name: Check report diff
+      run: |
+        cd output
+        result=$(sed -n '/<span class="badge badge-Incompatible">/,/<\/span>/p'  api-docs.html)
+        echo $result;
+        if [[ "$result" == *"Incompatible"* ]]; then
+             exit 1;
+        else
+            echo 'No incompatible differences between the two api docs';
+        fi
+    - name: Commit api-docs
+      run: |
+          git ls-files ./app** | grep 'api-docs*' | xargs git add
+          git config --global user.email "selfcare-github@pagopa.it"
+          git config --global user.name "selfcare-github-bot"
+          git commit -m "Update Swagger documentation" || exit 0
+          git push origin ${{ github.ref_name}}
