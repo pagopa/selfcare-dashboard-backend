@@ -5,6 +5,15 @@ image:
 ingress:
   annotations:
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://uat.selfcare.pagopa.it,http://localhost:3000,http://localhost:3001,http://localhost:3002"
+  tls:
+    - hosts:
+        - selc.internal.uat.selfcare.pagopa.it
+      secretName: selc-internal-uat-selfcare-pagopa-it
+  hosts:
+    - host: selc.internal.uat.selfcare.pagopa.it
+      paths:
+        - path: /dashboard/v1/(.*)
+          pathType: ImplementationSpecific
 
 autoscaling:
   enabled: false
