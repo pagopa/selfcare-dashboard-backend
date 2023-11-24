@@ -1,3 +1,5 @@
+replicaCount: 2
+
 image:
   repository: selcpacr.azurecr.io/selfcaredashboardbackend
   pullPolicy: Always # TODO change me in IfNotPresent when each build will have a different tag
@@ -22,6 +24,10 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+pdb:
+  enabled: true
+  minAvailable: 1
 
 configEnvSpecific:
   JAVA_TOOL_OPTIONS: "-javaagent:/applicationinsights-agent.jar"
