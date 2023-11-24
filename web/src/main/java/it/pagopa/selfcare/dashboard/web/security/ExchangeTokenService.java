@@ -310,6 +310,7 @@ public class ExchangeTokenService {
 
     @Data
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     static class Institution implements Serializable {
         private String id;
         @JsonProperty("fiscal_code")
@@ -323,6 +324,7 @@ public class ExchangeTokenService {
         private String aooParent;
         @Deprecated
         private String parentDescription;
+        @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RootParent.class)
         private RootParent rootParent;
         @JsonProperty("ipaCode")
         private String originId;
@@ -335,6 +337,7 @@ public class ExchangeTokenService {
     }
 
     @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     static class Role implements Serializable {
         private PartyRole partyRole;
         @JsonProperty("role")
