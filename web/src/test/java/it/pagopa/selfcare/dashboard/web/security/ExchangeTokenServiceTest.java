@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -69,6 +70,8 @@ class ExchangeTokenServiceTest {
     @BeforeEach
     void cleanContext() {
         TestSecurityContextHolder.clearContext();
+        environmentVariables.set("TOKEN_EXCHANGE_BILLING_URL", "http://localhost:8080/#selfcareToken=<IdentityToken>");
+        environmentVariables.set("TOKEN_EXCHANGE_BILLING_AUDIENCE", "test");
     }
 
 
@@ -222,11 +225,32 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = mock(JwtService.class);
         when(jwtServiceMock.getClaims(any()))
                 .thenReturn(null);
-        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
-        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        UUID userId = UUID.randomUUID();
+        SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
+
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        when(institutionServiceMock.getInstitution(any()))
+                .thenReturn(institutionInfo);
+        final Pageable pageable = Pageable.ofSize(100);
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
+        UserInfo user = mockInstance(new UserInfo());
+        user.setId(userId.toString());
+        groupInfo.setMembers(List.of(user));
+        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        for (int i = 0; i < pageable.getPageSize(); i++) {
+            groupInfos.add(groupInfo);
+        }
+        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, null, properties, null);
+
         // when
         Executable executable = () -> exchangeTokenService.exchange(institutionId, productId, null);
         // then
@@ -253,12 +277,6 @@ class ExchangeTokenServiceTest {
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
-                .thenReturn(Jwts.claims()
-                        .setId(jti)
-                        .setSubject(sub)
-                        .setIssuedAt(iat)
-                        .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -272,8 +290,6 @@ class ExchangeTokenServiceTest {
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
-        verify(jwtServiceMock, times(1))
-                .getClaims(any());
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
@@ -504,6 +520,330 @@ class ExchangeTokenServiceTest {
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
                 .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
+        verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
+    }
+
+    @Test
+    void billingExchange_noAuth() throws Exception {
+        // given
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setDuration("PT5S");
+        JwtService jwtServiceMock = mock(JwtService.class);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, null, null, null, properties, null);
+        // when
+        Executable executable = () -> exchangeTokenService.retrieveBillingExchangedToken(null);
+        // then
+        IllegalStateException e = assertThrows(IllegalStateException.class, executable);
+        assertEquals("Authentication is required", e.getMessage());
+        verifyNoInteractions(jwtServiceMock);
+    }
+
+    @Test
+    void billingExchange_noSessionTokenClaims() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setDuration("PT5S");
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
+                .thenReturn(null);
+        ProductsConnector productsConnector = mock(ProductsConnector.class);
+        ProductTree productTree = new ProductTree();
+        Product product = new Product();
+        product.setId("prod-io");
+        productTree.setNode(product);
+        when(productsConnector.getProductsTree()).thenReturn(List.of(productTree));
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        UUID userId = UUID.randomUUID();
+        SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+
+        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
+        UserInfo user = mockInstance(new UserInfo());
+        user.setId(userId.toString());
+        groupInfo.setMembers(List.of(user));
+        final Pageable pageable = Pageable.ofSize(100);
+        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        for (int i = 0; i < pageable.getPageSize(); i++) {
+            groupInfos.add(groupInfo);
+        }
+        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+
+        when(institutionServiceMock.getInstitution(any()))
+                .thenReturn(institutionInfo);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnector, properties, null);
+
+        Executable executable = () -> exchangeTokenService.retrieveBillingExchangedToken(institutionId);
+        // then
+        RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Session token claims is required", e.getMessage());
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verifyNoMoreInteractions(jwtServiceMock);
+    }
+
+
+    @Test
+    void billingExchange_noInstitutionInfo() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+
+        File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setDuration("PT5S");
+        JwtService jwtServiceMock = mock(JwtService.class);
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        // when
+        Executable executable = () -> exchangeTokenService.retrieveBillingExchangedToken(institutionId);
+        // then
+        RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Institution info is required", e.getMessage());
+        verify(institutionServiceMock, times(1))
+                .getInstitution(institutionId);
+        verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
+    }
+
+    @ParameterizedTest
+    @EnumSource(PrivateKey.class)
+    void billingExchange_nullGroupInfo(PrivateKey privateKey) throws Exception {
+        // given
+        String jti = "id";
+        String sub = "subject";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        String institutionId = "institutionId";
+        String productRole = "productRole";
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, "productId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        UUID userId = UUID.randomUUID();
+        SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
+
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        Product product = mockInstance(new Product());
+        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
+        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        productRole1.setCode(productRole);
+        productRoleInfo.setRoles(List.of(productRole1));
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
+        roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
+        product.setRoleMappings(roleMappings);
+        ProductTree productTree = new ProductTree();
+        productTree.setNode(product);
+        when(productsConnectorMock.getProductsTree()).thenReturn(List.of(productTree));
+
+        TestSecurityContextHolder.setAuthentication(authentication);
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
+                .thenReturn(Jwts.claims()
+                        .setId(jti)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp));
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        when(institutionServiceMock.getInstitution(any()))
+                .thenReturn(institutionInfo);
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
+        File file = ResourceUtils.getFile(privateKey.getResourceLocation());
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        String kid = "kid";
+        properties.setDuration("PT5S");
+        properties.setKid(kid);
+        environmentVariables.set("JWT_TOKEN_EXCHANGE_ISSUER", "https://dev.selfcare.pagopa.it");
+        environmentVariables.set("TOKEN_EXCHANGE_BILLING_URL", "http://localhost:8080/#selfcareToken=<IdentityToken>");
+        environmentVariables.set("TOKEN_EXCHANGE_BILLING_AUDIENCE", "test");
+        String issuer = "https://dev.selfcare.pagopa.it";
+        properties.setIssuer(issuer);
+        properties.setBillingUrl("http://localhost:8080/#selfcareToken=<IdentityToken>");
+        UserService userService = mock(UserService.class);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        WorkContact contact = new WorkContact();
+        CertifiedField<String> email =  new CertifiedField<>();
+        email.setValue("email");
+        contact.setEmail(email);
+        workContactMap.put(institutionId, contact);
+        user.setWorkContacts(workContactMap);
+        when(userService.getUserByInternalId(any())).thenReturn(user);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
+        // when
+        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId);
+        // then
+        assertNotNull(exchangedToken.getIdentityToken());
+        Jws<Claims> claimsJws = Jwts.parser()
+                .setSigningKey(loadPublicKey())
+                .parseClaimsJws(exchangedToken.getIdentityToken());
+        assertNotNull(claimsJws);
+        assertNotNull(claimsJws.getHeader());
+        assertEquals(kid, claimsJws.getHeader().getKeyId());
+        TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
+        assertNotEquals(jti, exchangedClaims.getId());
+        assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
+        assertEquals(sub, exchangedClaims.getSubject());
+        assertEquals(issuer, exchangedClaims.getIssuer());
+        // https://github.com/jwtk/jjwt/issues/122:
+        // The JWT RFC *mandates* NumericDate values are represented as seconds.
+        // Because java.util.Date requires milliseconds, we need to multiply by 1000:
+        assertEquals(exp.toInstant().getEpochSecond(), exchangedClaims.getDesiredExpiration().toInstant().getEpochSecond());
+        assertTrue(exchangedClaims.getIssuedAt().after(iat));
+        assertTrue(exchangedClaims.getExpiration().after(exp));
+        assertTrue(exchangedClaims.getExpiration().after(exchangedClaims.getIssuedAt()));
+        ExchangeTokenService.Institution institution = exchangedClaims.getInstitution();
+        assertNotNull(institution);
+        assertNull(institution.getGroups());
+        assertEquals(institutionId, institution.getId());
+        assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
+        assertNotNull(institution.getRoles());
+        assertFalse(exchangedClaims.containsKey("groups"));
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verify(institutionServiceMock, times(1))
+                .getInstitution(institutionId);
+        verify(groupServiceMock, times(1))
+                .getUserGroups(Optional.of(institutionId), Optional.empty(), Optional.of(userId), Pageable.ofSize(100));
+        verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(PrivateKey.class)
+    void billingExchange_ok(PrivateKey privateKey) throws Exception {
+        // given
+        String jti = "id";
+        String sub = "subject";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        String institutionId = "institutionId";
+        String productRole = "productRole";
+        final Pageable pageable = Pageable.ofSize(100);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, "productId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        UUID userId = UUID.randomUUID();
+        SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(any()))
+                .thenReturn(Jwts.claims()
+                        .setId(jti)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp));
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        UserService userService = mock(UserService.class);
+        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        when(institutionServiceMock.getInstitution(any()))
+                .thenReturn(institutionInfo);
+        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
+        UserInfo user = mockInstance(new UserInfo());
+        user.setId(userId.toString());
+        groupInfo.setMembers(List.of(user));
+        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        for (int i = 0; i < pageable.getPageSize(); i++) {
+            groupInfos.add(groupInfo);
+        }
+        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        Product product = mockInstance(new Product());
+        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
+        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        productRole1.setCode(productRole);
+        productRoleInfo.setRoles(List.of(productRole1));
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
+        roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
+        product.setRoleMappings(roleMappings);
+        ProductTree productTree = new ProductTree();
+        productTree.setNode(product);
+        when(productsConnectorMock.getProductsTree()).thenReturn(List.of(productTree));
+        File file = ResourceUtils.getFile(privateKey.getResourceLocation());
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        String kid = "kid";
+        environmentVariables.set("JWT_TOKEN_EXCHANGE_ISSUER", "https://dev.selfcare.pagopa.it");
+        String issuer = "https://dev.selfcare.pagopa.it";
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setKid(kid);
+        properties.setDuration("PT5S");
+        properties.setIssuer(issuer);
+        User pdvUser = new User();
+        pdvUser.setId(UUID.randomUUID().toString());
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        WorkContact contact = new WorkContact();
+        CertifiedField<String> email =  new CertifiedField<>();
+        email.setValue("email");
+        contact.setEmail(email);
+        workContactMap.put(institutionId, contact);
+        pdvUser.setWorkContacts(workContactMap);
+        when(userService.getUserByInternalId(any())).thenReturn(pdvUser);
+        ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService);
+        // when
+        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId);
+        // then
+        assertNotNull(exchangedToken.getIdentityToken());
+        Jws<Claims> claimsJws = Jwts.parser()
+                .setSigningKey(loadPublicKey())
+                .parseClaimsJws(exchangedToken.getIdentityToken());
+        assertNotNull(claimsJws);
+        assertNotNull(claimsJws.getHeader());
+        assertEquals(kid, claimsJws.getHeader().getKeyId());
+        TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
+        assertNotEquals(jti, exchangedClaims.getId());
+        assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
+        assertEquals(sub, exchangedClaims.getSubject());
+        assertEquals(issuer, exchangedClaims.getIssuer());
+        // https://github.com/jwtk/jjwt/issues/122:
+        // The JWT RFC *mandates* NumericDate values are represented as seconds.
+        // Because java.util.Date requires milliseconds, we need to multiply by 1000:
+        assertEquals(exp.toInstant().getEpochSecond(), exchangedClaims.getDesiredExpiration().toInstant().getEpochSecond());
+        assertTrue(exchangedClaims.getIssuedAt().after(iat));
+        assertTrue(exchangedClaims.getExpiration().after(exp));
+        assertTrue(exchangedClaims.getExpiration().after(exchangedClaims.getIssuedAt()));
+        ExchangeTokenService.Institution institution = exchangedClaims.getInstitution();
+        assertNotNull(institution);
+        assertEquals(institutionInfo.getDescription(), institution.getName());
+        assertEquals(institutionId, institution.getId());
+        checkNotNullFields(institution);
+        List<String> groups = institution.getGroups();
+        assertEquals(pageable.getPageSize(), groups.size());
+        assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
+        assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
+        verify(jwtServiceMock, times(1))
+                .getClaims(any());
+        verify(institutionServiceMock, times(1))
+                .getInstitution(institutionId);
+        verify(groupServiceMock, times(1))
+                .getUserGroups(Optional.of(institutionId), Optional.empty(), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 

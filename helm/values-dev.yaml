@@ -9,7 +9,7 @@ ingress:
         - selc.internal.dev.selfcare.pagopa.it
       secretName: selc-internal-dev-selfcare-pagopa-it
   hosts:
-    - host: "selc.internal.dev.selfcare.pagopa.it"
+    - host: selc.internal.dev.selfcare.pagopa.it
       paths:
         - path: /dashboard/v1/(.*)
           pathType: ImplementationSpecific

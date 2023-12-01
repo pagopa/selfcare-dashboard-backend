@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.net.URI;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -64,6 +65,28 @@ class TokenControllerTest {
         assertNotNull(resource.getToken());
         verify(exchangeTokenServiceMock, Mockito.times(1))
                 .exchange(institutionId, productId, Optional.empty());
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
+    }
+
+    @Test
+    void billingExchange() throws Exception {
+        // given
+        String institutionId = "inst1";
+        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(anyString()))
+                .thenReturn(new ExchangedToken("token", "urlBO"));
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/exchange/fatturazione")
+                        .param("institutionId", institutionId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        // then
+        URI resource = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
+        assertNotNull(resource);
+        verify(exchangeTokenServiceMock, Mockito.times(1))
+                .retrieveBillingExchangedToken(institutionId);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 

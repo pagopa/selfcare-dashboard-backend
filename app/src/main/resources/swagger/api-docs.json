@@ -2238,6 +2238,89 @@
         } ]
       }
     },
+    "/token/exchange/fatturazione" : {
+      "get" : {
+        "tags" : [ "token" ],
+        "summary" : "billingToken",
+        "description" : "Service to create a 'Billing Token' based on a Self Care session token",
+        "operationId" : "billingTokenUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "environment",
+          "in" : "query",
+          "description" : "Back Office environment",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "uri"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/users" : {
       "post" : {
         "tags" : [ "user" ],
@@ -4311,7 +4394,7 @@
           },
           "delegable" : {
             "type" : "boolean",
-            "description" : "If a product is delegable to a technical partner ",
+            "description" : "If a product is delegable to a technical partner",
             "example" : false
           },
           "description" : {
@@ -4325,6 +4408,11 @@
           "imageUrl" : {
             "type" : "string",
             "description" : "Product's depict image"
+          },
+          "invoiceable" : {
+            "type" : "boolean",
+            "description" : "If a product is invoiceable",
+            "example" : false
           },
           "logo" : {
             "type" : "string",
@@ -4419,7 +4507,7 @@
         "properties" : {
           "delegable" : {
             "type" : "boolean",
-            "description" : "If a product is delegable to a technical partner ",
+            "description" : "If a product is delegable to a technical partner",
             "example" : false
           },
           "description" : {
@@ -4433,6 +4521,11 @@
           "imageUrl" : {
             "type" : "string",
             "description" : "Product's depict image"
+          },
+          "invoiceable" : {
+            "type" : "boolean",
+            "description" : "If a product is invoiceable",
+            "example" : false
           },
           "logo" : {
             "type" : "string",

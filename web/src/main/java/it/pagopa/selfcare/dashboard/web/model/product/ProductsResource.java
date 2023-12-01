@@ -59,4 +59,7 @@ public class ProductsResource {
     @ApiModelProperty(value = "${swagger.dashboard.products.model.backOfficeEnvironmentConfigurations}")
     private Collection<BackOfficeConfigurationsResource> backOfficeEnvironmentConfigurations;
 
+    @ApiModelProperty(value = "${swagger.dashboard.products.model.invoiceable}")
+    private boolean invoiceable;
+
 }
