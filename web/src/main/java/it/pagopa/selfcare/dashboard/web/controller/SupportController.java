@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
@@ -31,6 +32,7 @@ public class SupportController {
         this.supportMapper = supportMapper;
     }
 
+    @Tag(name = "external-v2")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
