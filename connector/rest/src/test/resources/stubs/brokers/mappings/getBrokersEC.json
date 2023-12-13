@@ -1,7 +1,7 @@
 {
   "request":{
     "method":"GET",
-    "url":"/stations/brokers-EC?limit=10&page=1"
+    "url":"/brokers?limit=10&page=1"
   },
   "response":{
     "status":"200",

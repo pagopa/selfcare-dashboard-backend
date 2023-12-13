@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPspResource;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersResource;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Brokers;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPsp;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.dashboard.connector.rest.config.PagoPABackOfficeRestClientTestConfig;
@@ -61,7 +61,7 @@ class PagoPABackOfficeRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getBrokersEC() {
         // given and when
-        ResponseEntity<BrokersResource> response = backOfficeStationApiClient._getBrokersECUsingGET( 1, 10, null, null, null, null);
+        ResponseEntity<Brokers> response = backOfficeStationApiClient._getBrokers( 1, null, 10, null, null, null, null);
         // then
         assertFalse(Objects.isNull(response));
         assertEquals(200, response.getStatusCode().value());
@@ -74,7 +74,7 @@ class PagoPABackOfficeRestClientTest extends BaseFeignRestClientTest {
     @Test
     void getBrokersPSP() {
         // given and when
-        ResponseEntity<BrokersPspResource> response = backOfficeChannelApiClient._getBrokersPspUsingGET( 1, 10, null, null, null, null);
+        ResponseEntity<BrokersPsp> response = backOfficeChannelApiClient._getBrokersPsp( 1, null, 10, null, null, null, null);
         // then
         assertFalse(Objects.isNull(response));
         assertEquals(200, response.getStatusCode().value());
