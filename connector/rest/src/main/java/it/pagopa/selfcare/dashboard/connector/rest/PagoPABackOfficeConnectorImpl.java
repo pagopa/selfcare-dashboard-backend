@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPspResource;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersResource;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Brokers;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPsp;
 import it.pagopa.selfcare.dashboard.connector.api.PagoPABackOfficeConnector;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsBackOfficeChannelApiClient;
@@ -35,7 +35,7 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     @Override
     public List<BrokerInfo> getBrokersEC(int page, int limit) {
         log.trace("getBrokersEC start");
-        ResponseEntity<BrokersResource> responseBrokersEC = backofficeStationApiClient._getBrokersECUsingGET(page, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
+        ResponseEntity<Brokers> responseBrokersEC = backofficeStationApiClient._getBrokers(page, null, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
         log.debug("getBrokersEC result = {}", responseBrokersEC.getBody());
         List<BrokerInfo> brokers = this.parseBrokersEC(responseBrokersEC.getBody());
         log.trace("getBrokersEC end");
@@ -45,14 +45,14 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     @Override
     public List<BrokerInfo> getBrokersPSP(int page, int limit) {
         log.trace("getBrokersPSP start");
-        ResponseEntity<BrokersPspResource> responseBrokersPSP = backofficeChannelApiClient._getBrokersPspUsingGET(page, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
+        ResponseEntity<BrokersPsp> responseBrokersPSP = backofficeChannelApiClient._getBrokersPsp(page, null, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
         log.debug("getBrokersPSP result = {}", responseBrokersPSP.getBody());
         List<BrokerInfo> brokers = this.parseBrokersPSP(responseBrokersPSP.getBody());
         log.trace("getBrokersPSP end");
         return brokers;
     }
 
-    private List<BrokerInfo> parseBrokersPSP(BrokersPspResource brokersPspResource) {
+    private List<BrokerInfo> parseBrokersPSP(BrokersPsp brokersPspResource) {
         List<BrokerInfo> brokers = Collections.emptyList();
         if (brokersPspResource != null && brokersPspResource.getBrokersPsp() != null) {
             brokers = brokersPspResource.getBrokersPsp().stream()
@@ -62,7 +62,7 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
         return brokers;
     }
 
-    private List<BrokerInfo> parseBrokersEC(BrokersResource brokersResource) {
+    private List<BrokerInfo> parseBrokersEC(Brokers brokersResource) {
         List<BrokerInfo> brokers = Collections.emptyList();
         if (brokersResource != null && brokersResource.getBrokers() != null) {
             brokers = brokersResource.getBrokers().stream()

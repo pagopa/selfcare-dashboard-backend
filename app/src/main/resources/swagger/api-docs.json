@@ -2046,7 +2046,7 @@
     },
     "/support" : {
       "post" : {
-        "tags" : [ "support" ],
+        "tags" : [ "external-v2" ],
         "summary" : "sendSupportRequest",
         "description" : "Service to retrieve Support contact's form",
         "operationId" : "sendSupportRequestUsingPOST",

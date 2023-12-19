@@ -1,9 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerPspResource;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerResource;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPspResource;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersResource;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Broker;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerPsp;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Brokers;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPsp;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsBackOfficeChannelApiClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsBackOfficeStationApiClient;
@@ -45,12 +45,12 @@ class PagoPABackOfficeConnectorImplTest {
         BrokerInfo brokerInfo = new BrokerInfo();
         brokerInfo.setCode("code");
         brokerInfo.setDescription("description");
-        BrokersResource brokersResource = new BrokersResource();
-        brokersResource.setBrokers(List.of(new BrokerResource().brokerCode("code").description("description")));
-        ResponseEntity<BrokersResource> response = ResponseEntity.ok(brokersResource);
+        Brokers brokersResource = new Brokers();
+        brokersResource.setBrokers(List.of(new Broker().brokerCode("code").description("description")));
+        ResponseEntity<Brokers> response = ResponseEntity.ok(brokersResource);
         // when
         when(brokerMapper.fromBrokerResource(any())).thenReturn(brokerInfo);
-        when(backOfficeStationApiClient._getBrokersECUsingGET(anyInt(), anyInt(), any(), any(), any(), any()))
+        when(backOfficeStationApiClient._getBrokers(anyInt(), any(), anyInt(), any(), any(), any(), any()))
                 .thenReturn(response);
         List<BrokerInfo> brokers = pagoPABackOfficeConnector.getBrokersEC(1, 1000);
         // then
@@ -68,12 +68,12 @@ class PagoPABackOfficeConnectorImplTest {
         BrokerInfo brokerInfo = new BrokerInfo();
         brokerInfo.setCode("code");
         brokerInfo.setDescription("description");
-        BrokerPspResource innerResource = new BrokerPspResource().brokerPspCode("code").description("description");
-        BrokersPspResource brokersResource = new BrokersPspResource();
+        BrokerPsp innerResource = new BrokerPsp().brokerPspCode("code").description("description");
+        BrokersPsp brokersResource = new BrokersPsp();
         brokersResource.setBrokersPsp(List.of(innerResource));
-        ResponseEntity<BrokersPspResource> response = ResponseEntity.ok(brokersResource);
+        ResponseEntity<BrokersPsp> response = ResponseEntity.ok(brokersResource);
         when(brokerMapper.fromBrokerPSPResource(any())).thenReturn(brokerInfo);
-        when(backOfficeChannelApiClient._getBrokersPspUsingGET(anyInt(), anyInt(), any(), any(), any(), any()))
+        when(backOfficeChannelApiClient._getBrokersPsp(anyInt(), any(), anyInt(), any(), any(), any(), any()))
                 .thenReturn(response);
         // when
         List<BrokerInfo> brokers = pagoPABackOfficeConnector.getBrokersPSP(1, 1000);

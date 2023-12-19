@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest.mapper;
 
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerPspResource;
-import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerResource;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Broker;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerPsp;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapperImpl;
@@ -18,7 +18,7 @@ class BrokerMapperImplTest {
 
     @Test
     void fromBrokerResource() {
-        BrokerResource resource = new BrokerResource();
+        Broker resource = new Broker();
         resource.setBrokerCode("id");
         resource.setDescription("description");
         BrokerInfo brokerInfo = mapper.fromBrokerResource(resource);
@@ -29,7 +29,7 @@ class BrokerMapperImplTest {
 
     @Test
     void fromBrokerPSPResource() {
-        BrokerPspResource resource = new BrokerPspResource();
+        BrokerPsp resource = new BrokerPsp();
         resource.setBrokerPspCode("id");
         resource.setDescription("description");
         BrokerInfo brokerInfo = mapper.fromBrokerPSPResource(resource);
