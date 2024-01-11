@@ -370,7 +370,7 @@ class PartyConnectorImpl implements PartyConnector {
         RelationshipsResponse institutionRelationships = partyProcessRestClient.getUserInstitutionRelationships(institutionId, EnumSet.allOf(PartyRole.class), userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
         if (!institutionRelationships.isEmpty()) {
             Set<PartyRole> roles = partyRoleToUsersMap.keySet();
-            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
+            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).toList();
 
             if(checkUserRole(userDto, institutionRelationships)){
                 throw new ValidationException("User role conflict");
