@@ -27,6 +27,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionUpdate;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -820,8 +821,9 @@ class MsCoreConnectorImplTest {
     void institutionToInstitutionInfoFunction() {
         // given
         Institution institutionMock = mockInstance(new Institution());
+        InstitutionUpdate institutionUpdateMock = mockInstance(new InstitutionUpdate());
         // when
-        final InstitutionInfo result = PartyConnectorImpl.INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institutionMock);
+        final InstitutionInfo result = PartyConnectorImpl.INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institutionMock, institutionUpdateMock);
         // then
         assertEquals(institutionMock.getInstitutionType(), result.getInstitutionType());
         assertEquals(institutionMock.getDescription(), result.getDescription());
