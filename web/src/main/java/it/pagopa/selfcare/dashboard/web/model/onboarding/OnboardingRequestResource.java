@@ -113,7 +113,7 @@ public class OnboardingRequestResource {
             private boolean isAgentOfPublicService;
 
             @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicServiceNote}")
-            private boolean agentOfPublicServiceNote;
+            private String agentOfPublicServiceNote;
 
             @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.otherNote}")
             private String otherNote;

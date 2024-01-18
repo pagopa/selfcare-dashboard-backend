@@ -103,7 +103,7 @@ public class OnboardingRequestMapper {
                     resource.setBelongRegulatedMarket(additionaInformations.isBelongRegulatedMarket());
                     resource.setRegulatedMarketNote(additionaInformations.getRegulatedMarketNote());
                     resource.setAgentOfPublicService(additionaInformations.isAgentOfPublicService());
-                    resource.setAgentOfPublicServiceNote(additionaInformations.isAgentOfPublicService());
+                    resource.setAgentOfPublicServiceNote(additionaInformations.getAgentOfPublicServiceNote());
                     resource.setEstablishedByRegulatoryProvision(additionaInformations.isEstablishedByRegulatoryProvision());
                     resource.setEstablishedByRegulatoryProvisionNote(additionaInformations.getEstablishedByRegulatoryProvisionNote());
                     return resource;
