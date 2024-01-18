@@ -3327,6 +3327,49 @@
   },
   "components" : {
     "schemas" : {
+      "AdditionalInformations" : {
+        "title" : "AdditionalInformations",
+        "type" : "object",
+        "properties" : {
+          "agentOfPublicService" : {
+            "type" : "boolean"
+          },
+          "agentOfPublicServiceNote" : {
+            "type" : "boolean",
+            "description" : "agentOfPublicService Note",
+            "example" : false
+          },
+          "belongRegulatedMarket" : {
+            "type" : "boolean",
+            "description" : "The institution belongs to a regulated market",
+            "example" : false
+          },
+          "establishedByRegulatoryProvision" : {
+            "type" : "boolean",
+            "description" : "The institution is a company established by a regulatory provision",
+            "example" : false
+          },
+          "establishedByRegulatoryProvisionNote" : {
+            "type" : "string",
+            "description" : "establishedByRegulatoryProvision Note"
+          },
+          "ipa" : {
+            "type" : "boolean"
+          },
+          "ipaCode" : {
+            "type" : "string",
+            "description" : "IPA code"
+          },
+          "otherNote" : {
+            "type" : "string",
+            "description" : "Other note"
+          },
+          "regulatedMarketNote" : {
+            "type" : "string",
+            "description" : "regulatedMarket Note"
+          }
+        }
+      },
       "Attribute" : {
         "title" : "Attribute",
         "type" : "object",
@@ -3769,6 +3812,10 @@
         "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "recipientCode", "vatNumber", "zipCode" ],
         "type" : "object",
         "properties" : {
+          "additionalInformations" : {
+            "description" : "Institution's additional informations",
+            "$ref" : "#/components/schemas/AdditionalInformations"
+          },
           "address" : {
             "type" : "string",
             "description" : "Institution's physical address"
