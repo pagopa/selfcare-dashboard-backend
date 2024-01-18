@@ -1737,7 +1737,7 @@
           "style" : "simple",
           "schema" : {
             "type" : "string",
-            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
           }
         } ],
         "responses" : {
@@ -3701,7 +3701,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
           },
           "onboarding" : {
             "type" : "array",
@@ -3800,7 +3800,7 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
           },
           "mailAddress" : {
             "type" : "string",
@@ -3878,7 +3878,7 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution's type",
-            "enum" : [ "AS", "GSP", "PA", "PG", "PSP", "PT", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
           },
           "mailAddress" : {
             "type" : "string",
