@@ -239,7 +239,7 @@ class PartyConnectorImplTest {
         InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNotNull(institutionInfo);
-        checkNotNullFields(institutionInfo, "paymentServiceProvider", "dataProtectionOfficer","city","country","county");
+        checkNotNullFields(institutionInfo, "paymentServiceProvider", "dataProtectionOfficer","city","country","county","additionalInformations");
         assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
         assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
         assertEquals(onboardingData.getExternalId(), institutionInfo.getExternalId());

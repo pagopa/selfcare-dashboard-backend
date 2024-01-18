@@ -95,6 +95,9 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setPaymentServiceProvider(institution.getPaymentServiceProvider());
         institutionInfo.setDataProtectionOfficer(institution.getDataProtectionOfficer());
         institutionInfo.setBilling(institution.getBilling());
+        if(institutionUpdate.getAdditionalInformations() != null) {
+            institutionInfo.setAdditionalInformations(institutionUpdate.getAdditionalInformations());
+        }
         return institutionInfo;
     };
     protected static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {

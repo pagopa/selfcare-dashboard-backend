@@ -34,6 +34,7 @@ public class InstitutionInfo {
     private String aooParentCode;
     private String parentDescription;
     private String rootParentId;
+    private AdditionalInformations additionalInformations;
 
     @Override
     public boolean equals(Object o) {
