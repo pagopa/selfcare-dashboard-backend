@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model;
 
 import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.dashboard.connector.model.institution.AdditionalInformations;
 import it.pagopa.selfcare.dashboard.connector.model.institution.DataProtectionOfficer;
 import it.pagopa.selfcare.dashboard.connector.model.institution.PaymentServiceProvider;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class InstitutionUpdate {
     private String taxCode;
     private PaymentServiceProvider paymentServiceProvider;
     private DataProtectionOfficer dataProtectionOfficer;
+    private AdditionalInformations additionalInformations;
 
 }

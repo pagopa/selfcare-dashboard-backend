@@ -95,6 +95,9 @@ class PartyConnectorImpl implements PartyConnector {
         institutionInfo.setPaymentServiceProvider(institution.getPaymentServiceProvider());
         institutionInfo.setDataProtectionOfficer(institution.getDataProtectionOfficer());
         institutionInfo.setBilling(institution.getBilling());
+        if(institutionUpdate.getAdditionalInformations() != null) {
+            institutionInfo.setAdditionalInformations(institutionUpdate.getAdditionalInformations());
+        }
         return institutionInfo;
     };
     protected static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
@@ -473,6 +476,7 @@ class PartyConnectorImpl implements PartyConnector {
         final OnboardingRequestInfo onboardingRequestInfo = new OnboardingRequestInfo();
         onboardingRequestInfo.setAdmins(new ArrayList<>());
         final TokenInfo tokenInfo = partyManagementRestClient.getToken(UUID.fromString(tokenId));
+        onboardingRequestInfo.setProductId(tokenInfo.getProductId());
         tokenInfo.getLegals().forEach(relationshipBinding -> {
             final UserInfo userInfo = new UserInfo();
             userInfo.setId(relationshipBinding.getPartyId().toString());
