@@ -4153,6 +4153,10 @@
             "description" : "Manager specific data. It's required when institutionType is not PT",
             "$ref" : "#/components/schemas/UserInfo"
           },
+          "productId" : {
+            "type" : "string",
+            "description" : "Product's identifier"
+          },
           "status" : {
             "type" : "string",
             "description" : "Onboarding request's status",

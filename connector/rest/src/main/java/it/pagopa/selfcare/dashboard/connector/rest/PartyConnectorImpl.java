@@ -476,6 +476,7 @@ class PartyConnectorImpl implements PartyConnector {
         final OnboardingRequestInfo onboardingRequestInfo = new OnboardingRequestInfo();
         onboardingRequestInfo.setAdmins(new ArrayList<>());
         final TokenInfo tokenInfo = partyManagementRestClient.getToken(UUID.fromString(tokenId));
+        onboardingRequestInfo.setProductId(tokenInfo.getProductId());
         tokenInfo.getLegals().forEach(relationshipBinding -> {
             final UserInfo userInfo = new UserInfo();
             userInfo.setId(relationshipBinding.getPartyId().toString());
