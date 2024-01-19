@@ -12,5 +12,6 @@ public class OnboardingRequestInfo {
     private InstitutionInfo institutionInfo;
     private UserInfo manager;
     private List<UserInfo> admins;
+    private String productId;
 
 }
