@@ -36,6 +36,7 @@ public class OnboardingRequestMapper {
                             .ifPresent(userInfos -> resource.setAdmins(userInfos.stream()
                                     .map(userInfo -> toResource(userInfo.getUser(), institutionId))
                                     .collect(Collectors.toList())));
+                    resource.setProductId(model.getProductId());
                     return resource;
                 }).orElse(null);
     }
