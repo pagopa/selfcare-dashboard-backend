@@ -100,8 +100,8 @@ public class OnboardingRequestResource {
             @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.regulatedMarketNote}")
             private String regulatedMarketNote;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.isIpa}")
-            private boolean isIpa;
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.ipa}")
+            private boolean ipa;
 
             @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.ipaCode}")
             private String ipaCode;
@@ -112,8 +112,8 @@ public class OnboardingRequestResource {
             @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvisionNote}")
             private String establishedByRegulatoryProvisionNote;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.isAgentOfPublicService}")
-            private boolean isAgentOfPublicService;
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicService}")
+            private boolean agentOfPublicService;
 
             @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicServiceNote}")
             private String agentOfPublicServiceNote;
