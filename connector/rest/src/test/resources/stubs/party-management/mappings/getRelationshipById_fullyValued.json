@@ -31,11 +31,11 @@
         "additionalInformations" : {
           "belongRegulatedMarket" : true,
           "regulatedMarketNote" :  "string",
-          "isIpa" : true,
+          "ipa" : true,
           "ipaCode" : "string",
           "establishedByRegulatoryProvision" : true,
           "establishedByRegulatoryProvisionNote" : "string",
-          "isAgentOfPublicService" : true,
+          "agentOfPublicService" : true,
           "agentOfPublicServiceNote" : "string",
           "otherNote" : "string"
         },
