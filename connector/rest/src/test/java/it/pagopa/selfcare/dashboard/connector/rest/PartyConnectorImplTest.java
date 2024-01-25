@@ -20,10 +20,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
-import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
@@ -242,7 +239,7 @@ class PartyConnectorImplTest {
         InstitutionInfo institutionInfo = partyConnector.getOnBoardedInstitution(institutionId);
         // then
         assertNotNull(institutionInfo);
-        checkNotNullFields(institutionInfo, "paymentServiceProvider", "dataProtectionOfficer","city","country","county");
+        checkNotNullFields(institutionInfo, "paymentServiceProvider", "dataProtectionOfficer","city","country","county","additionalInformations");
         assertEquals(onboardingData.getDescription(), institutionInfo.getDescription());
         assertEquals(onboardingData.getDigitalAddress(), institutionInfo.getDigitalAddress());
         assertEquals(onboardingData.getExternalId(), institutionInfo.getExternalId());
@@ -1448,8 +1445,9 @@ class PartyConnectorImplTest {
     void institutionToInstitutionInfoFunction() {
         // given
         Institution institutionMock = mockInstance(new Institution());
+        InstitutionUpdate institutionUpdateMock = mockInstance(new InstitutionUpdate());
         // when
-        final InstitutionInfo result = PartyConnectorImpl.INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institutionMock);
+        final InstitutionInfo result = PartyConnectorImpl.INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institutionMock, institutionUpdateMock);
         // then
         assertEquals(institutionMock.getInstitutionType(), result.getInstitutionType());
         assertEquals(institutionMock.getDescription(), result.getDescription());

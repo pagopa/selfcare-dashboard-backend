@@ -14,10 +14,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyManagementRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.PartyProcessRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionPut;
-import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnBoardingInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingData;
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
@@ -36,6 +33,7 @@ import org.springframework.util.Assert;
 
 import javax.validation.ValidationException;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -82,21 +80,24 @@ class PartyConnectorImpl implements PartyConnector {
         return institutionInfo;
     };
 
-    protected static final Function<Institution, InstitutionInfo> INSTITUTION_TO_INSTITUTION_INFO_FUNCTION = institution -> {
+    protected static final BiFunction<Institution, InstitutionUpdate, InstitutionInfo> INSTITUTION_TO_INSTITUTION_INFO_FUNCTION = (institution, institutionUpdate) -> {
         InstitutionInfo institutionInfo = new InstitutionInfo();
         institutionInfo.setId(institution.getId());
         institutionInfo.setInstitutionType(institution.getInstitutionType());
-        institutionInfo.setDescription(institution.getDescription());
-        institutionInfo.setTaxCode(institution.getTaxCode());
-        institutionInfo.setDigitalAddress(institution.getDigitalAddress());
-        institutionInfo.setAddress(institution.getAddress());
+        institutionInfo.setDescription(institutionUpdate.getDescription());
+        institutionInfo.setTaxCode(institutionUpdate.getTaxCode());
+        institutionInfo.setDigitalAddress(institutionUpdate.getDigitalAddress());
+        institutionInfo.setAddress(institutionUpdate.getAddress());
         institutionInfo.setCity(institution.getCity());
         institutionInfo.setCountry(institution.getCountry());
         institutionInfo.setCounty(institution.getCounty());
-        institutionInfo.setZipCode(institution.getZipCode());
+        institutionInfo.setZipCode(institutionUpdate.getZipCode());
         institutionInfo.setPaymentServiceProvider(institution.getPaymentServiceProvider());
         institutionInfo.setDataProtectionOfficer(institution.getDataProtectionOfficer());
         institutionInfo.setBilling(institution.getBilling());
+        if(institutionUpdate.getAdditionalInformations() != null) {
+            institutionInfo.setAdditionalInformations(institutionUpdate.getAdditionalInformations());
+        }
         return institutionInfo;
     };
     protected static final Function<RelationshipInfo, UserInfo> RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION = relationshipInfo -> {
@@ -372,7 +373,7 @@ class PartyConnectorImpl implements PartyConnector {
         RelationshipsResponse institutionRelationships = partyProcessRestClient.getUserInstitutionRelationships(institutionId, EnumSet.allOf(PartyRole.class), userInfoFilter.getAllowedStates().orElse(null), userInfoFilter.getProductId().map(Set::of).orElse(null), userInfoFilter.getProductRoles().orElse(null), userInfoFilter.getUserId().orElse(null));
         if (!institutionRelationships.isEmpty()) {
             Set<PartyRole> roles = partyRoleToUsersMap.keySet();
-            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).collect(Collectors.toList());
+            List<PartyRole> partyRoles = institutionRelationships.stream().map(RelationshipInfo::getRole).toList();
 
             if(checkUserRole(userDto, institutionRelationships)){
                 throw new ValidationException("User role conflict");
@@ -475,6 +476,7 @@ class PartyConnectorImpl implements PartyConnector {
         final OnboardingRequestInfo onboardingRequestInfo = new OnboardingRequestInfo();
         onboardingRequestInfo.setAdmins(new ArrayList<>());
         final TokenInfo tokenInfo = partyManagementRestClient.getToken(UUID.fromString(tokenId));
+        onboardingRequestInfo.setProductId(tokenInfo.getProductId());
         tokenInfo.getLegals().forEach(relationshipBinding -> {
             final UserInfo userInfo = new UserInfo();
             userInfo.setId(relationshipBinding.getPartyId().toString());
@@ -487,7 +489,7 @@ class PartyConnectorImpl implements PartyConnector {
             }
         });
         Institution institution = partyProcessRestClient.getInstitution(tokenInfo.getInstitutionId());
-        InstitutionInfo institutionInfo = INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institution);
+        InstitutionInfo institutionInfo = INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institution, tokenInfo.getInstitutionUpdate());
         institutionInfo.setStatus(tokenInfo.getStatus());
         OnboardedProduct onboardedProduct = institution.getOnboarding().stream()
                 .filter(onboarding -> onboarding.getProductId().equals(tokenInfo.getProductId()))

@@ -30,6 +30,9 @@ public class OnboardingRequestResource {
     @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.admins}")
     private List<UserInfo> admins;
 
+    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.productId}")
+    private String productId;
+
 
     @Data
     @EqualsAndHashCode(of = "id")
@@ -85,6 +88,39 @@ public class OnboardingRequestResource {
 
         @ApiModelProperty(value = "${swagger.dashboard.institutions.model.dpoData}")
         private DpoData dpoData;
+
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations}")
+        private AdditionalInformations additionalInformations;
+
+        @Data
+        public static class AdditionalInformations{
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.belongRegulatedMarket}")
+            private boolean belongRegulatedMarket;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.regulatedMarketNote}")
+            private String regulatedMarketNote;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.ipa}")
+            private boolean ipa;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.ipaCode}")
+            private String ipaCode;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvision}")
+            private boolean establishedByRegulatoryProvision;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvisionNote}")
+            private String establishedByRegulatoryProvisionNote;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicService}")
+            private boolean agentOfPublicService;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicServiceNote}")
+            private String agentOfPublicServiceNote;
+
+            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.otherNote}")
+            private String otherNote;
+        }
 
         @Data
         public static class PspData {

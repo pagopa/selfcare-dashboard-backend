@@ -33,22 +33,10 @@ jobs:
     - name: Build with Maven
       run: mvn test -Dtest=SwaggerConfigTest#swaggerSpringPlugin -DfailIfNoTests=false
     - name: Run OpenAPI Diff (from HEAD revision)
-      uses: LimeFlight/openapi-diff-action@master
+      uses: mvegter/openapi-diff-action@72cde50f8d3a75f770f08e23b815d5ebe69ff757
       with:
-            head_spec: head/app/src/main/resources/swagger/api-docs.json
-            base_spec: base/app/src/main/resources/swagger/api-docs.json
-            output_path: ./output
-            github_token: ${{ github.token }}
-    - name: Check report diff
-      run: |
-        cd output
-        result=$(sed -n '/<span class="badge badge-Incompatible">/,/<\/span>/p'  api-docs.html)
-        echo $result;
-        if [[ "$result" == *"Incompatible"* ]]; then
-             exit 1;
-        else
-            echo 'No incompatible differences between the two api docs';
-        fi
+        head-spec: head/app/src/main/resources/swagger/api-docs.json
+        base-spec: base/app/src/main/resources/swagger/api-docs.json
     - name: Commit api-docs
       run: |
           git ls-files ./app** | grep 'api-docs*' | xargs git add
