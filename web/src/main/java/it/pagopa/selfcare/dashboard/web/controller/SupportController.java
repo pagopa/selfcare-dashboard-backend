@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.core.SupportService;
 import it.pagopa.selfcare.dashboard.web.model.mapper.SupportMapper;
 import it.pagopa.selfcare.dashboard.web.model.support.SupportRequestDto;
