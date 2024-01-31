@@ -33,10 +33,10 @@ public class SupportController {
     }
 
     @Tag(name = "external-v2")
-    @PostMapping
+    @PostMapping(produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
-    public SupportResponse sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
+    public String sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
                                               Authentication authentication) {
         log.trace("sendSupportRequest start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
@@ -44,6 +44,6 @@ public class SupportController {
         String url = supportService.sendRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
         log.debug("sendSupportRequest result = {}", url);
         log.trace("sendSupportRequest end");
-        return SupportResponse.builder().redirectUrl(url).build();
+        return url;
     }
 }
