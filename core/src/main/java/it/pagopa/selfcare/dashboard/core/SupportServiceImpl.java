@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
+
 
 @Slf4j
 @Service
@@ -59,9 +58,12 @@ public class SupportServiceImpl implements SupportService {
             throw new SupportException(e.getMessage());
         }
 
+        String redirectToProduct = Objects.nonNull(supportRequest.getProductId()) ?
+                returnTo.concat("?product=" + supportRequest.getProductId()) : returnTo;
+
         Map<String, String> map = new HashMap<>();
         map.put("jwt", jwtString);
-        map.put("returnTo", returnTo);
+        map.put("returnTo", redirectToProduct);
         map.put("action", redirectUrl);
 
         String html;
