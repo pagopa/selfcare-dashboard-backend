@@ -2104,9 +2104,9 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "application/json" : {
+              "text/html" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/SupportResponse"
+                  "type" : "string"
                 }
               }
             }
@@ -4649,15 +4649,6 @@
           "productId" : {
             "type" : "string",
             "description" : "Product's identifier"
-          }
-        }
-      },
-      "SupportResponse" : {
-        "title" : "SupportResponse",
-        "type" : "object",
-        "properties" : {
-          "redirectUrl" : {
-            "type" : "string"
           }
         }
       },

@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.core.SupportService;
 import it.pagopa.selfcare.dashboard.web.model.mapper.SupportMapper;
 import it.pagopa.selfcare.dashboard.web.model.support.SupportRequestDto;
@@ -33,10 +32,10 @@ public class SupportController {
     }
 
     @Tag(name = "external-v2")
-    @PostMapping
+    @PostMapping(produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
-    public SupportResponse sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
+    public String sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
                                               Authentication authentication) {
         log.trace("sendSupportRequest start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
@@ -44,6 +43,6 @@ public class SupportController {
         String url = supportService.sendRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
         log.debug("sendSupportRequest result = {}", url);
         log.trace("sendSupportRequest end");
-        return SupportResponse.builder().redirectUrl(url).build();
+        return url;
     }
 }
