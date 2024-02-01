@@ -23,17 +23,19 @@ public class SupportServiceImpl implements SupportService {
     private final String supportApiKey;
     private final String zendeskOrganization;
     private final String returnTo;
-    private static final String redirectUrl  = "https://pagopa.zendesk.com/access/jwt";
+    private final String redirectUrl;
     @Qualifier("zendeskFreeMarker")
     private final FreeMarkerConfigurer freeMarkerConfigurer;
 
     public SupportServiceImpl(@Value("${support.api.key}") String supportApiKey,
                               @Value("${support.api.zendesk.redirectUri}") String returnTo,
                               @Value("${support.api.zendesk.organization}") String zendeskOrganization,
+                              @Value("${support.api.zendesk.actionUri}") String redirectUrl,
                               FreeMarkerConfigurer freeMarkerConfigurer) {
         this.supportApiKey = supportApiKey;
         this.returnTo = returnTo;
         this.zendeskOrganization = zendeskOrganization;
+        this.redirectUrl = redirectUrl;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
     }
 

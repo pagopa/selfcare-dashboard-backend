@@ -22,7 +22,7 @@ class SupportServiceImplTest {
     @Test
     void testSendRequest(){
         FreeMarkerConfigurer freeMarkerConfigurer = freemarkerClassLoaderConfig();
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "test-organization", freeMarkerConfigurer);
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "test-organization", "redirectUrl", freeMarkerConfigurer);
         String url = supportServiceImpl.sendRequest(this.dummySupportRequest());
         assertNotNull(url);
         assertTrue(url.contains("jwt"));
@@ -35,7 +35,7 @@ class SupportServiceImplTest {
     @Test
     void testSendRequestThrowException() {
         FreeMarkerConfigurer freeMarkerConfigurer = Mockito.mock(FreeMarkerConfigurer.class);
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "test-organization", freeMarkerConfigurer);
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "test-organization", "redirectUrl", freeMarkerConfigurer);
         Exception exception = assertThrows(Exception.class, () -> supportServiceImpl.sendRequest(this.dummySupportRequest()));
         assertEquals("Impossible to retrieve zendesk form template", exception.getMessage());
     }
@@ -46,7 +46,7 @@ class SupportServiceImplTest {
     @Test
     void testSendRequestWithProductId() {
         FreeMarkerConfigurer freeMarkerConfigurer = freemarkerClassLoaderConfig();
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "", freeMarkerConfigurer);
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "", "redirectUrl", freeMarkerConfigurer);
         SupportRequest supportRequest = this.dummySupportRequest();
         supportRequest.setProductId("prodottoDiTest");
         String url = supportServiceImpl.sendRequest(supportRequest);
@@ -60,7 +60,7 @@ class SupportServiceImplTest {
      */
     @Test
     void testRequestWithMalformedEmptyKey() {
-        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("", "", "test", null);
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("", "", "test", "redirectUrl", null);
         SupportException exception = assertThrows(SupportException.class, () -> supportServiceImpl.sendRequest(this.dummySupportRequest()));
         assertEquals("secret key byte array cannot be null or empty.", exception.getMessage());
     }
