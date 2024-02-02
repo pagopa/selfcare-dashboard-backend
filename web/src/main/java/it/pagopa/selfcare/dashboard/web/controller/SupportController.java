@@ -18,7 +18,7 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/support", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/support")
 @Api(tags = "support")
 public class SupportController {
 
@@ -32,7 +32,7 @@ public class SupportController {
     }
 
     @Tag(name = "external-v2")
-    @PostMapping(produces = MediaType.TEXT_HTML_VALUE)
+    @PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
     public String sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
