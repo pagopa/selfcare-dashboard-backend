@@ -2104,7 +2104,7 @@
           "200" : {
             "description" : "OK",
             "content" : {
-              "text/html" : {
+              "text/plain" : {
                 "schema" : {
                   "type" : "string"
                 }
