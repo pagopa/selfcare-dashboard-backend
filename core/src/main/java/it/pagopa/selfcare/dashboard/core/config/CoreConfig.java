@@ -1,10 +1,13 @@
 package it.pagopa.selfcare.dashboard.core.config;
 
+import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.TemplateLoader;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
@@ -16,6 +19,7 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.net.URL;
 import java.util.Properties;
@@ -46,6 +50,16 @@ class CoreConfig implements AsyncConfigurer {
         configuration.setTemplateLoader(new CloudTemplateLoader(rootTemplateUrl));
         configuration.setSettings(settings);
         return configuration;
+    }
+
+    @Bean("zendeskFreeMarker")
+    public FreeMarkerConfigurer freemarkerClassLoaderConfig() {
+        freemarker.template.Configuration configuration = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_27);
+        TemplateLoader templateLoader = new ClassTemplateLoader(this.getClass(), "/template-zendesk");
+        configuration.setTemplateLoader(templateLoader);
+        FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+        freeMarkerConfigurer.setConfiguration(configuration);
+        return freeMarkerConfigurer;
     }
 
 
