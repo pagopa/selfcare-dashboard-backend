@@ -30,8 +30,3 @@ logging:
     it.pagopa.selfcare: ${B4F_DASHBOARD_LOG_LEVEL:DEBUG}
   pattern:
     additional-info: ",%X{X-Client-Ip:-}]"
-
-dashboard:
-  user:
-    client:
-      api-version: ${B4F_DASHBOARD_USER_CLIENT_API_VERSION:v1}

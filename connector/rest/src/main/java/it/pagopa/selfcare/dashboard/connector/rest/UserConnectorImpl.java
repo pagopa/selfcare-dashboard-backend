@@ -4,7 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionV2Mapper;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
 
     private final UserApiRestClient userApiRestClient;
-    private final InstitutionV2Mapper institutionMapper;
+    private final InstitutionMapper institutionMapper;
     private final UserMapper userMapper;
 
 

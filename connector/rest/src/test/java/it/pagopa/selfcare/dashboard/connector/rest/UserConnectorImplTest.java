@@ -4,7 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundExceptio
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionV2MapperImpl;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -22,11 +21,10 @@ import java.util.List;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = {UserConnectorImpl.class, InstitutionV2MapperImpl.class, UserMapper.class})
+@ContextConfiguration(classes = {UserConnectorImpl.class, InstitutionMapperImpl.class, UserMapper.class})
 class UserConnectorImplTest {
 
     @Mock
@@ -37,7 +35,7 @@ class UserConnectorImplTest {
 
     @Test
     void updateUserOK() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionV2MapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
         when(userApiRestClient._usersIdUserRegistryPut(eq("userID"),eq("InstitutionId"), any(UserRegistryFieldsDto.class)))
                 .thenReturn(ResponseEntity.ok().build());
         Assertions.assertDoesNotThrow(() -> userConnector.updateUser("userID", "InstitutionId", new MutableUserFieldsDto()));
@@ -45,7 +43,7 @@ class UserConnectorImplTest {
 
     @Test
     void updateUserKO() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionV2MapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
         when(userApiRestClient._usersIdUserRegistryPut(eq("userID"),eq("InstitutionId"), any(UserRegistryFieldsDto.class)))
                 .thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.updateUser("userID", "InstitutionId", new MutableUserFieldsDto()));
@@ -53,7 +51,7 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsNotFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionV2MapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
@@ -61,7 +59,7 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionV2MapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
         UserProductsResponse userProductsResponse = getUserProductsResponse();
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
