@@ -61,6 +61,9 @@ class SwaggerConfigTest {
     private UserService userServiceMock;
 
     @MockBean
+    private UserV2Service userV2ServiceMock;
+
+    @MockBean
     private BrokerService brokerService;
 
     @MockBean
