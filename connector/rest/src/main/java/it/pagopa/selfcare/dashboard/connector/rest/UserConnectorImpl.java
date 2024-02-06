@@ -19,7 +19,6 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 
 @Slf4j
 @Service
-@ConditionalOnProperty(value = "dashboard.user.client.api-version", havingValue = "v2")
 @RequiredArgsConstructor
 public class UserConnectorImpl implements UserApiConnector {
 
