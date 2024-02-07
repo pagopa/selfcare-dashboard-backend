@@ -1,10 +1,12 @@
 package it.pagopa.selfcare.dashboard.connector.model.support;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserField {
     private String aux_data;
 }
