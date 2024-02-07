@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.core.SupportService;
@@ -31,7 +32,7 @@ public class SupportController {
         this.supportMapper = supportMapper;
     }
 
-    @Tag(name = "external-v2")
+    @Tags({@Tag(name = "external-v2"), @Tag(name = "support")})
     @PostMapping(produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")

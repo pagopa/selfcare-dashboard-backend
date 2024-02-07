@@ -2046,7 +2046,7 @@
     },
     "/support" : {
       "post" : {
-        "tags" : [ "external-v2" ],
+        "tags" : [ "external-v2", "support" ],
         "summary" : "sendSupportRequest",
         "description" : "Service to retrieve Support contact's form",
         "operationId" : "sendSupportRequestUsingPOST",
@@ -4828,9 +4828,17 @@
             "format" : "email",
             "example" : "email@example.com"
           },
+          "institutionId" : {
+            "type" : "string",
+            "description" : "Institution's identifier"
+          },
           "productId" : {
             "type" : "string",
             "description" : "Product's identifier"
+          },
+          "userId" : {
+            "type" : "string",
+            "description" : "User's identifier"
           }
         }
       },
