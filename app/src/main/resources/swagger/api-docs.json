@@ -3812,7 +3812,7 @@
       },
       "InstitutionInfo" : {
         "title" : "InstitutionInfo",
-        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "recipientCode", "vatNumber", "zipCode" ],
+        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "vatNumber", "zipCode" ],
         "type" : "object",
         "properties" : {
           "additionalInformations" : {
@@ -4139,7 +4139,7 @@
       },
       "OnboardingRequestResource" : {
         "title" : "OnboardingRequestResource",
-        "required" : [ "institutionInfo", "manager", "status" ],
+        "required" : [ "institutionInfo", "status" ],
         "type" : "object",
         "properties" : {
           "admins" : {
