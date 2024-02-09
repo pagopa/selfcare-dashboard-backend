@@ -27,7 +27,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_repository"></a> [repository](#module\_repository) | github.com/pagopa/selfcare-commons//infra/terraform-modules/github_repository_settings | test-arm-secrets |
+| <a name="module_repository"></a> [repository](#module\_repository) | github.com/pagopa/selfcare-commons//infra/terraform-modules/github_repository_settings | main |
 
 ## Resources
 

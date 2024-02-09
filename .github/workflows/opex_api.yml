@@ -48,7 +48,7 @@ jobs:
           environment: prod
           api-name: ${{ env.API_NAME }}
           config: .opex/${{ env.API_NAME }}/env/prod/config.yaml
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ vars.ARM_TENANT_ID }}
+          subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
           docker-version: ${{ env.DOCKER_IMAGE_TAG }}

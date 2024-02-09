@@ -9,7 +9,7 @@ provider "azurerm" {
 }
 
 module "repository" {
-  source = "github.com/pagopa/selfcare-commons//infra/terraform-modules/github_repository_settings?ref=test-arm-secrets"
+  source = "github.com/pagopa/selfcare-commons//infra/terraform-modules/github_repository_settings?ref=main"
 
   github = {
     repository = "selfcare-dashboard-backend"
