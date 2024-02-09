@@ -3812,7 +3812,7 @@
       },
       "InstitutionInfo" : {
         "title" : "InstitutionInfo",
-        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "vatNumber", "zipCode" ],
+        "required" : [ "address", "fiscalCode", "institutionType", "mailAddress", "name", "vatNumber", "zipCode" ],
         "type" : "object",
         "properties" : {
           "additionalInformations" : {

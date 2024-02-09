@@ -37,8 +37,7 @@ public class OnboardingRequestResource {
     @EqualsAndHashCode(of = "id")
     public static class InstitutionInfo {
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.id}", required = true)
-        @JsonProperty(required = true)
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.id}")
         private String id;
 
         @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
