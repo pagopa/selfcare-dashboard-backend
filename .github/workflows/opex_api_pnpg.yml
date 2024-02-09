@@ -1,6 +1,5 @@
 name: Opex Dashboard PNPG
 
-# Controls when the workflow will run
 on:
   push:
     branches:
@@ -13,10 +12,6 @@ on:
 
 env:
   TEMPLATE_DIR: azure-dashboard
-  ARM_USE_OIDC: true
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID_CD }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   API_NAME: api-selfcare-dashboard-pnpg
   DOCKER_IMAGE_TAG: sha256:04d8ead53c772d23b094c2a395292dc159e6f2905e1b13b5f828f31eac6eb27f
 
@@ -24,19 +19,14 @@ permissions:
   id-token: write
   contents: read
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-22.04
-
     environment: 'prod-cd'
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout
         id: checkout
-        # from https://github.com/actions/checkout/commits/main
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
         with:
           persist-credentials: false
@@ -49,7 +39,6 @@ jobs:
           echo "TERRAFORM_VERSION=`cat .terraform-version`" >> $GITHUB_ENV
 
       - name: Setup Terraform
-        # from https://github.com/hashicorp/setup-terraform/commits/main
         uses: hashicorp/setup-terraform@69c00852f1304c321337f45a105731218c2d5544
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
@@ -59,7 +48,7 @@ jobs:
           environment: prod
           api-name: ${{ env.API_NAME }}
           config: .opex/${{ env.API_NAME }}/env/prod/config.yaml
-          client-id: ${{ secrets.AZURE_CLIENT_ID_CD }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
           docker-version: ${{ env.DOCKER_IMAGE_TAG }}
