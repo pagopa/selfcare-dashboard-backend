@@ -1,0 +1,49 @@
+name: Release PNPG dashboard-backend
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+      - releases/*
+    paths:
+      - '!.devops/**'
+      - '!helm/**'
+      - '!**.md'
+      - '!**ignore'
+      - '!infra/**'
+      - '!.terraform-version'
+      - '!CODEOWNERS'
+
+jobs:
+
+  release_dev:
+    uses: pagopa/selfcare-commons/.github/workflows/call_release_docker.yml@EC-149-template-git-hub-workflows
+    name: '[Dev] DashboardBackend Release'
+    if: startsWith(github.ref_name, 'releases/') != true
+    secrets: inherit
+    with:
+      environment: dev
+      tf_environment: dev-pnpg
+      dir: 'infra'
+
+  release_uat:
+    uses: pagopa/selfcare-commons/.github/workflows/call_release_docker.yml@EC-149-template-git-hub-workflows
+    name: '[UAT] DashboardBackend Release'
+    if: startsWith(github.ref_name, 'releases/')
+    secrets: inherit
+    with:
+      environment: uat
+      tf_environment: uat-pnpg
+      dir: 'infra'
+
+  release_prod:
+    uses: pagopa/selfcare-commons/.github/workflows/call_release_docker.yml@EC-149-template-git-hub-workflows
+    name: '[Prod] DashboardBackend Release'
+    if: startsWith(github.ref_name, 'releases/')
+    secrets: inherit
+    with:
+      environment: prod
+      tf_environment: prod-pnpg
+      dir: 'infra'
