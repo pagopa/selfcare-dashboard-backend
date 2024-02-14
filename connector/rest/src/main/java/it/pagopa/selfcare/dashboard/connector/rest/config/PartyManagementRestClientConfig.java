@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @Import(RestClientBaseConfig.class)
-@EnableFeignClients(clients = PartyManagementRestClient.class)
+@EnableFeignClients(clients = {PartyManagementRestClient.class})
 @PropertySource("classpath:config/party-management-rest-client.properties")
-class PartyManagementRestClientConfig {
+public class PartyManagementRestClientConfig {
 }
