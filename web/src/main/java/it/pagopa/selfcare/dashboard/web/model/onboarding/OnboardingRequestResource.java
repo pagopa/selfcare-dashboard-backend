@@ -23,8 +23,7 @@ public class OnboardingRequestResource {
     @JsonProperty(required = true)
     private InstitutionInfo institutionInfo;
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.manager}", required = true)
-    @JsonProperty(required = true)
+    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.manager}")
     private UserInfo manager;
 
     @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.admins}")
@@ -38,8 +37,7 @@ public class OnboardingRequestResource {
     @EqualsAndHashCode(of = "id")
     public static class InstitutionInfo {
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.id}", required = true)
-        @JsonProperty(required = true)
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.id}")
         private String id;
 
         @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
@@ -79,8 +77,7 @@ public class OnboardingRequestResource {
         @JsonProperty(required = true)
         private String vatNumber;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}", required = true)
-        @JsonProperty(required = true)
+        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}")
         private String recipientCode;
 
         @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData}")
