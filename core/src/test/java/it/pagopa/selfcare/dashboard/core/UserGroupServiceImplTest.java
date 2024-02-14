@@ -1098,4 +1098,46 @@ class UserGroupServiceImplTest {
         verifyNoMoreInteractions(partyConnector);
         Mockito.verifyNoInteractions(groupConnector);
     }
+
+    @Test
+    void deleteMembersByUserId() {
+        //given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String userId = "userId";
+        UserInfo userInfoMock = mockInstance(new UserInfo(), "setId");
+        userInfoMock.setInstitutionId(institutionId);
+        userInfoMock.setId(userId);
+        ProductInfo productInfoMock = mockInstance(new ProductInfo());
+        productInfoMock.setId(productId);
+        Map<String, ProductInfo> products = new HashMap<>();
+        products.put(productInfoMock.getId(), productInfoMock);
+        userInfoMock.setProducts(products);
+        UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
+        filter.setProductId(Optional.of(productId));
+        filter.setUserId(Optional.of(userInfoMock.getId()));
+        when(partyConnector.getUser(anyString()))
+                .thenReturn(userInfoMock);
+        String id1 = randomUUID().toString();
+        String id2 = randomUUID().toString();
+        String id3 = randomUUID().toString();
+        String id4 = randomUUID().toString();
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
+
+        userInfoMock1.setId(id1);
+        userInfoMock2.setId(id2);
+        userInfoMock3.setId(id3);
+        userInfoMock4.setId(id4);
+
+        //when
+        Executable executable = () -> {
+            groupService.deleteMembersByUserId(userId, institutionId, productId);
+            Thread.sleep(1000);
+        };
+        //then
+        assertDoesNotThrow(executable);
+    }
 }

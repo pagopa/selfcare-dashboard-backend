@@ -2,10 +2,8 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,23 +17,12 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 
 @Slf4j
 @Service
-@ConditionalOnProperty(value = "dashboard.user.client.api-version", havingValue = "v2")
 @RequiredArgsConstructor
 public class UserConnectorImpl implements UserApiConnector {
 
 
     private final UserApiRestClient userApiRestClient;
     private final InstitutionMapper institutionMapper;
-    private final UserMapper userMapper;
-
-
-    @Override
-    public void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto) {
-        log.trace("updateUser start");
-        log.debug("updateUser userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toMutableUserFieldsDto(userDto));
-        log.trace("updateUser end");
-    }
 
     @Override
     @ConditionalOnProperty(value = "dashboard.user.client.api-version", havingValue = "v2")
@@ -53,5 +40,29 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");
         return result;
+    }
+
+    @Override
+    public void suspendUserProduct(String userId, String institutionId, String productId) {
+        log.trace("suspend start");
+        log.debug("suspend userId = {}, institutionId = {}", userId, institutionId);
+        userApiRestClient._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.SUSPENDED);
+        log.trace("suspend end");
+    }
+
+    @Override
+    public void activateUserProduct(String userId, String institutionId, String productId) {
+        log.trace("activate start");
+        log.debug("activate userId = {}, institutionId = {}", userId, institutionId);
+        userApiRestClient._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.ACTIVE);
+        log.trace("activate end");
+    }
+
+    @Override
+    public void deleteUserProduct(String userId, String institutionId, String productId) {
+        log.trace("delete start");
+        log.debug("delete userId = {}, institutionId = {}", userId, institutionId);
+        userApiRestClient._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.DELETED);
+        log.trace("delete end");
     }
 }
