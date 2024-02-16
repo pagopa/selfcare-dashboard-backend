@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @Import(RestClientBaseConfig.class)
-@EnableFeignClients(clients = {MsCoreRestClient.class, CoreUserApiRestClient.class, CoreDelegationApiRestClient.class,
+@EnableFeignClients(clients = {CoreUserApiRestClient.class, CoreDelegationApiRestClient.class,
         CoreInstitutionApiRestClient.class, CoreOnboardingApiRestClient.class, CoreManagementApiRestClient.class})
 @PropertySource("classpath:config/ms-core-rest-client.properties")
 public class MsCoreRestClientConfig {

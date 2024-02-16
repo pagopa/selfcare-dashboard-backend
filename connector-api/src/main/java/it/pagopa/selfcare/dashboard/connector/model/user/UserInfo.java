@@ -17,10 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipStat
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(of = "id")
@@ -61,6 +58,15 @@ public class UserInfo {
         public void setAllowedState(Optional<EnumSet<RelationshipState>> allowedStates) {
             this.allowedStates = allowedStates == null ? Optional.empty() : allowedStates;
         }
+    }
+
+    @Data
+    public static class UserInfoFilterV2 {
+        private SelfCareAuthority role;
+        private String productId;
+        private List<String> productRoles;
+        private String userId;
+        private List<RelationshipState> allowedStates = Collections.emptyList();
     }
 
 }
