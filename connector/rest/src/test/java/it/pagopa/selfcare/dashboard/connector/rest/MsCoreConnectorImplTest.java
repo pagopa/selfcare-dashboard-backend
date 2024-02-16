@@ -24,9 +24,9 @@ import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.CoreDelegationApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.CoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionUpdate;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
@@ -39,7 +39,6 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingDa
 import it.pagopa.selfcare.dashboard.connector.rest.model.onboarding.OnboardingUsersRequest;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.rest.model.product.Products;
-import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -86,10 +85,10 @@ class MsCoreConnectorImplTest {
     private MsCoreRestClient msCoreRestClientMock;
 
     @MockBean
-    private MsCoreUserApiRestClient msCoreUserApiRestClientMock;
+    private CoreUserApiRestClient msCoreUserApiRestClientMock;
 
     @MockBean
-    private MsCoreDelegationApiRestClient msCoreInstitutionApiRestClient;
+    private CoreDelegationApiRestClient msCoreInstitutionApiRestClient;
 
     @MockBean
     private BrokerMapper brokerMapper;
@@ -145,7 +144,7 @@ class MsCoreConnectorImplTest {
         assertEquals(0, institutions.size());
         
         verify(msCoreUserApiRestClientMock, times(1))
-                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())));
+                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())));
         verifyNoMoreInteractions(msCoreUserApiRestClientMock);
     }
 
@@ -179,7 +178,7 @@ class MsCoreConnectorImplTest {
         assertEquals(userProductsResponse.getBindings().get(0).getInstitutionId(), institutions.get(0).getId());
 
         verify(msCoreUserApiRestClientMock, times(1))
-                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())));
+                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())));
         verifyNoMoreInteractions(msCoreUserApiRestClientMock);
     }
 
@@ -929,7 +928,7 @@ class MsCoreConnectorImplTest {
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
         Delegation delegation = dummyDelegation();
 
-        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any()))
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
@@ -948,7 +947,7 @@ class MsCoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getBrokerName(), delegationList.get(0).getBrokerName());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null);
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
@@ -961,7 +960,7 @@ class MsCoreConnectorImplTest {
 
         when(delegationResponseEntity.getBody()).thenReturn(null);
 
-        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any()))
+        when(msCoreInstitutionApiRestClient._getDelegationsUsingGET(any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
@@ -972,7 +971,7 @@ class MsCoreConnectorImplTest {
         assertEquals(0, delegationList.size());
 
         verify(msCoreInstitutionApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null);
         verifyNoMoreInteractions(msCoreInstitutionApiRestClient);
     }
 
