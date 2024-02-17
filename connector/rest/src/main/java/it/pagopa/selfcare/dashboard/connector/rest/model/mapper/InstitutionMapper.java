@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,16 +27,13 @@ public interface InstitutionMapper {
     @Mapping(target = "status", source = ".", qualifiedByName = "toStatus")
     InstitutionInfo toInstitutionInfo(InstitutionProducts institutionProducts);
 
-    //TODO:TEST
     List<InstitutionInfo> toInstitutionInfo(List<OnboardedInstitutionResponse> institutionResponse);
 
-    //TODO:TEST
     @Mapping(target = "status", expression = "java(getState(institutionResponse.getState()))")
     @Mapping(target = "category", expression = "java(getCategory(institutionResponse.getAttributes()))")
     @Mapping(target = "geographicTaxonomies", expression = "java(getGeographicTaxonomies(institutionResponse.getGeographicTaxonomies()))")
     InstitutionInfo toInstitutionInfo(OnboardedInstitutionResponse institutionResponse);
 
-    //TODO:TEST
     @Mapping(target = "institutionType", expression = "java(toInstitutionType(institutionResponse.getInstitutionType()))")
     @Mapping(target = "description" , source = "institutionUpdate.description")
     @Mapping(target = "taxCode" , source = "institutionUpdate.taxCode")
@@ -69,11 +67,20 @@ public interface InstitutionMapper {
 
     Billing toBilling(BillingResponse billing);
 
+    @Mapping(target = "onBoardingStatus", expression = "java(toOnboardedProductState(institutionProduct.getState()))")
     PartyProduct toPartyProduct(InstitutionProduct institutionProduct);
 
     @Named("toInstitutionType")
     default InstitutionType toInstitutionType(InstitutionResponse.InstitutionTypeEnum institutionTypeEnum) {
         return InstitutionType.valueOf(institutionTypeEnum.name());
+    }
+
+    @Named("toOnboardedProductState")
+    default ProductOnBoardingStatus toOnboardedProductState(InstitutionProduct.StateEnum stateEnum) {
+        if(stateEnum != null){
+            return ProductOnBoardingStatus.valueOf(stateEnum.getValue());
+        }
+        return null;
     }
 
     @Named("getCategory")

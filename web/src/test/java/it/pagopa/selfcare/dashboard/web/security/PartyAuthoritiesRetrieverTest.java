@@ -3,7 +3,6 @@ package it.pagopa.selfcare.dashboard.web.security;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import org.junit.jupiter.api.Assertions;
@@ -27,9 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class PartyAuthoritiesRetrieverTest {
-
-    @Mock
-    private PartyConnector partyConnectorMock;
 
     @Mock
     private MsCoreConnector msCoreConnector;

@@ -11,7 +11,6 @@ import org.mapstruct.Named;
 public interface DelegationRestClientMapper {
     Delegation toDelegations (it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse delegationResponse);
 
-    //TODO: TEST
     @Mapping(target = "type", expression = "java(toDelegationType(delegation.getType()))")
     DelegationRequest toDelegationRequest(it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest delegation);
 

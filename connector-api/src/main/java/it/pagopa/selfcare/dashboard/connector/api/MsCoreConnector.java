@@ -58,5 +58,5 @@ public interface MsCoreConnector {
 
     void rejectOnboardingRequest(String tokenId);
 
-    Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilterV2 userInfoFilter);
+    Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 }

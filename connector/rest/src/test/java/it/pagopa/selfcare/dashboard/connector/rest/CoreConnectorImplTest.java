@@ -35,7 +35,6 @@ import it.pagopa.selfcare.dashboard.connector.rest.client.CoreDelegationApiRestC
 import it.pagopa.selfcare.dashboard.connector.rest.client.CoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
-import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
@@ -68,9 +67,7 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE;
-import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
-import static it.pagopa.selfcare.dashboard.connector.rest.PartyConnectorImpl.REQUIRED_TOKEN_ID_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.*;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -777,7 +774,7 @@ class CoreConnectorImplTest {
     void getUsers_nullInstitutionId() {
         // given
         String institutionId = null;
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         // when
         Executable executable = () -> msCoreConnector.getUsers(institutionId, userInfoFilter);
         // then
@@ -790,7 +787,7 @@ class CoreConnectorImplTest {
     void getUsers_nullResponse_emptyRole_emptyProductIds_emptyProductRole_emptyUserId() {
         // given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
         when(coreInstitutionApiRestClient._getUserInstitutionRelationshipsUsingGET(institutionId, null, null, ACTIVE.name() +","+ SUSPENDED.name(), null, null))
@@ -809,7 +806,7 @@ class CoreConnectorImplTest {
     void getUsers_nullResponse() {
         // given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         when(coreInstitutionApiRestClient._getUserInstitutionRelationshipsUsingGET(institutionId, null, null, null, null, null))
                 .thenReturn(ResponseEntity.ok().build());
         // when
@@ -826,7 +823,7 @@ class CoreConnectorImplTest {
     void getUsers_notEmptyProductIds() {
         // given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId("productId");
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
@@ -847,7 +844,7 @@ class CoreConnectorImplTest {
     void getUsers_notEmptyProductRoles() {
         // given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductRoles(List.of("api", "security"));
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         when(coreInstitutionApiRestClient._getUserInstitutionRelationshipsUsingGET(institutionId, null, null, ACTIVE.name() +","+ SUSPENDED.name(), null, String.join(",", userInfoFilter.getProductRoles())))
@@ -867,7 +864,7 @@ class CoreConnectorImplTest {
     void getUsers_notEmptyRole(SelfCareAuthority selfCareAuthority) {
         // given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setRole(selfCareAuthority);
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         List<String> partyRoles = new ArrayList<>();
@@ -893,7 +890,7 @@ class CoreConnectorImplTest {
     void getUsers() {
         // given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
         List<RelationshipResult> relationshipsResponse = new ArrayList<>();
@@ -971,9 +968,9 @@ class CoreConnectorImplTest {
     void relationship_info_to_user_info_function() throws IOException {
         // given
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/relationInfo-to-userInfo.json");
-        RelationshipInfo relationshipInfo = mapper.readValue(stub, RelationshipInfo.class);
+        RelationshipResult relationshipInfo = mapper.readValue(stub, RelationshipResult.class);
         // when
-        UserInfo userInfo = PartyConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
+        UserInfo userInfo = CoreConnectorImpl.RELATIONSHIP_INFO_TO_USER_INFO_FUNCTION.apply(relationshipInfo);
         // then
         assertNull(userInfo.getUser());
         assertEquals(relationshipInfo.getState().toString(), userInfo.getStatus());
@@ -997,7 +994,7 @@ class CoreConnectorImplTest {
     void getUser_mergeRoleInfos() throws IOException {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/multi-role.json");
         List<RelationshipResult> relationshipsResponse = mapper.readValue(stub, new TypeReference<>() {});
@@ -1019,7 +1016,7 @@ class CoreConnectorImplTest {
     void getUsers_higherRoleForActiveUsers() throws IOException {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/higher-role-active.json");
         List<RelationshipResult> relationshipsResponse = mapper.readValue(stub, new TypeReference<>() {});
@@ -1040,7 +1037,7 @@ class CoreConnectorImplTest {
     void getUser_getProductFromMerge() throws IOException {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/merge.json");
@@ -1062,7 +1059,7 @@ class CoreConnectorImplTest {
     void getUsers_higherRoleForPendingUsers() throws IOException {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/higher-role-pending.json");
@@ -1083,7 +1080,7 @@ class CoreConnectorImplTest {
     void getUsers_activeRoleUserDifferentStatus() throws IOException {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/active-role-different-status.json");
         List<RelationshipResult> relationshipsResponse = mapper.readValue(stub, new TypeReference<>() {});
@@ -1104,7 +1101,7 @@ class CoreConnectorImplTest {
     void getUsers_activeRoleUserDifferentStatus_2() throws IOException {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
         File stub = ResourceUtils.getFile("classpath:stubs/PartyConnectorImplTest/getUserInstitutionRelationships/active-role-different-status-2.json");
         List<RelationshipResult> relationshipsResponse = mapper.readValue(stub, new TypeReference<>() {});
@@ -1125,7 +1122,7 @@ class CoreConnectorImplTest {
     void getUsers_activeRoleUserDifferentStatus2() {
         //given
         String institutionId = "institutionId";
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
         List<RelationshipResult> relationshipsResponse = new ArrayList<>();
         RelationshipResult relationshipInfo1 = mockInstance(new RelationshipResult(), "setFrom");
@@ -1161,7 +1158,7 @@ class CoreConnectorImplTest {
         String productId = null;
         List<RelationshipState> allowedStates = null;
         //when
-        UserInfo.UserInfoFilterV2 filter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
         filter.setUserId(userId);
         filter.setProductRoles(productRoles);
         filter.setProductId(productId);
@@ -1289,7 +1286,7 @@ class CoreConnectorImplTest {
         roleMock.setProductRole(productRoles);
         roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
-        UserInfo.UserInfoFilterV2 mockUserInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
         mockUserInfoFilter.setProductId(productId);
         mockUserInfoFilter.setUserId(userId);
         mockUserInfoFilter.setAllowedStates(List.of(ACTIVE));
@@ -1469,25 +1466,6 @@ class CoreConnectorImplTest {
     }
 
     @Test
-    void institutionToInstitutionInfoFunction() {
-        // given
-        Institution institutionMock = mockInstance(new Institution());
-        it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionUpdate institutionUpdateMock = mockInstance(new it.pagopa.selfcare.dashboard.connector.rest.model.InstitutionUpdate());
-        // when
-        final InstitutionInfo result = PartyConnectorImpl.INSTITUTION_TO_INSTITUTION_INFO_FUNCTION.apply(institutionMock, institutionUpdateMock);
-        // then
-        assertEquals(institutionMock.getInstitutionType(), result.getInstitutionType());
-        assertEquals(institutionMock.getDescription(), result.getDescription());
-        assertEquals(institutionMock.getTaxCode(), result.getTaxCode());
-        assertEquals(institutionMock.getDigitalAddress(), result.getDigitalAddress());
-        assertEquals(institutionMock.getAddress(), result.getAddress());
-        assertEquals(institutionMock.getZipCode(), result.getZipCode());
-        assertEquals(institutionMock.getPaymentServiceProvider(), result.getPaymentServiceProvider());
-        assertEquals(institutionMock.getDataProtectionOfficer(), result.getDataProtectionOfficer());
-        assertEquals(institutionMock.getBilling(), result.getBilling());
-    }
-
-    @Test
     void getOnboardingRequestInfo_hasNullToken() {
         // given
         String tokenId = null;
@@ -1614,9 +1592,9 @@ class CoreConnectorImplTest {
         roleMock.setPartyRole(partyRole);
         createUserDto.setRoles(Set.of(roleMock));
         UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
-        mockUserInfoFilter.setProductId(Optional.of(productId));
-        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
-        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        mockUserInfoFilter.setProductId(productId);
+        mockUserInfoFilter.setUserId(userId);
+        mockUserInfoFilter.setAllowedStates(List.of(ACTIVE));
         List<RelationshipResult> mockRelationshipsResponse = getRelationshipResults();
         when(coreInstitutionApiRestClient._getUserInstitutionRelationshipsUsingGET(anyString(), any(), any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(mockRelationshipsResponse));
@@ -1656,9 +1634,9 @@ class CoreConnectorImplTest {
         roleMock.setPartyRole(PartyRole.OPERATOR);
         createUserDto.setRoles(Set.of(roleMock));
         UserInfo.UserInfoFilter mockUserInfoFilter = new UserInfo.UserInfoFilter();
-        mockUserInfoFilter.setProductId(Optional.of(productId));
-        mockUserInfoFilter.setUserId(Optional.ofNullable(userId));
-        mockUserInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE)));
+        mockUserInfoFilter.setProductId(productId);
+        mockUserInfoFilter.setUserId(userId);
+        mockUserInfoFilter.setAllowedStates(List.of(ACTIVE));
         RelationshipResult mockRelationshipResult = new RelationshipResult();
         mockRelationshipResult.setFrom("from");
         mockRelationshipResult.setId("id");

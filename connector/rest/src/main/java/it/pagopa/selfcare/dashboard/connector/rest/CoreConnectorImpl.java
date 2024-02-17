@@ -333,7 +333,7 @@ class CoreConnectorImpl implements MsCoreConnector {
 
         Map<Person.RoleEnum, List<Person>> partyRoleToUsersMap = getPartyRoleListMap(userId, userDto);
 
-        UserInfo.UserInfoFilterV2 userInfoFilter = new UserInfo.UserInfoFilterV2();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
         userInfoFilter.setUserId(userId);
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
@@ -486,7 +486,7 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilterV2 userInfoFilter) {
+    public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);

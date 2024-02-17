@@ -30,43 +30,13 @@ public class UserInfo {
     private String status;
     private String institutionId;
 
-
     @Data
     public static class UserInfoFilter {
-        private Optional<SelfCareAuthority> role = Optional.empty();
-        private Optional<String> productId = Optional.empty();
-        private Optional<Set<String>> productRoles = Optional.empty();
-        private Optional<String> userId = Optional.empty();
-        private Optional<EnumSet<RelationshipState>> allowedStates = Optional.empty();
-
-        public void setRole(Optional<SelfCareAuthority> role) {
-            this.role = role == null ? Optional.empty() : role;
-        }
-
-        public void setProductId(Optional<String> productId) {
-            this.productId = productId == null ? Optional.empty() : productId;
-        }
-
-        public void setProductRoles(Optional<Set<String>> productRoles) {
-            this.productRoles = productRoles == null ? Optional.empty() : productRoles;
-        }
-
-        public void setUserId(Optional<String> userId) {
-            this.userId = userId == null ? Optional.empty() : userId;
-        }
-
-        public void setAllowedState(Optional<EnumSet<RelationshipState>> allowedStates) {
-            this.allowedStates = allowedStates == null ? Optional.empty() : allowedStates;
-        }
-    }
-
-    @Data
-    public static class UserInfoFilterV2 {
         private SelfCareAuthority role;
         private String productId;
         private List<String> productRoles;
         private String userId;
-        private List<RelationshipState> allowedStates = Collections.emptyList();
+        private List<RelationshipState> allowedStates;
     }
 
 }
