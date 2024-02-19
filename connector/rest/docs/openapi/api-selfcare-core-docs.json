@@ -930,11 +930,10 @@
           "in" : "query",
           "description" : "List of Institution to onboard",
           "required" : true,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -1169,13 +1168,10 @@
           "description" : "states",
           "required" : false,
           "style" : "form",
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
-
-            }
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         } ],
         "responses" : {
@@ -1368,47 +1364,42 @@
           "in" : "query",
           "description" : "roles",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
           }
         }, {
           "name" : "states",
           "in" : "query",
           "description" : "states",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
-
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         }, {
           "name" : "products",
           "in" : "query",
           "description" : "products",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "productRoles",
           "in" : "query",
           "description" : "productRoles",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -2567,12 +2558,11 @@
           "in" : "query",
           "description" : "List of Relationship state for filter products",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         } ],
         "responses" : {
@@ -2641,46 +2631,42 @@
           "in" : "query",
           "description" : "roles",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
           }
         }, {
           "name" : "states",
           "in" : "query",
           "description" : "states",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         }, {
           "name" : "products",
           "in" : "query",
           "description" : "products",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "productRoles",
           "in" : "query",
           "description" : "productRoles",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -3455,46 +3441,42 @@
           "in" : "query",
           "description" : "roles",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
           }
         }, {
           "name" : "states",
           "in" : "query",
           "description" : "states",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         }, {
           "name" : "products",
           "in" : "query",
           "description" : "products",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "productRoles",
           "in" : "query",
           "description" : "productRoles",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -3865,11 +3847,10 @@
           "in" : "query",
           "description" : "List of Relationship state for filter products",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -4528,11 +4509,10 @@
           "in" : "query",
           "description" : "productsFilter",
           "required" : true,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -4606,11 +4586,10 @@
           "in" : "query",
           "description" : "productsFilter",
           "required" : true,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "userId",
@@ -4673,12 +4652,11 @@
           "in" : "query",
           "description" : "${swagger.mscore.token.model.states}",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           }
         }, {
           "name" : "page",
@@ -5505,11 +5483,9 @@
           "description" : "List of Relationship state for filter products",
           "required" : false,
           "style" : "form",
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -5652,11 +5628,10 @@
           "in" : "query",
           "description" : "List of Relationship state for filter products",
           "required" : false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {

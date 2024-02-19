@@ -17,9 +17,4 @@ public interface UserService {
     UserId saveUser(String institutionId, SaveUserDto userDto);
 
     void deleteById(String userId);
-
-    UserInfo findByRelationshipId(String relationshipId, EnumSet<User.Fields> fieldList);
-
-    Collection<UserInfo> findByInstitutionId(String institutionId, UserInfo.UserInfoFilter userInfoFilter, EnumSet<User.Fields> fieldList);
-
 }
