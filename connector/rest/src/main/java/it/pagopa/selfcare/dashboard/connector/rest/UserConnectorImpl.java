@@ -46,7 +46,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void suspendUserProduct(String userId, String institutionId, String productId) {
         log.trace("suspend start");
         log.debug("suspend userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.SUSPENDED);
+        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED);
         log.trace("suspend end");
     }
 
@@ -54,7 +54,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void activateUserProduct(String userId, String institutionId, String productId) {
         log.trace("activate start");
         log.debug("activate userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.ACTIVE);
+        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE);
         log.trace("activate end");
     }
 
@@ -62,7 +62,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void deleteUserProduct(String userId, String institutionId, String productId) {
         log.trace("delete start");
         log.debug("delete userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.DELETED);
+        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED);
         log.trace("delete end");
     }
 }

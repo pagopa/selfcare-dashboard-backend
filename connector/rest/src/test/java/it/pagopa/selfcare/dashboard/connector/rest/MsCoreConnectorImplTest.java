@@ -144,7 +144,7 @@ class MsCoreConnectorImplTest {
         assertEquals(0, institutions.size());
         
         verify(msCoreUserApiRestClientMock, times(1))
-                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq((ACTIVE.name()+","+PENDING.name()+","+TOBEVALIDATED.name())));
+                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(List.of(ACTIVE.name(),PENDING.name(),TOBEVALIDATED.name())));
         verifyNoMoreInteractions(msCoreUserApiRestClientMock);
     }
 
@@ -178,7 +178,7 @@ class MsCoreConnectorImplTest {
         assertEquals(userProductsResponse.getBindings().get(0).getInstitutionId(), institutions.get(0).getId());
 
         verify(msCoreUserApiRestClientMock, times(1))
-                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(ACTIVE.name()+","+ PENDING.name()+","+ TOBEVALIDATED.name()));
+                ._getUserProductsInfoUsingGET(eq(userId), isNull(), eq(List.of(ACTIVE.name(),PENDING.name(),TOBEVALIDATED.name())));
         verifyNoMoreInteractions(msCoreUserApiRestClientMock);
     }
 

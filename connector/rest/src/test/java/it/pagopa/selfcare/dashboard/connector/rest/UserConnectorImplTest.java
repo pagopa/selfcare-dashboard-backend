@@ -94,7 +94,7 @@ class UserConnectorImplTest {
         userConnector.suspendUserProduct(userId, institutionId, productId);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.SUSPENDED);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId,  OnboardedProductState.SUSPENDED);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -110,7 +110,7 @@ class UserConnectorImplTest {
         userConnector.activateUserProduct(userId, institutionId, productId);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.ACTIVE);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -126,7 +126,7 @@ class UserConnectorImplTest {
         userConnector.deleteUserProduct(userId, institutionId, productId);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdStatusPut(userId, institutionId, productId, null, null, OnboardedProductState.DELETED);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
