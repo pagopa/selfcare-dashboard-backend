@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Broker;
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerPsp;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.BrokerResponse;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import org.mapstruct.Mapper;
@@ -17,7 +18,11 @@ public interface BrokerMapper {
 
     @Mapping(source = "id", target = "code")
     BrokerInfo fromInstitution(Institution institution);
-    List<BrokerInfo> fromInstitutions(List<Institution> institutions);
+
+    @Mapping(source = "id", target = "code")
+    BrokerInfo fromInstitution(BrokerResponse institutions);
+
+    List<BrokerInfo> fromInstitutions(List<BrokerResponse> institutions);
 
     @Mapping(source = "brokerPspCode", target = "code")
     BrokerInfo fromBrokerPSPResource(BrokerPsp brokerPspResource);
