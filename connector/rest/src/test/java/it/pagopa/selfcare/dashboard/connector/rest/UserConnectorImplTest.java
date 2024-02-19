@@ -40,7 +40,7 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsNotFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
@@ -48,7 +48,7 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
         UserProductsResponse userProductsResponse = getUserProductsResponse();
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
@@ -84,7 +84,7 @@ class UserConnectorImplTest {
 
     @Test
     void suspend() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
 
         // given
         String userId = "userId";
@@ -100,7 +100,7 @@ class UserConnectorImplTest {
 
     @Test
     void activate() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
 
         // given
         String userId = "userId";
@@ -116,7 +116,7 @@ class UserConnectorImplTest {
 
     @Test
     void delete() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
 
         // given
         String userId = "userId";

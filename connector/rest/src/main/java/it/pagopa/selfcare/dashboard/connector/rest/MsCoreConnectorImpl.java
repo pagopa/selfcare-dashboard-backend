@@ -81,7 +81,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     public List<InstitutionInfo> getUserProducts(String userId) {
         log.trace("getUserProducts start");
         UserProductsResponse productsInfoUsingGET = msCoreUserApiRestClient._getUserProductsInfoUsingGET(userId, null,
-                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+                String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
 
         if(Objects.isNull(productsInfoUsingGET) ||
                 Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
