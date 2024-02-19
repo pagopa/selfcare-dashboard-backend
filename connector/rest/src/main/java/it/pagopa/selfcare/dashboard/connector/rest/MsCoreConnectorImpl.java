@@ -14,9 +14,9 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreDelegationApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.CoreDelegationApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.CoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.client.MsCoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.model.RelationshipsResponse;
@@ -47,17 +47,17 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution description is required";
 
     private final MsCoreRestClient msCoreRestClient;
-    private final MsCoreUserApiRestClient msCoreUserApiRestClient;
+    private final CoreUserApiRestClient msCoreUserApiRestClient;
     private final BrokerMapper brokerMapper;
     private final InstitutionMapper institutionMapper;
 
-    private final MsCoreDelegationApiRestClient msCoreDelegationApiRestClient;
+    private final CoreDelegationApiRestClient msCoreDelegationApiRestClient;
 
    private final DelegationRestClientMapper delegationMapper;
 
 
     @Autowired
-    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, MsCoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper, BrokerMapper brokerMapper, MsCoreDelegationApiRestClient msCoreInstitutionApiRestClient, DelegationRestClientMapper delegationMapper) {
+    public MsCoreConnectorImpl(MsCoreRestClient msCoreRestClient, CoreUserApiRestClient msCoreUserApiRestClient, InstitutionMapper institutionMapper, BrokerMapper brokerMapper, CoreDelegationApiRestClient msCoreInstitutionApiRestClient, DelegationRestClientMapper delegationMapper) {
         this.msCoreRestClient = msCoreRestClient;
         this.msCoreUserApiRestClient = msCoreUserApiRestClient;
         this.institutionMapper = institutionMapper;
@@ -81,7 +81,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     public List<InstitutionInfo> getUserProducts(String userId) {
         log.trace("getUserProducts start");
         UserProductsResponse productsInfoUsingGET = msCoreUserApiRestClient._getUserProductsInfoUsingGET(userId, null,
-                String.join(",", ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
 
         if(Objects.isNull(productsInfoUsingGET) ||
                 Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
@@ -227,7 +227,7 @@ class MsCoreConnectorImpl implements MsCoreConnector {
     public List<Delegation> getDelegations(String from, String to, String productId) {
         log.trace("getDelegations start");
         log.debug("getDelegations productId = {}, type = {}", from, productId);
-        List<DelegationResponse> delegationsResponse = msCoreDelegationApiRestClient._getDelegationsUsingGET(from, to, productId).getBody();
+        List<DelegationResponse> delegationsResponse = msCoreDelegationApiRestClient._getDelegationsUsingGET(from, to, productId, null).getBody();
 
         if(Objects.isNull(delegationsResponse))
             return List.of();
