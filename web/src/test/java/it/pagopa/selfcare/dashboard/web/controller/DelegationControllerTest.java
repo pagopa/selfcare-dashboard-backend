@@ -63,7 +63,7 @@ class DelegationControllerTest {
         delegationRequest.setType(DelegationType.PT);
         String content = (new ObjectMapper()).writeValueAsString(delegationRequest);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/delegations")
+                .post("/v1/delegations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
         MvcResult result =  MockMvcBuilders.standaloneSetup(delegationController)
@@ -92,7 +92,7 @@ class DelegationControllerTest {
         DelegationRequestDto delegationRequest = new DelegationRequestDto();
         String content = (new ObjectMapper()).writeValueAsString(delegationRequest);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/delegations")
+                .post("/v1/delegations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
         MockMvcBuilders.standaloneSetup(delegationController)
@@ -115,7 +115,7 @@ class DelegationControllerTest {
         delegationRequest.setType(DelegationType.UO);
         String content = (new ObjectMapper()).writeValueAsString(delegationRequest);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/delegations")
+                .post("/v1/delegations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
         MockMvcBuilders.standaloneSetup(delegationController)

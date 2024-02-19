@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {ProductController.class, WebTestConfig.class, BrokerResourceMapperImpl.class})
 class ProductControllerTest {
 
-    private static final String BASE_URL = "/products";
+    private static final String BASE_URL = "/v1/products";
 
     @Autowired
     protected MockMvc mvc;
