@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/relationships", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/relationships", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "relationships")
 public class RelationshipController {
 
