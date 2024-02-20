@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.CertifiableFieldResourceOfstring;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.CertificationEnum;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserRegistryFieldsDto;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.WorkContactResource;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,7 +21,7 @@ public interface UserMapper {
     @Mapping(target = "name", expression = "java(toCertifiableFieldResourceOfString(userDto.getName()))")
     @Mapping(target = "familyName", expression = "java(toCertifiableFieldResourceOfString(userDto.getFamilyName()))")
     @Mapping(target = "workContacts", expression = "java(toWorkContacts(userDto.getWorkContacts()))")
-    it.pagopa.selfcare.user.generated.openapi.v1.dto.MutableUserFieldsDto toMutableUserFieldsDto(MutableUserFieldsDto userDto);
+    UserRegistryFieldsDto toMutableUserFieldsDto(MutableUserFieldsDto userDto);
 
     @Named("toCertifiableFieldResourceOfString")
     default CertifiableFieldResourceOfstring toCertifiableFieldResourceOfString(CertifiedField<String> field){
