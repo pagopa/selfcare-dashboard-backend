@@ -3,30 +3,42 @@ package it.pagopa.selfcare.dashboard.web.security;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
-
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {SelfCarePermissionEvaluator.class})
 class SelfCarePermissionEvaluatorTest {
 
-    @Mock
+    @MockBean
     MsCoreConnector msCoreConnector;
 
-    private final SelfCarePermissionEvaluator permissionEvaluator = new SelfCarePermissionEvaluator(msCoreConnector);
+    @Autowired
+    SelfCarePermissionEvaluator permissionEvaluator;
 
 
     @Test
@@ -315,6 +327,50 @@ class SelfCarePermissionEvaluatorTest {
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
         assertTrue(hasPermission);
+    }
+
+    @Test
+    void hasPermission_withTargetId_targetTypeRelationshipId_notPermitted_invalidRole() {
+        // given
+        Serializable targetId = "relationshipId";
+        String targetType = "relationshipId";
+        Object permission = LIMITED.toString();
+        UserInfo userInfo = getUserInfo();
+        when(msCoreConnector.getUser(anyString())).thenReturn(userInfo);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(targetId.toString(), roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        // when
+        boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
+        // then
+        assertFalse(hasPermission);
+    }
+
+
+    @Test
+    void hasPermission_withTargetId_targetTypeRelationshipId_permitted() {
+        // given
+        Serializable targetId = "relationshipId";
+        String targetType = "relationshipId";
+        Object permission = ADMIN.toString();
+        UserInfo userInfo = getUserInfo();
+        when(msCoreConnector.getUser(anyString())).thenReturn(userInfo);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "productId"));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("institutionId", roleOnProducts));
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", authorities);
+        // when
+        boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
+        // then
+        assertTrue(hasPermission);
+    }
+
+    private static UserInfo getUserInfo() {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setInstitutionId("institutionId");
+        Map<String, ProductInfo> map = new HashMap<>();
+        map.put("productId", new ProductInfo());
+        userInfo.setProducts(map);
+        return userInfo;
     }
 
 }

@@ -4,7 +4,6 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.PermissionEvaluator;
