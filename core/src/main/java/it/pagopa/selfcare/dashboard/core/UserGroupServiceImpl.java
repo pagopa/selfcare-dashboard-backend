@@ -239,9 +239,9 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.trace("deleteMembersByUserId start");
         log.debug("deleteMembersByUserId userId = {}", userId);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(Optional.of(productId));
-        userInfoFilter.setUserId(Optional.of(userId));
-        Collection<UserInfo> users = partyConnector.getUsers(institutionId, userInfoFilter);
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setUserId(userId);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
         if (users.isEmpty()) {
             groupConnector.deleteMembers(userId, institutionId, productId);
         }

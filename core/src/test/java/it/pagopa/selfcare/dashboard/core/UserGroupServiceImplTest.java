@@ -1110,8 +1110,8 @@ class UserGroupServiceImplTest {
         products.put(productInfoMock.getId(), productInfoMock);
         userInfoMock.setProducts(products);
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
-        filter.setProductId(Optional.of(productId));
-        filter.setUserId(Optional.of(userInfoMock.getId()));
+        filter.setProductId(productId);
+        filter.setUserId(userInfoMock.getId());
         when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         String id1 = randomUUID().toString();

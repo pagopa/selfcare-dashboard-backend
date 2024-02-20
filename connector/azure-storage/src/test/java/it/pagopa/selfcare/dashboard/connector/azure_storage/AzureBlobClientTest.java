@@ -6,12 +6,10 @@ import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import it.pagopa.selfcare.dashboard.connector.exception.FileUploadException;
-
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -20,11 +18,10 @@ import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
-@SpringBootTest
-public class AzureBlobClientTest {
+class AzureBlobClientTest {
 
     @Test
-    public void uploadInstitutionLogo_ok() throws URISyntaxException, InvalidKeyException, FileUploadException, IOException, NoSuchFieldException, IllegalAccessException, StorageException {
+    void uploadInstitutionLogo_ok() throws URISyntaxException, InvalidKeyException, FileUploadException, IOException, NoSuchFieldException, IllegalAccessException, StorageException {
         // given
         AzureBlobClient blobClient = new AzureBlobClient("UseDevelopmentStorage=true;", "$web");
         CloudBlockBlob blockBlobMock = Mockito.mock(CloudBlockBlob.class);
@@ -49,7 +46,7 @@ public class AzureBlobClientTest {
 
 
     @Test
-    public void uploadInstitutionLogo_ko() throws URISyntaxException, InvalidKeyException, FileUploadException, IOException, NoSuchFieldException, IllegalAccessException, StorageException {
+    void uploadInstitutionLogo_ko() throws URISyntaxException, InvalidKeyException, FileUploadException, IOException, NoSuchFieldException, IllegalAccessException, StorageException {
         // given
         AzureBlobClient blobClient = new AzureBlobClient("UseDevelopmentStorage=true;", "$web");
         CloudBlobClient blobClientMock = Mockito.mock(CloudBlobClient.class);
