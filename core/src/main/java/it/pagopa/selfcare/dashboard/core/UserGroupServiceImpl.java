@@ -213,8 +213,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     @Async
     public void deleteMembersByRelationshipId(String relationshipId) {
-        log.trace("deleteMembers start");
-        log.debug("deleteMembers relationshipId = {}", relationshipId);
+        log.trace("deleteMembersByRelationshipId start");
+        log.debug("deleteMembersByRelationshipId relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, "A relationshipId is required");
         UserInfo user = msCoreConnector.getUser(relationshipId);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
@@ -230,7 +230,22 @@ public class UserGroupServiceImpl implements UserGroupService {
         if (users.isEmpty()) {
             groupConnector.deleteMembers(userId, institutionId, productId);
         }
-        log.trace("deleteMembers end");
+        log.trace("deleteMembersByRelationshipId end");
+    }
+
+    @Override
+    @Async
+    public void deleteMembersByUserId(String userId, String institutionId, String productId) {
+        log.trace("deleteMembersByUserId start");
+        log.debug("deleteMembersByUserId userId = {}", userId);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setUserId(userId);
+        Collection<UserInfo> users = msCoreConnector.getUsers(institutionId, userInfoFilter);
+        if (users.isEmpty()) {
+            groupConnector.deleteMembers(userId, institutionId, productId);
+        }
+        log.trace("deleteMembersByUserId end");
     }
 
 }
