@@ -2,9 +2,11 @@ package it.pagopa.selfcare.dashboard.web.security;
 
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SelfCarePermissionEvaluatorTest {
 
-    private final SelfCarePermissionEvaluator permissionEvaluator = new SelfCarePermissionEvaluator();
+    @Mock
+    MsCoreConnector msCoreConnector;
+
+    private final SelfCarePermissionEvaluator permissionEvaluator = new SelfCarePermissionEvaluator(msCoreConnector);
 
 
     @Test
