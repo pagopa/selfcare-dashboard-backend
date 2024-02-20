@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class UserV2Controller {
     @PostMapping(value = "/{userId}/suspend")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void suspendRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("userId") String userId,
                                     @ApiParam("${swagger.dashboard.support.model.institutionId}")
@@ -67,6 +69,7 @@ public class UserV2Controller {
     @PostMapping(value = "/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                      @PathVariable("userId") String userId,
                                      @RequestParam(value = "institutionId") String institutionId,
@@ -82,6 +85,7 @@ public class UserV2Controller {
     @DeleteMapping(value = "/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.id}")
                                        @PathVariable("userId") String userId,
                                        @RequestParam(value = "institutionId") String institutionId,
