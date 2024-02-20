@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
@@ -54,7 +54,7 @@ class UserGroupServiceImplTest {
     private UserGroupConnector groupConnector;
 
     @MockBean
-    private PartyConnector partyConnector;
+    private MsCoreConnector partyConnector;
 
     @MockBean
     private UserRegistryConnector userRegistryConnector;
@@ -99,11 +99,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(userGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(userGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(userGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
@@ -138,11 +138,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(userGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(userGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(userGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(partyConnector);
         Mockito.verifyNoInteractions(groupConnector);
     }
@@ -228,7 +228,7 @@ class UserGroupServiceImplTest {
         String id2 = randomUUID().toString();
         String id3 = randomUUID().toString();
         String id4 = randomUUID().toString();
-        List<String> userIds = List.of(id1.toString(), id2, id3, id4);
+        List<String> userIds = List.of(id1, id2, id3, id4);
         userGroup.setMembers(userIds);
 
         UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
@@ -259,11 +259,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(foundGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verify(groupConnector, times(1))
                 .updateUserGroup(anyString(), any());
         verifyNoMoreInteractions(partyConnector, groupConnector);
@@ -308,11 +308,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(foundGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verify(groupConnector, times(1))
                 .getUserGroupById(anyString());
         verifyNoMoreInteractions(partyConnector, groupConnector);
@@ -403,11 +403,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
@@ -471,7 +471,7 @@ class UserGroupServiceImplTest {
         assertEquals(foundGroup.getName(), groupInfo.getName());
         assertEquals(foundGroup.getMembers(), groupInfo.getMembers());
         assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock.getId().toString(), groupInfo.getCreatedBy().getId());
+        assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
         assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
         assertNull(groupInfo.getModifiedBy());
         verify(groupConnector, times(1))
@@ -485,11 +485,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
@@ -576,11 +576,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(partyConnector, userRegistryConnector, groupConnector);
     }
 
@@ -621,10 +621,6 @@ class UserGroupServiceImplTest {
         Optional<String> institutionId = Optional.of("institutionId");
         UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
         foundGroup.setId(groupId);
-        UUID id1 = randomUUID();
-        UUID id2 = randomUUID();
-        UUID id3 = randomUUID();
-        UUID id4 = randomUUID();
         UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
         UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
         userInfoMock1.setId("createdBy");
@@ -692,11 +688,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
 
         verifyNoMoreInteractions(groupConnector, partyConnector);
     }
@@ -748,11 +744,11 @@ class UserGroupServiceImplTest {
         verify(partyConnector, times(1))
                 .getUsers(eq(institutionId.get()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertEquals(Optional.empty(), capturedFilter.getUserId());
-        assertEquals(Optional.empty(), capturedFilter.getProductRoles());
-        assertEquals(Optional.empty(), capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId().get());
-        assertEquals(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)), capturedFilter.getAllowedStates());
+        assertNull(capturedFilter.getUserId());
+        assertNull(capturedFilter.getProductRoles());
+        assertNull(capturedFilter.getRole());
+        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
+        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(groupConnector, partyConnector);
     }
 
@@ -953,8 +949,8 @@ class UserGroupServiceImplTest {
         products.put(productInfoMock.getId(), productInfoMock);
         userInfoMock.setProducts(products);
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
-        filter.setProductId(Optional.of(productId));
-        filter.setUserId(Optional.of(userInfoMock.getId()));
+        filter.setProductId(productId);
+        filter.setUserId(userInfoMock.getId());
         when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         //when
@@ -1024,8 +1020,8 @@ class UserGroupServiceImplTest {
         products.put(productInfoMock.getId(), productInfoMock);
         userInfoMock.setProducts(products);
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
-        filter.setProductId(Optional.of(productId));
-        filter.setUserId(Optional.of(userInfoMock.getId()));
+        filter.setProductId(productId);
+        filter.setUserId(userInfoMock.getId());
         when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         when(partyConnector.getUsers(anyString(), any()))
@@ -1062,8 +1058,8 @@ class UserGroupServiceImplTest {
         products.put(productInfoMock.getId(), productInfoMock);
         userInfoMock.setProducts(products);
         UserInfo.UserInfoFilter filter = new UserInfo.UserInfoFilter();
-        filter.setProductId(Optional.of(productId));
-        filter.setUserId(Optional.of(userInfoMock.getId()));
+        filter.setProductId(productId);
+        filter.setUserId(userInfoMock.getId());
         when(partyConnector.getUser(anyString()))
                 .thenReturn(userInfoMock);
         String id1 = randomUUID().toString();

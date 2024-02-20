@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/pnPGInstitutions", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/pnPGInstitutions", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "pnPGInstitutions")
 public class PnPGInstitutionController {
 

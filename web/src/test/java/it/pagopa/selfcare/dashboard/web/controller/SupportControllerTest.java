@@ -67,7 +67,7 @@ class SupportControllerTest {
         supportRequest.setEmail("test@gmail.com");
         String content = (new ObjectMapper()).writeValueAsString(supportRequest);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/support")
+                .post("/v1/support")
                 .principal(authentication)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
@@ -91,7 +91,7 @@ class SupportControllerTest {
         supportRequest.setEmail("pp");
         String content = (new ObjectMapper()).writeValueAsString(supportRequest);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/support")
+                .post("/v1/support")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
         MockMvcBuilders.standaloneSetup(supportController)

@@ -13,7 +13,7 @@ ingress:
   hosts:
     - host: selc.internal.dev.selfcare.pagopa.it
       paths:
-        - path: /dashboard/v1/(.*)
+        - path: /dashboard/(.*)
           pathType: ImplementationSpecific
 
 resources:

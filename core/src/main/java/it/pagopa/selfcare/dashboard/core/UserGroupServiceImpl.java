@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
@@ -12,8 +12,8 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
@@ -29,6 +28,7 @@ import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserGroupServiceImpl implements UserGroupService {
 
     private static final EnumSet<User.Fields> MEMBER_FIELD_LIST = EnumSet.of(name, familyName, workContacts);
@@ -38,23 +38,15 @@ public class UserGroupServiceImpl implements UserGroupService {
 
     private final UserGroupConnector groupConnector;
     private final UserRegistryConnector userRegistryConnector;
-    private final PartyConnector partyConnector;
-
-
-    @Autowired
-    public UserGroupServiceImpl(UserGroupConnector groupConnector, UserRegistryConnector userRegistryConnector, PartyConnector partyConnector) {
-        this.groupConnector = groupConnector;
-        this.userRegistryConnector = userRegistryConnector;
-        this.partyConnector = partyConnector;
-    }
+    private final MsCoreConnector msCoreConnector;
 
     @Override
     public String createUserGroup(CreateUserGroup group) {
         log.trace("createUserGroup start");
         log.debug("createUserGroup group = {}", group);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(Optional.of(group.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
+        userInfoFilter.setProductId(group.getProductId());
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
         List<String> retrievedId = retrievedIds(group.getInstitutionId(), userInfoFilter);
 
@@ -88,13 +80,13 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     private List<String> retrievedIds(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
-        Collection<UserInfo> retrievedUsers = partyConnector.getUsers(
+        Collection<UserInfo> retrievedUsers = msCoreConnector.getUsers(
                 institutionId,
                 userInfoFilter);
         return retrievedUsers.stream()
                 .map(UserInfo::getId)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -113,8 +105,8 @@ public class UserGroupServiceImpl implements UserGroupService {
         UserGroupInfo userGroupInfo = groupConnector.getUserGroupById(groupId);
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
+        userInfoFilter.setProductId(userGroupInfo.getProductId());
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
         List<String> retrievedId = retrievedIds(userGroupInfo.getInstitutionId(), userInfoFilter);
 
@@ -135,8 +127,8 @@ public class UserGroupServiceImpl implements UserGroupService {
         Assert.notNull(userId, "A userId is required");
         UserGroupInfo retrievedGroup = groupConnector.getUserGroupById(groupId);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(Optional.of(retrievedGroup.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
+        userInfoFilter.setProductId(retrievedGroup.getProductId());
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         List<String> retrievedIds = retrievedIds(retrievedGroup.getInstitutionId(), userInfoFilter);
         if (!retrievedIds.contains(userId.toString())) {
             throw new InvalidMemberListException("This user is not allowed for this group");
@@ -170,11 +162,11 @@ public class UserGroupServiceImpl implements UserGroupService {
         Comparator<UserInfo> userInfoComparator = Comparator.comparing(UserInfo::getId);
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(Optional.of(userGroupInfo.getProductId()));
-        userInfoFilter.setAllowedState(Optional.of(EnumSet.of(ACTIVE, SUSPENDED)));
-        List<UserInfo> userInfos = partyConnector.getUsers(userGroupInfo.getInstitutionId(), userInfoFilter).stream()
+        userInfoFilter.setProductId(userGroupInfo.getProductId());
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
+        List<UserInfo> userInfos = msCoreConnector.getUsers(userGroupInfo.getInstitutionId(), userInfoFilter).stream()
                 .sorted(userInfoComparator)
-                .collect(Collectors.toList());
+                .toList();
         userGroupInfo.setMembers(userGroupInfo.getMembers().stream()
                 .map(userInfo -> {
                     int index = Collections.binarySearch(userInfos, userInfo, userInfoComparator);
@@ -188,7 +180,7 @@ public class UserGroupServiceImpl implements UserGroupService {
                     userInfos.get(index).setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), MEMBER_FIELD_LIST));
                     return userInfos.get(index);
                 }).filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+                .toList());
         User createdBy = userRegistryConnector.getUserByInternalId(userGroupInfo.getCreatedBy().getId(), FIELD_LIST);
         userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
@@ -224,7 +216,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.trace("deleteMembersByRelationshipId start");
         log.debug("deleteMembersByRelationshipId relationshipId = {}", relationshipId);
         Assert.hasText(relationshipId, "A relationshipId is required");
-        UserInfo user = partyConnector.getUser(relationshipId);
+        UserInfo user = msCoreConnector.getUser(relationshipId);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         String productId = user.getProducts().keySet().iterator().next();
         Assert.notNull(productId, "A product Id is required");
@@ -232,9 +224,9 @@ public class UserGroupServiceImpl implements UserGroupService {
         Assert.notNull(institutionId, "An institution id is required");
         String userId = user.getId();
         Assert.notNull(userId, "A user id is required");
-        userInfoFilter.setProductId(Optional.of(productId));
-        userInfoFilter.setUserId(Optional.ofNullable(user.getId()));
-        Collection<UserInfo> users = partyConnector.getUsers(user.getInstitutionId(), userInfoFilter);
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setUserId(user.getId());
+        Collection<UserInfo> users = msCoreConnector.getUsers(user.getInstitutionId(), userInfoFilter);
         if (users.isEmpty()) {
             groupConnector.deleteMembers(userId, institutionId, productId);
         }

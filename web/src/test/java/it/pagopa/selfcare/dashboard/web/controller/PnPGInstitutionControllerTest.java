@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {PnPGInstitutionController.class, WebTestConfig.class, DashboardExceptionsHandler.class})
 class PnPGInstitutionControllerTest {
 
-    private static final String BASE_URL = "/pnPGInstitutions";
+    private static final String BASE_URL = "/v1/pnPGInstitutions";
 
     @Autowired
     protected MockMvc mvc;

@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = {UserGroupController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {UserGroupController.class, WebTestConfig.class, DashboardExceptionsHandler.class})
 class UserGroupControllerTest {
-    private static final String BASE_URL = "/user-groups";
+    private static final String BASE_URL = "/v1/user-groups";
 
     @Autowired
     protected MockMvc mvc;

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @ContextConfiguration(classes = {TokenController.class, WebTestConfig.class})
 class TokenControllerTest {
 
-    private static final String BASE_URL = "/token";
+    private static final String BASE_URL = "/v1/token";
 
     @Autowired
     protected MockMvc mvc;
