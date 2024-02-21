@@ -3990,7 +3990,7 @@
         "properties" : {
           "geographicTaxonomyDtoList" : {
             "type" : "array",
-            "description" : "List of institution's geographic taxonomies  ",
+            "description" : "List of institution's geographic taxonomies",
             "items" : {
               "$ref" : "#/components/schemas/GeographicTaxonomyDto"
             }
