@@ -876,13 +876,13 @@
     "/delegations/{delegationId}" : {
       "delete" : {
         "tags" : [ "Delegation" ],
-        "summary" : "${swagger.mscore.delegation.delete}",
-        "description" : "${swagger.mscore.delegation.delete}",
+        "summary" : "Il servizio elimina un'associazione tra l'ente ed il partner tecnologico",
+        "description" : "Il servizio elimina un'associazione tra l'ente ed il partner tecnologico",
         "operationId" : "deleteDelegationUsingDELETE",
         "parameters" : [ {
           "name" : "delegationId",
           "in" : "path",
-          "description" : "${swagger.mscore.delegation.model.delegationId}",
+          "description" : "Identificativo interno della delega",
           "required" : true,
           "style" : "simple",
           "schema" : {
