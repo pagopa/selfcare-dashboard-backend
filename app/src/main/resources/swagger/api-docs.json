@@ -4056,6 +4056,9 @@
           "dataProtectionOfficer" : {
             "$ref" : "#/components/schemas/DataProtectionOfficer"
           },
+          "delegation" : {
+            "type" : "boolean"
+          },
           "description" : {
             "type" : "string"
           },
@@ -4234,6 +4237,11 @@
           "county" : {
             "type" : "string",
             "description" : "Institution's county"
+          },
+          "delegation" : {
+            "type" : "boolean",
+            "description" : "Institution's delegation presence",
+            "example" : false
           },
           "externalId" : {
             "type" : "string",
