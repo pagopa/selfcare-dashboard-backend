@@ -124,7 +124,7 @@
                         </goals>
                         <phase>process-resources</phase>
                         <configuration>
-                            <inputSpec>${project.basedir}/docs/openapi/api-user-docs.json</inputSpec>
+                            <inputSpec>${project.basedir}/docs/openapi/selfcare-user-docs.json</inputSpec>
                             <generatorName>spring</generatorName>
                             <library>spring-cloud</library>
                             <modelNameSuffix />

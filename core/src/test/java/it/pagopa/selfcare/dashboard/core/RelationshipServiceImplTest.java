@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.api.PartyConnector;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RelationshipServiceImplTest {
 
     @Mock
-    private PartyConnector partyConnectorMock;
+    private MsCoreConnector partyConnectorMock;
 
     @InjectMocks
     private RelationshipServiceImpl relationshipService;

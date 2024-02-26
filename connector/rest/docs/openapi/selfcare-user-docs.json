@@ -523,6 +523,64 @@
         ]
       }
     },
+    "/users/{id}/institution/{institutionId}/product/{productId}/status": {
+      "put": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Service to update user product status",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "institutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OnboardedProductState"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
     "/users/{id}/status": {
       "put": {
         "tags": [
@@ -622,7 +680,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserRegistryFieldsDto"
+                "$ref": "#/components/schemas/MutableUserFieldsDto"
               }
             }
           }
@@ -816,6 +874,9 @@
           "institutionRootName": {
             "type": "string"
           },
+          "userMailUuid": {
+            "type": "string"
+          },
           "products": {
             "type": "array",
             "items": {
@@ -834,7 +895,7 @@
         "type": "string",
         "example": "2022-03-10T12:15:50.000Z"
       },
-      "UserRegistryFieldsDto": {
+      "MutableUserFieldsDto": {
         "type": "object",
         "properties": {
           "birthDate": {
@@ -929,6 +990,12 @@
             "type": "string"
           },
           "institutionDescription": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          },
+          "userMailUuid": {
             "type": "string"
           },
           "products": {

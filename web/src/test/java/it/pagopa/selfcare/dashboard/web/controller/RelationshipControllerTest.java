@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(classes = {RelationshipController.class, WebTestConfig.class})
 class RelationshipControllerTest {
 
-    private static final String BASE_URL = "/relationships";
+    private static final String BASE_URL = "/v1/relationships";
 
     @Autowired
     protected MockMvc mvc;

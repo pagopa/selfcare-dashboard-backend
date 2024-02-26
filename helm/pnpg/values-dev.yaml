@@ -11,7 +11,7 @@ ingress:
   hosts:
     - host: "dev01.pnpg.internal.dev.selfcare.pagopa.it"
       paths:
-        - path: /dashboard/v1/(.*)
+        - path: /dashboard/(.*)
           pathType: ImplementationSpecific
 
 autoscaling:

@@ -68,7 +68,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {InstitutionController.class, DelegationMapperImpl.class, WebTestConfig.class, DashboardExceptionsHandler.class, InstitutionResourceMapperImpl.class})
 class InstitutionControllerTest {
 
-    private static final String BASE_URL = "/institutions";
+    private static final String BASE_URL = "/v1/institutions";
     private static final ProductTree PRODUCT;
 
     static {

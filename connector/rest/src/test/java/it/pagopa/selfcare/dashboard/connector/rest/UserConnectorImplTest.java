@@ -11,6 +11,7 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +20,12 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.List;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {UserConnectorImpl.class, InstitutionMapperImpl.class, UserMapper.class})
@@ -33,25 +37,10 @@ class UserConnectorImplTest {
 
     UserConnectorImpl userConnector;
 
-    @Test
-    void updateUserOK() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
-        when(userApiRestClient._usersIdUserRegistryPut(eq("userID"),eq("InstitutionId"), any(UserRegistryFieldsDto.class)))
-                .thenReturn(ResponseEntity.ok().build());
-        Assertions.assertDoesNotThrow(() -> userConnector.updateUser("userID", "InstitutionId", new MutableUserFieldsDto()));
-    }
-
-    @Test
-    void updateUserKO() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
-        when(userApiRestClient._usersIdUserRegistryPut(eq("userID"),eq("InstitutionId"), any(UserRegistryFieldsDto.class)))
-                .thenThrow(ResourceNotFoundException.class);
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.updateUser("userID", "InstitutionId", new MutableUserFieldsDto()));
-    }
 
     @Test
     void getUserProductsNotFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
@@ -59,7 +48,7 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), new UserMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
         UserProductsResponse userProductsResponse = getUserProductsResponse();
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
@@ -92,4 +81,54 @@ class UserConnectorImplTest {
         onboardedProductResponse2.setStatus(OnboardedProductState.PENDING);
         return List.of(onboardedProductResponse, onboardedProductResponse2);
     }
+
+    @Test
+    void suspend() {
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+
+        // given
+        String userId = "userId";
+        String institutionId = "id1";
+        String productId = "prod-pagopa";
+        // when
+        userConnector.suspendUserProduct(userId, institutionId, productId);
+        // then
+        verify(userApiRestClient, times(1))
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId,  OnboardedProductState.SUSPENDED);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void activate() {
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+
+        // given
+        String userId = "userId";
+        String institutionId = "id1";
+        String productId = "prod-pagopa";
+        // when
+        userConnector.activateUserProduct(userId, institutionId, productId);
+        // then
+        verify(userApiRestClient, times(1))
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void delete() {
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+
+        // given
+        String userId = "userId";
+        String institutionId = "id1";
+        String productId = "prod-pagopa";
+        // when
+        userConnector.deleteUserProduct(userId, institutionId, productId);
+        // then
+        verify(userApiRestClient, times(1))
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/onboarding-requests", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/onboarding-requests", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "onboarding")
 public class OnboardingController {
 

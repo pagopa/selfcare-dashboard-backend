@@ -19,7 +19,7 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/support", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/support", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "support")
 public class SupportController {
 
