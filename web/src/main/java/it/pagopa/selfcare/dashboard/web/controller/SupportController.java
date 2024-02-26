@@ -3,9 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.core.SupportService;
 import it.pagopa.selfcare.dashboard.web.model.mapper.SupportMapper;
 import it.pagopa.selfcare.dashboard.web.model.support.SupportRequestDto;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/support", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/support", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "support")
 public class SupportController {
 
@@ -32,11 +32,11 @@ public class SupportController {
         this.supportMapper = supportMapper;
     }
 
-    @Tag(name = "external-v2")
-    @PostMapping
+    @Tags({@Tag(name = "external-v2"), @Tag(name = "support")})
+    @PostMapping(produces = MediaType.TEXT_HTML_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
-    public SupportResponse sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
+    public String sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
                                               Authentication authentication) {
         log.trace("sendSupportRequest start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
@@ -44,6 +44,6 @@ public class SupportController {
         String url = supportService.sendRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
         log.debug("sendSupportRequest result = {}", url);
         log.trace("sendSupportRequest end");
-        return SupportResponse.builder().redirectUrl(url).build();
+        return url;
     }
 }

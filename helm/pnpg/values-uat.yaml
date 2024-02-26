@@ -12,7 +12,7 @@ ingress:
   hosts:
     - host: "uat01.pnpg.internal.uat.selfcare.pagopa.it"
       paths:
-        - path: /dashboard/v1/(.*)
+        - path: /dashboard/(.*)
           pathType: ImplementationSpecific
 
 autoscaling:

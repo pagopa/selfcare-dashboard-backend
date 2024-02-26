@@ -1,9 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.model.institution.DataProtectionOfficer;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.PaymentServiceProvider;
-import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
@@ -39,6 +36,7 @@ public class OnboardingRequestMapper {
                             .ifPresent(userInfos -> resource.setAdmins(userInfos.stream()
                                     .map(userInfo -> toResource(userInfo.getUser(), institutionId))
                                     .collect(Collectors.toList())));
+                    resource.setProductId(model.getProductId());
                     return resource;
                 }).orElse(null);
     }
@@ -65,6 +63,7 @@ public class OnboardingRequestMapper {
                             });
                     resource.setPspData(toResource(model.getPaymentServiceProvider()));
                     resource.setDpoData(toResource(model.getDataProtectionOfficer()));
+                    resource.setAdditionalInformations(toResource(model.getAdditionalInformations()));
                     return resource;
                 }).orElse(null);
     }
@@ -91,6 +90,23 @@ public class OnboardingRequestMapper {
                     resource.setAddress(dpo.getAddress());
                     resource.setEmail(dpo.getEmail());
                     resource.setPec(dpo.getPec());
+                    return resource;
+                }).orElse(null);
+    }
+
+    public static OnboardingRequestResource.InstitutionInfo.AdditionalInformations toResource(AdditionalInformations model) {
+        return Optional.ofNullable(model)
+                .map(additionaInformations -> {
+                    final OnboardingRequestResource.InstitutionInfo.AdditionalInformations resource = new OnboardingRequestResource.InstitutionInfo.AdditionalInformations();
+                    resource.setIpa(additionaInformations.isIpa());
+                    resource.setIpaCode(additionaInformations.getIpaCode());
+                    resource.setOtherNote(additionaInformations.getOtherNote());
+                    resource.setBelongRegulatedMarket(additionaInformations.isBelongRegulatedMarket());
+                    resource.setRegulatedMarketNote(additionaInformations.getRegulatedMarketNote());
+                    resource.setAgentOfPublicService(additionaInformations.isAgentOfPublicService());
+                    resource.setAgentOfPublicServiceNote(additionaInformations.getAgentOfPublicServiceNote());
+                    resource.setEstablishedByRegulatoryProvision(additionaInformations.isEstablishedByRegulatoryProvision());
+                    resource.setEstablishedByRegulatoryProvisionNote(additionaInformations.getEstablishedByRegulatoryProvisionNote());
                     return resource;
                 }).orElse(null);
     }

@@ -25,6 +25,17 @@
           "address": "via del campo",
           "zipCode": "string",
           "taxCode": "string",
+          "additionalInformations" : {
+            "belongRegulatedMarket" : true,
+            "regulatedMarketNote" :  "string",
+            "ipa" : true,
+            "ipaCode" : "string",
+            "establishedByRegulatoryProvision" : true,
+            "establishedByRegulatoryProvisionNote" : "string",
+            "agentOfPublicService" : true,
+            "agentOfPublicServiceNote" : "string",
+            "otherNote" : "string"
+          },
           "paymentServiceProvider": {
             "abiCode": "string",
             "businessRegisterNumber": "string",

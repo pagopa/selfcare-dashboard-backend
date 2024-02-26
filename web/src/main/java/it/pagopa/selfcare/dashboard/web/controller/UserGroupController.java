@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/user-groups", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/user-groups", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "user-groups")
 public class UserGroupController {
 

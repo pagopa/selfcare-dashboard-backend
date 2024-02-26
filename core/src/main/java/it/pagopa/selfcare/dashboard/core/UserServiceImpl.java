@@ -98,30 +98,4 @@ public class UserServiceImpl implements UserService {
         userConnector.deleteById(userId);
         log.trace("deleteById end");
     }
-
-    @Override
-    public UserInfo findByRelationshipId(String relationshipId, EnumSet<User.Fields> fieldList) {
-        log.trace("findByRelationshipId start");
-        log.debug("findByRelationshipId = {}", relationshipId);
-        final UserInfo userInfo = msCoreConnector.getUser(relationshipId);
-        userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId(), fieldList));
-        log.debug("findByRelationshipId result = {}", userInfo);
-        log.trace("findByRelationshipId end");
-        return userInfo;
-    }
-
-    @Override
-    public Collection<UserInfo> findByInstitutionId(String institutionId, UserInfo.UserInfoFilter userInfoFilter, EnumSet<User.Fields> fieldList) {
-        log.trace("findByInstitutionId start");
-        log.debug("findByInstitutionId institutionId = {}, role = {}, productId = {}, productRoles = {}, userId = {}", institutionId, userInfoFilter.getRole(), userInfoFilter.getProductId(), userInfoFilter.getProductRoles(), userInfoFilter.getUserId());
-        Assert.hasText(institutionId, "An Institution id is required");
-        Collection<UserInfo> userInfos = msCoreConnector.getUsers(institutionId, userInfoFilter).stream()
-                .peek(userInfo -> {
-                    userInfo.setUser(userConnector.getUserByInternalId(userInfo.getId(), fieldList));
-                }).collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "findByInstitutionId result = {}", userInfos);
-        log.trace("findByInstitutionId end");
-        return userInfos;
-    }
-
 }

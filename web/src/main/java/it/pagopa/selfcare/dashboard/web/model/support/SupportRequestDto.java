@@ -18,4 +18,10 @@ public class SupportRequestDto {
     @ApiModelProperty(value = "${swagger.dashboard.support.model.productId}")
     private String productId;
 
+    @ApiModelProperty(value = "${swagger.dashboard.support.model.userId}")
+    private String userId;
+
+    @ApiModelProperty(value = "${swagger.dashboard.support.model.institutionId}")
+    private String institutionId;
+
 }

@@ -8,11 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/relationships", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/relationships", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "relationships")
 public class RelationshipController {
 
@@ -28,6 +29,7 @@ public class RelationshipController {
     @PostMapping(value = "/{relationshipId}/suspend")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}")
+    @PreAuthorize("hasPermission(#relationshipId, 'relationshipId', 'ADMIN')")
     public void suspendRelationship(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
                                     @PathVariable("relationshipId")
                                             String relationshipId) {
@@ -43,6 +45,7 @@ public class RelationshipController {
     @PostMapping(value = "/{relationshipId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}")
+    @PreAuthorize("hasPermission(#relationshipId, 'relationshipId', 'ADMIN')")
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
                                      @PathVariable("relationshipId")
                                              String relationshipId) {
@@ -57,6 +60,7 @@ public class RelationshipController {
     @DeleteMapping(value = "/{relationshipId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
+    @PreAuthorize("hasPermission(#relationshipId, 'relationshipId', 'ADMIN')")
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.relationshipId}")
                                        @PathVariable("relationshipId")
                                                String relationshipId) {
