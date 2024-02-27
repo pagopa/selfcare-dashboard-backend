@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "User API (development)",
+    "title": "user-ms API",
     "version": "1.0.0"
   },
   "paths": {
@@ -468,6 +468,46 @@
         ]
       }
     },
+    "/users/search": {
+      "post": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Search user by fiscalCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
     "/users/{id}": {
       "get": {
         "tags": [
@@ -505,6 +545,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
+    "/users/{id}/details": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Retrieves user's information from pdv: name, familyName, email, fiscalCode and workContacts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetailResponse"
                 }
               }
             }
@@ -839,6 +920,17 @@
           }
         }
       },
+      "CertifiableFieldResponseString": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "certified": {
+            "type": "boolean"
+          }
+        }
+      },
       "CertificationEnum": {
         "enum": [
           "NONE",
@@ -924,9 +1016,6 @@
           "productId": {
             "type": "string"
           },
-          "relationshipId": {
-            "type": "string"
-          },
           "tokenId": {
             "type": "string"
           },
@@ -976,6 +1065,43 @@
           "UPDATE"
         ],
         "type": "string"
+      },
+      "SearchUserDto": {
+        "required": [
+          "fiscalCode"
+        ],
+        "type": "object",
+        "properties": {
+          "fiscalCode": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fiscalCode": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/CertifiableFieldResponseString"
+          },
+          "familyName": {
+            "$ref": "#/components/schemas/CertifiableFieldResponseString"
+          },
+          "email": {
+            "$ref": "#/components/schemas/CertifiableFieldResponseString"
+          },
+          "workContacts": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/WorkContactResponse"
+            }
+          }
+        }
       },
       "UserInstitutionResponse": {
         "type": "object",
@@ -1145,6 +1271,14 @@
         "properties": {
           "email": {
             "$ref": "#/components/schemas/CertifiableFieldResourceOfstring"
+          }
+        }
+      },
+      "WorkContactResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "$ref": "#/components/schemas/CertifiableFieldResponseString"
           }
         }
       }

@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
@@ -11,21 +11,22 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {UserConnectorImpl.class, InstitutionMapperImpl.class, UserMapper.class})
@@ -37,10 +38,13 @@ class UserConnectorImplTest {
 
     UserConnectorImpl userConnector;
 
+    @Spy
+    UserMapper userMapper = new UserMapperImpl();
+
 
     @Test
     void getUserProductsNotFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
@@ -48,7 +52,7 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
         UserProductsResponse userProductsResponse = getUserProductsResponse();
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
@@ -84,7 +88,8 @@ class UserConnectorImplTest {
 
     @Test
     void suspend() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+
 
         // given
         String userId = "userId";
@@ -100,7 +105,8 @@ class UserConnectorImplTest {
 
     @Test
     void activate() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+
 
         // given
         String userId = "userId";
@@ -116,7 +122,8 @@ class UserConnectorImplTest {
 
     @Test
     void delete() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl());
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+
 
         // given
         String userId = "userId";
@@ -130,5 +137,36 @@ class UserConnectorImplTest {
         verifyNoMoreInteractions(userApiRestClient);
     }
 
+    @Test
+    void getUserById(){
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+
+        //given
+        String userId = "userId";
+        UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
+        when(userApiRestClient._usersIdDetailsGet(anyString())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        //when
+        User user = userConnector.getUserById(userId);
+        //then
+        assertNotNull(user);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId);
+    }
+
+    @Test
+    void search(){
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+        //given
+        String fiscalCode = "fiscalCode";
+        UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
+        when(userApiRestClient._usersSearchPost(any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        //when
+        User user = userConnector.searchByFiscalCode(fiscalCode);
+        //then
+        assertNotNull(user);
+        ArgumentCaptor<SearchUserDto> searchUserDtoArgumentCaptor = ArgumentCaptor.forClass(SearchUserDto.class);
+        verify(userApiRestClient, times(1))._usersSearchPost(searchUserDtoArgumentCaptor.capture());
+        SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
+        assertEquals(fiscalCode, captured.getFiscalCode());
+    }
 
 }
