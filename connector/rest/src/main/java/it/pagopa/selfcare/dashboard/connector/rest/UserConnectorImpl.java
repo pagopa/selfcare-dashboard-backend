@@ -62,9 +62,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public User searchByFiscalCode(String fiscalCode) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
-        SearchUserDto request = new SearchUserDto();
-        request.setFiscalCode(fiscalCode);
-        User user = userMapper.toUser(userApiRestClient._usersSearchPost(new SearchUserDto(fiscalCode)).getBody());
+        User user = userMapper.toUser(userApiRestClient._usersSearchPost(SearchUserDto.builder().fiscalCode(fiscalCode).build()).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return user;

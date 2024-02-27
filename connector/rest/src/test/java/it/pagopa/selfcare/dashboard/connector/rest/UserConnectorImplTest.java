@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -41,10 +42,15 @@ class UserConnectorImplTest {
     @Spy
     UserMapper userMapper = new UserMapperImpl();
 
+    @BeforeEach
+    void setup(){
+        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+    }
+
 
     @Test
     void getUserProductsNotFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
@@ -52,7 +58,6 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsFound() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
         UserProductsResponse userProductsResponse = getUserProductsResponse();
         when(userApiRestClient._usersUserIdProductsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
@@ -88,8 +93,6 @@ class UserConnectorImplTest {
 
     @Test
     void suspend() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
-
 
         // given
         String userId = "userId";
@@ -105,8 +108,6 @@ class UserConnectorImplTest {
 
     @Test
     void activate() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
-
 
         // given
         String userId = "userId";
@@ -122,8 +123,6 @@ class UserConnectorImplTest {
 
     @Test
     void delete() {
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
-
 
         // given
         String userId = "userId";
@@ -139,7 +138,6 @@ class UserConnectorImplTest {
 
     @Test
     void getUserById(){
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
 
         //given
         String userId = "userId";
@@ -154,7 +152,6 @@ class UserConnectorImplTest {
 
     @Test
     void search(){
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
         //given
         String fiscalCode = "fiscalCode";
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
