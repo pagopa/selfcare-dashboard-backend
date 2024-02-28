@@ -28,10 +28,10 @@ public class UserConnectorImpl implements UserApiConnector {
 
     private final UserApiRestClient userApiRestClient;
     private final InstitutionMapper institutionMapper;
+
     private final UserMapper userMapper;
 
     @Override
-    @ConditionalOnProperty(value = "dashboard.user.client.api-version", havingValue = "v2")
     public List<InstitutionInfo> getUserProducts(String userId) {
         log.trace("getUserProducts start");
         UserProductsResponse productsInfoUsingGET = userApiRestClient._usersUserIdProductsGet(userId, null,
