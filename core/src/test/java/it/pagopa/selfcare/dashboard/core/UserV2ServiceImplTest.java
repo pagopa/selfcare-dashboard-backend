@@ -4,6 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -95,5 +96,32 @@ class UserV2ServiceImplTest {
         Mockito.verify(userGroupService, Mockito.times(1))
                 .deleteMembersByUserId(userId, institutionid, productId);
         Mockito.verifyNoMoreInteractions(userApiConnector, userGroupService);
+    }
+
+    @Test
+    void getById(){
+        //given
+        String userId = "userId";
+        User user = mockInstance(new User());
+        when(userApiConnector.getUserById(anyString())).thenReturn(user);
+        //when
+        User result = userService.getUserById(userId);
+        //then
+        assertNotNull(result);
+        assertEquals(user, result);
+        verify(userApiConnector, times(1)).getUserById(userId);
+    }
+
+    @Test
+    void searchByFiscalCode(){
+        String fiscalCode = "fiscalCode";
+        User user = mockInstance(new User());
+        when(userApiConnector.searchByFiscalCode(anyString())).thenReturn(user);
+        //when
+        User result = userService.searchUserByFiscalCode(fiscalCode);
+        //then
+        assertNotNull(result);
+        assertEquals(user, result);
+        verify(userApiConnector, times(1)).searchByFiscalCode(fiscalCode);
     }
 }
