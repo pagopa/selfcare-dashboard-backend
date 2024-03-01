@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +31,7 @@ public class UserConnectorImpl implements UserApiConnector {
     private final InstitutionMapper institutionMapper;
 
     private final UserMapper userMapper;
+
 
     @Override
     public List<InstitutionInfo> getUserProducts(String userId) {
