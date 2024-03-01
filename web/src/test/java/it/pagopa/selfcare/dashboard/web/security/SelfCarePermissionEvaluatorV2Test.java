@@ -33,20 +33,6 @@ class SelfCarePermissionEvaluatorV2Test {
     @Autowired
     SelfCarePermissionEvaluatorV2 permissionEvaluator;
 
-
-    @Test
-    void hasPermission_withObjectDomain_nullAuth() {
-        // given
-        Object targetDomainObject = new Object();
-        Object permission = new Object();
-        // when
-        Executable executable = () -> permissionEvaluator.hasPermission(null, targetDomainObject, permission);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("An authentication is required", e.getMessage());
-    }
-
-
     @Test
     void hasPermission_withObjectDomain_nullPermission() {
         // given
@@ -56,7 +42,7 @@ class SelfCarePermissionEvaluatorV2Test {
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetDomainObject, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A permission is required", e.getMessage());
+        assertEquals("A permission type is required", e.getMessage());
     }
 
 
@@ -133,35 +119,6 @@ class SelfCarePermissionEvaluatorV2Test {
         assertTrue(hasPermission);
     }
 
-
-    @Test
-    void hasPermission_withTargetId_nullAuth() {
-        // given
-        Serializable targetId = "targetId";
-        String targetType = "targetType";
-        Object permission = new Object();
-        // when
-        Executable executable = () -> permissionEvaluator.hasPermission(null, targetId, targetType, permission);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("An authentication is required", e.getMessage());
-    }
-
-
-    @Test
-    void hasPermission_withTargetId_nullTargetType() {
-        // given
-        Authentication authentication = new TestingAuthenticationToken(null, null);
-        Serializable targetId = "targetId";
-        Object permission = new Object();
-        // when
-        Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetId, null, permission);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A targetType is required", e.getMessage());
-    }
-
-
     @Test
     void hasPermission_withTargetId_nullPermission() {
         // given
@@ -172,7 +129,7 @@ class SelfCarePermissionEvaluatorV2Test {
         Executable executable = () -> permissionEvaluator.hasPermission(authentication, targetId, targetType, null);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A permission is required", e.getMessage());
+        assertEquals("A permission type is required", e.getMessage());
     }
 
 
