@@ -5,6 +5,63 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/authorize/{institutionId}": {
+      "get": {
+        "tags": [
+          "User Permission Controller"
+        ],
+        "summary": "Get permission for a user in an institution",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          {
+            "name": "permission",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/PermissionTypeEnum"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
     "/institutions/{institutionId}/products/{productId}/createdAt": {
       "put": {
         "tags": [
@@ -296,6 +353,40 @@
                   }
                 }
               }
+            }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Create or Update user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {}
             }
           },
           "401": {
@@ -945,6 +1036,32 @@
         ],
         "type": "string"
       },
+      "CreateUserDto": {
+        "required": [
+          "institutionId",
+          "user",
+          "product"
+        ],
+        "type": "object",
+        "properties": {
+          "institutionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "institutionDescription": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          }
+        }
+      },
       "Env": {
         "enum": [
           "ROOT",
@@ -1059,6 +1176,35 @@
         ],
         "type": "string"
       },
+      "PermissionTypeEnum": {
+        "enum": [
+          "ADMIN",
+          "ANY"
+        ],
+        "type": "string"
+      },
+      "Product": {
+        "required": [
+          "productId",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PartyRole"
+          },
+          "tokenId": {
+            "type": "string"
+          },
+          "productRole": {
+            "type": "string"
+          }
+        }
+      },
       "QueueEvent": {
         "enum": [
           "ADD",
@@ -1073,6 +1219,37 @@
         "type": "object",
         "properties": {
           "fiscalCode": {
+            "pattern": "\\S",
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "familyName",
+          "fiscalCode",
+          "name",
+          "institutionEmail"
+        ],
+        "type": "object",
+        "properties": {
+          "birthDate": {
+            "type": "string"
+          },
+          "familyName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "fiscalCode": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "institutionEmail": {
+            "minLength": 1,
             "type": "string"
           }
         }
