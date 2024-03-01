@@ -12,6 +12,7 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.PermissionTypeEnum;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class UserConnectorImpl implements UserApiConnector {
     private final InstitutionMapper institutionMapper;
 
     private final UserMapper userMapper;
+
 
     @Override
     public List<InstitutionInfo> getUserProducts(String userId) {
