@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,26 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.debug("suspend userId = {} for institutionId = {} and product = {}", userId, institutionId, productId);
         userApiConnector.suspendUserProduct(userId, institutionId, productId);
         log.trace("suspend end");
+    }
+
+    @Override
+    public User getUserById(String userId) {
+        log.trace("getUserById start");
+        log.debug("getUserById id = {}", userId);
+        User user = userApiConnector.getUserById(userId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
+        log.trace("getUserById end");
+        return user;
+    }
+
+    @Override
+    public User searchUserByFiscalCode(String fiscalCode) {
+        log.trace("searchByFiscalCode start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
+        User user = userApiConnector.searchByFiscalCode(fiscalCode);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
+        log.trace("searchByFiscalCode end");
+        return user;
     }
 
 }
