@@ -12,9 +12,14 @@ import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
+import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
+import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
+import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,6 +35,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.Matchers.in;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,7 +47,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {UserV2Controller.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {UserV2Controller.class, InstitutionResourceMapperImpl.class, WebTestConfig.class})
+@ContextConfiguration(classes = {UserV2Controller.class, InstitutionResourceMapperImpl.class, WebTestConfig.class, UserMapperV2Impl.class})
 class UserV2ControllerTest {
 
     @Autowired
@@ -52,6 +59,9 @@ class UserV2ControllerTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Spy
+    UserMapperV2 userMapperV2 = new UserMapperV2Impl();
 
     private static final String BASE_URL = "/v2";
 
@@ -165,6 +175,49 @@ class UserV2ControllerTest {
         assertEquals(0, result.getResponse().getContentLength());
         Mockito.verify(userServiceMock, Mockito.times(1))
                 .deleteUserProduct(userId, institutionid, productId);
+        Mockito.verifyNoMoreInteractions(userServiceMock);
+    }
+
+    @Test
+    void getUserById() throws Exception {
+        //given
+        String userId = "userId";
+        when(userServiceMock.getUserById(any())).thenReturn(USER_RESOURCE);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL+"/{id}", userId)
+                .contentType(APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andReturn();
+        //then
+        UserResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
+        assertNotNull(resource);
+        assertNotNull(resource.getId());
+        verify(userServiceMock, times(1)).getUserById(userId);
+
+    }
+
+    @Test
+    void search() throws Exception {
+        //given
+        String externalId = "externalId";
+        SearchUserDto externalIdDto = new SearchUserDto();
+        externalIdDto.setFiscalCode(externalId);
+        Mockito.when(userServiceMock.searchUserByFiscalCode(Mockito.anyString()))
+                .thenReturn(USER_RESOURCE);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .post(BASE_URL + "/search")
+                        .content(objectMapper.writeValueAsString(externalIdDto))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        //then
+        UserResource userResponse = objectMapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
+        assertNotNull(userResponse);
+        Mockito.verify(userServiceMock, Mockito.times(1))
+                .searchUserByFiscalCode(externalId);
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 

@@ -2,9 +2,11 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.CertifiableFieldResourceOfstring;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.CertificationEnum;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDetailResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.WorkContactResource;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -41,5 +43,7 @@ public interface UserMapper {
         }
         return resourceMap;
     }
+
+    User toUser(UserDetailResponse response);
 
 }
