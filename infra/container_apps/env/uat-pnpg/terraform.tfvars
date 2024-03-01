@@ -18,6 +18,58 @@ container_app = {
 }
 
 app_settings = [
+  {
+    name  = "APPLICATIONINSIGHTS_ROLE_NAME"
+    value = "b4f-dashboard"
+  },
+  {
+    name  = "JAVA_TOOL_OPTIONS"
+    value = "-javaagent:/applicationinsights-agent.jar"
+  },
+  {
+    name  = "APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL"
+    value = "OFF"
+  },
+  {
+    name  = "B4F_ONBOARDING_LOG_LEVEL"
+    value = "DEBUG"
+  },
+  {
+    name  = "REST_CLIENT_LOGGER_LEVEL"
+    value = "FULL"
+  },
+  {
+    name  = "JWT_TOKEN_EXCHANGE_ISSUER"
+    value = "https://pnpg.uat.selfcare.pagopa.it"
+  },
+  {
+    name  = "PUBLIC_FILE_STORAGE_BASE_URL"
+    value = "https://selcuweupnpgcheckoutsa.z6.web.core.windows.net"
+  },
+  {
+    name  = "JWT_ISSUER"
+    value = "https://hub-login.spid.dev.pn.pagopa.it"
+  },
+  {
+    name  = "REST_CLIENT_READ_TIMEOUT"
+    value = "30000"
+  },
+  {
+    name  = "REST_CLIENT_CONNECT_TIMEOUT"
+    value = "30000"
+  },
+  {
+    name  = "USER_STATES_FILTER"
+    value = "ACTIVE,SUSPENDED"
+  },
+  {
+    name  = "SUPPORT_API_ZENDESK_REDIRECT_URI"
+    value = "https://send.assistenza.pagopa.it/hc/it/requests/new"
+  },
+  {
+    name  = "SUPPORT_API_ZENDESK_ORGANIZATION"
+    value = "_users_hc_send"
+  }
 ]
 
 secrets_names = [
