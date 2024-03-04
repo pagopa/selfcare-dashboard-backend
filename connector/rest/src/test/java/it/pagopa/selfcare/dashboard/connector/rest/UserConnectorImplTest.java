@@ -4,6 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundExceptio
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,8 +27,6 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -39,6 +37,9 @@ class UserConnectorImplTest {
     @Mock
     UserApiRestClient userApiRestClient;
 
+    @Mock
+    UserPermissionRestClient userPermissionRestClient;
+
 
     UserConnectorImpl userConnector;
 
@@ -47,7 +48,7 @@ class UserConnectorImplTest {
 
     @BeforeEach
     void setup(){
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+        userConnector = new UserConnectorImpl(userApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
     }
 
 
@@ -167,6 +168,34 @@ class UserConnectorImplTest {
         verify(userApiRestClient, times(1))._usersSearchPost(searchUserDtoArgumentCaptor.capture());
         SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
         assertEquals(fiscalCode, captured.getFiscalCode());
+    }
+
+    @Test
+    void hasPermissionTrue() {
+        //given
+        String institutionId = "institutionId";
+        String permission = "ADMIN";
+        String productId = "productId";
+        when(userPermissionRestClient._authorizeInstitutionIdGet(institutionId, PermissionTypeEnum.ADMIN, productId)).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(institutionId, permission, productId);
+        //then
+        assertNotNull(result);
+        assertEquals(true, result);
+    }
+
+    @Test
+    void hasPermissionFalse() {
+        //given
+        String institutionId = "institutionId";
+        String permission = "ADMIN";
+        String productId = "productId";
+        when(userPermissionRestClient._authorizeInstitutionIdGet(institutionId, PermissionTypeEnum.ADMIN, productId)).thenReturn(new ResponseEntity<>(false, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(institutionId, permission, productId);
+        //then
+        assertNotNull(result);
+        assertEquals(false, result);
     }
 
 }

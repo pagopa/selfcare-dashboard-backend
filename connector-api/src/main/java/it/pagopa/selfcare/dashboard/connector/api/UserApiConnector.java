@@ -19,4 +19,6 @@ public interface UserApiConnector {
     void activateUserProduct(String userId, String institutionId, String productId);
 
     void deleteUserProduct(String userId, String institutionId, String productId);
+
+    Boolean hasPermission(String institutionId, String permission, String productId);
 }
