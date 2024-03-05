@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {OnboardingController.class, WebTestConfig.class, DashboardExceptionsHandler.class})
 class OnboardingControllerTest {
 
-    private static final String BASE_URL = "/onboarding-requests";
+    private static final String BASE_URL = "/v1/onboarding-requests";
 
     @Autowired
     protected MockMvc mvc;

@@ -87,4 +87,7 @@ public class InstitutionResource {
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.county}")
     private String county;
 
+    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.delegation}")
+    private boolean delegation;
+
 }

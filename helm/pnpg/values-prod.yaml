@@ -13,7 +13,7 @@ ingress:
   hosts:
     - host: "prod01.pnpg.internal.selfcare.pagopa.it"
       paths:
-        - path: /dashboard/v1/(.*)
+        - path: /dashboard/(.*)
           pathType: ImplementationSpecific
           
 autoscaling:
