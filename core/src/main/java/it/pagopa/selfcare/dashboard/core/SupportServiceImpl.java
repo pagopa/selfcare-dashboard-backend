@@ -104,29 +104,6 @@ public class SupportServiceImpl implements SupportService {
             log.error("Impossible to sign zendesk jwt. Error: {}", e.getMessage(), e);
             throw new SupportException(e.getMessage());
         }
-
-        String redirectToProduct = Objects.nonNull(supportRequest.getProductId()) ?
-                returnTo.concat("?product=" + supportRequest.getProductId()) : returnTo;
-
-        Map<String, String> map = new HashMap<>();
-        map.put("jwt", jwtString);
-        map.put("returnTo", redirectToProduct);
-        map.put("action", redirectUrl);
-
-        String html;
-
-        try {
-            Template freemarkerTemplate = freeMarkerConfigurer.getConfiguration()
-                    .getTemplate("/template-zendesk-form.ftl");
-            html = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerTemplate, map);
-        } catch (Exception e){
-            String errorMessage = "Impossible to retrieve zendesk form template";
-            log.error(errorMessage);
-            throw new SupportException(errorMessage, e);
-        }
-
-        log.trace("sendRequest end");
-        return html;
         return jwtString;
     }
 
