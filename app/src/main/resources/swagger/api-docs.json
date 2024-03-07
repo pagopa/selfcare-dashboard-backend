@@ -51,7 +51,7 @@
     "description" : "UserGroups operations"
   } ],
   "paths" : {
-    "/delegations" : {
+    "/v1/delegations" : {
       "post" : {
         "tags" : [ "delegations" ],
         "summary" : "createDelegation",
@@ -116,7 +116,7 @@
         } ]
       }
     },
-    "/institutions" : {
+    "/v1/institutions" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutions",
@@ -223,7 +223,7 @@
         } ]
       }
     },
-    "/institutions/products" : {
+    "/v1/institutions/products" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getProductsTree",
@@ -289,7 +289,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}" : {
+    "/v1/institutions/{institutionId}" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitution",
@@ -432,7 +432,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/geographicTaxonomy" : {
+    "/v1/institutions/{institutionId}/geographicTaxonomy" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionGeographicTaxonomy",
@@ -571,7 +571,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/institutions" : {
+    "/v1/institutions/{institutionId}/institutions" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "Retrieve list of delegation using to",
@@ -656,7 +656,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/logo" : {
+    "/v1/institutions/{institutionId}/logo" : {
       "put" : {
         "tags" : [ "institutions" ],
         "summary" : "saveInstitutionLogo",
@@ -741,7 +741,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/partners" : {
+    "/v1/institutions/{institutionId}/partners" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "Retrieve institution's delegations",
@@ -826,7 +826,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/products" : {
+    "/v1/institutions/{institutionId}/products" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionProducts",
@@ -903,7 +903,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/products/{productId}/users" : {
+    "/v1/institutions/{institutionId}/products/{productId}/users" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionProductUsers",
@@ -1087,7 +1087,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/products/{productId}/users/{userId}" : {
+    "/v1/institutions/{institutionId}/products/{productId}/users/{userId}" : {
       "put" : {
         "tags" : [ "institutions" ],
         "summary" : "addUserProductRoles",
@@ -1170,7 +1170,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/users" : {
+    "/v1/institutions/{institutionId}/users" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionUsers",
@@ -1276,7 +1276,7 @@
         } ]
       }
     },
-    "/institutions/{institutionId}/users/{userId}" : {
+    "/v1/institutions/{institutionId}/users/{userId}" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionUser",
@@ -1358,7 +1358,7 @@
         } ]
       }
     },
-    "/onboarding-requests/approve/{tokenId}" : {
+    "/v1/onboarding-requests/approve/{tokenId}" : {
       "post" : {
         "tags" : [ "onboarding" ],
         "summary" : "approveOnboardingRequest",
@@ -1415,7 +1415,7 @@
         } ]
       }
     },
-    "/onboarding-requests/reject/{tokenId}" : {
+    "/v1/onboarding-requests/reject/{tokenId}" : {
       "delete" : {
         "tags" : [ "onboarding" ],
         "summary" : "rejectOnboardingRequest",
@@ -1472,7 +1472,7 @@
         } ]
       }
     },
-    "/onboarding-requests/{tokenId}" : {
+    "/v1/onboarding-requests/{tokenId}" : {
       "get" : {
         "tags" : [ "onboarding" ],
         "summary" : "retrieveOnboardingRequest",
@@ -1546,7 +1546,7 @@
         } ]
       }
     },
-    "/pnPGInstitutions/{institutionId}/products" : {
+    "/v1/pnPGInstitutions/{institutionId}/products" : {
       "get" : {
         "tags" : [ "pnPGInstitutions" ],
         "summary" : "getPnPGInstitutionProducts",
@@ -1622,7 +1622,7 @@
         } ]
       }
     },
-    "/products/{productId}/back-office" : {
+    "/v1/products/{productId}/back-office" : {
       "get" : {
         "tags" : [ "products" ],
         "summary" : "retrieveProductBackoffice",
@@ -1714,7 +1714,7 @@
         } ]
       }
     },
-    "/products/{productId}/brokers/{institutionType}" : {
+    "/v1/products/{productId}/brokers/{institutionType}" : {
       "get" : {
         "tags" : [ "products" ],
         "summary" : "getProductBrokers",
@@ -1800,7 +1800,7 @@
         } ]
       }
     },
-    "/products/{productId}/roles" : {
+    "/v1/products/{productId}/roles" : {
       "get" : {
         "tags" : [ "products" ],
         "summary" : "getProductRoles",
@@ -1876,7 +1876,7 @@
         } ]
       }
     },
-    "/relationships/{relationshipId}" : {
+    "/v1/relationships/{relationshipId}" : {
       "delete" : {
         "tags" : [ "relationships" ],
         "summary" : "deleteRelationshipById",
@@ -1932,7 +1932,7 @@
         } ]
       }
     },
-    "/relationships/{relationshipId}/activate" : {
+    "/v1/relationships/{relationshipId}/activate" : {
       "post" : {
         "tags" : [ "relationships" ],
         "summary" : "activateRelationship",
@@ -1988,7 +1988,7 @@
         } ]
       }
     },
-    "/relationships/{relationshipId}/suspend" : {
+    "/v1/relationships/{relationshipId}/suspend" : {
       "post" : {
         "tags" : [ "relationships" ],
         "summary" : "suspendRelationship",
@@ -2044,9 +2044,9 @@
         } ]
       }
     },
-    "/support" : {
+    "/v1/support" : {
       "post" : {
-        "tags" : [ "external-v2" ],
+        "tags" : [ "external-v2", "support" ],
         "summary" : "sendSupportRequest",
         "description" : "Service to retrieve Support contact's form",
         "operationId" : "sendSupportRequestUsingPOST",
@@ -2147,7 +2147,7 @@
         } ]
       }
     },
-    "/token/exchange" : {
+    "/v1/token/exchange" : {
       "get" : {
         "tags" : [ "token" ],
         "summary" : "exchange",
@@ -2238,7 +2238,7 @@
         } ]
       }
     },
-    "/token/exchange/fatturazione" : {
+    "/v1/token/exchange/fatturazione" : {
       "get" : {
         "tags" : [ "token" ],
         "summary" : "billingToken",
@@ -2321,7 +2321,7 @@
         } ]
       }
     },
-    "/users" : {
+    "/v1/users" : {
       "post" : {
         "tags" : [ "user" ],
         "summary" : "saveUser",
@@ -2393,7 +2393,7 @@
         } ]
       }
     },
-    "/users/search" : {
+    "/v1/users/search" : {
       "post" : {
         "tags" : [ "user" ],
         "summary" : "search",
@@ -2475,7 +2475,7 @@
         } ]
       }
     },
-    "/users/{id}" : {
+    "/v1/users/{id}" : {
       "get" : {
         "tags" : [ "user" ],
         "summary" : "getUserByInternalId",
@@ -2686,7 +2686,7 @@
         } ]
       }
     },
-    "/user-groups" : {
+    "/v1/user-groups" : {
       "get" : {
         "tags" : [ "user-groups" ],
         "summary" : "getUserGroups",
@@ -2813,7 +2813,7 @@
         } ]
       }
     },
-    "/user-groups/" : {
+    "/v1/user-groups/" : {
       "post" : {
         "tags" : [ "user-groups" ],
         "summary" : "createUserGroup",
@@ -2878,7 +2878,7 @@
         } ]
       }
     },
-    "/user-groups/{id}" : {
+    "/v1/user-groups/{id}" : {
       "get" : {
         "tags" : [ "user-groups" ],
         "summary" : "getUserGroupById",
@@ -3080,7 +3080,7 @@
         } ]
       }
     },
-    "/user-groups/{id}/activate" : {
+    "/v1/user-groups/{id}/activate" : {
       "post" : {
         "tags" : [ "user-groups" ],
         "summary" : "activateUserGroup",
@@ -3136,7 +3136,7 @@
         } ]
       }
     },
-    "/user-groups/{id}/members/{userId}" : {
+    "/v1/user-groups/{id}/members/{userId}" : {
       "post" : {
         "tags" : [ "user-groups" ],
         "summary" : "addMemberToUserGroup",
@@ -3202,7 +3202,7 @@
         } ]
       }
     },
-    "/user-groups/{id}/suspend" : {
+    "/v1/user-groups/{id}/suspend" : {
       "post" : {
         "tags" : [ "user-groups" ],
         "summary" : "suspendUserGroup",
@@ -3258,7 +3258,7 @@
         } ]
       }
     },
-    "/user-groups/{userGroupId}/members/{userId}" : {
+    "/v1/user-groups/{userGroupId}/members/{userId}" : {
       "delete" : {
         "tags" : [ "user-groups" ],
         "summary" : "deleteMemberFromUserGroup",
@@ -3282,6 +3282,480 @@
           "schema" : {
             "type" : "string",
             "format" : "uuid"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/institutions" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "summary" : "getInstitutions",
+        "description" : "Service to get all the institutions related to logged user",
+        "operationId" : "getInstitutionsUsingGET_1",
+        "parameters" : [ {
+          "name" : "authenticated",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "authorities[0].authority",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "credentials",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "details",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "principal",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/InstitutionBaseResource"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/search" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "search",
+        "description" : "Retrieve the user for a given fiscal code",
+        "operationId" : "searchUsingPOST_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SearchUserDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/{id}" : {
+      "get" : {
+        "tags" : [ "user" ],
+        "summary" : "getUserById",
+        "description" : "Retrieve the user by internal id",
+        "operationId" : "getUserByIdUsingGET",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/{userId}" : {
+      "delete" : {
+        "tags" : [ "user" ],
+        "summary" : "deleteRelationshipById",
+        "description" : "Delete the relationship",
+        "operationId" : "deleteRelationshipByIdUsingDELETE_1",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "institutionId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "productId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/{userId}/activate" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "activateRelationship",
+        "description" : "Activate the relationship",
+        "operationId" : "activateRelationshipUsingPOST_1",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "institutionId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "productId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/{userId}/suspend" : {
+      "post" : {
+        "tags" : [ "user" ],
+        "summary" : "suspendRelationship",
+        "description" : "Suspend the relationship",
+        "operationId" : "suspendRelationshipUsingPOST_1",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "productId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -3661,7 +4135,7 @@
         "properties" : {
           "geographicTaxonomyDtoList" : {
             "type" : "array",
-            "description" : "List of institution's geographic taxonomies  ",
+            "description" : "List of institution's geographic taxonomies",
             "items" : {
               "$ref" : "#/components/schemas/GeographicTaxonomyDto"
             }
@@ -3726,6 +4200,9 @@
           },
           "dataProtectionOfficer" : {
             "$ref" : "#/components/schemas/DataProtectionOfficer"
+          },
+          "delegation" : {
+            "type" : "boolean"
           },
           "description" : {
             "type" : "string"
@@ -3812,7 +4289,7 @@
       },
       "InstitutionInfo" : {
         "title" : "InstitutionInfo",
-        "required" : [ "address", "fiscalCode", "id", "institutionType", "mailAddress", "name", "recipientCode", "vatNumber", "zipCode" ],
+        "required" : [ "address", "fiscalCode", "institutionType", "mailAddress", "name", "vatNumber", "zipCode" ],
         "type" : "object",
         "properties" : {
           "additionalInformations" : {
@@ -3905,6 +4382,11 @@
           "county" : {
             "type" : "string",
             "description" : "Institution's county"
+          },
+          "delegation" : {
+            "type" : "boolean",
+            "description" : "Institution's delegation presence",
+            "example" : false
           },
           "externalId" : {
             "type" : "string",
@@ -4139,7 +4621,7 @@
       },
       "OnboardingRequestResource" : {
         "title" : "OnboardingRequestResource",
-        "required" : [ "institutionInfo", "manager", "status" ],
+        "required" : [ "institutionInfo", "status" ],
         "type" : "object",
         "properties" : {
           "admins" : {
@@ -4646,9 +5128,17 @@
             "format" : "email",
             "example" : "email@example.com"
           },
+          "institutionId" : {
+            "type" : "string",
+            "description" : "Institution's identifier"
+          },
           "productId" : {
             "type" : "string",
             "description" : "Product's identifier"
+          },
+          "userId" : {
+            "type" : "string",
+            "description" : "User's identifier"
           }
         }
       },
@@ -4933,6 +5423,23 @@
           },
           "name" : {
             "description" : "User's name",
+            "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
+          },
+          "workContacts" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/WorkContactResource"
+            },
+            "description" : "${swagger.dasuboard.user.model.workContacts}"
+          }
+        }
+      },
+      "WorkContactResource" : {
+        "title" : "WorkContactResource",
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "description" : "User's institutional email",
             "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
           }
         }

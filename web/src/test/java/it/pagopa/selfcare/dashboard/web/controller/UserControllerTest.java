@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {UserController.class, WebTestConfig.class})
 class UserControllerTest {
 
-    private static final String BASE_URL = "/users";
+    private static final String BASE_URL = "/v1/users";
     private static final User USER_RESOURCE;
 
     static {

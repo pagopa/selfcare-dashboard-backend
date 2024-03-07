@@ -20,7 +20,7 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/delegations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/delegations", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "delegations")
 public class DelegationController {
 

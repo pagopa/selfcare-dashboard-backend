@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "user")
 public class UserController {
 

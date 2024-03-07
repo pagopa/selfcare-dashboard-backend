@@ -51,7 +51,7 @@ ingress:
   hosts:
     - host: ""
       paths:
-        - path: /dashboard/v1/(.*)
+        - path: /dashboard/(.*)
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
