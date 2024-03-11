@@ -212,30 +212,6 @@ public class InstitutionController {
         return result;
     }
 
-    /**
-     * @deprecated method has been deprecated because a new Api has been implemented.
-     */
-    @Deprecated(forRemoval = true, since = "1.5")
-    @GetMapping(value = "/{institutionId}/products")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
-    public List<ProductsResource> getInstitutionProducts(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                         @PathVariable("institutionId")
-                                                                 String institutionId) {
-        log.trace("getInstitutionProducts start");
-        log.debug("getInstitutionProducts institutionId = {}", institutionId);
-
-        List<ProductTree> products = institutionService.getInstitutionProducts(institutionId);
-        List<ProductsResource> result = products.stream()
-                .map(ProductsMapper::toResource)
-                .collect(Collectors.toList());
-        log.debug("getInstitutionProducts result = {}", result);
-        log.trace("getInstitutionProducts end");
-
-        return result;
-    }
-
     @GetMapping(value = "/products")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")

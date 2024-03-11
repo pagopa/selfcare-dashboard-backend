@@ -199,57 +199,6 @@ class InstitutionControllerTest {
     }
 
     @Test
-    void getInstitutionProducts_notNull() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitutionProducts(any()))
-                .thenReturn(singletonList(PRODUCT));
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<ProductsResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertFalse(products.isEmpty());
-        assertEquals(1, products.get(0).getChildren().size());
-        verify(institutionServiceMock, times(1))
-                .getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutionProducts_empty() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitutionProducts(any()))
-                .thenReturn(Collections.emptyList());
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<ProductsResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertTrue(products.isEmpty());
-        verify(institutionServiceMock, times(1))
-                .getInstitutionProducts(institutionId);
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
     void getProductsTree_notNull() throws Exception {
         // given
         String institutionId = "institutionId";
