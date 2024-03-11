@@ -84,15 +84,15 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-p-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-core-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-p-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-core-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-p-party-reg-proxy-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-party-reg-proxy-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
@@ -100,7 +100,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-ms-user-group-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-user-group-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
