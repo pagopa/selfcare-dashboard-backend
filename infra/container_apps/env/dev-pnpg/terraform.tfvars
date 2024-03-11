@@ -5,7 +5,7 @@ tags = {
   CreatedBy   = "Terraform"
   Environment = "Dev"
   Owner       = "SelfCare"
-  Source      = "https://github.com/pagopa/selfcare-dashboard-backend"
+  Source      = "https://github.com/pagopa/selfcare-dashboard-pnpg-backend"
   CostCenter  = "TS310 - PAGAMENTI & SERVIZI"
 }
 
@@ -24,7 +24,7 @@ app_settings = [
   },
   {
     name  = "JAVA_TOOL_OPTIONS"
-    value = "-javaagent:/applicationinsights-agent.jar"
+    value = "-javaagent:applicationinsights-agent.jar"
   },
   {
     name  = "APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL"
@@ -69,8 +69,51 @@ app_settings = [
   {
     name  = "SUPPORT_API_ZENDESK_ORGANIZATION"
     value = "_users_hc_send"
+  },
+  {
+    name  = "MS_CORE_URL"
+    value = "https://selc-d-pnpg-ms-core-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "USERVICE_PARTY_PROCESS_URL"
+    value = "https://selc-d-pnpg-ms-core-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
+    value = "https://selc-d-pnpg-party-reg-proxy-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "MS_PRODUCT_URL"
+    value = "https://dev01.pnpg.internal.dev.selfcare.pagopa.it/ms-product/v1"
+  },
+  {
+    name  = "MS_USER_GROUP_URL"
+    value = "https://selc-d-pnpg-ms-user-group-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "USERVICE_USER_REGISTRY_URL"
+    value = "https://api.uat.pdv.pagopa.it/user-registry/v1"
+  },
+  {
+    name  = "JWT_TOKEN_EXCHANGE_DURATION"
+    value = "PT15M"
+  },
+  {
+    name  = "TOKEN_EXCHANGE_BILLING_URL"
+    value = "https://dev.portalefatturazione.pagopa.it/auth?selfcareToken=<IdentityToken>"
+  },
+  {
+    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
+    value = "dev.portalefatturazione.pagopa.it"
   }
 ]
 
-secrets_names = [
-]
+secrets_names = {
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = "appinsights-connection-string"
+    "BLOB_STORAGE_CONN_STRING"                        = "web-storage-connection-string"
+    "USER_REGISTRY_API_KEY"                           = "user-registry-api-key"
+    BACKOFFICE_PAGO_PA_API_KEY                        = "pagopa-backoffice-api-key"
+    SUPPORT_API_KEY                                   = "zendesk-support-api-key"
+    JWT_TOKEN_EXCHANGE_PRIVATE_KEY                    = "jwt-exchange-private-key"
+    JWT_TOKEN_EXCHANGE_KID                            = "jwt-exchange-kid"
+}

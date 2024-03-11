@@ -23,7 +23,7 @@ app_settings = [
   },
   {
     name  = "JAVA_TOOL_OPTIONS"
-    value = "-javaagent:/applicationinsights-agent.jar"
+    value = "-javaagent:applicationinsights-agent.jar"
   },
   {
     name  = "APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL"
@@ -68,35 +68,51 @@ app_settings = [
   {
     name  = "SUPPORT_API_ZENDESK_ORGANIZATION"
     value = "_users_hc_selfcare"
+  },
+  {
+    name  = "MS_CORE_URL"
+    value = "https://selc-d-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "USERVICE_PARTY_PROCESS_URL"
+    value = "https://selc-d-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
+    value = "https://selc-d-party-reg-proxy-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "MS_PRODUCT_URL"
+    value = "https://selc.internal.dev.pagopa.it/ms-product/v1"
+  },
+  {
+    name  = "MS_USER_GROUP_URL"
+    value = "https://selc-d-ms-user-group-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+  },
+  {
+    name  = "USERVICE_USER_REGISTRY_URL"
+    value = "https://api.uat.pdv.pagopa.it/user-registry/v1"
+  },
+  {
+    name  = "JWT_TOKEN_EXCHANGE_DURATION"
+    value = "PT15M"
+  },
+  {
+    name  = "TOKEN_EXCHANGE_BILLING_URL"
+    value = "https://dev.portalefatturazione.pagopa.it/auth?selfcareToken=<IdentityToken>"
+  },
+  {
+    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
+    value = "dev.portalefatturazione.pagopa.it"
   }
-
-  BLOB_STORAGE_CONN_STRING
-  BLOB_CONTAINER_REF
-  MS_CORE_URL
-  BACKOFFICE_PAGO_PA_API_KEY
-  USERVICE_PARTY_MANAGEMENT_URL
-  USERVICE_PARTY_PROCESS_URL
-  USERVICE_PARTY_REGISTRY_PROXY_URL
-  MS_PRODUCT_URL
-  MS_USER_GROUP_URL
-  USERVICE_USER_REGISTRY_URL
-  USERVICE_USER_REGISTRY_API_KEY
-
-  INSTITUTION_LOGO_ALLOWED_MIME_TYPES
-  INSTITUTION_LOGO_ALLOWED_EXTENSIONS
-  SUPPORT_API_KEY
-  SUPPORT_API_ZENDESK_ACTION_URI
-
-  MULTIPART_MAX_FILE_SIZE
-  MULTIPART_MAX_FILE_SIZE
-
-  JWT_TOKEN_EXCHANGE_PRIVATE_KEY
-  JWT_TOKEN_EXCHANGE_DURATION
-  JWT_TOKEN_EXCHANGE_KID
-  JWT_TOKEN_EXCHANGE_ISSUER
-  TOKEN_EXCHANGE_BILLING_URL
-  TOKEN_EXCHANGE_BILLING_AUDIENCE
 ]
 
-secrets_names = [
-]
+secrets_names = {
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = "appinsights-connection-string"
+    "BLOB_STORAGE_CONN_STRING"                        = "web-storage-connection-string"
+    "USER_REGISTRY_API_KEY"                           = "user-registry-api-key"
+    BACKOFFICE_PAGO_PA_API_KEY                        = "pagopa-backoffice-api-key"
+    SUPPORT_API_KEY                                   = "zendesk-support-api-key"
+    JWT_TOKEN_EXCHANGE_PRIVATE_KEY                    = "jwt-exchange-private-key"
+    JWT_TOKEN_EXCHANGE_KID                            = "jwt-exchange-kid"
+}
