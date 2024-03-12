@@ -129,4 +129,5 @@ secrets_names = {
     "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"                  = "jwt-exchange-private-key"
     "JWT_TOKEN_EXCHANGE_KID"                          = "jwt-exchange-kid"
     "JWT_TOKEN_PUBLIC_KEY"                            = "jwt-public-key"
+    "USERVICE_USER_REGISTRY_API_KEY"                  = "user-registry-api-key"
 }
