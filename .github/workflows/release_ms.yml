@@ -29,26 +29,29 @@ jobs:
   release_dev:
     uses: pagopa/selfcare-commons/.github/workflows/call_release_docker.yml@main
     name: '[Dev] DashboardBackend Release'
-    if: startsWith(github.ref_name, 'releases/') != true
+    if: ${{ (startsWith(github.ref_name, 'releases/') != true && inputs.env == null) || inputs.env == 'dev' }}
     secrets: inherit
     with:
       environment: dev
-      dir: 'infra'
+      tf_environment: dev
+      dir: 'infra/container_apps'
 
   release_uat:
     uses: pagopa/selfcare-commons/.github/workflows/call_release_docker.yml@main
     name: '[UAT] DashboardBackend Release'
-    if: startsWith(github.ref_name, 'releases/')
+    if: ${{ (startsWith(github.ref_name, 'releases/') == true && inputs.env == null) || inputs.env == 'uat' }}
     secrets: inherit
     with:
       environment: uat
-      dir: 'infra'
+      tf_environment: uat
+      dir: 'infra/container_apps'
 
   release_prod:
     uses: pagopa/selfcare-commons/.github/workflows/call_release_docker.yml@main
     name: '[Prod] DashboardBackend Release'
-    if: startsWith(github.ref_name, 'releases/')
+    if: ${{ inputs.env == 'prod' }}
     secrets: inherit
     with:
       environment: prod
-      dir: 'infra'
+      tf_environment: prod
+      dir: 'infra/container_apps'
