@@ -128,4 +128,5 @@ secrets_names = {
     "SUPPORT_API_KEY"                                 = "zendesk-support-api-key"
     "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"                  = "jwt-exchange-private-key"
     "JWT_TOKEN_EXCHANGE_KID"                          = "jwt-exchange-kid"
+    "JWT_TOKEN_PUBLIC_KEY"                            = "jwt-public-key"
 }
