@@ -1,4 +1,4 @@
-name: Release - dashboard-backend
+name: Release - PNPG dashboard-backend
 
 on:
   workflow_dispatch:
@@ -33,7 +33,7 @@ jobs:
     secrets: inherit
     with:
       environment: dev
-      tf_environment: dev
+      tf_environment: dev-pnpg
       dir: 'infra/container_apps'
 
   release_uat:
@@ -43,7 +43,7 @@ jobs:
     secrets: inherit
     with:
       environment: uat
-      tf_environment: uat
+      tf_environment: uat-pnpg
       dir: 'infra/container_apps'
 
   release_prod:
@@ -53,5 +53,5 @@ jobs:
     secrets: inherit
     with:
       environment: prod
-      tf_environment: prod
+      tf_environment: prod-pnpg
       dir: 'infra/container_apps'
