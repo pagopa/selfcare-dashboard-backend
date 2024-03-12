@@ -2,6 +2,14 @@ name: Release dashboard-backend
 
 on:
   workflow_dispatch:
+    inputs:
+      env:
+        type: choice
+        description: Environment
+        options: 
+        - dev
+        - uat
+        - prod
 
   push:
     branches:
