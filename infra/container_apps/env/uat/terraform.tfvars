@@ -83,7 +83,7 @@ app_settings = [
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc.internal.uat.pagopa.it/ms-product/v1"
+    value = "https://selc.internal.uat.selfcare.pagopa.it/ms-product/v1"
   },
   {
     name  = "MS_USER_GROUP_URL"
