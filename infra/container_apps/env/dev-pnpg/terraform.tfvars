@@ -88,7 +88,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-d-pnpg-ms-user-group-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-pnpg-user-group-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"

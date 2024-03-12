@@ -87,7 +87,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-u-ms-user-group-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-user-group-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"

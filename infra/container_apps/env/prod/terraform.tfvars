@@ -100,7 +100,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-ms-user-group-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-user-group-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"

@@ -87,7 +87,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-d-ms-user-group-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-user-group-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"

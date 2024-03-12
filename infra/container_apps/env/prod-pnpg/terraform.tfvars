@@ -101,7 +101,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-pnpg-ms-user-group-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-user-group-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
