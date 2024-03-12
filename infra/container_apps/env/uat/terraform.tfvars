@@ -4,7 +4,7 @@ tags = {
   CreatedBy   = "Terraform"
   Environment = "Uat"
   Owner       = "SelfCare"
-  Source      = "https://github.com/pagopa/selfcare-dashboaru-backend"
+  Source      = "https://github.com/pagopa/selfcare-dashboard-backend"
   CostCenter  = "TS310 - PAGAMENTI & SERVIZI"
 }
 
