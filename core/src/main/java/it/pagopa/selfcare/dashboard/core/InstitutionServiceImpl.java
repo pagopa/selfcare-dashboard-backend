@@ -124,67 +124,6 @@ class InstitutionServiceImpl implements InstitutionService {
         return productTrees;
     }
 
-    @Override
-    public List<ProductTree> getInstitutionProducts(String institutionId) {
-        log.trace("getInstitutionProducts start");
-        log.debug("getInstitutionProducts institutionId = {}", institutionId);
-        List<ProductTree> productTrees = productsConnector.getProductsTree();
-        if (!productTrees.isEmpty()) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
-                    .stream()
-                    .filter(grantedAuthority -> SelfCareGrantedAuthority.class.isAssignableFrom(grantedAuthority.getClass()))
-                    .map(SelfCareGrantedAuthority.class::cast)
-                    .filter(grantedAuthority -> institutionId.equals(grantedAuthority.getInstitutionId()))
-                    .findAny();
-
-            if (selcAuthority.isPresent()) {
-                Map<String, ProductGrantedAuthority> userAuthProducts = ((SelfCareGrantedAuthority) selcAuthority.get()).getRoleOnProducts();
-                Map<String, PartyProduct> institutionsProductsMap = msCoreConnector.getInstitutionProducts(institutionId).stream()
-                        .collect(Collectors.toMap(PartyProduct::getId, Function.identity(), MERGE_FUNCTION));
-
-                if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
-                    productTrees = productTrees.stream()
-                            .filter(product -> institutionsProductsMap.containsKey(product.getNode().getId()))
-                            .filter(product -> userAuthProducts.containsKey(product.getNode().getId()))
-                            .peek(product -> product.getNode().setAuthorized(true))
-                            .peek(product -> product.getNode().setUserRole(LIMITED.name()))
-                            .peek(product -> product.getNode().setOnBoardingStatus(institutionsProductsMap.get(product.getNode().getId()).getOnBoardingStatus()))
-                            .collect(Collectors.toList());
-                    productTrees.stream()
-                            .filter(productTree -> productTree.getChildren() != null)
-                            .forEach(productTree -> productTree.setChildren(productTree.getChildren().stream()
-                                    .filter(product -> institutionsProductsMap.containsKey(product.getId()))
-                                    .filter(product -> userAuthProducts.containsKey(product.getId()))
-                                    .peek(product -> product.setAuthorized(true))
-                                    .peek(product -> product.setUserRole(LIMITED.name()))
-                                    .peek(product -> product.setOnBoardingStatus(institutionsProductsMap.get(product.getId()).getOnBoardingStatus()))
-                                    .collect(Collectors.toList())));
-                } else {
-                    productTrees.forEach(product -> {
-                        product.getNode().setAuthorized(userAuthProducts.containsKey(product.getNode().getId()));
-                        product.getNode().setOnBoardingStatus(Optional.ofNullable(institutionsProductsMap.get(product.getNode().getId()))
-                                .map(PartyProduct::getOnBoardingStatus)
-                                .orElse(ProductOnBoardingStatus.INACTIVE));
-                        Optional.ofNullable(userAuthProducts.get(product.getNode().getId()))
-                                .ifPresentOrElse(authority -> product.getNode().setUserRole(authority.getAuthority()), () -> product.getNode().setUserRole(null));
-                    });
-                    productTrees.stream()
-                            .map(ProductTree::getChildren)
-                            .filter(Objects::nonNull)
-                            .flatMap(Collection::stream)
-                            .forEach(product ->
-                                    product.setOnBoardingStatus(Optional.ofNullable(institutionsProductsMap.get(product.getId()))
-                                            .map(PartyProduct::getOnBoardingStatus)
-                                            .orElse(ProductOnBoardingStatus.INACTIVE)));
-                }
-            }
-        }
-        log.debug("getInstitutionProducts result = {}", productTrees);
-        log.trace("getInstitutionProducts end");
-        return productTrees;
-    }
-
     /**
      * @deprecated method has been deprecated because a new method has been implemented.
      * Remove the query from the repository

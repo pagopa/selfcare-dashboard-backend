@@ -30,3 +30,7 @@ logging:
     it.pagopa.selfcare: ${B4F_DASHBOARD_LOG_LEVEL:DEBUG}
   pattern:
     additional-info: ",%X{X-Client-Ip:-}]"
+
+dashboard:
+  security:
+    connector: ${B4F_DASHBOARD_SECURITY_CONNECTOR:v1}

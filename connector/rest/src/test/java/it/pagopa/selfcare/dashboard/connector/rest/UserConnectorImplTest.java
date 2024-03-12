@@ -4,6 +4,7 @@ import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundExceptio
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
@@ -36,6 +37,9 @@ class UserConnectorImplTest {
     @Mock
     UserApiRestClient userApiRestClient;
 
+    @Mock
+    UserPermissionRestClient userPermissionRestClient;
+
 
     UserConnectorImpl userConnector;
 
@@ -44,7 +48,7 @@ class UserConnectorImplTest {
 
     @BeforeEach
     void setup(){
-        userConnector = new UserConnectorImpl(userApiRestClient, new InstitutionMapperImpl(), userMapper);
+        userConnector = new UserConnectorImpl(userApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
     }
 
 
@@ -164,6 +168,34 @@ class UserConnectorImplTest {
         verify(userApiRestClient, times(1))._usersSearchPost(searchUserDtoArgumentCaptor.capture());
         SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
         assertEquals(fiscalCode, captured.getFiscalCode());
+    }
+
+    @Test
+    void hasPermissionTrue() {
+        //given
+        String institutionId = "institutionId";
+        String permission = "ADMIN";
+        String productId = "productId";
+        when(userPermissionRestClient._authorizeInstitutionIdGet(institutionId, PermissionTypeEnum.ADMIN, productId)).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(institutionId, permission, productId);
+        //then
+        assertNotNull(result);
+        assertEquals(true, result);
+    }
+
+    @Test
+    void hasPermissionFalse() {
+        //given
+        String institutionId = "institutionId";
+        String permission = "ADMIN";
+        String productId = "productId";
+        when(userPermissionRestClient._authorizeInstitutionIdGet(institutionId, PermissionTypeEnum.ADMIN, productId)).thenReturn(new ResponseEntity<>(false, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(institutionId, permission, productId);
+        //then
+        assertNotNull(result);
+        assertEquals(false, result);
     }
 
 }

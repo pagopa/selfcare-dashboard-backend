@@ -1,46 +1,21 @@
-name: Swagger Update
+name: Swagger Detect Conflict and Update
 on:
   pull_request:
     branches:
       - release-dev
     types: [ opened, synchronize, reopened ]
-  workflow_dispatch: #allow to run github action manually
+    
 permissions:
   contents: write
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  swagger_conflict_update:  
+    runs-on: ubuntu-20.04
     permissions: write-all
-    #if: github.event.pull_request.merged == true
+    name: Swagger Detect Conflict and Update
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - id: swagger-conflict-update
+        uses: pagopa/selfcare-commons/github-actions-template/swagger-detect-conflict-spring@main
         with:
-          ref: ${{ github.head_ref }}
-          path: head
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Check out BASE revision
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-        with:
-          ref: release-dev
-          path: base
-      - name: Build with Maven
-        working-directory: head
-        run: mvn test -Dtest=SwaggerConfigTest#swaggerSpringPlugin -DfailIfNoTests=false
-      - name: Run OpenAPI Diff (from HEAD revision)
-        uses: mvegter/openapi-diff-action@72cde50f8d3a75f770f08e23b815d5ebe69ff757
-        with:
-          head-spec: head/app/src/main/resources/swagger/api-docs.json
-          base-spec: base/app/src/main/resources/swagger/api-docs.json
-      - name: Commit api-docs
-        working-directory: head
-        run: |
-          git ls-files ./app** | grep 'api-docs*' | xargs git add .
-          git config --global user.email "selfcare-github@pagopa.it"
-          git config --global user.name "selfcare-github-bot"
-          git commit -m "Update Swagger documentation" || exit 0
-          git push origin ${{ github.head_ref}}
+          path_openapi_docs: app/src/main/resources/swagger/api-docs.json
+          branch_ref: release-dev

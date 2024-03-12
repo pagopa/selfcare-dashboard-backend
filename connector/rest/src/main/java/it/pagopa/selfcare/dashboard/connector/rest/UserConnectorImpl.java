@@ -5,19 +5,19 @@ import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.PermissionTypeEnum;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
@@ -28,6 +28,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
 
     private final UserApiRestClient userApiRestClient;
+    private final UserPermissionRestClient userPermissionRestClient;
     private final InstitutionMapper institutionMapper;
 
     private final UserMapper userMapper;
@@ -47,6 +48,19 @@ public class UserConnectorImpl implements UserApiConnector {
                 .toList();
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");
+        return result;
+    }
+
+    @Override
+    public Boolean hasPermission(String institutionId, String permission, String productId) {
+        log.trace("permissionInstitutionIdPermissionGet start");
+        log.debug("permissionInstitutionIdPermissionGet institutionId = {}, permission = {}, productId = {}", institutionId, permission, productId);
+
+        PermissionTypeEnum permissionTypeEnum = PermissionTypeEnum.fromValue(permission);
+        Boolean result = userPermissionRestClient._authorizeInstitutionIdGet(institutionId, permissionTypeEnum, productId).getBody();
+
+        log.debug("permissionInstitutionIdPermissionGet result = {}", result);
+        log.trace("permissionInstitutionIdPermissionGet end");
         return result;
     }
 
