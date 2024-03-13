@@ -20,7 +20,7 @@ on:
       - '!helm/**'
       - '!**.md'
       - '!**ignore'
-      - '!infra/**'
+      - '!infra/repository/**'
       - '!.terraform-version'
       - '!CODEOWNERS'
 
