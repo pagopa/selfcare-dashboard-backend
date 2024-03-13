@@ -117,7 +117,11 @@ app_settings = [
   {
     name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
     value = "portalefatturazione.pagopa.it"
-  }
+  },
+    {
+      name  = "SELFCARE_USER_URL"
+      value = "https://selc-d-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+    }
 ]
 
 secrets_names = {

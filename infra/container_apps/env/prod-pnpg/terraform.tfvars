@@ -118,7 +118,11 @@ app_settings = [
   {
     name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
     value = "portalefatturazione.pagopa.it"
-  }
+  },
+    {
+      name  = "SELFCARE_USER_URL"
+      value = "https://selc-d-user-ms-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+    }
 ]
 
 secrets_names = {
