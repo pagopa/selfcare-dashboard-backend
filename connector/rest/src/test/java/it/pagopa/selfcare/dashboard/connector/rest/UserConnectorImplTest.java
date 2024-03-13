@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
@@ -196,6 +197,20 @@ class UserConnectorImplTest {
         //then
         assertNotNull(result);
         assertEquals(false, result);
+    }
+
+    @Test
+    void update() {
+        // given
+        final String userId = "userId";
+        final String institutionId = "institutionId";
+        final var user = new MutableUserFieldsDto();
+        // when
+        userConnector.updateUser(userId, institutionId, user);
+        // then
+        verify(userApiRestClient, times(1))
+                ._usersIdUserRegistryPut(userId, institutionId, it.pagopa.selfcare.user.generated.openapi.v1.dto.MutableUserFieldsDto.builder().build());
+        verifyNoMoreInteractions(userApiRestClient);
     }
 
 }
