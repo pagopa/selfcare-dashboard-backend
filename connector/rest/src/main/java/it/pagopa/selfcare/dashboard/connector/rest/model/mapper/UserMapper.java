@@ -41,7 +41,7 @@ public interface UserMapper {
         if(workContactMap != null && !workContactMap.isEmpty()) {
             workContactMap.forEach((s, workContact) -> resourceMap.put(s, WorkContactResource.builder().email(toCertifiableFieldResourceOfString(workContact.getEmail())).build()));
         }
-        return resourceMap;
+        return null;
     }
 
     User toUser(UserDetailResponse response);

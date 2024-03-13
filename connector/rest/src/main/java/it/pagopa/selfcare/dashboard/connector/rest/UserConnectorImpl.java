@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
@@ -12,12 +13,12 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.PermissionTypeEnum;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
@@ -26,13 +27,10 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 @RequiredArgsConstructor
 public class UserConnectorImpl implements UserApiConnector {
 
-
     private final UserApiRestClient userApiRestClient;
     private final UserPermissionRestClient userPermissionRestClient;
     private final InstitutionMapper institutionMapper;
-
     private final UserMapper userMapper;
-
 
     @Override
     public List<InstitutionInfo> getUserProducts(String userId) {
@@ -106,5 +104,13 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("delete userId = {}, institutionId = {}", userId, institutionId);
         userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED);
         log.trace("delete end");
+    }
+
+    @Override
+    public void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto) {
+        log.trace("updateUser start");
+        log.debug("updateUser userId = {}, institutionId = {}, userDto = {}", userId, institutionId, userDto);
+        userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toMutableUserFieldsDto(userDto));
+        log.trace("updateUser end");
     }
 }
