@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
+import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
@@ -74,7 +75,6 @@ public class UserV2Controller {
         log.trace("suspendUser end");
 
     }
-
 
     @PostMapping(value = "/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -138,5 +138,23 @@ public class UserV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return userMapperV2.toUserResource(user);
+    }
+
+    @PutMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
+    public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
+                           @PathVariable("id")
+                           String userId,
+                           @ApiParam("${swagger.dashboard.institutions.model.id}")
+                           @RequestParam(value = "institutionId")
+                           String institutionId,
+                           @RequestBody
+                           @Valid
+                           UpdateUserDto updateUserDto) {
+        log.trace("updateUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "userId = {}, institutionId = {}, userDto = {}", userId, institutionId, updateUserDto);
+        userService.updateUser(userId, institutionId, userMapperV2.fromUpdateUser(institutionId, updateUserDto));
+        log.trace("updateUser end");
     }
 }
