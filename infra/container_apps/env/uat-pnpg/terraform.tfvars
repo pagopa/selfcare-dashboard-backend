@@ -2,7 +2,7 @@ is_pnpg   = true
 env_short = "u"
 private_dns_name   = "selc-u-dashboard-backend-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "uat.selfcare"
-api_dns_zone_prefix = format("api-pnpg.%s", var.dns_zone_prefix)
+api_dns_zone_prefix = "api-pnpg.uat.selfcare"
 
 tags = {
   CreatedBy   = "Terraform"
@@ -111,7 +111,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+      value = "https://selc-u-user-ms-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
     }
 ]
 

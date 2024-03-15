@@ -123,7 +123,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+      value = "https://selc-p-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
     }
 ]
 

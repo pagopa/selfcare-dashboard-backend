@@ -110,7 +110,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+      value = "https://selc-u-user-ms-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
     }
 ]
 
