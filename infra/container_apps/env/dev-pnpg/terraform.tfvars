@@ -1,6 +1,10 @@
 is_pnpg   = true
 env_short = "d"
 
+private_dns_name = "selc-d-pnpg-dashboard-backend-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+dns_zone_prefix    = "dev.selfcare"
+api_dns_zone_prefix = format("api-pnpg.%s", var.dns_zone_prefix)
+
 tags = {
   CreatedBy   = "Terraform"
   Environment = "Dev"

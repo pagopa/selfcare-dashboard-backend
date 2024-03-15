@@ -1,5 +1,8 @@
 is_pnpg   = true
 env_short = "u"
+private_dns_name   = "selc-u-dashboard-backend-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+dns_zone_prefix    = "uat.selfcare"
+api_dns_zone_prefix = format("api-pnpg.%s", var.dns_zone_prefix)
 
 tags = {
   CreatedBy   = "Terraform"
