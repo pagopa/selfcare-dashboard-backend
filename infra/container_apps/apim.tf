@@ -3,6 +3,7 @@ locals {
     apim_rg         = format("selc-%s-api-rg", var.env_short)
     api_name        = var.is_pnpg ? format("selc-%s-pnpg-api-bff-dashboard", var.env_short) : format("selc-%s-api-bff-dashboard", var.env_short)
     display_name    = var.is_pnpg ? "BFF PNPG Dashboard API" : "BFF Dashboard API"
+    base_path       = var.is_pnpg ? "imprese/dashboard" : "dashboard"
 }
 
 
@@ -24,7 +25,7 @@ module "apim_api_bff_dashboard" {
 
   description  = local.display_name
   display_name = local.display_name
-  path         = "dashboard"
+  path         = local.base_path
   protocols = [
     "https"
   ]
@@ -33,8 +34,8 @@ module "apim_api_bff_dashboard" {
 
   content_format = "openapi+json"
   content_value  = templatefile("../../app/src/main/resources/swagger/api-docs.json", {
-    url         = format("%s.%s", var.api_dns_zone_prefix, var.external_domain)
-    basePath     = "/dashboard"
+    url        = format("%s.%s", var.api_dns_zone_prefix, var.external_domain)
+    basePath   = local.base_path
   })
 
   subscription_required = false
