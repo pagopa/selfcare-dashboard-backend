@@ -43,6 +43,9 @@ class SwaggerConfigTest {
     private InstitutionService institutionServiceMock;
 
     @MockBean
+    private InstitutionV2Service institutionV2Service;
+
+    ;@MockBean
     private PnPGInstitutionService pnPGInstitutionService;
 
     @MockBean

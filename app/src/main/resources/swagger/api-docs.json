@@ -826,83 +826,6 @@
         } ]
       }
     },
-    "/v1/institutions/{institutionId}/products" : {
-      "get" : {
-        "tags" : [ "institutions" ],
-        "summary" : "getInstitutionProducts",
-        "description" : "Service to get all the products related to a specific institution",
-        "operationId" : "getInstitutionProductsUsingGET",
-        "parameters" : [ {
-          "name" : "institutionId",
-          "in" : "path",
-          "description" : "Institution's unique internal identifier",
-          "required" : true,
-          "style" : "simple",
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/ProductsResource"
-                  }
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/problem+json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/Problem"
-                }
-              }
-            }
-          }
-        },
-        "deprecated" : true,
-        "security" : [ {
-          "bearerAuth" : [ "global" ]
-        } ]
-      }
-    },
     "/v1/institutions/{institutionId}/products/{productId}/users" : {
       "get" : {
         "tags" : [ "institutions" ],
@@ -1290,6 +1213,128 @@
           "style" : "simple",
           "schema" : {
             "type" : "string"
+          }
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "description" : "User's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InstitutionUserDetailsResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/institutions/{institutionId}/users/{userId}" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutionUser",
+        "description" : "Service to get the users with the given user id related to a specific institution",
+        "operationId" : "getInstitutionUserUsingGET_1",
+        "parameters" : [ {
+          "name" : "authenticated",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "authorities[0].authority",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "credentials",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "details",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "principal",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
           }
         }, {
           "name" : "userId",

@@ -354,19 +354,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -388,19 +377,8 @@
             "content": {
               "application/json": {}
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/emails": {
@@ -440,19 +418,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/ids": {
@@ -486,19 +453,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/notification": {
@@ -544,19 +500,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/search": {
@@ -584,19 +529,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/{id}": {
@@ -639,19 +573,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/{id}/details": {
@@ -680,19 +603,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/{id}/institution/{institutionId}/product/{productId}/status": {
@@ -738,19 +650,8 @@
         "responses": {
           "204": {
             "description": "No Content"
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/{id}/status": {
@@ -810,19 +711,8 @@
             "content": {
               "application/json": {}
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/{id}/user-registry": {
@@ -863,19 +753,96 @@
             "content": {
               "application/json": {}
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
+        }
+      }
+    },
+    "/users/{userId}/institution/{institutionId}": {
+      "get": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "The API retrieves users with optional filters in input as query params",
+        "parameters": [
           {
-            "SecurityScheme": []
+            "name": "institutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "personId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "products",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "roles",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "states",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
-        ]
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDataResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/users/{userId}/institutions/{institutionId}/products/{productId}": {
@@ -913,19 +880,8 @@
         "responses": {
           "204": {
             "description": "No Content"
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     },
     "/users/{userId}/products": {
@@ -971,19 +927,8 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
           }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
+        }
       }
     }
   },
@@ -1254,6 +1199,44 @@
           }
         }
       },
+      "UserDataResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "institutionId": {
+            "type": "string"
+          },
+          "institutionDescription": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          },
+          "userMailUuid": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OnboardedProductResponse"
+            }
+          },
+          "userResponse": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        }
+      },
       "UserDetailResponse": {
         "type": "object",
         "properties": {
@@ -1403,6 +1386,12 @@
           },
           "email": {
             "type": "string"
+          },
+          "workContacts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },

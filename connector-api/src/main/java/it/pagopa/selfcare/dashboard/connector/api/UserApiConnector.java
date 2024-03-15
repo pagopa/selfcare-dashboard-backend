@@ -4,6 +4,9 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 
+import java.util.Collection;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+
 import java.util.List;
 
 public interface UserApiConnector {
@@ -23,4 +26,6 @@ public interface UserApiConnector {
     Boolean hasPermission(String institutionId, String permission, String productId);
 
     void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto);
+
+    Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId);
 }
