@@ -1,11 +1,14 @@
 is_pnpg   = true
 env_short = "u"
+private_dns_name   = "selc-u-dashboard-backend-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+dns_zone_prefix    = "imprese.uat.notifichedigitali"
+api_dns_zone_prefix = "api-pnpg.uat.selfcare"
 
 tags = {
   CreatedBy   = "Terraform"
   Environment = "Uat"
   Owner       = "SelfCare"
-  Source      = "https://github.com/pagopa/selfcare-dashboaru-pnpg-backend"
+  Source      = "https://github.com/pagopa/selfcare-dashboard-backend"
   CostCenter  = "TS310 - PAGAMENTI & SERVIZI"
 }
 
@@ -108,7 +111,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+      value = "https://selc-u-pnpg-user-ms-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
     }
 ]
 

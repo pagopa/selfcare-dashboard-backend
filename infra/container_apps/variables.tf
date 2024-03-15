@@ -55,3 +55,26 @@ variable "secrets_names" {
   type        = map(string)
   description = "KeyVault secrets to get values from"
 }
+
+variable "private_dns_name" {
+  type        = string
+  description = "Container Apps private DNS record"
+}
+
+variable "external_domain" {
+  type        = string
+  default     = "pagopa.it"
+  description = "Domain for delegation"
+}
+
+variable "dns_zone_prefix" {
+  type        = string
+  default     = "selfcare"
+  description = "The dns subdomain."
+}
+
+variable "api_dns_zone_prefix" {
+  type        = string
+  default     = "api.selfcare"
+  description = "The dns subdomain."
+}
