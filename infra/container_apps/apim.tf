@@ -45,7 +45,7 @@ module "apim_api_bff_dashboard" {
             <allowed-origins>
                 <origin>https://${var.dns_zone_prefix}.${var.external_domain}</origin>
                 <origin>https://${var.api_dns_zone_prefix}.${var.external_domain}</origin>
-                <origin>https://localhost:3000</origin>
+                <origin>http://localhost:3000</origin>
             </allowed-origins>
             <allowed-methods>
                 <method>GET</method>
