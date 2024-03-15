@@ -1,7 +1,8 @@
 locals {
-    apim_name = format("selc-%s-apim", var.env_short)
-    apim_rg   = format("selc-%s-api-rg", var.env_short)
-    api_name  = format("selc-%s-api-bff-dashboard", var.env_short)
+    apim_name       = format("selc-%s-apim", var.env_short)
+    apim_rg         = format("selc-%s-api-rg", var.env_short)
+    api_name        = var.is_pnpg ? format("selc-%s-pnpg-api-bff-dashboard", var.env_short) : format("selc-%s-api-bff-dashboard", var.env_short)
+    display_name    = var.is_pnpg ? "BFF PNPG Dashboard API" : "BFF Dashboard API"
 }
 
 
@@ -9,7 +10,7 @@ resource "azurerm_api_management_api_version_set" "apim_api_bff_dashboard" {
   name                = local.api_name
   resource_group_name = local.apim_rg
   api_management_name = local.apim_name
-  display_name        = "BFF Dashboard API"
+  display_name        = local.display_name
   versioning_scheme   = "Segment"
 }
 
@@ -21,8 +22,8 @@ module "apim_api_bff_dashboard" {
   resource_group_name = local.apim_rg
   version_set_id      = azurerm_api_management_api_version_set.apim_api_bff_dashboard.id
 
-  description  = "BFF Dashboard API"
-  display_name = "BFF Dashboard API"
+  description  = local.display_name
+  display_name = local.display_name
   path         = "dashboard"
   protocols = [
     "https"
