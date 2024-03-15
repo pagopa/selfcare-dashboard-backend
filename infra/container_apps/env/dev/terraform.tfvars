@@ -1,4 +1,7 @@
-env_short = "d"
+env_short           = "d"
+private_dns_name    = "selc-d-dashboard-backend-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+dns_zone_prefix     = "dev.selfcare"
+api_dns_zone_prefix = "api.dev.selfcare"
 
 tags = {
   CreatedBy   = "Terraform"

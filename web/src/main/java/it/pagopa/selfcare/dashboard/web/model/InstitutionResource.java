@@ -75,7 +75,7 @@ public class InstitutionResource {
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.parentDescription}")
     private String parentDescription;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.products}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.products}")
     private List<OnboardedProductResource> products;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.city}")

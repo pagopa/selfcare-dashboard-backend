@@ -1,11 +1,15 @@
 is_pnpg   = true
 env_short = "d"
 
+private_dns_name = "selc-d-pnpg-dashboard-backend-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+dns_zone_prefix    = "pnpg.dev.selfcare"
+api_dns_zone_prefix = "api-pnpg.dev.selfcare"
+
 tags = {
   CreatedBy   = "Terraform"
   Environment = "Dev"
   Owner       = "SelfCare"
-  Source      = "https://github.com/pagopa/selfcare-dashboard-pnpg-backend"
+  Source      = "https://github.com/pagopa/selfcare-dashboard-backend"
   CostCenter  = "TS310 - PAGAMENTI & SERVIZI"
 }
 
@@ -108,7 +112,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+      value = "https://selc-d-pnpg-user-ms-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
     }
 ]
 

@@ -1,4 +1,7 @@
 env_short = "u"
+private_dns_name = "selc-u-dashboard-backend-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+dns_zone_prefix    = "uat.selfcare"
+api_dns_zone_prefix = format("api.%s, var.dns_zone_prefix)
 
 tags = {
   CreatedBy   = "Terraform"
@@ -107,7 +110,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+      value = "https://selc-u-user-ms-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
     }
 ]
 

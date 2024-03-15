@@ -1,4 +1,7 @@
 env_short = "p"
+private_dns_name = "selc-p-dashboard-backend-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+dns_zone_prefix    = "selfcare"
+api_dns_zone_prefix = format("api.%s, var.dns_zone_prefix)
 
 tags = {
   CreatedBy   = "Terraform"
@@ -120,7 +123,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+      value = "https://selc-p-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
     }
 ]
 
