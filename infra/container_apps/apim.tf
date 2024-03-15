@@ -51,6 +51,7 @@ module "apim_api_bff_dashboard" {
                 <method>GET</method>
                 <method>POST</method>
                 <method>PUT</method>
+                <method>HEAD</method>
                 <method>DELETE</method>
                 <method>OPTIONS</method>
             </allowed-methods>
