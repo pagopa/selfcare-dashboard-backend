@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -94,6 +95,18 @@ public class UserV2ServiceImpl implements UserV2Service {
         }
         userApiConnector.updateUser(id, institutionId, userDto);
         log.trace("updateUser end");
+    }
+
+    @Override
+    public Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, String loggedUserId) {
+        log.trace("getUsersByInstitutionId start");
+        log.debug("getUsersByInstitutionId institutionId = {}", institutionId);
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        Collection<UserInfo> result = userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
+        log.info("getUsersByInstitutionId result size = {}", result.size());
+        log.trace("getUsersByInstitutionId end");
+        return result;
     }
 
 }

@@ -11,12 +11,15 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Problem;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -156,5 +159,27 @@ public class UserV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "userId = {}, institutionId = {}, userDto = {}", userId, institutionId, updateUserDto);
         userService.updateUser(userId, institutionId, userMapperV2.fromUpdateUser(institutionId, updateUserDto));
         log.trace("updateUser end");
+    }
+
+    @GetMapping(value = "/institution/{institutionId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId") String institutionId,
+                                              @RequestParam(value = "productId", required = false) String productId,
+                                              Authentication authentication) {
+        log.trace("getUsers start");
+        log.debug("getUsers for institution: {} and product: {}", institutionId, productId);
+        String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
+
+        Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+        List<ProductUserResource> result = userInfos.stream()
+                .map(UserMapper::toProductUser)
+                .toList();
+        log.debug("getUsers result = {}", result);
+        log.trace("getUsers end");
+
+        return result;
     }
 }
