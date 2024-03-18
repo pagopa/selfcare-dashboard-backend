@@ -1,9 +1,11 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
@@ -22,12 +24,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -210,6 +213,48 @@ class UserConnectorImplTest {
         // then
         verify(userApiRestClient, times(1))
                 ._usersIdUserRegistryPut(userId, institutionId, it.pagopa.selfcare.user.generated.openapi.v1.dto.MutableUserFieldsDto.builder().build());
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void getUsers_emptyList() {
+        // given
+        String institutionId = "institutionId";
+        String loggedUserId = "loggedUserId";
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setRole(SelfCareAuthority.ADMIN);
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null)))
+                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        // when
+        Collection<UserInfo> result = userConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
+
+        // then
+        assertTrue(result.isEmpty());
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null));
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void getUsers_notEmpty() {
+        // given
+        String institutionId = "institutionId";
+        String loggedUserId = "loggedUserId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null))
+                .thenReturn(ResponseEntity.ok(List.of(UserDataResponse.builder().userId("userId").build())));
+
+        when(userMapper.toUserInfo(any())).thenReturn(new UserInfo());
+
+        // when
+        Collection<UserInfo> result = userConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
+
+        // then
+        assertEquals(1, result.size());
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null);
         verifyNoMoreInteractions(userApiRestClient);
     }
 

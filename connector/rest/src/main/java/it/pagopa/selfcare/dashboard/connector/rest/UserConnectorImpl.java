@@ -1,24 +1,25 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.PermissionTypeEnum;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
@@ -31,6 +32,8 @@ public class UserConnectorImpl implements UserApiConnector {
     private final UserPermissionRestClient userPermissionRestClient;
     private final InstitutionMapper institutionMapper;
     private final UserMapper userMapper;
+
+    static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
 
     @Override
     public List<InstitutionInfo> getUserProducts(String userId) {
@@ -112,5 +115,31 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("updateUser userId = {}, institutionId = {}, userDto = {}", userId, institutionId, userDto);
         userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toMutableUserFieldsDto(userDto));
         log.trace("updateUser end");
+    }
+
+    @Override
+    public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
+        log.trace("getUsers start");
+        log.debug("getUsers institutionId = {}, userInfoFilter = {}", institutionId, userInfoFilter);
+
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+
+        List<String> roles = Arrays.stream(PartyRole.values())
+                .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
+                .map(Enum::name)
+                .toList();
+
+        return Optional.ofNullable(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId,
+                                loggedUserId,
+                                userInfoFilter.getUserId(),
+                                userInfoFilter.getProductRoles(),
+                                StringUtils.hasText(userInfoFilter.getProductId()) ? List.of(userInfoFilter.getProductId()) : null,
+                                !CollectionUtils.isEmpty(roles) ? roles : null,
+                                !CollectionUtils.isEmpty(userInfoFilter.getAllowedStates()) ? userInfoFilter.getAllowedStates().stream().map(Enum::name).toList() : null)
+                        .getBody())
+                .map(userDataResponses -> userDataResponses.stream()
+                        .map(userMapper::toUserInfo)
+                        .toList())
+                .orElse(Collections.emptyList());
     }
 }
