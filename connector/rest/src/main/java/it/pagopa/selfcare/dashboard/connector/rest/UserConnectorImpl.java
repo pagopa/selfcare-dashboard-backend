@@ -2,23 +2,25 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.PermissionTypeEnum;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
@@ -28,6 +30,7 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 public class UserConnectorImpl implements UserApiConnector {
 
     private final UserApiRestClient userApiRestClient;
+    private final UserInstitutionApiRestClient userInstitutionApiRestClient;
     private final UserPermissionRestClient userPermissionRestClient;
     private final InstitutionMapper institutionMapper;
     private final UserMapper userMapper;
@@ -112,5 +115,26 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("updateUser userId = {}, institutionId = {}, userDto = {}", userId, institutionId, userDto);
         userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toMutableUserFieldsDto(userDto));
         log.trace("updateUser end");
+    }
+
+    @Override
+    public List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId) {
+        log.trace("retrieveFilteredUser start");
+        log.debug("retrieveFilteredUser userId = {}, institutionId = {}, productId = {}", userId, institutionId, productId);
+        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(productId), null, getValidUserStates(), userId).getBody();
+        if(!CollectionUtils.isEmpty(institutionResponses)) {
+            log.info("retrieveFilteredUser institutionResponses size = {}", institutionResponses.size());
+            return institutionResponses.stream()
+                    .map(userMapper::toUserInstitution)
+                    .toList();
+        }
+        return Collections.emptyList();
+    }
+
+    private List<String> getValidUserStates() {
+        return Stream.of(OnboardedProductState.values())
+                .filter(onboardedProductState -> onboardedProductState != OnboardedProductState.DELETED && onboardedProductState != OnboardedProductState.REJECTED)
+                .map(Enum::name)
+                .toList();
     }
 }

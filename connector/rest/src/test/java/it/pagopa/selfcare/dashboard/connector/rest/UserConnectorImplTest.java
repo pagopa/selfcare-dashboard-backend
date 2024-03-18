@@ -4,7 +4,9 @@ import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundExceptio
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
@@ -22,12 +24,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -41,6 +43,9 @@ class UserConnectorImplTest {
     @Mock
     UserPermissionRestClient userPermissionRestClient;
 
+    @Mock
+    UserInstitutionApiRestClient userInstitutionApiRestClient;
+
 
     UserConnectorImpl userConnector;
 
@@ -49,7 +54,7 @@ class UserConnectorImplTest {
 
     @BeforeEach
     void setup(){
-        userConnector = new UserConnectorImpl(userApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
+        userConnector = new UserConnectorImpl(userApiRestClient,userInstitutionApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
     }
 
 
@@ -153,6 +158,32 @@ class UserConnectorImplTest {
         //then
         assertNotNull(user);
         verify(userApiRestClient, times(1))._usersIdDetailsGet(userId);
+    }
+    @Test
+    void verifyUserExist_UserExists() {
+        String userId = "userId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId))).thenReturn(ResponseEntity.ok(List.of(new UserInstitutionResponse())));
+
+       List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
+       assertEquals(1, response.size());
+
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
+    }
+
+    @Test
+    void verifyUserExist_UserDoesNotExist() {
+        String userId = "userId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId)))
+                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
+        assertEquals(0, response.size());
+
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
     }
 
     @Test
