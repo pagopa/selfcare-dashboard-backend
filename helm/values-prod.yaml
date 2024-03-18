@@ -18,6 +18,14 @@ ingress:
         - path: /dashboard/(.*)
           pathType: ImplementationSpecific
 
+resources:
+  requests:
+    cpu: 300m
+    memory: 700M
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
 autoscaling:
   enabled: false
   minReplicas: 1
