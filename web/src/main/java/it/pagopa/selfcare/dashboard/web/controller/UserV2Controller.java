@@ -143,7 +143,7 @@ public class UserV2Controller {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
-    @PreAuthorize("hasPermission(#institutionId, 'ADMIN')")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
                            @PathVariable("id")
                            String userId,
