@@ -5,7 +5,7 @@ import it.pagopa.selfcare.commons.base.utils.Env;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import lombok.Data;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 public class OnboardedProduct {
@@ -16,6 +16,6 @@ public class OnboardedProduct {
     private String productRole;
     private PartyRole role;
     private Env env;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
