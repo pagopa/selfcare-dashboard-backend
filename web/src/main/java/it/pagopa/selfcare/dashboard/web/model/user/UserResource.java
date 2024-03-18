@@ -24,7 +24,7 @@ public class UserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
     private String fiscalCode;
 
-    @ApiModelProperty(value = "${swagger.dasuboard.user.model.workContacts}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.workContacts}")
     private Map<String, WorkContactResource> workContacts;
 
 }

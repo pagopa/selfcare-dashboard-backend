@@ -1,3 +1,5 @@
+replicaCount: 0
+
 image:
   repository: selcdcommonacr.azurecr.io/selfcaredashboardbackend
 
@@ -16,8 +18,8 @@ ingress:
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
+  minReplicas: 0
+  maxReplicas: 0
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
