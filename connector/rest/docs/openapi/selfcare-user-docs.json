@@ -977,56 +977,6 @@
         ]
       }
     },
-    "/users/{userId}/institutions/{institutionId}/products/{productId}": {
-      "delete": {
-        "tags": [
-          "User Controller"
-        ],
-        "summary": "Delete logically the association institution and product",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Not Authorized"
-          },
-          "403": {
-            "description": "Not Allowed"
-          }
-        },
-        "security": [
-          {
-            "SecurityScheme": []
-          }
-        ]
-      }
-    },
     "/users/{userId}/institutions": {
       "get": {
         "tags": [
@@ -1070,6 +1020,56 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/institutions/{institutionId}/products/{productId}": {
+      "delete": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Delete logically the association institution and product",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Not Authorized"
