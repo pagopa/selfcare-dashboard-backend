@@ -67,7 +67,7 @@ class UserConnectorImplTest {
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
         List<InstitutionBase> result = userConnector.getUserInstitutions("userID");
         Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(ACTIVE, result.get(0).getStatus());
+        Assertions.assertEquals(ACTIVE.name(), result.get(0).getStatus());
         Assertions.assertEquals("institutionId", result.get(0).getId());
         Assertions.assertEquals("institutionName", result.get(0).getName());
     }

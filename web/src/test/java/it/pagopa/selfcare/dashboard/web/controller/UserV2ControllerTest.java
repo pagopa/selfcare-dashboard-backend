@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -41,10 +40,6 @@ import java.util.*;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.hamcrest.Matchers.emptyString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.hamcrest.Matchers.in;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -90,9 +85,8 @@ class UserV2ControllerTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
 
-        InstitutionInfo expectedInstitution = mockInstance(new InstitutionInfo());
-        expectedInstitution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        List<InstitutionInfo> expectedInstitutionInfos = new ArrayList<>();
+        InstitutionBase expectedInstitution = mockInstance(new InstitutionBase());
+        List<InstitutionBase> expectedInstitutionInfos = new ArrayList<>();
         expectedInstitutionInfos.add(expectedInstitution);
         when(userServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
         // when
@@ -110,7 +104,7 @@ class UserV2ControllerTest {
 
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
-        assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus().name());
+        assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus());
         assertNotNull(resources.get(0).getUserRole());
         verify(userServiceMock, times(1))
                 .getInstitutions(userId);
