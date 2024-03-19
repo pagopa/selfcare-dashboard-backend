@@ -3,7 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -36,16 +36,16 @@ public class UserConnectorImpl implements UserApiConnector {
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
 
     @Override
-    public List<InstitutionInfo> getUserProducts(String userId) {
+    public List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
-        UserProductsResponse productsInfoUsingGET = userApiRestClient._usersUserIdProductsGet(userId, null,
+        UserInfoResponse userInfoResponse = userApiRestClient._usersUserIdInstitutionsGet(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
 
-        if(Objects.isNull(productsInfoUsingGET) ||
-                Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
+        if(Objects.isNull(userInfoResponse) ||
+                Objects.isNull(userInfoResponse.getInstitutions())) return List.of();
 
-        List<InstitutionInfo> result = productsInfoUsingGET.getBindings().stream()
-                .map(institutionMapper::toInstitutionInfo)
+        List<InstitutionBase> result = userInfoResponse.getInstitutions().stream()
+                .map(institutionMapper::toInstitutionBase)
                 .toList();
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");

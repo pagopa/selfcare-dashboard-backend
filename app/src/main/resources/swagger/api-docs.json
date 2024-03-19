@@ -4551,7 +4551,7 @@
           },
           "products" : {
             "type" : "array",
-            "description" : "${swagger.dashboard.institutions.model.products}",
+            "description" : "Authorized user products",
             "items" : {
               "$ref" : "#/components/schemas/OnboardedProductResource"
             }
@@ -5547,7 +5547,7 @@
             "additionalProperties" : {
               "$ref" : "#/components/schemas/WorkContactResource"
             },
-            "description" : "${swagger.dasuboard.user.model.workContacts}"
+            "description" : "User's workcontacts, contains the emails associated to every institution the user is assigned to"
           }
         }
       },

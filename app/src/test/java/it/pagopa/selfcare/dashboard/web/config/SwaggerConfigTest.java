@@ -108,7 +108,7 @@ class SwaggerConfigTest {
                     Path basePath = Paths.get("src/main/resources/swagger/");
                     Files.createDirectories(basePath);
                     Files.write(basePath.resolve("api-docs.json"), formatted.getBytes());
-                    assertTrue(content.contains("${"), "Generated swagger contains placeholders");
+                    assertFalse(content.contains("${"), "Generated swagger contains placeholders");
                 });
     }
 

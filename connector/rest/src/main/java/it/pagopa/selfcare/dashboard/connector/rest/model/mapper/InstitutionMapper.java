@@ -7,7 +7,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionRoleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -20,6 +20,13 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface InstitutionMapper {
+
+    @Mapping(target = "id", source = "institutionId")
+    @Mapping(target = "name", source = "institutionName")
+    @Mapping(target = "parentDescription", source = "institutionRootName")
+    @Mapping(target = "userRole", expression = "java(institutionProducts.getRole().name())")
+    @Mapping(target = "status", expression = "java(institutionProducts.getStatus().name())")
+    InstitutionBase toInstitutionBase(UserInstitutionRoleResponse institutionProducts);
 
     @Mapping(target = "id", source = "institutionId")
     @Mapping(target = "description", source = "institutionName")
@@ -50,13 +57,6 @@ public interface InstitutionMapper {
     @Mapping(target = "geographicTaxonomies", ignore = true)
     @Mapping(target = "supportContact", ignore = true)
     InstitutionInfo toInstitutionInfo(InstitutionResponse institutionResponse, InstitutionUpdate institutionUpdate);
-
-
-    @Mapping(target = "id", source = "institutionId")
-    @Mapping(target = "description", source = "institutionName")
-    @Mapping(target = "parentDescription", source = "institutionRootName")
-    @Mapping(target = "status", source = ".", qualifiedByName = "toStatus")
-    InstitutionInfo toInstitutionInfo(it.pagopa.selfcare.user.generated.openapi.v1.dto.InstitutionProducts institutionProducts);
 
     @Mapping(target = "category", expression = "java(getCategory(institution.getAttributes()))")
     Institution toInstitution(InstitutionResponse institution);
@@ -118,16 +118,6 @@ public interface InstitutionMapper {
     default RelationshipState toStatus(InstitutionProducts institutionProducts) {
         return institutionProducts.getProducts().stream()
                 .map(Product::getStatus)
-                .sorted()
-                .findFirst()
-                .map(statusEnum -> RelationshipState.valueOf(statusEnum.name()))
-                .orElse(null);
-    }
-
-    @Named("toStatus")
-    default RelationshipState toStatus(it.pagopa.selfcare.user.generated.openapi.v1.dto.InstitutionProducts institutionProducts) {
-        return institutionProducts.getProducts().stream()
-                .map(OnboardedProductResponse::getStatus)
                 .sorted()
                 .findFirst()
                 .map(statusEnum -> RelationshipState.valueOf(statusEnum.name()))
