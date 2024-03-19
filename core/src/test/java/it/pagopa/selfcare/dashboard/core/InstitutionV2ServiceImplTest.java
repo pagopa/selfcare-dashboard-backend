@@ -1,11 +1,8 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -41,8 +38,6 @@ class InstitutionV2ServiceImplTest {
     private InstitutionV2ServiceImpl institutionV2Service;
     @MockBean
     private UserApiConnector userApiConnectorMock;
-    @MockBean
-    private ProductsConnector productServiceMock;
 
     @Test
     void getInstitutionUser() {
@@ -75,13 +70,6 @@ class InstitutionV2ServiceImplTest {
         when(userApiConnectorMock.getUsers(eq(institutionId), any(UserInfo.UserInfoFilter.class), eq(loggedUserId)))
                 .thenReturn(List.of(userInfoMock1));
 
-        Product product1 = mockInstance(new Product(), "setId");
-        product1.setId(productId1);
-        when(productServiceMock.getProduct(productId1))
-                .thenReturn(product1);
-
-        Map<String, Product> idToProductMap = Map.of(productId1, product1);
-
         // when
         UserInfo userInfo = institutionV2Service.getInstitutionUser(institutionId, userInfoFilter.getUserId(), loggedUserId);
         // then
@@ -90,10 +78,6 @@ class InstitutionV2ServiceImplTest {
         Map<String, ProductInfo> productInfoMap = userInfo.getProducts();
         Assertions.assertNotNull(userInfo.getProducts());
         Assertions.assertEquals(1, userInfo.getProducts().size());
-        for (String key : productInfoMap.keySet()) {
-            ProductInfo productInfo = productInfoMap.get(key);
-            Assertions.assertEquals(idToProductMap.get(productInfo.getId()).getTitle(), productInfo.getTitle());
-        }
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnectorMock, times(1))
                 .getUsers(Mockito.eq(institutionId), filterCaptor.capture(), Mockito.eq(loggedUserId));
@@ -102,11 +86,6 @@ class InstitutionV2ServiceImplTest {
         assertNull(capturedFilter.getProductId());
         assertNull(capturedFilter.getProductRoles());
         assertEquals(userInfoFilter.getUserId(), capturedFilter.getUserId());
-
-        verify(productServiceMock, times(1))
-                .getProduct(productId1);
-
-        verifyNoMoreInteractions(userApiConnectorMock, productServiceMock);
     }
 
     @Test
@@ -149,8 +128,6 @@ class InstitutionV2ServiceImplTest {
         assertNull(capturedFilter.getProductRoles());
         assertEquals(userId, capturedFilter.getUserId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verify(productServiceMock, times(0))
-                .getProduct(any());
         verifyNoMoreInteractions(userApiConnectorMock);
     }
 

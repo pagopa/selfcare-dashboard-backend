@@ -1,10 +1,8 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +22,12 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
     private final List<RelationshipState> allowedStates;
     private final UserApiConnector userApiConnector;
-    private final ProductsConnector productService;
 
 
     @Autowired
     public InstitutionV2ServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
-                                    ProductsConnector productService,
                                     UserApiConnector userApiConnector) {
         this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
-        this.productService = productService;
         this.userApiConnector = userApiConnector;
     }
 
@@ -60,16 +55,7 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
         return userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)
                 .stream()
-                .findFirst()
-                .map(userInfo -> {
-                    userInfo.getProducts().forEach((productId, value) -> {
-                        Product product = productService.getProduct(productId);
-                        if (product != null) {
-                            value.setTitle(product.getTitle());
-                        }
-                    });
-                    return userInfo;
-                });
+                .findFirst();
     }
 
 
