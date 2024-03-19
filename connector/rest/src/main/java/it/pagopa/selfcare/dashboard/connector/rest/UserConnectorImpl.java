@@ -1,11 +1,14 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
@@ -15,12 +18,11 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
@@ -35,17 +37,19 @@ public class UserConnectorImpl implements UserApiConnector {
     private final InstitutionMapper institutionMapper;
     private final UserMapper userMapper;
 
+    static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+
     @Override
-    public List<InstitutionInfo> getUserProducts(String userId) {
+    public List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
-        UserProductsResponse productsInfoUsingGET = userApiRestClient._usersUserIdProductsGet(userId, null,
+        UserInfoResponse userInfoResponse = userApiRestClient._usersUserIdInstitutionsGet(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
 
-        if(Objects.isNull(productsInfoUsingGET) ||
-                Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
+        if(Objects.isNull(userInfoResponse) ||
+                Objects.isNull(userInfoResponse.getInstitutions())) return List.of();
 
-        List<InstitutionInfo> result = productsInfoUsingGET.getBindings().stream()
-                .map(institutionMapper::toInstitutionInfo)
+        List<InstitutionBase> result = userInfoResponse.getInstitutions().stream()
+                .map(institutionMapper::toInstitutionBase)
                 .toList();
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");
@@ -115,6 +119,32 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("updateUser userId = {}, institutionId = {}, userDto = {}", userId, institutionId, userDto);
         userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toMutableUserFieldsDto(userDto));
         log.trace("updateUser end");
+    }
+
+    @Override
+    public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
+        log.trace("getUsers start");
+        log.debug("getUsers institutionId = {}, userInfoFilter = {}", institutionId, userInfoFilter);
+
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+
+        List<String> roles = Arrays.stream(PartyRole.values())
+                .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
+                .map(Enum::name)
+                .toList();
+
+        return Optional.ofNullable(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId,
+                                loggedUserId,
+                                userInfoFilter.getUserId(),
+                                userInfoFilter.getProductRoles(),
+                                StringUtils.hasText(userInfoFilter.getProductId()) ? List.of(userInfoFilter.getProductId()) : null,
+                                !CollectionUtils.isEmpty(roles) ? roles : null,
+                                !CollectionUtils.isEmpty(userInfoFilter.getAllowedStates()) ? userInfoFilter.getAllowedStates().stream().map(Enum::name).toList() : null)
+                        .getBody())
+                .map(userDataResponses -> userDataResponses.stream()
+                        .map(userMapper::toUserInfo)
+                        .toList())
+                .orElse(Collections.emptyList());
     }
 
     @Override

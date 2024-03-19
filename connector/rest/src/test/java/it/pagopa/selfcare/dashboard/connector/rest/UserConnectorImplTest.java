@@ -1,9 +1,11 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
@@ -24,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,32 +63,32 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsNotFound() {
-
-        when(userApiRestClient._usersUserIdProductsGet("userID", null,
+        when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserInstitutions("userID"));
     }
 
     @Test
     void getUserProductsFound() {
-        UserProductsResponse userProductsResponse = getUserProductsResponse();
-        when(userApiRestClient._usersUserIdProductsGet("userID", null,
+        UserInfoResponse userProductsResponse = getUserProductsResponse();
+        when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
-        List<InstitutionInfo> result = userConnector.getUserProducts("userID");
+        List<InstitutionBase> result = userConnector.getUserInstitutions("userID");
         Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(ACTIVE, result.get(0).getStatus());
+        Assertions.assertEquals(ACTIVE.name(), result.get(0).getStatus());
         Assertions.assertEquals("institutionId", result.get(0).getId());
-        Assertions.assertEquals("institutionName", result.get(0).getDescription());
+        Assertions.assertEquals("institutionName", result.get(0).getName());
     }
 
-    private static UserProductsResponse getUserProductsResponse() {
-        UserProductsResponse userProductsResponse = new UserProductsResponse();
-        userProductsResponse.setId("userID");
-        InstitutionProducts institutionProducts = new InstitutionProducts();
+    private static UserInfoResponse getUserProductsResponse() {
+        UserInfoResponse userProductsResponse = new UserInfoResponse();
+        userProductsResponse.setUserId("userId");
+        UserInstitutionRoleResponse institutionProducts = new UserInstitutionRoleResponse();
         institutionProducts.setInstitutionId("institutionId");
         institutionProducts.setInstitutionName("institutionName");
-        institutionProducts.setProducts(getOnboardedProduct());
-        userProductsResponse.setBindings(List.of(institutionProducts));
+        institutionProducts.setStatus(OnboardedProductState.ACTIVE);
+        institutionProducts.setRole(PartyRole.MANAGER);
+        userProductsResponse.setInstitutions(List.of(institutionProducts));
         return userProductsResponse;
     }
 
@@ -241,6 +244,48 @@ class UserConnectorImplTest {
         // then
         verify(userApiRestClient, times(1))
                 ._usersIdUserRegistryPut(userId, institutionId, it.pagopa.selfcare.user.generated.openapi.v1.dto.MutableUserFieldsDto.builder().build());
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void getUsers_emptyList() {
+        // given
+        String institutionId = "institutionId";
+        String loggedUserId = "loggedUserId";
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setRole(SelfCareAuthority.ADMIN);
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null)))
+                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        // when
+        Collection<UserInfo> result = userConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
+
+        // then
+        assertTrue(result.isEmpty());
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null));
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void getUsers_notEmpty() {
+        // given
+        String institutionId = "institutionId";
+        String loggedUserId = "loggedUserId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null))
+                .thenReturn(ResponseEntity.ok(List.of(UserDataResponse.builder().userId("userId").build())));
+
+        when(userMapper.toUserInfo(any())).thenReturn(new UserInfo());
+
+        // when
+        Collection<UserInfo> result = userConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
+
+        // then
+        assertEquals(1, result.size());
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
