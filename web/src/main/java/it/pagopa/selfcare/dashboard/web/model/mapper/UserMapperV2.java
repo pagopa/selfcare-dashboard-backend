@@ -16,7 +16,7 @@ public interface UserMapperV2 {
     UserResource toUserResource(User model);
 
     @Mapping(source = "userDto.name", target = "name", qualifiedByName = "mapCertifiedField")
-    @Mapping(source = "userDto.email", target = "email", qualifiedByName = "mapCertifiedField")
+    @Mapping(target = "email", ignore = true)
     @Mapping(target = "workContacts", expression = "java(getEmail(userDto, institutionId))")
     @Mapping(source = "userDto.surname", target = "familyName", qualifiedByName = "mapCertifiedField")
     MutableUserFieldsDto fromUpdateUser(String institutionId, UpdateUserDto userDto);
@@ -33,10 +33,10 @@ public interface UserMapperV2 {
     }
 
     @Named("getEmail")
-    default Map getEmail(UpdateUserDto userDto, String institutionId) {
+    default Map<String, WorkContact> getEmail(UpdateUserDto userDto, String institutionId) {
         if (Objects.nonNull(userDto) && Objects.nonNull(institutionId)) {
             WorkContact contact = new WorkContact();
-            contact.setEmail(CertifiedFieldMapper.map(userDto.getEmail()));
+            contact.setEmail(this.mapCertifiedField(userDto.getEmail()));
             return Map.of(institutionId, contact);
         }
         return Map.of();

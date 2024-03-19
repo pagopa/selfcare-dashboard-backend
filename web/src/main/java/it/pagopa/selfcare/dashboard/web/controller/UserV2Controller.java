@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Problem;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
@@ -51,7 +51,7 @@ public class UserV2Controller {
 
         log.trace("getInstitutions start");
         String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<InstitutionInfo> institutions = userService.getInstitutions(userId);
+        Collection<InstitutionBase> institutions = userService.getInstitutions(userId);
 
         List<InstitutionBaseResource> result = institutions.stream()
                 .map(institutionResourceMapper::toResource)
@@ -146,6 +146,7 @@ public class UserV2Controller {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
                            @PathVariable("id")
                            String userId,

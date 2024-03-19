@@ -45,8 +45,8 @@ class InstitutionV2ControllerTest {
     @Test
     void getInstitutionUser_notNullUser() throws Exception {
         //given
-        String institutionId = "institutionId";
-        String userId = "notFound";
+        final String institutionId = "institutionId";
+        final String userId = "notFound";
         UserInfo userInfo = mockInstance(new UserInfo(), "setId");
         userInfo.setId(randomUUID().toString());
 

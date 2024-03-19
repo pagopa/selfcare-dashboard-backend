@@ -354,8 +354,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -377,8 +388,19 @@
             "content": {
               "application/json": {}
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/emails": {
@@ -418,8 +440,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/ids": {
@@ -453,8 +486,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/notification": {
@@ -500,8 +544,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/search": {
@@ -529,8 +584,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/{id}": {
@@ -573,8 +639,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/{id}/details": {
@@ -603,8 +680,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/{id}/institution/{institutionId}/product/{productId}/status": {
@@ -650,8 +738,19 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/{id}/status": {
@@ -711,8 +810,19 @@
             "content": {
               "application/json": {}
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/{id}/user-registry": {
@@ -753,8 +863,19 @@
             "content": {
               "application/json": {}
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
     "/users/{userId}/institution/{institutionId}": {
@@ -762,7 +883,7 @@
         "tags": [
           "User Controller"
         ],
-        "summary": "The API retrieves users with optional filters in input as query params",
+        "summary": "The retrieveUsers function is used to retrieve a list of users from the UserInstitution collection and userRegistry.\nAt first it try to retrieve a UserInstitution document associated with a logged user (admin)\nIf this userInstitution object is not null, so user has AdminRole, it try to retriew the userInstitutions filtered by given institutionId, roles, states, products and productRoles\nand optional given personId, otherwise it do the same query using the logged user id instead of personId.\nAfter that it retrieve personal user data, foreach userId retrieved, from userRegistry and return a stream of UserDataResponse objects containing the requested user data.",
         "parameters": [
           {
             "name": "institutionId",
@@ -841,50 +962,22 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     },
-    "/users/{userId}/institutions/{institutionId}/products/{productId}": {
-      "delete": {
-        "tags": [
-          "User Controller"
-        ],
-        "summary": "Delete logically the association institution and product",
-        "parameters": [
-          {
-            "name": "institutionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        }
-      }
-    },
-    "/users/{userId}/products": {
+    "/users/{userId}/institutions": {
       "get": {
         "tags": [
           "User Controller"
@@ -923,12 +1016,73 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProductsResponse"
+                  "$ref": "#/components/schemas/UserInfoResponse"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
           }
-        }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/institutions/{institutionId}/products/{productId}": {
+      "delete": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Delete logically the association institution and product",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
       }
     }
   },
@@ -1015,29 +1169,6 @@
           "PROD"
         ],
         "type": "string"
-      },
-      "InstitutionProducts": {
-        "type": "object",
-        "properties": {
-          "institutionId": {
-            "type": "string"
-          },
-          "institutionName": {
-            "type": "string"
-          },
-          "institutionRootName": {
-            "type": "string"
-          },
-          "userMailUuid": {
-            "type": "string"
-          },
-          "products": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OnboardedProductResponse"
-            }
-          }
-        }
       },
       "LocalDate": {
         "format": "date",
@@ -1263,6 +1394,20 @@
           }
         }
       },
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "institutions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserInstitutionRoleResponse"
+            }
+          }
+        }
+      },
       "UserInstitutionResponse": {
         "type": "object",
         "properties": {
@@ -1289,6 +1434,26 @@
             "items": {
               "$ref": "#/components/schemas/OnboardedProductResponse"
             }
+          }
+        }
+      },
+      "UserInstitutionRoleResponse": {
+        "type": "object",
+        "properties": {
+          "institutionId": {
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PartyRole"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OnboardedProductState"
           }
         }
       },
@@ -1343,20 +1508,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/OnboardedProductResponse"
-            }
-          }
-        }
-      },
-      "UserProductsResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "bindings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstitutionProducts"
             }
           }
         }

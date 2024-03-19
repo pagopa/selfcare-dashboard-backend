@@ -5,7 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -28,9 +28,9 @@ public class UserV2ServiceImpl implements UserV2Service {
     private final UserGroupService userGroupService;
 
     @Override
-    public Collection<InstitutionInfo> getInstitutions(String userId) {
+    public Collection<InstitutionBase> getInstitutions(String userId) {
         log.trace("getInstitutions start");
-        Collection<InstitutionInfo> result = userApiConnector.getUserProducts(userId);
+        Collection<InstitutionBase> result = userApiConnector.getUserInstitutions(userId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
         return result;
