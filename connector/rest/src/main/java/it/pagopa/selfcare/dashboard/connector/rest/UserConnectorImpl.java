@@ -23,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 
