@@ -59,7 +59,7 @@ public class InstitutionV2Controller {
         return result;
     }
 
-    @GetMapping("/institutions")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
     public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {

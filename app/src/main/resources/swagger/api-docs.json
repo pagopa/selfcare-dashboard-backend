@@ -1281,7 +1281,7 @@
         } ]
       }
     },
-    "/v2/institutions/institutions" : {
+    "/v2/institutions" : {
       "get" : {
         "tags" : [ "institutions" ],
         "summary" : "getInstitutions",

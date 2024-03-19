@@ -103,7 +103,7 @@ class InstitutionV2ControllerTest {
         when(userServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/institutions")
+                        .get(BASE_URL)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
