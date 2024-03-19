@@ -5,7 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
@@ -47,11 +47,11 @@ class UserV2ServiceImplTest {
     void getInstitutions() {
         // given
         String userId = "userId";
-        InstitutionInfo expectedInstitutionInfo = new InstitutionInfo();
+        InstitutionBase expectedInstitutionInfo = new InstitutionBase();
 
-        when(userApiConnector.getUserProducts(userId)).thenReturn(List.of(expectedInstitutionInfo));
+        when(userApiConnector.getUserInstitutions(userId)).thenReturn(List.of(expectedInstitutionInfo));
         // when
-        Collection<InstitutionInfo> institutions = userService.getInstitutions(userId);
+        Collection<InstitutionBase> institutions = userService.getInstitutions(userId);
 
         assertNotNull(institutions);
         assertEquals(1, institutions.size());
