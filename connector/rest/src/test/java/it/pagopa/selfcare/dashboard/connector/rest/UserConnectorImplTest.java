@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
@@ -55,32 +55,32 @@ class UserConnectorImplTest {
 
     @Test
     void getUserProductsNotFound() {
-
-        when(userApiRestClient._usersUserIdProductsGet("userID", null,
+        when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserProducts("userID"));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserInstitutions("userID"));
     }
 
     @Test
     void getUserProductsFound() {
-        UserProductsResponse userProductsResponse = getUserProductsResponse();
-        when(userApiRestClient._usersUserIdProductsGet("userID", null,
+        UserInfoResponse userProductsResponse = getUserProductsResponse();
+        when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
-        List<InstitutionInfo> result = userConnector.getUserProducts("userID");
+        List<InstitutionBase> result = userConnector.getUserInstitutions("userID");
         Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals(ACTIVE, result.get(0).getStatus());
+        Assertions.assertEquals(ACTIVE.name(), result.get(0).getStatus());
         Assertions.assertEquals("institutionId", result.get(0).getId());
-        Assertions.assertEquals("institutionName", result.get(0).getDescription());
+        Assertions.assertEquals("institutionName", result.get(0).getName());
     }
 
-    private static UserProductsResponse getUserProductsResponse() {
-        UserProductsResponse userProductsResponse = new UserProductsResponse();
-        userProductsResponse.setId("userID");
-        InstitutionProducts institutionProducts = new InstitutionProducts();
+    private static UserInfoResponse getUserProductsResponse() {
+        UserInfoResponse userProductsResponse = new UserInfoResponse();
+        userProductsResponse.setUserId("userId");
+        UserInstitutionRoleResponse institutionProducts = new UserInstitutionRoleResponse();
         institutionProducts.setInstitutionId("institutionId");
         institutionProducts.setInstitutionName("institutionName");
-        institutionProducts.setProducts(getOnboardedProduct());
-        userProductsResponse.setBindings(List.of(institutionProducts));
+        institutionProducts.setStatus(OnboardedProductState.ACTIVE);
+        institutionProducts.setRole(PartyRole.MANAGER);
+        userProductsResponse.setInstitutions(List.of(institutionProducts));
         return userProductsResponse;
     }
 

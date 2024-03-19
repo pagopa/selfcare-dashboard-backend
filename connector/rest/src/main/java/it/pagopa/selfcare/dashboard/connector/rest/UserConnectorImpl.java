@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
@@ -12,7 +12,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.PermissionTypeEnum;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.SearchUserDto;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductsResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,16 +33,16 @@ public class UserConnectorImpl implements UserApiConnector {
     private final UserMapper userMapper;
 
     @Override
-    public List<InstitutionInfo> getUserProducts(String userId) {
+    public List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
-        UserProductsResponse productsInfoUsingGET = userApiRestClient._usersUserIdProductsGet(userId, null,
+        UserInfoResponse userInfoResponse = userApiRestClient._usersUserIdInstitutionsGet(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
 
-        if(Objects.isNull(productsInfoUsingGET) ||
-                Objects.isNull(productsInfoUsingGET.getBindings())) return List.of();
+        if(Objects.isNull(userInfoResponse) ||
+                Objects.isNull(userInfoResponse.getInstitutions())) return List.of();
 
-        List<InstitutionInfo> result = productsInfoUsingGET.getBindings().stream()
-                .map(institutionMapper::toInstitutionInfo)
+        List<InstitutionBase> result = userInfoResponse.getInstitutions().stream()
+                .map(institutionMapper::toInstitutionBase)
                 .toList();
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");
