@@ -3476,7 +3476,7 @@
         } ]
       }
     },
-    "/v2/institution/{institutionId}" : {
+    "/v2/users/institution/{institutionId}" : {
       "get" : {
         "tags" : [ "user" ],
         "summary" : "getUsers",
@@ -3601,12 +3601,12 @@
         } ]
       }
     },
-    "/v2/institutions" : {
+    "/v2/users/institutions" : {
       "get" : {
         "tags" : [ "user" ],
         "summary" : "getInstitutions",
         "description" : "Service to get all the institutions related to logged user",
-        "operationId" : "getInstitutionsUsingGET_1",
+        "operationId" : "getInstitutionsUsingGET_2",
         "parameters" : [ {
           "name" : "authenticated",
           "in" : "query",
@@ -3708,7 +3708,6 @@
         } ]
       }
     },
-    "/v2/search" : {
     "/v2/users/search" : {
       "post" : {
         "tags" : [ "user" ],
