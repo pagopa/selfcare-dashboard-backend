@@ -1,18 +1,19 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.Certification;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,19 +25,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.Matchers.emptyString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -66,10 +67,10 @@ class UserV2ControllerTest {
     private static final User USER_RESOURCE;
 
     static {
-        USER_RESOURCE = TestUtils.mockInstance(new User());
-        USER_RESOURCE.setId(UUID.randomUUID().toString());
+        USER_RESOURCE = mockInstance(new User());
+        USER_RESOURCE.setId(randomUUID().toString());
         Map<String, WorkContact> workContacts = new HashMap<>();
-        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
+        WorkContact workContact = mockInstance(new WorkContact());
         workContact.getEmail().setCertification(Certification.SPID);
         workContacts.put("institutionId", workContact);
         USER_RESOURCE.setWorkContacts(workContacts);
@@ -207,6 +208,42 @@ class UserV2ControllerTest {
                 .updateUser(eq(id), eq(institutionId), any(MutableUserFieldsDto.class));
 
         Mockito.verifyNoMoreInteractions(userServiceMock);
+    }
+
+    @Test
+    void getUsers_institutionIdProductIdValid() throws Exception {
+        // given
+        String institutionId = "institutionId";
+        String productId = "productId";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
+
+        UserInfo userInfo = mockInstance(new UserInfo());
+        userInfo.setId(randomUUID().toString());
+        List<UserInfo> userInfos = List.of(userInfo);
+
+        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, "userId")).thenReturn(userInfos);
+
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/institution/" + institutionId)
+                        .principal(authentication)
+                        .queryParam("productId", productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // then
+        List<ProductUserResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertNotNull(resources);
+        assertFalse(resources.isEmpty());
+        verify(userServiceMock, times(1))
+                .getUsersByInstitutionId(institutionId, productId, "userId");
+        verifyNoMoreInteractions(userServiceMock);
     }
 
 

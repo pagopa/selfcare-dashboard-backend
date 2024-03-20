@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -165,5 +167,46 @@ class UserV2ServiceImplTest {
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, executable);
         assertEquals("There is no institution for given institutionId", exception.getMessage());
         verifyNoInteractions(userApiConnector);
+    }
+
+    @Test
+    void getUsersByInstitutionId_returnsExpectedUsers() {
+        // given
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String loggedUserId = "loggedUserId";
+        UserInfo expectedUser = new UserInfo();
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+
+        when(userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(List.of(expectedUser));
+        // when
+        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+
+        // then
+        assertNotNull(users);
+        assertEquals(1, users.size());
+        assertSame(expectedUser, users.iterator().next());
+        verifyNoMoreInteractions(userApiConnector);
+    }
+
+    @Test
+    void getUsersByInstitutionId_emptyList() {
+        // given
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String loggedUserId = "loggedUserId";
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+
+        when(userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(Collections.emptyList());
+        // when
+        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+
+        // then
+        assertNotNull(users);
+        assertTrue(users.isEmpty());
+        verifyNoMoreInteractions(userApiConnector);
     }
 }
