@@ -17,6 +17,8 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
@@ -86,6 +88,22 @@ public class SupportServiceImpl implements SupportService {
 
         log.trace("sendRequest end");
         return html;
+    }
+
+    @Override
+    public String getSupportRequest(SupportRequest supportRequest) {
+        log.trace("sendRequest start");
+        log.debug("sendRequest request = {}", supportRequest);
+        final String jwtString = getJWTString(supportRequest);
+        final String  redirectUrl = "https://pagopa.zendesk.com/access/jwt?jwt=" + jwtString;
+        log.debug("sendRequest result = {}", redirectUrl);
+        log.trace("sendRequest end");
+
+        String returnUrl = StringUtils.hasText(supportRequest.getProductId()) ?
+                URLEncoder.encode(returnTo.concat("?product=" + supportRequest.getProductId()), StandardCharsets.UTF_8) :
+                URLEncoder.encode(returnTo, StandardCharsets.UTF_8);
+
+        return redirectUrl.concat("&return_to=" + returnUrl);
     }
 
     private String getJWTString(SupportRequest supportRequest) {

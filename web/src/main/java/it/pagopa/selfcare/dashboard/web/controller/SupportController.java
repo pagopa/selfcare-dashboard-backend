@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.core.SupportService;
 import it.pagopa.selfcare.dashboard.web.model.mapper.SupportMapper;
 import it.pagopa.selfcare.dashboard.web.model.support.SupportRequestDto;
@@ -37,7 +38,7 @@ public class SupportController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
     public String sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
-                                              Authentication authentication) {
+                                     Authentication authentication) {
         log.trace("sendSupportRequest start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
         final SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
@@ -45,5 +46,20 @@ public class SupportController {
         log.debug("sendSupportRequest result = {}", url);
         log.trace("sendSupportRequest end");
         return url;
+    }
+
+    @Deprecated
+    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
+    public SupportResponse getSupportRedirectUrl(@RequestBody @Valid SupportRequestDto supportRequestDto,
+                                                 Authentication authentication) {
+        log.trace("sendSupportRequest start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
+        final SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+        final String url = supportService.getSupportRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
+        log.debug("sendSupportRequest result = {}", url);
+        log.trace("sendSupportRequest end");
+        return SupportResponse.builder().redirectUrl(url).build();
     }
 }
