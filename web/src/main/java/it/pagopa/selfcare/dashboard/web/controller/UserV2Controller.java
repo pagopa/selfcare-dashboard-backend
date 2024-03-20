@@ -41,26 +41,7 @@ import java.util.List;
 public class UserV2Controller {
 
     private final UserV2Service userService;
-    private final InstitutionResourceMapper institutionResourceMapper;
     private final UserMapperV2 userMapperV2;
-
-    @GetMapping("/institutions")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
-    public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
-
-        log.trace("getInstitutions start");
-        String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<InstitutionBase> institutions = userService.getInstitutions(userId);
-
-        List<InstitutionBaseResource> result = institutions.stream()
-                .map(institutionResourceMapper::toResource)
-                .toList();
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
-        log.trace("getInstitutions end");
-
-        return result;
-    }
 
     @PostMapping(value = "/{userId}/suspend")
     @ResponseStatus(HttpStatus.NO_CONTENT)
