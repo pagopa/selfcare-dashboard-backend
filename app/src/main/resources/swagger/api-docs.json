@@ -1281,6 +1281,113 @@
         } ]
       }
     },
+    "/v2/institutions" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "getInstitutions",
+        "description" : "Service to get all the institutions related to logged user",
+        "operationId" : "getInstitutionsUsingGET_1",
+        "parameters" : [ {
+          "name" : "authenticated",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "authorities[0].authority",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "credentials",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "details",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        }, {
+          "name" : "principal",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "object"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/InstitutionBaseResource"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/v2/institutions/{institutionId}/users/{userId}" : {
       "get" : {
         "tags" : [ "institutions" ],
@@ -3602,6 +3709,7 @@
       }
     },
     "/v2/search" : {
+    "/v2/users/search" : {
       "post" : {
         "tags" : [ "user" ],
         "summary" : "search",
@@ -3673,7 +3781,7 @@
         } ]
       }
     },
-    "/v2/{id}" : {
+    "/v2/users/{id}" : {
       "get" : {
         "tags" : [ "user" ],
         "summary" : "getUserById",
@@ -3818,7 +3926,7 @@
         } ]
       }
     },
-    "/v2/{userId}" : {
+    "/v2/users/{userId}" : {
       "delete" : {
         "tags" : [ "user" ],
         "summary" : "deleteRelationshipById",
@@ -3892,7 +4000,7 @@
         } ]
       }
     },
-    "/v2/{userId}/activate" : {
+    "/v2/users/{userId}/activate" : {
       "post" : {
         "tags" : [ "user" ],
         "summary" : "activateRelationship",
@@ -3966,7 +4074,7 @@
         } ]
       }
     },
-    "/v2/{userId}/suspend" : {
+    "/v2/users/{userId}/suspend" : {
       "post" : {
         "tags" : [ "user" ],
         "summary" : "suspendRelationship",
