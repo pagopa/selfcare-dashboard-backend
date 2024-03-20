@@ -3,6 +3,7 @@ env_short = "u"
 private_dns_name   = "selc-u-pnpg-dashboard-backend-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "imprese.uat.notifichedigitali"
 api_dns_zone_prefix = "api-pnpg.uat.selfcare"
+external_domain     = "it"
 
 tags = {
   CreatedBy   = "Terraform"
