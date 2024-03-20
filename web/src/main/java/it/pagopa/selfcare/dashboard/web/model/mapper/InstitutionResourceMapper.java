@@ -26,6 +26,8 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "userRole", expression = "java(toUserRole(model.getId(), model.getStatus()))")
     InstitutionBaseResource toResource(InstitutionInfo model);
 
+    InstitutionBaseResource toResource(InstitutionBase model);
+
     @Mapping(target = "name", source = "description")
     @Mapping(target = "fiscalCode", source = "taxCode")
     @Mapping(target = "mailAddress", source = "digitalAddress")

@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 0
 
 image:
   repository: selcdacr.azurecr.io/selfcaredashboardbackend
@@ -26,8 +26,8 @@ resources:
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
+  minReplicas: 0
+  maxReplicas: 0
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 

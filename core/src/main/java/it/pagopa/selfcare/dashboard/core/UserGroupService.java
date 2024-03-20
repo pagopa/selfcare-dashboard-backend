@@ -28,6 +28,4 @@ public interface UserGroupService {
 
     Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable);
     void deleteMembersByRelationshipId(String relationshipId);
-
-    void deleteMembersByUserId(String userId, String institutionId, String productId);
 }
