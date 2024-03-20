@@ -107,4 +107,15 @@ public interface UserMapper {
         return productInfoMap;
     }
 
+    @Mapping(target = "products", expression = "java(toOnboardedProducts(userInstitutionResponse.getProducts()))")
+    UserInstitution toUserInstitution(UserInstitutionResponse userInstitutionResponse);
+
+    @Named("toOnboardedProducts")
+    List<OnboardedProduct> toOnboardedProducts(List<OnboardedProductResponse> onboardedProductResponse);
+
+    @Mapping(target = "status", expression = "java(it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.valueOf(onboardedProductResponse.getStatus().name()))")
+    @Mapping(target = "env", expression = "java(it.pagopa.selfcare.commons.base.utils.Env.valueOf(onboardedProductResponse.getEnv().name()))")
+    @Mapping(target = "role", expression = "java(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProductResponse.getRole().name()))")
+    OnboardedProduct toOnboardedProducts(OnboardedProductResponse onboardedProductResponse);
+
 }

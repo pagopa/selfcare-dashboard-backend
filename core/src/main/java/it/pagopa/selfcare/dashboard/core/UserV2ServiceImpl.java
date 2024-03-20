@@ -23,9 +23,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserV2ServiceImpl implements UserV2Service {
 
-    private final MsCoreConnector msCoreConnector;
     private final UserApiConnector userApiConnector;
-    private final UserGroupService userGroupService;
+    private final MsCoreConnector msCoreConnector;
+    private final UserV2GroupService userGroupService;
 
     @Override
     public Collection<InstitutionBase> getInstitutions(String userId) {
