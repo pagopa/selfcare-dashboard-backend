@@ -41,7 +41,7 @@ class UserV2ServiceImplTest {
     private UserApiConnector userApiConnector;
 
     @Mock
-    private UserGroupService userGroupService;
+    private UserV2GroupService userGroupService;
 
     @Test
     void getInstitutions() {

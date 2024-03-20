@@ -6,7 +6,9 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
@@ -44,6 +46,9 @@ class UserConnectorImplTest {
     @Mock
     UserPermissionRestClient userPermissionRestClient;
 
+    @Mock
+    UserInstitutionApiRestClient userInstitutionApiRestClient;
+
 
     UserConnectorImpl userConnector;
 
@@ -52,7 +57,7 @@ class UserConnectorImplTest {
 
     @BeforeEach
     void setup(){
-        userConnector = new UserConnectorImpl(userApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
+        userConnector = new UserConnectorImpl(userApiRestClient,userInstitutionApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
     }
 
 
@@ -156,6 +161,32 @@ class UserConnectorImplTest {
         //then
         assertNotNull(user);
         verify(userApiRestClient, times(1))._usersIdDetailsGet(userId);
+    }
+    @Test
+    void verifyUserExist_UserExists() {
+        String userId = "userId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId))).thenReturn(ResponseEntity.ok(List.of(new UserInstitutionResponse())));
+
+       List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
+       assertEquals(1, response.size());
+
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
+    }
+
+    @Test
+    void verifyUserExist_UserDoesNotExist() {
+        String userId = "userId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId)))
+                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
+        assertEquals(0, response.size());
+
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
     }
 
     @Test

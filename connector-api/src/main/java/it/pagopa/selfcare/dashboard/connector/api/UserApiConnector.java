@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.api;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 
 import java.util.Collection;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -28,4 +29,6 @@ public interface UserApiConnector {
     void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto);
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId);
+
+    List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId);
 }
