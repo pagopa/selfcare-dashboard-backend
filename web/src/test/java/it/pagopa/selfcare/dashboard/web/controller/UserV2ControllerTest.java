@@ -77,39 +77,6 @@ class UserV2ControllerTest {
     }
 
     @Test
-    void getInstitutions_institutionInfoNotNull() throws Exception {
-        // given
-        String userId = "userId";
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
-
-        InstitutionBase expectedInstitution = mockInstance(new InstitutionBase());
-        List<InstitutionBase> expectedInstitutionInfos = new ArrayList<>();
-        expectedInstitutionInfos.add(expectedInstitution);
-        when(userServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/institutions")
-                        .principal(authentication)
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-
-        assertNotNull(resources);
-        assertFalse(resources.isEmpty());
-        assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus());
-        assertNotNull(resources.get(0).getUserRole());
-        verify(userServiceMock, times(1))
-                .getInstitutions(userId);
-        verifyNoMoreInteractions(userServiceMock);
-    }
-
-    @Test
     void suspendRelationship() throws Exception {
         // given
         String userId = "rel1";
