@@ -106,6 +106,7 @@ class SupportServiceImplTest {
         assertTrue(url.contains(supportRequest.getProductId()));
         assertEquals("<html>", url.substring(0, 6));
     }
+
     /**
      * Method under test: {@link SupportServiceImpl#sendRequest(SupportRequest)}
      */
@@ -116,6 +117,22 @@ class SupportServiceImplTest {
         assertEquals("secret key byte array cannot be null or empty.", exception.getMessage());
     }
 
+    /**
+     * Method under test: {@link SupportServiceImpl#getSupportRequest(SupportRequest)}
+     */
+    @Test
+    void testGetRequestUrlWithProductId() {
+        FreeMarkerConfigurer freeMarkerConfigurer = freemarkerClassLoaderConfig();
+        SupportServiceImpl supportServiceImpl = new SupportServiceImpl("w90kAW1FIIJaMuWbKGyd8GfDkv45tVPiyYvrdLADsK2ANX26", "", "", "redirectUrl", freeMarkerConfigurer, null);
+        SupportRequest supportRequest = this.dummySupportRequest();
+        supportRequest.setProductId("prodottoDiTest");
+        String url = supportServiceImpl.getSupportRequest(supportRequest);
+        assertNotNull(url);
+        assertTrue(url.contains("jwt"));
+        assertTrue(url.contains(supportRequest.getProductId()));
+        assertEquals("http", url.substring(0, 4));
+    }
+    
     private SupportRequest dummySupportRequest() {
         SupportRequest supportRequest = new SupportRequest();
         supportRequest.setName("Mario Rossi");
