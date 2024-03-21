@@ -18,10 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +40,7 @@ class UserV2ServiceImplTest {
     private UserApiConnector userApiConnector;
 
     @Mock
-    private UserV2GroupService userGroupService;
+    private UserGroupV2Service userGroupService;
 
     @Test
     void getInstitutions() {
@@ -111,13 +108,13 @@ class UserV2ServiceImplTest {
         //given
         String userId = "userId";
         User user = mockInstance(new User());
-        when(userApiConnector.getUserById(anyString())).thenReturn(user);
+        when(userApiConnector.getUserById(userId, null)).thenReturn(user);
         //when
         User result = userService.getUserById(userId);
         //then
         assertNotNull(result);
         assertEquals(user, result);
-        verify(userApiConnector, times(1)).getUserById(userId);
+        verify(userApiConnector, times(1)).getUserById(userId, null);
     }
 
     @Test

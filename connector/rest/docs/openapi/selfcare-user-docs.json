@@ -668,6 +668,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

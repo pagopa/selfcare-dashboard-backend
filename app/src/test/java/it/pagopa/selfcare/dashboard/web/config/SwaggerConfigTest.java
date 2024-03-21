@@ -85,6 +85,9 @@ class SwaggerConfigTest {
     private UserMapperV2 userMapperImpl;
 
     @MockBean
+    private UserGroupV2Service userGroupServiceV2Mock;
+
+    @MockBean
     private InstitutionResourceMapper institutionResourceMapper;
 
     @Autowired
