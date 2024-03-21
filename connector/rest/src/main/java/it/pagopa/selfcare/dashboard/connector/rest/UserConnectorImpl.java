@@ -4,17 +4,16 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -147,7 +146,6 @@ public class UserConnectorImpl implements UserApiConnector {
                         .toList())
                 .orElse(Collections.emptyList());
     }
-
     @Override
     public List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId) {
         log.trace("retrieveFilteredUser start");
@@ -167,5 +165,57 @@ public class UserConnectorImpl implements UserApiConnector {
                 .filter(onboardedProductState -> onboardedProductState != OnboardedProductState.DELETED && onboardedProductState != OnboardedProductState.REJECTED)
                 .map(Enum::name)
                 .toList();
+    }
+
+    @Override
+    public String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role) {
+        log.trace("createOrUpdateUserByFiscalCode start");
+        log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
+        CreateUserDto createUserDto = buildCreateUserDto(institutionId, productId, userDto, role);
+        String userId = userApiRestClient._usersPost(createUserDto).getBody();
+        log.trace("createOrUpdateUserByFiscalCode end");
+        return userId;
+    }
+
+    @Override
+    public void createOrUpdateUserByUserId(String institutionId, String productId, String userId, it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role) {
+        log.trace("createOrUpdateUserByUserId start");
+        log.debug("createOrUpdateUserByUserId userId = {}", userId);
+        AddUserRoleDto addUserRoleDto = AddUserRoleDto.builder()
+                .institutionId(institutionId)
+                .product(Product.builder()
+                        .productRole(role.getProductRole())
+                        .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(role.getPartyRole().name()))
+                        .productId(productId)
+                        .build())
+                .build();
+
+        userApiRestClient._usersUserIdPost(userId, addUserRoleDto);
+        log.trace("createOrUpdateUserByUserId end");
+    }
+
+    private CreateUserDto buildCreateUserDto(String institutionId, String productId, UserToCreate userDto, it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role) {
+        return CreateUserDto.builder()
+                .institutionId(institutionId)
+                .user(buildUser(userDto))
+                .product(buildProduct(productId, role))
+                .build();
+    }
+
+    private Product1 buildProduct(String productId, it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role) {
+        return Product1.builder()
+                .productRole(role.getProductRole())
+                .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(role.getPartyRole().name()))
+                .productId(productId)
+                .build();
+    }
+
+    private it.pagopa.selfcare.user.generated.openapi.v1.dto.User buildUser(UserToCreate userDto) {
+        return it.pagopa.selfcare.user.generated.openapi.v1.dto.User.builder()
+                .fiscalCode(userDto.getTaxCode())
+                .name(userDto.getName())
+                .familyName(userDto.getSurname())
+                .institutionEmail(userDto.getEmail())
+                .build();
     }
 }

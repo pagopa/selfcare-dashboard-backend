@@ -10,9 +10,13 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
+import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
+import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
+import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,8 +25,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -35,6 +41,7 @@ public class InstitutionV2Controller {
     private final InstitutionV2Service institutionV2Service;
     private final UserV2Service userService;
     private final InstitutionResourceMapper institutionResourceMapper;
+    private final UserMapperV2 userMapperV2;
 
     @GetMapping(value = "/{institutionId}/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
@@ -75,5 +82,53 @@ public class InstitutionV2Controller {
         log.trace("getInstitutions end");
 
         return result;
+    }
+
+    @PostMapping(value = "/{institutionId}/products/{productId}/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    public UserIdResource createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                       @PathVariable("institutionId")
+                                                       String institutionId,
+                                                       @ApiParam("${swagger.dashboard.products.model.id}")
+                                                       @PathVariable("productId")
+                                                       String productId,
+                                                       @ApiParam("${swagger.dashboard.user.model.role}")
+                                                       @RequestBody
+                                                       @Valid
+                                                       CreateUserDto user) {
+
+        log.trace("createInstitutionProductUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
+        String userId = userService.createUsers(institutionId, productId, userMapperV2.toUserToCreate(user));
+        UserIdResource result = new UserIdResource();
+        result.setId(UUID.fromString(userId));
+        log.debug("createInstitutionProductUser result = {}", result);
+        log.trace("createInstitutionProductUser end");
+        return result;
+    }
+
+    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    public void addUserProductRoles(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                    @PathVariable("institutionId")
+                                    String institutionId,
+                                    @ApiParam("${swagger.dashboard.products.model.id}")
+                                    @PathVariable("productId")
+                                    String productId,
+                                    @ApiParam("${swagger.dashboard.user.model.id}")
+                                    @PathVariable("userId")
+                                    String userId,
+                                    @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                    @RequestBody
+                                    @Valid
+                                    UserProductRoles userProductRoles) {
+        log.trace("addUserProductRoles start");
+        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
+        userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles());
+        log.trace("addUserProductRoles end");
     }
 }
