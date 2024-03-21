@@ -1,8 +1,9 @@
 is_pnpg   = true
 env_short = "u"
-private_dns_name   = "selc-u-pnpg-dashboard-backend-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+private_dns_name   = "selc-u-pnpg-dashboard-backend-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "imprese.uat.notifichedigitali"
 api_dns_zone_prefix = "api-pnpg.uat.selfcare"
+external_domain     = "it"
 
 tags = {
   CreatedBy   = "Terraform"
@@ -75,15 +76,15 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-u-pnpg-ms-core-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-pnpg-ms-core-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-u-pnpg-ms-core-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-pnpg-ms-core-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-u-pnpg-party-reg-proxy-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-pnpg-party-reg-proxy-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
@@ -91,7 +92,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-u-pnpg-user-group-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-pnpg-user-group-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -111,7 +112,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-u-pnpg-user-ms-ca.redground-be752d1f5.westeurope.azurecontainerapps.io"
+      value = "https://selc-u-pnpg-user-ms-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
     }
 ]
 
