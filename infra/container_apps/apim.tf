@@ -43,7 +43,7 @@ module "apim_api_bff_dashboard" {
   xml_content = <<XML
 <policies>
     <inbound>
-        <cors>
+        <cors allow-credentials="true">
             <allowed-origins>
                 <origin>https://${var.dns_zone_prefix}.${var.external_domain}</origin>
                 <origin>https://${var.api_dns_zone_prefix}.${var.external_domain}</origin>

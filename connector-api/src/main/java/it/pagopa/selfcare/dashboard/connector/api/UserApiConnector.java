@@ -11,7 +11,7 @@ public interface UserApiConnector {
 
     List<InstitutionBase> getUserInstitutions(String userId);
 
-    User getUserById(String userId);
+    User getUserById(String userId, List<String> fields);
 
     User searchByFiscalCode(String fiscalCode);
 

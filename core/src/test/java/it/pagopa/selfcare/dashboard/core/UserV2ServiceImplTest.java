@@ -44,7 +44,7 @@ class UserV2ServiceImplTest {
     private UserApiConnector userApiConnector;
 
     @Mock
-    private UserV2GroupService userGroupService;
+    private UserGroupV2Service userGroupService;
 
     @Mock
     private ProductsConnector productsConnector;
@@ -115,13 +115,13 @@ class UserV2ServiceImplTest {
         //given
         String userId = "userId";
         User user = mockInstance(new User());
-        when(userApiConnector.getUserById(anyString())).thenReturn(user);
+        when(userApiConnector.getUserById(userId, null)).thenReturn(user);
         //when
         User result = userService.getUserById(userId);
         //then
         assertNotNull(result);
         assertEquals(user, result);
-        verify(userApiConnector, times(1)).getUserById(userId);
+        verify(userApiConnector, times(1)).getUserById(userId, null);
     }
 
     @Test

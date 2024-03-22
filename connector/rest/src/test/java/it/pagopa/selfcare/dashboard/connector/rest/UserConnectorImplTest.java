@@ -144,12 +144,12 @@ class UserConnectorImplTest {
         //given
         String userId = "userId";
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersIdDetailsGet(anyString())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersIdDetailsGet(userId, null)).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.getUserById(userId);
+        User user = userConnector.getUserById(userId, null);
         //then
         assertNotNull(user);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, null);
     }
     @Test
     void verifyUserExist_UserExists() {

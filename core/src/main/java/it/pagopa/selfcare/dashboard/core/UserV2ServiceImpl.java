@@ -27,8 +27,8 @@ import java.util.*;
 public class UserV2ServiceImpl implements UserV2Service {
 
     private final MsCoreConnector msCoreConnector;
+    private final UserGroupV2Service userGroupService;
     private final UserApiConnector userApiConnector;
-    private final UserV2GroupService userGroupService;
     private final ProductsConnector productsConnector;
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
 
@@ -72,7 +72,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     public User getUserById(String userId) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
-        User user = userApiConnector.getUserById(userId);
+        User user = userApiConnector.getUserById(userId, null);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return user;
