@@ -25,7 +25,7 @@ public class UserV2ServiceImpl implements UserV2Service {
 
     private final UserApiConnector userApiConnector;
     private final MsCoreConnector msCoreConnector;
-    private final UserV2GroupService userGroupService;
+    private final UserGroupV2Service userGroupService;
 
     @Override
     public Collection<InstitutionBase> getInstitutions(String userId) {
@@ -66,7 +66,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     public User getUserById(String userId) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
-        User user = userApiConnector.getUserById(userId);
+        User user = userApiConnector.getUserById(userId, null);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return user;
