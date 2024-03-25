@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionV2Service;
@@ -121,5 +122,38 @@ class InstitutionV2ControllerTest {
         verify(userServiceMock, times(1))
                 .getInstitutions(userId);
         verifyNoMoreInteractions(userServiceMock);
+    }
+
+    @Test
+    void getInstitutionTest() throws Exception {
+        //given
+        final String institutionId = "institutionId";
+        UserInfo userInfo = mockInstance(new UserInfo(), "setId");
+        userInfo.setId(randomUUID().toString());
+
+        Institution institution = new Institution();
+        institution.setId(institutionId);
+
+        String loggedUserId = "loggedUserId";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(loggedUserId).build());
+
+        when(institutionV2ServiceMock.findInstitutionById(any()))
+                .thenReturn(institution);
+        //when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}", institutionId)
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+        //then
+        InstitutionResource userResource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionResource.class);
+        assertNotNull(userResource);
+        verify(institutionV2ServiceMock, times(1))
+                .findInstitutionById(institutionId);
+        verifyNoMoreInteractions(institutionV2ServiceMock);
+
     }
 }

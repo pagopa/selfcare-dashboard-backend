@@ -1,16 +1,24 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 
 @Slf4j
 @Service
@@ -22,13 +30,15 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
     private final List<RelationshipState> allowedStates;
     private final UserApiConnector userApiConnector;
-
+    private final MsCoreConnector msCoreConnector;
 
     @Autowired
     public InstitutionV2ServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
-                                    UserApiConnector userApiConnector) {
+                                    UserApiConnector userApiConnector,
+                                  MsCoreConnector msCoreConnector) {
         this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
         this.userApiConnector = userApiConnector;
+        this.msCoreConnector = msCoreConnector;
     }
 
     @Override
@@ -58,5 +68,32 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
                 .findFirst();
     }
 
+    @Override
+    public Institution findInstitutionById(String institutionId) {
+        log.trace("findInstitutionById start");
+        log.debug("findInstitutionById institutionId = {}", institutionId);
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+
+        String userId = ((SelfCareUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        UserInstitution userInstitution = userApiConnector.getProducts(institutionId, userId);
+        Institution institution = msCoreConnector.getInstitution(institutionId);
+
+        if (userInstitution != null) {
+            boolean limited = userInstitution.getProducts().stream().anyMatch(prod -> SelfCareAuthority.ADMIN.equals(prod.getRole().getSelfCareAuthority()));
+            if (limited) {
+                institution.getOnboarding().stream()
+                        .filter(product -> userInstitution.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())))
+                        .forEach(product -> {product.setAuthorized(true); product.setUserRole(LIMITED.name());});
+            } else {
+                institution.getOnboarding().forEach(product -> {
+                    product.setAuthorized(userInstitution.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())));
+                    userInstitution.getProducts().stream().filter(prodUser -> product.getProductId().equals(prodUser.getProductId())).findAny().ifPresentOrElse(userProd -> product.setUserRole(userProd.getRole().name()), () -> product.setUserRole(null));
+                });
+            }
+        }
+        log.debug("findInstitutionById result = {}", institution);
+        log.trace("findInstitutionById end");
+        return institution;
+    }
 
 }
