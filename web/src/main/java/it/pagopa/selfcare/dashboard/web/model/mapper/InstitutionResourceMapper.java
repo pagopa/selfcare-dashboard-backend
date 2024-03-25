@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
@@ -12,6 +13,7 @@ import org.mapstruct.Named;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,9 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "name", source = "description")
     @Mapping(target = "userRole", expression = "java(toUserRole(model.getId(), model.getStatus()))")
     InstitutionBaseResource toResource(InstitutionInfo model);
+
+    @Mapping(target = "userRole", expression = "java(toUserRole(model.getUserRole()))")
+    InstitutionBaseResource toResource(InstitutionBase model);
 
     @Mapping(target = "name", source = "description")
     @Mapping(target = "fiscalCode", source = "taxCode")
@@ -67,6 +72,14 @@ public interface InstitutionResourceMapper {
 
         }
         return userRole;
+    }
+
+    @Named("toUserRole")
+    default String toUserRole(String userRole) {
+        if(StringUtils.hasText(userRole)){
+            return PartyRole.valueOf(userRole).getSelfCareAuthority().toString();
+        }
+        return null;
     }
 
 }

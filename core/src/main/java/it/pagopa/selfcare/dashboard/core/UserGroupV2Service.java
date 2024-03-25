@@ -9,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserGroupService {
+public interface UserGroupV2Service {
+    void deleteMembersByUserId(String userId, String institutionId, String productId);
+
     String createUserGroup(CreateUserGroup group);
 
     void delete(String groupId);
@@ -24,8 +26,7 @@ public interface UserGroupService {
 
     void deleteMemberFromUserGroup(String groupId, UUID userId);
 
-    UserGroupInfo getUserGroupById(String groupId, Optional<String> institutionId);
+    UserGroupInfo getUserGroupById(String groupId, String institutionId);
 
-    Page<UserGroupInfo> getUserGroups(Optional<String> institutionId, Optional<String> productId, Optional<UUID> userId, Pageable pageable);
-    void deleteMembersByRelationshipId(String relationshipId);
+    Page<UserGroupInfo> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable);
 }

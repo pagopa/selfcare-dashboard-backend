@@ -668,6 +668,13 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -878,23 +885,15 @@
         ]
       }
     },
-    "/users/{userId}/institutions/{institutionId}/products/{productId}": {
-      "delete": {
+    "/users/{userId}/institution/{institutionId}": {
+      "get": {
         "tags": [
           "User Controller"
         ],
-        "summary": "Delete logically the association institution and product",
+        "summary": "The retrieveUsers function is used to retrieve a list of users from the UserInstitution collection and userRegistry.\nAt first it try to retrieve a UserInstitution document associated with a logged user (admin)\nIf this userInstitution object is not null, so user has AdminRole, it try to retriew the userInstitutions filtered by given institutionId, roles, states, products and productRoles\nand optional given personId, otherwise it do the same query using the logged user id instead of personId.\nAfter that it retrieve personal user data, foreach userId retrieved, from userRegistry and return a stream of UserDataResponse objects containing the requested user data.",
         "parameters": [
           {
             "name": "institutionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "productId",
             "in": "path",
             "required": true,
             "schema": {
@@ -908,11 +907,68 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "personId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productRoles",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "products",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "roles",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "states",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDataResponse"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Not Authorized"
@@ -928,7 +984,7 @@
         ]
       }
     },
-    "/users/{userId}/products": {
+    "/users/{userId}/institutions": {
       "get": {
         "tags": [
           "User Controller"
@@ -967,10 +1023,60 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProductsResponse"
+                  "$ref": "#/components/schemas/UserInfoResponse"
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/institutions/{institutionId}/products/{productId}": {
+      "delete": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Delete logically the association institution and product",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
           },
           "401": {
             "description": "Not Authorized"
@@ -1070,29 +1176,6 @@
           "PROD"
         ],
         "type": "string"
-      },
-      "InstitutionProducts": {
-        "type": "object",
-        "properties": {
-          "institutionId": {
-            "type": "string"
-          },
-          "institutionName": {
-            "type": "string"
-          },
-          "institutionRootName": {
-            "type": "string"
-          },
-          "userMailUuid": {
-            "type": "string"
-          },
-          "products": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OnboardedProductResponse"
-            }
-          }
-        }
       },
       "LocalDate": {
         "format": "date",
@@ -1254,6 +1337,44 @@
           }
         }
       },
+      "UserDataResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "institutionId": {
+            "type": "string"
+          },
+          "institutionDescription": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          },
+          "userMailUuid": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OnboardedProductResponse"
+            }
+          },
+          "userResponse": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        }
+      },
       "UserDetailResponse": {
         "type": "object",
         "properties": {
@@ -1276,6 +1397,20 @@
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/WorkContactResponse"
+            }
+          }
+        }
+      },
+      "UserInfoResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "institutions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserInstitutionRoleResponse"
             }
           }
         }
@@ -1306,6 +1441,26 @@
             "items": {
               "$ref": "#/components/schemas/OnboardedProductResponse"
             }
+          }
+        }
+      },
+      "UserInstitutionRoleResponse": {
+        "type": "object",
+        "properties": {
+          "institutionId": {
+            "type": "string"
+          },
+          "institutionName": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PartyRole"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OnboardedProductState"
           }
         }
       },
@@ -1364,20 +1519,6 @@
           }
         }
       },
-      "UserProductsResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "bindings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstitutionProducts"
-            }
-          }
-        }
-      },
       "UserResponse": {
         "required": [
           "id",
@@ -1403,6 +1544,12 @@
           },
           "email": {
             "type": "string"
+          },
+          "workContacts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },

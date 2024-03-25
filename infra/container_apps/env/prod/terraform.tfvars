@@ -1,7 +1,7 @@
 env_short = "p"
 private_dns_name = "selc-p-dashboard-backend-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "selfcare"
-api_dns_zone_prefix = format("api.%s, var.dns_zone_prefix)
+api_dns_zone_prefix = "api.selfcare"
 
 tags = {
   CreatedBy   = "Terraform"
@@ -67,11 +67,11 @@ app_settings = [
   },
   {
     name  = "REST_CLIENT_READ_TIMEOUT"
-    value = "30000"
+    value = "45000"
   },
   {
     name  = "REST_CLIENT_CONNECT_TIMEOUT"
-    value = "30000"
+    value = "45000"
   },
   {
     name  = "USER_STATES_FILTER"

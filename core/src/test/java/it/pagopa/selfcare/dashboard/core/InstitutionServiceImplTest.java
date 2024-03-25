@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User.Fields;

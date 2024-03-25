@@ -9,13 +9,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Problem;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
+import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
+import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,31 +36,12 @@ import java.util.List;
 @Slf4j
 @RestController
 @Api(tags = "user")
-@RequestMapping(value = "/v2", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/v2/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class UserV2Controller {
 
     private final UserV2Service userService;
-    private final InstitutionResourceMapper institutionResourceMapper;
     private final UserMapperV2 userMapperV2;
-
-    @GetMapping("/institutions")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
-    public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
-
-        log.trace("getInstitutions start");
-        String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<InstitutionInfo> institutions = userService.getInstitutions(userId);
-
-        List<InstitutionBaseResource> result = institutions.stream()
-                .map(institutionResourceMapper::toResource)
-                .toList();
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
-        log.trace("getInstitutions end");
-
-        return result;
-    }
 
     @PostMapping(value = "/{userId}/suspend")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -74,7 +59,6 @@ public class UserV2Controller {
         log.trace("suspendUser end");
 
     }
-
 
     @PostMapping(value = "/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -138,5 +122,46 @@ public class UserV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return userMapperV2.toUserResource(user);
+    }
+
+    @PutMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
+                           @PathVariable("id")
+                           String userId,
+                           @ApiParam("${swagger.dashboard.institutions.model.id}")
+                           @RequestParam(value = "institutionId")
+                           String institutionId,
+                           @RequestBody
+                           @Valid
+                           UpdateUserDto updateUserDto) {
+        log.trace("updateUser start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "userId = {}, institutionId = {}, userDto = {}", userId, institutionId, updateUserDto);
+        userService.updateUser(userId, institutionId, userMapperV2.fromUpdateUser(institutionId, updateUserDto));
+        log.trace("updateUser end");
+    }
+
+    @GetMapping(value = "/institution/{institutionId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId") String institutionId,
+                                              @RequestParam(value = "productId", required = false) String productId,
+                                              Authentication authentication) {
+        log.trace("getUsers start");
+        log.debug("getUsers for institution: {} and product: {}", institutionId, productId);
+        String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
+
+        Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+        List<ProductUserResource> result = userInfos.stream()
+                .map(UserMapper::toProductUser)
+                .toList();
+        log.debug("getUsers result = {}", result);
+        log.trace("getUsers end");
+
+        return result;
     }
 }

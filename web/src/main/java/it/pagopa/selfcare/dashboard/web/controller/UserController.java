@@ -69,13 +69,13 @@ public class UserController {
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
                            @PathVariable("id")
-                                   UUID id,
+                           UUID id,
                            @ApiParam("${swagger.dashboard.institutions.model.id}")
                            @RequestParam(value = "institutionId")
-                                   String institutionId,
+                           String institutionId,
                            @RequestBody
                            @Valid
-                                   UpdateUserDto updateUserDto) {
+                           UpdateUserDto updateUserDto) {
         log.trace("updateUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "id = {}, institutionId = {}, userDto = {}", id, institutionId, updateUserDto);
         userService.updateUser(id, institutionId, UserMapper.fromUpdateUser(updateUserDto, institutionId));

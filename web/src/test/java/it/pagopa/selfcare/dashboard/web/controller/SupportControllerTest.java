@@ -44,6 +44,15 @@ class SupportControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final SelfCareUser user;
+
+    static {
+        user = SelfCareUser.builder("id")
+                .surname("surname")
+                .name("name")
+                .fiscalCode("FFFFFFFF")
+                .build();
+    }
 
     /**
      * Method under test: {@link SupportController#sendSupportRequest(SupportRequestDto, Authentication)}
@@ -55,11 +64,6 @@ class SupportControllerTest {
         Authentication authentication = Mockito.mock(Authentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
-        SelfCareUser user = SelfCareUser.builder("id")
-                .surname("surname")
-                .name("name")
-                .fiscalCode("FFFFFFFF")
-                .build();
         when(authentication.getPrincipal()).thenReturn(user);
         when(supportService.sendRequest(any())).thenReturn(redirectUrl);
 
@@ -68,6 +72,38 @@ class SupportControllerTest {
         String content = (new ObjectMapper()).writeValueAsString(supportRequest);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/v1/support")
+                .principal(authentication)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+        MvcResult result =  MockMvcBuilders.standaloneSetup(supportController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        assertNotNull(response);
+
+    }
+
+    /**
+     * Method under test: {@link SupportController#getSupportRedirectUrl(SupportRequestDto, Authentication)}
+     */
+    @Test
+    void testSupportRedirectUrl() throws Exception {
+
+        String redirectUrl = "test";
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(user);
+        when(supportService.getSupportRequest(any())).thenReturn(redirectUrl);
+
+        SupportRequestDto supportRequest = new SupportRequestDto();
+        supportRequest.setEmail("test@gmail.com");
+        String content = (new ObjectMapper()).writeValueAsString(supportRequest);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/v1/support/request")
                 .principal(authentication)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);

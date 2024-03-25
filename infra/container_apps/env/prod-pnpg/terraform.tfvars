@@ -1,8 +1,9 @@
 is_pnpg   = true
 env_short = "p"
-private_dns_name = "selc-p-dashboard-backend-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+private_dns_name = "selc-p-pnpg-dashboard-backend-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "imprese.notifichedigitali"
 api_dns_zone_prefix = "api-pnpg.selfcare"
+external_domain     = "it"
 
 tags = {
   CreatedBy   = "Terraform"
@@ -64,7 +65,7 @@ app_settings = [
   },
   {
     name  = "JWT_ISSUER"
-    value = "https://hub-login.spid.dev.pn.pagopa.it"
+    value = "SPID"
   },
   {
     name  = "REST_CLIENT_READ_TIMEOUT"
