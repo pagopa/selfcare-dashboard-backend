@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.core.*;
 import it.pagopa.selfcare.dashboard.web.model.mapper.*;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
+import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,8 +46,11 @@ class SwaggerConfigTest {
     @MockBean
     private InstitutionV2Service institutionV2Service;
 
-    ;@MockBean
+    @MockBean
     private PnPGInstitutionService pnPGInstitutionService;
+
+    @MockBean
+    private ExchangeTokenServiceV2 exchangeTokenServiceV2Mock;
 
     @MockBean
     private ExchangeTokenService exchangeTokenServiceMock;
