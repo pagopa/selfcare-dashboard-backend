@@ -99,6 +99,7 @@ class InstitutionV2ControllerTest {
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
 
         InstitutionBase expectedInstitution = mockInstance(new InstitutionBase());
+        expectedInstitution.setUserRole("MANAGER");
         List<InstitutionBase> expectedInstitutionInfos = new ArrayList<>();
         expectedInstitutionInfos.add(expectedInstitution);
         when(userServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);

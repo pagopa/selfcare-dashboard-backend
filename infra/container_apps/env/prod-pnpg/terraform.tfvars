@@ -65,7 +65,7 @@ app_settings = [
   },
   {
     name  = "JWT_ISSUER"
-    value = "https://hub-login.spid.dev.pn.pagopa.it"
+    value = "SPID"
   },
   {
     name  = "REST_CLIENT_READ_TIMEOUT"
