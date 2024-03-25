@@ -3711,6 +3711,16 @@
         "summary" : "search",
         "description" : "Retrieve the user for a given fiscal code",
         "operationId" : "searchUsingPOST_1",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -3789,6 +3799,24 @@
           "description" : "User's unique identifier",
           "required" : true,
           "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "fields",
+          "in" : "query",
+          "description" : "Fields to retrieve from pdv when searching for user",
+          "required" : true,
+          "style" : "form",
           "schema" : {
             "type" : "string"
           }
