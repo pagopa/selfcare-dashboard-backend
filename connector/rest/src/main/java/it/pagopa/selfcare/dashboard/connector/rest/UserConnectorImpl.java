@@ -95,7 +95,7 @@ public class UserConnectorImpl implements UserApiConnector {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
         String fieldsString = !CollectionUtils.isEmpty(fields) ? String.join(",", fields) : null;
-        User user = userMapper.toUser(userApiRestClient._usersIdDetailsGet(userId, institutionId, fieldsString).getBody());
+        User user = userMapper.toUser(userApiRestClient._usersIdDetailsGet(userId, fieldsString, institutionId).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return user;
