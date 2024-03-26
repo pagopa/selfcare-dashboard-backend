@@ -5,11 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
@@ -74,6 +76,24 @@ public class InstitutionV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
 
+        return result;
+    }
+
+    @GetMapping("/{institutionId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "${swagger.dashboard.institutions.api.getInstitution}", notes = "${swagger.dashboard.institutions.api.getInstitution}", nickname = "v2GetInstitution")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId")
+                                              String institutionId) {
+        log.trace("getInstitution start");
+        log.debug("getInstitution institutionId = {}", institutionId);
+
+        Institution institution = institutionV2Service.findInstitutionById(institutionId);
+        InstitutionResource result = institutionResourceMapper.toResource(institution);
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
+        log.trace("getInstitution end");
         return result;
     }
 }

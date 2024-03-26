@@ -3,9 +3,9 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -55,6 +55,26 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");
         return result;
+    }
+
+    @Override
+    public UserInstitution getProducts(String institutionId, String userId) {
+        log.trace("getProducts start");
+        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+                institutionId,
+                null,
+                null,
+                null,
+                null,
+                userId
+        ).getBody();
+
+        if (Objects.isNull(institutionResponses) || institutionResponses.size() != 1)
+            throw new ResourceNotFoundException(String.format("InstitutionId %s and userId %s not found", institutionId, userId));
+
+        log.debug("getProducts result = {}", institutionResponses);
+        log.trace("getProducts end");
+        return institutionMapper.toInstitution(institutionResponses.get(0));
     }
 
     @Override
