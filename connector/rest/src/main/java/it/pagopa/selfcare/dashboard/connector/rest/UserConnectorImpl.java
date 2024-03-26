@@ -70,6 +70,26 @@ public class UserConnectorImpl implements UserApiConnector {
         ).getBody();
 
         if (Objects.isNull(institutionResponses) || institutionResponses.size() != 1)
+            throw new ResourceNotFoundException(String.format("InstitutionId %s and userId %s not found", institutionId, userId));
+
+        log.debug("getProducts result = {}", institutionResponses);
+        log.trace("getProducts end");
+        return institutionMapper.toInstitution(institutionResponses.get(0));
+    }
+
+    @Override
+    public UserInstitution getProducts(String institutionId, String userId) {
+        log.trace("getProducts start");
+        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+                institutionId,
+                null,
+                null,
+                null,
+                null,
+                userId
+        ).getBody();
+
+        if (Objects.isNull(institutionResponses) || institutionResponses.size() != 1)
             throw new ResourceNotFoundException("InstituitionId " + institutionId + " and userId " + userId + " not found");
 
         log.debug("getProducts result = {}", institutionResponses);

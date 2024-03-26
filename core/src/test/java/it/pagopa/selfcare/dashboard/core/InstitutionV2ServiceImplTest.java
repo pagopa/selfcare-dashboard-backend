@@ -1,12 +1,16 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.utils.TestUtils;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,12 +19,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
+import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
@@ -38,6 +49,8 @@ class InstitutionV2ServiceImplTest {
     private InstitutionV2ServiceImpl institutionV2Service;
     @MockBean
     private UserApiConnector userApiConnectorMock;
+    @MockBean
+    private MsCoreConnector msCoreConnectorMock;
 
     @Test
     void getInstitutionUser() {
@@ -71,7 +84,8 @@ class InstitutionV2ServiceImplTest {
                 .thenReturn(List.of(userInfoMock1));
 
         // when
-        UserInfo userInfo = institutionV2Service.getInstitutionUser(institutionId, userInfoFilter.getUserId(), loggedUserId);
+        UserInfo userInfo = institutionV2Service.getInstitutionUser(institutionId, userInfoFilter.getUserId(),
+                loggedUserId);
         // then
         TestUtils.checkNotNullFields(userInfo);
         TestUtils.checkNotNullFields(userInfo.getUser());
@@ -79,8 +93,8 @@ class InstitutionV2ServiceImplTest {
         Assertions.assertNotNull(userInfo.getProducts());
         Assertions.assertEquals(1, userInfo.getProducts().size());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnectorMock, times(1))
-                .getUsers(Mockito.eq(institutionId), filterCaptor.capture(), Mockito.eq(loggedUserId));
+        verify(userApiConnectorMock, times(1)).getUsers(Mockito.eq(institutionId), filterCaptor.capture(),
+                Mockito.eq(loggedUserId));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getRole());
         assertNull(capturedFilter.getProductId());
@@ -112,16 +126,15 @@ class InstitutionV2ServiceImplTest {
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setUserId(userId);
-        when(userApiConnectorMock.getUsers(any(), any(), any()))
-                .thenReturn(Collections.emptyList());
+        when(userApiConnectorMock.getUsers(any(), any(), any())).thenReturn(Collections.emptyList());
         // when
-        Executable executable = () -> institutionV2Service.getInstitutionUser(institutionId, userId,loggedUserId);
+        Executable executable = () -> institutionV2Service.getInstitutionUser(institutionId, userId, loggedUserId);
         // then
         ResourceNotFoundException e = assertThrows(ResourceNotFoundException.class, executable);
         Assertions.assertEquals("No User found for the given userId", e.getMessage());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnectorMock, times(1))
-                .getUsers(Mockito.eq(institutionId), filterCaptor.capture(), Mockito.eq(loggedUserId));
+        verify(userApiConnectorMock, times(1)).getUsers(Mockito.eq(institutionId), filterCaptor.capture(),
+                Mockito.eq(loggedUserId));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getRole());
         assertNull(capturedFilter.getProductId());
@@ -129,6 +142,88 @@ class InstitutionV2ServiceImplTest {
         assertEquals(userId, capturedFilter.getUserId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
         verifyNoMoreInteractions(userApiConnectorMock);
+    }
+
+    @Test
+    void findInstitutionByIdTest2(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn("UserId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(
+                principal,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+
+        UserInstitution userInstitution = new UserInstitution();
+        userInstitution.setProducts(Collections.emptyList());
+        when(userApiConnectorMock.getProducts("institutionId", "UserId")).thenReturn(userInstitution);
+
+        Institution institutionResponse = institutionV2Service.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+    }
+
+    @Test
+    void findInstitutionByIdTest3(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn("UserId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(
+                principal,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+
+        it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct onboardedProduct1 = new it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct();
+        onboardedProduct1.setRole(MANAGER);
+        onboardedProduct1.setProductId("productId");
+        UserInstitution userInstitution = new UserInstitution();
+        userInstitution.setProducts(List.of(onboardedProduct1));
+        when(userApiConnectorMock.getProducts("institutionId", "UserId")).thenReturn(userInstitution);
+
+        Institution institutionResponse = institutionV2Service.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+    }
+
+    @Test
+    void findInstitutionByIdTest(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn("UserId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(
+                principal,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Institution institution = new Institution();
+        institution.setExternalId("externalId");
+        institution.setDescription("description");
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId("productId");
+        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
+        Institution institutionResponse = institutionV2Service.findInstitutionById("institutionId");
+        Assertions.assertEquals("description", institutionResponse.getDescription());
+        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
     }
 
 }
