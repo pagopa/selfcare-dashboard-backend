@@ -78,26 +78,6 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public UserInstitution getProducts(String institutionId, String userId) {
-        log.trace("getProducts start");
-        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
-                institutionId,
-                null,
-                null,
-                null,
-                null,
-                userId
-        ).getBody();
-
-        if (Objects.isNull(institutionResponses) || institutionResponses.size() != 1)
-            throw new ResourceNotFoundException("InstituitionId " + institutionId + " and userId " + userId + " not found");
-
-        log.debug("getProducts result = {}", institutionResponses);
-        log.trace("getProducts end");
-        return institutionMapper.toInstitution(institutionResponses.get(0));
-    }
-
-    @Override
     public Boolean hasPermission(String institutionId, String permission, String productId) {
         log.trace("permissionInstitutionIdPermissionGet start");
         log.debug("permissionInstitutionIdPermissionGet institutionId = {}, permission = {}, productId = {}", institutionId, permission, productId);
