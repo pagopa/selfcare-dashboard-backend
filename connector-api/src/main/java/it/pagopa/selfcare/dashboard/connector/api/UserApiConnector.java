@@ -23,6 +23,8 @@ public interface UserApiConnector {
 
     void deleteUserProduct(String userId, String institutionId, String productId);
 
+    UserInstitution getProducts(String institutionId, String userId);
+
     Boolean hasPermission(String institutionId, String permission, String productId);
 
     void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto);
