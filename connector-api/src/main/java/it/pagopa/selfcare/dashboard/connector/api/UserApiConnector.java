@@ -3,20 +3,19 @@ package it.pagopa.selfcare.dashboard.connector.api;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 
 import java.util.Collection;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-
 import java.util.List;
 
 public interface UserApiConnector {
 
     List<InstitutionBase> getUserInstitutions(String userId);
 
-    User getUserById(String userId, List<String> fields);
+    User getUserById(String userId, String institutionId, List<String> fields);
 
-    User searchByFiscalCode(String fiscalCode);
+    User searchByFiscalCode(String fiscalCode, String institutionId);
 
     void suspendUserProduct(String userId, String institutionId, String productId);
 

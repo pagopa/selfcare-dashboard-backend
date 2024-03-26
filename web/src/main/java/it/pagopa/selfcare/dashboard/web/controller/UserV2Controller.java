@@ -9,14 +9,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Problem;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
-import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
@@ -94,10 +91,16 @@ public class UserV2Controller {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}")
     public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
-                                    @PathVariable("id") String userId) {
+                                    @PathVariable("id") String userId,
+                                    @ApiParam("${swagger.dashboard.institutions.model.id}")
+                                    @RequestParam(value = "institutionId")
+                                    String institutionI,
+                                    @ApiParam("${swagger.dashboard.user.model.fields}")
+                                    @RequestParam(value = "fields")
+                                    List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
-        User user = userService.getUserById(userId);
+        User user = userService.getUserById(userId, institutionI, fields);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return userMapperV2.toUserResource(user);
@@ -115,10 +118,13 @@ public class UserV2Controller {
     public UserResource search(@ApiParam("${swagger.dashboard.user.model.searchUserDto}")
                                @RequestBody
                                @Valid
-                               SearchUserDto searchUserDto) {
+                               SearchUserDto searchUserDto,
+                               @ApiParam("${swagger.dashboard.institutions.model.id}")
+                               @RequestParam(value = "institutionId")
+                               String institutionId) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", searchUserDto);
-        User user = userService.searchUserByFiscalCode(searchUserDto.getFiscalCode());
+        User user = userService.searchUserByFiscalCode(searchUserDto.getFiscalCode(), institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return userMapperV2.toUserResource(user);

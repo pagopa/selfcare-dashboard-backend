@@ -153,14 +153,16 @@ class UserConnectorImplTest {
     void getUserById(){
 
         //given
-        String userId = "userId";
+        final String userId = "userId";
+        final String institutionId = "institutionId";
+        final List<String> fields = List.of("fields");
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersIdDetailsGet(userId, null)).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersIdDetailsGet(anyString(), anyString(), anyString())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.getUserById(userId, null);
+        User user = userConnector.getUserById(userId, institutionId, fields);
         //then
         assertNotNull(user);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, null);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, institutionId, fields.get(0));
     }
     @Test
     void verifyUserExist_UserExists() {
@@ -193,14 +195,15 @@ class UserConnectorImplTest {
     void search(){
         //given
         String fiscalCode = "fiscalCode";
+        final String institutionId = "institutionId";
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersSearchPost(any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersSearchPost(any(), any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.searchByFiscalCode(fiscalCode);
+        User user = userConnector.searchByFiscalCode(fiscalCode, institutionId);
         //then
         assertNotNull(user);
         ArgumentCaptor<SearchUserDto> searchUserDtoArgumentCaptor = ArgumentCaptor.forClass(SearchUserDto.class);
-        verify(userApiRestClient, times(1))._usersSearchPost(searchUserDtoArgumentCaptor.capture());
+        verify(userApiRestClient, times(1))._usersSearchPost(eq(institutionId), searchUserDtoArgumentCaptor.capture());
         SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
         assertEquals(fiscalCode, captured.getFiscalCode());
     }

@@ -4455,6 +4455,7 @@
           "description" : "Fields to retrieve from pdv when searching for user",
           "required" : true,
           "style" : "form",
+          "explode" : true,
           "schema" : {
             "type" : "string"
           }
