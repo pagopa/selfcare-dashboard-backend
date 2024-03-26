@@ -1,6 +1,6 @@
 is_pnpg   = true
 env_short = "p"
-private_dns_name = "selc-p-pnpg-dashboard-backend-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+private_dns_name = "selc-p-pnpg-dashboard-backend-ca.salmonpond-60269923.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "imprese.notifichedigitali"
 api_dns_zone_prefix = "api-pnpg.selfcare"
 external_domain     = "it"
@@ -89,15 +89,15 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-p-pnpg-ms-core-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-ms-core-ca.salmonpond-60269923.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-p-pnpg-ms-core-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-ms-core-ca.salmonpond-60269923.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-p-pnpg-party-reg-proxy-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-party-reg-proxy-ca.salmonpond-60269923.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
@@ -105,7 +105,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-pnpg-user-group-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-user-group-ca.salmonpond-60269923.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -125,7 +125,7 @@ app_settings = [
   },
     {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-p-pnpg-user-ms-ca.salmonpond-602699235.westeurope.azurecontainerapps.io"
+      value = "https://selc-p-pnpg-user-ms-ca.salmonpond-60269923.westeurope.azurecontainerapps.io"
     }
 ]
 
