@@ -96,7 +96,7 @@ public class UserV2Controller {
                                     @RequestParam(value = "institutionId")
                                     String institutionI,
                                     @ApiParam("${swagger.dashboard.user.model.fields}")
-                                    @RequestParam(value = "fields")
+                                    @RequestParam(value = "fields", required = false)
                                     List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
