@@ -81,7 +81,7 @@ public class InstitutionV2Controller {
 
     @GetMapping("/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
+    @ApiOperation(value = "${swagger.dashboard.institutions.api.getInstitution}", notes = "${swagger.dashboard.institutions.api.getInstitution}", nickname = "v2GetInstitution")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
