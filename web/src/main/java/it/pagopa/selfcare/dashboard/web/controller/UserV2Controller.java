@@ -89,7 +89,7 @@ public class UserV2Controller {
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}", nickname = "v2 getUserByIdUsingGET")
     public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("id") String userId,
                                     @ApiParam("${swagger.dashboard.institutions.model.id}")
@@ -108,7 +108,7 @@ public class UserV2Controller {
 
     @PostMapping(value = "/search")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}", nickname = "v2 searchUserByFiscalCodeUsingPOST")
     @ApiResponse(responseCode = "404",
             description = "Not Found",
             content = {

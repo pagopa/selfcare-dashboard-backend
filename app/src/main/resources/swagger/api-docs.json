@@ -4585,7 +4585,7 @@
         "tags" : [ "user" ],
         "summary" : "search",
         "description" : "Retrieve the user for a given fiscal code",
-        "operationId" : "searchUsingPOST_1",
+        "operationId" : "v2 searchUserByFiscalCodeUsingPOST",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "query",
@@ -4667,7 +4667,7 @@
         "tags" : [ "user" ],
         "summary" : "getUserById",
         "description" : "Retrieve the user by internal id",
-        "operationId" : "getUserByIdUsingGET",
+        "operationId" : "v2 getUserByIdUsingGET",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
