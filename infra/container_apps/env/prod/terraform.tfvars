@@ -67,11 +67,11 @@ app_settings = [
   },
   {
     name  = "REST_CLIENT_READ_TIMEOUT"
-    value = "30000"
+    value = "45000"
   },
   {
     name  = "REST_CLIENT_CONNECT_TIMEOUT"
-    value = "30000"
+    value = "45000"
   },
   {
     name  = "USER_STATES_FILTER"
@@ -121,10 +121,14 @@ app_settings = [
     name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
     value = "portalefatturazione.pagopa.it"
   },
-    {
+  {
       name  = "SELFCARE_USER_URL"
       value = "https://selc-p-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
-    }
+  },
+  {
+    name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
+    value = "v1"
+  }
 ]
 
 secrets_names = {

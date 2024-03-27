@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -279,6 +280,51 @@ class UserConnectorImplTest {
     }
 
     @Test
+    void getProducts_returnsUserInstitution() {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+        UserInstitutionResponse userInstitutionResponse = new UserInstitutionResponse();
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+                eq(institutionId),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(userId)
+        )).thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
+
+        // when
+        UserInstitution result = userConnector.getProducts(institutionId, userId);
+
+        // then
+        assertNotNull(result);
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
+    }
+
+    @Test
+    void getProducts_throwsResourceNotFoundException() {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+                eq(institutionId),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(userId)
+        )).thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        // when
+        Executable executable = () -> userConnector.getProducts(institutionId, userId);
+
+        // then
+        assertThrows(ResourceNotFoundException.class, executable);
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
+    }
+
+    @Test
     void testCreateOrUpdateUserByFiscalCode() {
         // Arrange
         when(userApiRestClient._usersPost(Mockito.any()))
@@ -325,4 +371,5 @@ class UserConnectorImplTest {
         // Assert that nothing has changed
         verify(userApiRestClient)._usersUserIdPost(eq("userId"), any());
     }
+
 }
