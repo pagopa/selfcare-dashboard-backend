@@ -1,21 +1,25 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.Objects;
+import java.lang.reflect.Executable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -23,9 +27,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserV2ServiceImpl implements UserV2Service {
 
-    private final UserApiConnector userApiConnector;
     private final MsCoreConnector msCoreConnector;
     private final UserGroupV2Service userGroupService;
+    private final UserApiConnector userApiConnector;
+    private final ProductsConnector productsConnector;
+    private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
+
 
     @Override
     public Collection<InstitutionBase> getInstitutions(String userId) {
@@ -107,6 +114,44 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.info("getUsersByInstitutionId result size = {}", result.size());
         log.trace("getUsersByInstitutionId end");
         return result;
+    }
+
+    @Override
+    public String createUsers(String institutionId, String productId, UserToCreate userDto) {
+        log.trace("createOrUpdateUserByFiscalCode start");
+        log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
+        List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles());
+        String userId = userApiConnector.createOrUpdateUserByFiscalCode(institutionId, productId, userDto, role);
+        log.trace("createOrUpdateUserByFiscalCode end");
+        return userId;
+    }
+
+    @Override
+    public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles) {
+        log.trace("createOrUpdateUserByUserId start");
+        log.debug("createOrUpdateUserByUserId userId = {}", userId);
+        List<CreateUserDto.Role> role = retrieveRole(productId, productRoles);
+        userApiConnector.createOrUpdateUserByUserId(institutionId, productId, userId, role);
+        log.trace("createOrUpdateUserByUserId end");
+    }
+    /**
+     * This method is used to retrieve a list of roles for a given product.
+     * It maps each product role to a CreateUserDto.Role object, which includes the label and party role.
+     * To retrieve the party role, it uses the roleMappings of the product filtering by a white list of party roles (Only SUB_DELEGATE and OPERATOR are allowed
+     * as Role to be assigned to a user in add Users ProductRoles operation).
+     * If the party role is not valid, it throws an InvalidProductRoleException.
+     */
+    private List<CreateUserDto.Role> retrieveRole(String productId, Set<String> productRoles) {
+        Product product = productsConnector.getProduct(productId);
+        return productRoles.stream().map(productRole -> {
+            EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            CreateUserDto.Role role = new CreateUserDto.Role();
+            role.setLabel(Product.getLabel(productRole, roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = Product.getPartyRole(productRole, roleMappings, PARTY_ROLE_WHITE_LIST);
+            role.setPartyRole(partyRole.orElseThrow(() ->
+                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole))));
+            return role;
+        }).toList();
     }
 
 }
