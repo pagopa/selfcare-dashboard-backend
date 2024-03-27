@@ -4,9 +4,11 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserToCreate;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface UserV2Service {
 
@@ -25,4 +27,8 @@ public interface UserV2Service {
     void updateUser(String id, String institutionId, MutableUserFieldsDto userDto);
 
     Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, String loggedUserId);
+
+    String createUsers(String institutionId, String productId, UserToCreate userToCreate);
+
+    void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles);
 }

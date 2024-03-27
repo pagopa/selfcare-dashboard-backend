@@ -41,4 +41,6 @@ public interface UserMapperV2 {
         }
         return Map.of();
     }
+
+    UserToCreate toUserToCreate(it.pagopa.selfcare.dashboard.web.model.CreateUserDto user);
 }

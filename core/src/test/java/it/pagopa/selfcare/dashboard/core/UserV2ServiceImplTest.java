@@ -1,15 +1,18 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -17,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.method.P;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +48,9 @@ class UserV2ServiceImplTest {
 
     @Mock
     private UserGroupV2Service userGroupService;
+
+    @Mock
+    private ProductsConnector productsConnector;
 
     @Test
     void getInstitutions() {
@@ -211,5 +218,79 @@ class UserV2ServiceImplTest {
         assertNotNull(users);
         assertTrue(users.isEmpty());
         verifyNoMoreInteractions(userApiConnector);
+    }
+
+    @Test
+    void addUserProductRoles_ok() {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        Set<String> productRoles = new HashSet<>(List.of("operator"));
+        Product product = getProduct();
+        when(productsConnector.getProduct(productId)).thenReturn(product);
+        doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
+
+        // when
+        userService.addUserProductRoles(institutionId, productId, userId, productRoles);
+
+        // then
+        verify(userApiConnector, times(1))
+                .createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
+        verifyNoMoreInteractions(userApiConnector);
+    }
+
+    @Test
+    void addUserProductRoles_invalidProductRole() {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        Set<String> productRoles = new HashSet<>(List.of("role1"));
+        Product product = getProduct();
+        when(productsConnector.getProduct(productId)).thenReturn(product);
+
+        // when
+        Assertions.assertThrows(InvalidProductRoleException.class, () -> userService.addUserProductRoles(institutionId, productId, userId, productRoles));
+
+        verifyNoInteractions(userApiConnector);
+    }
+
+    @Test
+    void createUsersByFiscalCode() {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        UserToCreate userToCreate = new UserToCreate();
+        HashSet<String> productRoles = new HashSet<>();
+        productRoles.add("operator");
+        userToCreate.setProductRoles(productRoles);
+
+        Product product = getProduct();
+
+        when(productsConnector.getProduct(productId)).thenReturn(product);
+
+        when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
+        // when
+        String userId = userService.createUsers(institutionId, productId, userToCreate);
+
+        // then
+        assertNotNull(userId);
+        verify(userApiConnector, times(1))
+                .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList());
+        verifyNoMoreInteractions(userApiConnector);
+    }
+
+    private static Product getProduct() {
+        Product product = new Product();
+        EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        ProductRoleInfo.ProductRole productRole = new ProductRoleInfo.ProductRole();
+        productRole.setCode("operator");
+        productRole.setLabel("operator");
+        productRoleInfo.setRoles(List.of(productRole));
+        map.put(PartyRole.OPERATOR, productRoleInfo);
+        product.setRoleMappings(map);
+        return product;
     }
 }
