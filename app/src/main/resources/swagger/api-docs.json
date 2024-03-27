@@ -1286,7 +1286,7 @@
         "tags" : [ "institutions" ],
         "summary" : "getInstitutions",
         "description" : "Service to get all the institutions related to logged user",
-        "operationId" : "getInstitutionsUsingGET_1",
+        "operationId" : "v2RetrieveUserInstitutions",
         "parameters" : [ {
           "name" : "authenticated",
           "in" : "query",
@@ -1393,7 +1393,7 @@
         "tags" : [ "institutions" ],
         "summary" : "createInstitutionProductUser",
         "description" : "Service to Create a user related to a specific pair of institution-product",
-        "operationId" : "createInstitutionProductUserUsingPOST_1",
+        "operationId" : "v2PostCreateInstitutionProductUser",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
@@ -1474,7 +1474,7 @@
         "tags" : [ "institutions" ],
         "summary" : "addUserProductRoles",
         "description" : "Service to add a new role/product to a specific user",
-        "operationId" : "addUserProductRolesUsingPUT_1",
+        "operationId" : "v2AddUserProductRole",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
@@ -1557,7 +1557,7 @@
         "tags" : [ "institutions" ],
         "summary" : "getInstitutionUser",
         "description" : "Service to get the users with the given user id related to a specific institution",
-        "operationId" : "getInstitutionUserUsingGET_1",
+        "operationId" : "v2RetrieveInstitutionUser",
         "parameters" : [ {
           "name" : "authenticated",
           "in" : "query",

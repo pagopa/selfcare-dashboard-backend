@@ -29,8 +29,8 @@ public interface UserApiConnector {
 
     List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId);
 
-    String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, CreateUserDto.Role role);
+    String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, List<CreateUserDto.Role> role);
 
-    void createOrUpdateUserByUserId(String institutionId, String productId, String userId, CreateUserDto.Role role);
+    void createOrUpdateUserByUserId(String institutionId, String productId, String userId, List<CreateUserDto.Role> role);
 
 }

@@ -169,29 +169,41 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role) {
+    public String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
-        CreateUserDto createUserDto = buildCreateUserDto(institutionId, productId, userDto, role);
-        String userId = userApiRestClient._usersPost(createUserDto).getBody();
+        List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> finalRole = new ArrayList<>(roles);
+        String userId = roles.stream()
+                .findFirst()
+                .map(role -> {
+                    CreateUserDto createUserDto = buildCreateUserDto(institutionId, productId, userDto, role);
+                    finalRole.remove(role);
+                    return userApiRestClient._usersPost(createUserDto).getBody();
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Role list cannot be empty"));
+
+
+        createOrUpdateUserByUserId(institutionId, productId, userId, finalRole);
+
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
     }
 
     @Override
-    public void createOrUpdateUserByUserId(String institutionId, String productId, String userId, it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role role) {
+    public void createOrUpdateUserByUserId(String institutionId, String productId, String userId, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
-        AddUserRoleDto addUserRoleDto = AddUserRoleDto.builder()
-                .institutionId(institutionId)
-                .product(Product.builder()
-                        .productRole(role.getProductRole())
-                        .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(role.getPartyRole().name()))
-                        .productId(productId)
-                        .build())
-                .build();
-
-        userApiRestClient._usersUserIdPost(userId, addUserRoleDto);
+        roles.forEach(role -> {
+            AddUserRoleDto addUserRoleDto = AddUserRoleDto.builder()
+                    .institutionId(institutionId)
+                    .product(Product.builder()
+                            .productRole(role.getProductRole())
+                            .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(role.getPartyRole().name()))
+                            .productId(productId)
+                            .build())
+                    .build();
+            userApiRestClient._usersUserIdPost(userId, addUserRoleDto);
+        });
         log.trace("createOrUpdateUserByUserId end");
     }
 

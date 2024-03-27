@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 
 import java.lang.reflect.Executable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -119,7 +120,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     public String createUsers(String institutionId, String productId, UserToCreate userDto) {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
-        CreateUserDto.Role role = retrieveRole(productId, userDto.getProductRoles());
+        List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles());
         String userId = userApiConnector.createOrUpdateUserByFiscalCode(institutionId, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
@@ -129,14 +130,20 @@ public class UserV2ServiceImpl implements UserV2Service {
     public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles) {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
-        CreateUserDto.Role role = retrieveRole(productId, productRoles);
+        List<CreateUserDto.Role> role = retrieveRole(productId, productRoles);
         userApiConnector.createOrUpdateUserByUserId(institutionId, productId, userId, role);
         log.trace("createOrUpdateUserByUserId end");
     }
-
-    private CreateUserDto.Role retrieveRole(String productId, Set<String> productRoles) {
+    /**
+     * This method is used to retrieve a list of roles for a given product.
+     * It maps each product role to a CreateUserDto.Role object, which includes the label and party role.
+     * To retrieve the party role, it uses the roleMappings of the product filtering by a white list of party roles (Only SUB_DELEGATE and OPERATOR are allowed
+     * as Role to be assigned to a user in add Users ProductRoles operation).
+     * If the party role is not valid, it throws an InvalidProductRoleException.
+     */
+    private List<CreateUserDto.Role> retrieveRole(String productId, Set<String> productRoles) {
         Product product = productsConnector.getProduct(productId);
-        return productRoles.stream().findFirst().map(productRole -> {
+        return productRoles.stream().map(productRole -> {
             EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
             CreateUserDto.Role role = new CreateUserDto.Role();
             role.setLabel(Product.getLabel(productRole, roleMappings).orElse(null));
@@ -144,7 +151,7 @@ public class UserV2ServiceImpl implements UserV2Service {
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole))));
             return role;
-        }).orElse(null);
+        }).toList();
     }
 
 }

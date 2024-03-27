@@ -294,8 +294,12 @@ class UserConnectorImplTest {
         CreateUserDto.Role role = new CreateUserDto.Role();
         role.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
         role.setProductRole("admin");
+
+        CreateUserDto.Role role2 = new CreateUserDto.Role();
+        role2.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role2.setProductRole("admin2");
         // Act
-        userConnector.createOrUpdateUserByFiscalCode("institutionId", "productId",  userDto, role);
+        userConnector.createOrUpdateUserByFiscalCode("institutionId", "productId",  userDto, List.of(role, role2));
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersPost(Mockito.any());
@@ -316,7 +320,7 @@ class UserConnectorImplTest {
         role.setProductRole("admin");
 
         // Act
-        userConnector.createOrUpdateUserByUserId("institutionId", "productId", "userId", role);
+        userConnector.createOrUpdateUserByUserId("institutionId", "productId", "userId", List.of(role));
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersUserIdPost(eq("userId"), any());

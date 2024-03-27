@@ -223,14 +223,14 @@ class UserV2ServiceImplTest {
         Set<String> productRoles = new HashSet<>(List.of("operator"));
         Product product = getProduct();
         when(productsConnector.getProduct(productId)).thenReturn(product);
-        doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), any(CreateUserDto.Role.class));
+        doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
 
         // when
         userService.addUserProductRoles(institutionId, productId, userId, productRoles);
 
         // then
         verify(userApiConnector, times(1))
-                .createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), any(CreateUserDto.Role.class));
+                .createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
         verifyNoMoreInteractions(userApiConnector);
     }
 
@@ -264,14 +264,14 @@ class UserV2ServiceImplTest {
 
         when(productsConnector.getProduct(productId)).thenReturn(product);
 
-        when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), any(CreateUserDto.Role.class))).thenReturn("userId");
+        when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
         // when
         String userId = userService.createUsers(institutionId, productId, userToCreate);
 
         // then
         assertNotNull(userId);
         verify(userApiConnector, times(1))
-                .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), any(CreateUserDto.Role.class));
+                .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList());
         verifyNoMoreInteractions(userApiConnector);
     }
 
