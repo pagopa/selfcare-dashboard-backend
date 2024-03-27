@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "User API (development)",
+    "title": "user-ms API",
     "version": "1.0.0"
   },
   "paths": {
@@ -569,6 +569,15 @@
           "User Controller"
         ],
         "summary": "Search user by fiscalCode",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -675,6 +684,13 @@
           },
           {
             "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "institutionId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -1396,7 +1412,6 @@
         "type": "object",
         "properties": {
           "fiscalCode": {
-            "pattern": "\\S",
             "type": "string"
           }
         }

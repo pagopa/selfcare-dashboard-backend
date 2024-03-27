@@ -9,6 +9,8 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
@@ -92,21 +94,21 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public User getUserById(String userId, List<String> fields) {
+    public User getUserById(String userId, String institutionId, List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
         String fieldsString = !CollectionUtils.isEmpty(fields) ? String.join(",", fields) : null;
-        User user = userMapper.toUser(userApiRestClient._usersIdDetailsGet(userId, fieldsString).getBody());
+        User user = userMapper.toUser(userApiRestClient._usersIdDetailsGet(userId, fieldsString, institutionId).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return user;
     }
 
     @Override
-    public User searchByFiscalCode(String fiscalCode) {
+    public User searchByFiscalCode(String fiscalCode, String institutionId) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
-        User user = userMapper.toUser(userApiRestClient._usersSearchPost(SearchUserDto.builder().fiscalCode(fiscalCode).build()).getBody());
+        User user = userMapper.toUser(userApiRestClient._usersSearchPost(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build()).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return user;
@@ -169,6 +171,7 @@ public class UserConnectorImpl implements UserApiConnector {
                         .toList())
                 .orElse(Collections.emptyList());
     }
+
     @Override
     public List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId) {
         log.trace("retrieveFilteredUser start");

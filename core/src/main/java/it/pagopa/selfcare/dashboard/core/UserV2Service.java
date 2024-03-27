@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserToCreate;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface UserV2Service {
@@ -19,9 +20,9 @@ public interface UserV2Service {
 
     void suspendUserProduct(String userId, String institutionId, String productId);
 
-    User getUserById(String userId);
+    User getUserById(String userId, String institutionId, List<String> fields);
 
-    User searchUserByFiscalCode(String fiscalCode);
+    User searchUserByFiscalCode(String fiscalCode, String institutionId);
 
     void updateUser(String id, String institutionId, MutableUserFieldsDto userDto);
 

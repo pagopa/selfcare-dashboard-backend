@@ -20,6 +20,9 @@ import org.springframework.util.Assert;
 import java.lang.reflect.Executable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -70,20 +73,20 @@ public class UserV2ServiceImpl implements UserV2Service {
     }
 
     @Override
-    public User getUserById(String userId) {
+    public User getUserById(String userId, String institutionId, List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
-        User user = userApiConnector.getUserById(userId, null);
+        User user = userApiConnector.getUserById(userId, institutionId, fields);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return user;
     }
 
     @Override
-    public User searchUserByFiscalCode(String fiscalCode) {
+    public User searchUserByFiscalCode(String fiscalCode, String institutionId) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
-        User user = userApiConnector.searchByFiscalCode(fiscalCode);
+        User user = userApiConnector.searchByFiscalCode(fiscalCode, institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return user;

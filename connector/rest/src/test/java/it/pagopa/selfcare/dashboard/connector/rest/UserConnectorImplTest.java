@@ -3,12 +3,10 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
@@ -30,7 +28,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
@@ -143,14 +144,16 @@ class UserConnectorImplTest {
     void getUserById() {
 
         //given
-        String userId = "userId";
+        final String userId = "userId";
+        final String institutionId = "institutionId";
+        final List<String> fields = List.of("fields");
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersIdDetailsGet(userId, null)).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersIdDetailsGet(anyString(), anyString(), anyString())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.getUserById(userId, null);
+        User user = userConnector.getUserById(userId, institutionId, fields);
         //then
         assertNotNull(user);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, null);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, fields.get(0), institutionId);
     }
     @Test
     void verifyUserExist_UserExists() {
@@ -183,14 +186,15 @@ class UserConnectorImplTest {
     void search() {
         //given
         String fiscalCode = "fiscalCode";
+        final String institutionId = "institutionId";
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersSearchPost(any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersSearchPost(any(), any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.searchByFiscalCode(fiscalCode);
+        User user = userConnector.searchByFiscalCode(fiscalCode, institutionId);
         //then
         assertNotNull(user);
         ArgumentCaptor<SearchUserDto> searchUserDtoArgumentCaptor = ArgumentCaptor.forClass(SearchUserDto.class);
-        verify(userApiRestClient, times(1))._usersSearchPost(searchUserDtoArgumentCaptor.capture());
+        verify(userApiRestClient, times(1))._usersSearchPost(eq(institutionId), searchUserDtoArgumentCaptor.capture());
         SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
         assertEquals(fiscalCode, captured.getFiscalCode());
     }

@@ -20,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.access.method.P;
 
 import java.util.*;
 
@@ -113,28 +112,31 @@ class UserV2ServiceImplTest {
     @Test
     void getById(){
         //given
-        String userId = "userId";
+        final String userId = "userId";
+        final String institutionId = "institutionId";
+        final List<String> fields = List.of("fields");
         User user = mockInstance(new User());
-        when(userApiConnector.getUserById(userId, null)).thenReturn(user);
+        when(userApiConnector.getUserById(anyString(), anyString(), any())).thenReturn(user);
         //when
-        User result = userService.getUserById(userId);
+        User result = userService.getUserById(userId, institutionId, fields);
         //then
         assertNotNull(result);
         assertEquals(user, result);
-        verify(userApiConnector, times(1)).getUserById(userId, null);
+        verify(userApiConnector, times(1)).getUserById(userId, institutionId, fields);
     }
 
     @Test
     void searchByFiscalCode(){
-        String fiscalCode = "fiscalCode";
+        final String fiscalCode = "fiscalCode";
+        final String institutionId = "institutionId";
         User user = mockInstance(new User());
-        when(userApiConnector.searchByFiscalCode(anyString())).thenReturn(user);
+        when(userApiConnector.searchByFiscalCode(anyString(), anyString())).thenReturn(user);
         //when
-        User result = userService.searchUserByFiscalCode(fiscalCode);
+        User result = userService.searchUserByFiscalCode(fiscalCode, institutionId);
         //then
         assertNotNull(result);
         assertEquals(user, result);
-        verify(userApiConnector, times(1)).searchByFiscalCode(fiscalCode);
+        verify(userApiConnector, times(1)).searchByFiscalCode(fiscalCode, institutionId);
     }
 
     @Test
