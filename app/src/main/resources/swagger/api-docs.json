@@ -4460,7 +4460,7 @@
         "tags" : [ "user" ],
         "summary" : "getUsers",
         "description" : "Service to get all the users related to a specific institution",
-        "operationId" : "getUsersUsingGET",
+        "operationId" : "v2 getUsersUsingGET",
         "parameters" : [ {
           "name" : "authenticated",
           "in" : "query",
@@ -4757,7 +4757,7 @@
         "tags" : [ "user" ],
         "summary" : "updateUser",
         "description" : "Update previously added user",
-        "operationId" : "updateUserUsingPUT_1",
+        "operationId" : "v2 updateUserUsingPUT",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -4831,7 +4831,7 @@
         "tags" : [ "user" ],
         "summary" : "deleteRelationshipById",
         "description" : "Delete the relationship",
-        "operationId" : "deleteRelationshipByIdUsingDELETE_1",
+        "operationId" : "v2 deleteRelationshipByIdUsingDELETE",
         "parameters" : [ {
           "name" : "userId",
           "in" : "path",
@@ -4905,7 +4905,7 @@
         "tags" : [ "user" ],
         "summary" : "activateRelationship",
         "description" : "Activate the relationship",
-        "operationId" : "activateRelationshipUsingPOST_1",
+        "operationId" : "v2 activateRelationshipUsingPOST",
         "parameters" : [ {
           "name" : "userId",
           "in" : "path",
@@ -4979,7 +4979,7 @@
         "tags" : [ "user" ],
         "summary" : "suspendRelationship",
         "description" : "Suspend the relationship",
-        "operationId" : "suspendRelationshipUsingPOST_1",
+        "operationId" : "v2 suspendRelationshipUsingPOST",
         "parameters" : [ {
           "name" : "userId",
           "in" : "path",

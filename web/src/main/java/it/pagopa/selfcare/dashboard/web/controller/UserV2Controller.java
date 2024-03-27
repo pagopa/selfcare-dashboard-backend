@@ -42,7 +42,7 @@ public class UserV2Controller {
 
     @PostMapping(value = "/{userId}/suspend")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}", nickname = "v2 suspendRelationshipUsingPOST")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void suspendRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("userId") String userId,
@@ -59,7 +59,7 @@ public class UserV2Controller {
 
     @PostMapping(value = "/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}", nickname = "v2 activateRelationshipUsingPOST")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                      @PathVariable("userId") String userId,
@@ -75,7 +75,7 @@ public class UserV2Controller {
 
     @DeleteMapping(value = "/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}", nickname = "v2 deleteRelationshipByIdUsingDELETE")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.id}")
                                        @PathVariable("userId") String userId,
@@ -132,7 +132,7 @@ public class UserV2Controller {
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}", nickname = "v2 updateUserUsingPUT")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
                            @PathVariable("id")
@@ -151,7 +151,7 @@ public class UserV2Controller {
 
     @GetMapping(value = "/institution/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}", nickname = "v2 getUsersUsingGET")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
