@@ -79,7 +79,7 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
         Institution institution = msCoreConnector.getInstitution(institutionId);
 
         if (userInstitution != null) {
-            boolean limited = userInstitution.getProducts().stream().anyMatch(prod -> SelfCareAuthority.ADMIN.equals(prod.getRole().getSelfCareAuthority()));
+            boolean limited = userInstitution.getProducts().stream().noneMatch(prod -> SelfCareAuthority.ADMIN.equals(prod.getRole().getSelfCareAuthority()));
             if (limited) {
                 institution.getOnboarding().stream()
                         .filter(product -> userInstitution.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())))
