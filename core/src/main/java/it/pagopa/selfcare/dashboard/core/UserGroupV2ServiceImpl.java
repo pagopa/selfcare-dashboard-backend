@@ -17,9 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -185,14 +183,14 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
                                 userGroupInfo.getProductId()));
                         return null;
                     }
-                    userInfos.get(index).setUser(userApiConnector.getUserById(userInfo.getId(), MEMBER_FIELD_LIST.stream().map(Enum::name).toList()));
+                    userInfos.get(index).setUser(userApiConnector.getUserById(userInfo.getId(), institutionId, MEMBER_FIELD_LIST.stream().map(Enum::name).toList()));
                     return userInfos.get(index);
                 }).filter(Objects::nonNull)
                 .toList());
-        User createdBy = userApiConnector.getUserById(userGroupInfo.getCreatedBy().getId(), FIELD_LIST.stream().map(Enum::name).toList());
+        User createdBy = userApiConnector.getUserById(userGroupInfo.getCreatedBy().getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
         userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
-            User modifiedBy = userApiConnector.getUserById(userGroupInfo.getModifiedBy().getId(), FIELD_LIST.stream().map(Enum::name).toList());
+            User modifiedBy = userApiConnector.getUserById(userGroupInfo.getModifiedBy().getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
             userGroupInfo.setModifiedBy(modifiedBy);
         }
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserGroupById userGroupInfo = {}", userGroupInfo);

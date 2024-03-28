@@ -3,11 +3,9 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
@@ -32,14 +30,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.Matchers.emptyString;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -146,11 +145,15 @@ class UserV2ControllerTest {
     @Test
     void getUserById() throws Exception {
         //given
-        String userId = "userId";
-        when(userServiceMock.getUserById(any())).thenReturn(USER_RESOURCE);
+        final String userId = "userId";
+        final String institutionId = "institutionId";
+        final List<String> fields = List.of("fields");
+        when(userServiceMock.getUserById(anyString(), anyString(), any())).thenReturn(USER_RESOURCE);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL+"/{id}", userId)
+                        .param("institutionId", institutionId)
+                        .param("fields", fields.get(0))
                 .contentType(APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andReturn();
@@ -158,21 +161,23 @@ class UserV2ControllerTest {
         UserResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
         assertNotNull(resource);
         assertNotNull(resource.getId());
-        verify(userServiceMock, times(1)).getUserById(userId);
+        verify(userServiceMock, times(1)).getUserById(userId, institutionId, fields);
 
     }
 
     @Test
     void search() throws Exception {
         //given
-        String externalId = "externalId";
+        final String externalId = "externalId";
+        final String institutionId = "institutionId";
         SearchUserDto externalIdDto = new SearchUserDto();
         externalIdDto.setFiscalCode(externalId);
-        Mockito.when(userServiceMock.searchUserByFiscalCode(Mockito.anyString()))
+        Mockito.when(userServiceMock.searchUserByFiscalCode(anyString(), anyString()))
                 .thenReturn(USER_RESOURCE);
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/search")
+                        .param("institutionId", institutionId)
                         .content(objectMapper.writeValueAsString(externalIdDto))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
@@ -182,7 +187,7 @@ class UserV2ControllerTest {
         UserResource userResponse = objectMapper.readValue(result.getResponse().getContentAsString(), UserResource.class);
         assertNotNull(userResponse);
         Mockito.verify(userServiceMock, Mockito.times(1))
-                .searchUserByFiscalCode(externalId);
+                .searchUserByFiscalCode(externalId, institutionId);
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
