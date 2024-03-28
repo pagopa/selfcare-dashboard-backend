@@ -1,21 +1,12 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
-import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
-import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
-import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
-import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,13 +17,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = {ProductV2Controller.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {ProductV2Controller.class, WebTestConfig.class, BrokerResourceMapperImpl.class})
 class ProductV2ControllerTest {
-
     private static final String BASE_URL = "/v2/products";
 
     @Autowired
@@ -54,9 +40,6 @@ class ProductV2ControllerTest {
 
     @MockBean
     private ExchangeTokenServiceV2 exchangeTokenServiceMock;
-
-
-
 
     @Test
     void retrieveProductBackoffice() throws Exception {
