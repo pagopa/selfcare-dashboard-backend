@@ -20,6 +20,7 @@ import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -65,13 +66,16 @@ public class ExchangeTokenServiceV2 {
     private final ProductsConnector productsConnector;
     private final String issuer;
 
+    private final InstitutionResourceMapper institutionResourceMapper;
+
     public ExchangeTokenServiceV2(JwtService jwtService,
                                   InstitutionService institutionService,
                                   UserGroupService groupService,
                                   ProductsConnector productConnector,
                                   ExchangeTokenProperties properties,
                                   UserService userService,
-                                  UserApiConnector userApiConnector)
+                                  UserApiConnector userApiConnector,
+                                  InstitutionResourceMapper institutionResourceMapper)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.billingUrl = properties.getBillingUrl();
         this.billingAudience = properties.getBillingAudience();
@@ -85,6 +89,7 @@ public class ExchangeTokenServiceV2 {
         this.kid = properties.getKid();
         this.userService = userService;
         this.userApiConnector = userApiConnector;
+        this.institutionResourceMapper = institutionResourceMapper;
     }
 
 
@@ -101,7 +106,9 @@ public class ExchangeTokenServiceV2 {
         final ProductGrantedAuthority productGrantedAuthority = Optional.ofNullable(productGrantedAuthorityMap.get(productId))
                 .orElseThrow(() -> new IllegalArgumentException(String.format("A Product Granted SelfCareAuthority is required for product '%s' and institution '%s'", productId, institutionId)));
 
-        Institution institution = retrieveInstitution(institutionId, List.of(productGrantedAuthority), false);
+        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
+        Assert.notNull(institutionInfo, "Institution info is required");
+        Institution institution = institutionResourceMapper.toInstitution(institutionInfo, List.of(productGrantedAuthority), false);
         retrieveAndSetGroups(institution, institutionId, productId, userId);
         TokenExchangeClaims claims = retrieveAndSetClaims(authentication.getCredentials().toString(), institution, userId);
 
@@ -137,8 +144,10 @@ public class ExchangeTokenServiceV2 {
 
         Map<String, ProductGrantedAuthority> productGrantedAuthorityMap = retrieveProductsFromInstitutionAndUser(institutionId, userId);
         addProductIfIsInvoiceable(productGrantedAuthorityMap, invoiceableProductList, productGrantedAuthorities);
+        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
+        Assert.notNull(institutionInfo, "Institution info is required");
+        Institution institution = institutionResourceMapper.toInstitution(institutionInfo, productGrantedAuthorities, true);
 
-        Institution institution = retrieveInstitution(institutionId, productGrantedAuthorities, true);
         retrieveAndSetGroups(institution, institutionId, null, userId);
 
         TokenExchangeClaims claims = retrieveAndSetClaims(credentials, institution, userId);
@@ -229,48 +238,6 @@ public class ExchangeTokenServiceV2 {
         }
     }
 
-    private Institution retrieveInstitution(String institutionId, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken) {
-        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
-        Assert.notNull(institutionInfo, "Institution info is required");
-        Institution institution = new Institution();
-        institution.setId(institutionId);
-        institution.setName(institutionInfo.getDescription());
-        institution.setTaxCode(institutionInfo.getTaxCode());
-        institution.setSubUnitType(institutionInfo.getSubunitType());
-        institution.setSubUnitCode(institutionInfo.getSubunitCode());
-        institution.setAooParent(institutionInfo.getAooParentCode());
-        institution.setParentDescription(institutionInfo.getParentDescription());
-        RootParent rootParent = new RootParent();
-        rootParent.setId(institutionInfo.getRootParentId());
-        rootParent.setDescription(institutionInfo.getParentDescription());
-        institution.setRootParent(rootParent);
-        institution.setOriginId(institutionInfo.getOriginId());
-        institution.setRoles(retrieveInstitutionRoles(productGrantedAuthorities, isBillingToken));
-        return institution;
-    }
-
-    private List<Role> retrieveInstitutionRoles(List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken) {
-        List<Role> roles = new ArrayList<>();
-
-        for (ProductGrantedAuthority authority : productGrantedAuthorities) {
-            roles.addAll(constructRole(authority, isBillingToken));
-        }
-        return roles;
-    }
-
-    private List<Role> constructRole(ProductGrantedAuthority productGrantedAuthority, boolean isBillingToken) {
-        return productGrantedAuthority.getProductRoles().stream()
-                .map(productRoleCode -> {
-                    Role role = new Role();
-                    role.setPartyRole(productGrantedAuthority.getPartyRole());
-                    role.setProductRole(productRoleCode);
-                    if (isBillingToken) {
-                        role.setProductId(productGrantedAuthority.getProductId());
-                    }
-                    return role;
-                }).toList();
-    }
-
     private void addProductIfIsInvoiceable(
             Map<String, ProductGrantedAuthority> map,
             List<String> productList,
@@ -319,7 +286,7 @@ public class ExchangeTokenServiceV2 {
     @Data
     @ToString
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    static class Institution implements Serializable {
+    public static class Institution implements Serializable {
         private String id;
         @JsonProperty("fiscal_code")
         private String taxCode;
@@ -339,14 +306,14 @@ public class ExchangeTokenServiceV2 {
     }
 
     @Data
-    static class RootParent implements Serializable {
+    public static class RootParent implements Serializable {
         private String id;
         private String description;
     }
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    static class Role implements Serializable {
+    public static class Role implements Serializable {
         private PartyRole partyRole;
         @JsonProperty("role")
         private String productRole;

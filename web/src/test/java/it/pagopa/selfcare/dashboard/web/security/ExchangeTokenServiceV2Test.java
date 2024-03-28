@@ -21,6 +21,7 @@ import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +82,7 @@ class ExchangeTokenServiceV2Test {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenServiceV2(null, null, null, null, properties, null, null);
+        Executable executable = () -> new ExchangeTokenServiceV2(null, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("Illegal base64"));
@@ -97,7 +98,7 @@ class ExchangeTokenServiceV2Test {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenServiceV2(null, null, null, null, properties, null, null);
+        Executable executable = () -> new ExchangeTokenServiceV2(null, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // then
         assertThrows(InvalidKeySpecException.class, executable);
     }
@@ -112,7 +113,7 @@ class ExchangeTokenServiceV2Test {
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         // when
-        Executable executable = () -> new ExchangeTokenServiceV2(null, null, null, null, properties, null, null);
+        Executable executable = () -> new ExchangeTokenServiceV2(null, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertTrue(e.getMessage().startsWith("failed to construct sequence from byte[]"));
@@ -128,7 +129,7 @@ class ExchangeTokenServiceV2Test {
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // when
         Executable executable = () -> ExchangeTokenServiceV2.exchange(null, null, null);
         // then
@@ -160,7 +161,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority("differentInstitutionId", roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
@@ -192,7 +193,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "differentProductId"));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
@@ -255,7 +256,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, null, properties, null, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
 
         // when
         Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null);
@@ -298,7 +299,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
@@ -354,6 +355,7 @@ class ExchangeTokenServiceV2Test {
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        institutionInfo.setId(institutionId);
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -392,7 +394,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty());
         // then
@@ -464,6 +466,7 @@ class ExchangeTokenServiceV2Test {
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         UserService userService = mock(UserService.class);
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        institutionInfo.setId(institutionId);
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -520,7 +523,7 @@ class ExchangeTokenServiceV2Test {
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty());
         // then
@@ -573,7 +576,7 @@ class ExchangeTokenServiceV2Test {
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // when
         Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(null);
         // then
@@ -637,7 +640,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnector, properties, null, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnector, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
 
         Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
@@ -664,7 +667,6 @@ class ExchangeTokenServiceV2Test {
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
-
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
@@ -676,10 +678,10 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
-        TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("ccbc5350-0ba7-47bc-9f61-8c65001939f9").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
         Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
@@ -730,6 +732,7 @@ class ExchangeTokenServiceV2Test {
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        institutionInfo.setId(institutionId);
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -764,7 +767,7 @@ class ExchangeTokenServiceV2Test {
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
@@ -831,6 +834,7 @@ class ExchangeTokenServiceV2Test {
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         UserService userService = mock(UserService.class);
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        institutionInfo.setId(institutionId);
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -882,7 +886,7 @@ class ExchangeTokenServiceV2Test {
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
 
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then

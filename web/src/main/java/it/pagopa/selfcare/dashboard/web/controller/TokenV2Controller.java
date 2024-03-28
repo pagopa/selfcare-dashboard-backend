@@ -4,11 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtAuthenticationToken;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
-import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,7 @@ public class TokenV2Controller {
 
     @GetMapping(value = "exchange")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.exchange}")
+    @ApiOperation(value = "${swagger.dashboard.token.api.exchange}", notes = "${swagger.dashboard.token.api.exchange}", nickname = "v2Exchange")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
     public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                           @RequestParam("institutionId")
