@@ -30,7 +30,7 @@ public class ProductV2Controller {
 
     @GetMapping(value = "/{productId}/back-office")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}")
+    @ApiOperation(value = "${swagger.dashboard.product.api.retrieveProductBackoffice}", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}", nickname = "v2RetrieveProductBackofficeUsingGET")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
     public URI retrieveProductBackoffice(@ApiParam("${swagger.dashboard.products.model.id}")
                                          @PathVariable("productId")
