@@ -9,14 +9,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Problem;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
-import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
@@ -45,7 +42,7 @@ public class UserV2Controller {
 
     @PostMapping(value = "/{userId}/suspend")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}", nickname = "v2SuspendRelationshipUsingPOST")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void suspendRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("userId") String userId,
@@ -62,7 +59,7 @@ public class UserV2Controller {
 
     @PostMapping(value = "/{userId}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}", nickname = "v2ActivateRelationshipUsingPOST")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                      @PathVariable("userId") String userId,
@@ -78,7 +75,7 @@ public class UserV2Controller {
 
     @DeleteMapping(value = "/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}", nickname = "v2DeleteRelationshipByIdUsingDELETE")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.id}")
                                        @PathVariable("userId") String userId,
@@ -92,12 +89,18 @@ public class UserV2Controller {
 
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}", nickname = "v2GetUserByIdUsingGET")
     public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
-                                    @PathVariable("id") String userId) {
+                                    @PathVariable("id") String userId,
+                                    @ApiParam("${swagger.dashboard.institutions.model.id}")
+                                    @RequestParam(value = "institutionId")
+                                    String institutionI,
+                                    @ApiParam("${swagger.dashboard.user.model.fields}")
+                                    @RequestParam(value = "fields", required = false)
+                                    List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
-        User user = userService.getUserById(userId);
+        User user = userService.getUserById(userId, institutionI, fields);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return userMapperV2.toUserResource(user);
@@ -105,7 +108,7 @@ public class UserV2Controller {
 
     @PostMapping(value = "/search")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}", nickname = "v2SearchUserByFiscalCodeUsingPOST")
     @ApiResponse(responseCode = "404",
             description = "Not Found",
             content = {
@@ -115,10 +118,13 @@ public class UserV2Controller {
     public UserResource search(@ApiParam("${swagger.dashboard.user.model.searchUserDto}")
                                @RequestBody
                                @Valid
-                               SearchUserDto searchUserDto) {
+                               SearchUserDto searchUserDto,
+                               @ApiParam("${swagger.dashboard.institutions.model.id}")
+                               @RequestParam(value = "institutionId")
+                               String institutionId) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", searchUserDto);
-        User user = userService.searchUserByFiscalCode(searchUserDto.getFiscalCode());
+        User user = userService.searchUserByFiscalCode(searchUserDto.getFiscalCode(), institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return userMapperV2.toUserResource(user);
@@ -126,7 +132,7 @@ public class UserV2Controller {
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}", nickname = "v2UpdateUserUsingPUT")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
                            @PathVariable("id")
@@ -145,7 +151,7 @@ public class UserV2Controller {
 
     @GetMapping(value = "/institution/{institutionId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}", nickname = "v2GetUsersUsingGET")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
