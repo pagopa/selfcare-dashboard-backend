@@ -1,5 +1,5 @@
 env_short           = "d"
-private_dns_name    = "selc-d-dashboard-backend-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+private_dns_name    = "selc-d-dashboard-backend-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
 dns_zone_prefix     = "dev.selfcare"
 api_dns_zone_prefix = "api.dev.selfcare"
 
@@ -87,23 +87,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-d-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-ms-core-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-d-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-ms-core-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-d-party-reg-proxy-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-party-reg-proxy-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc.internal.dev.selfcare.pagopa.it/ms-product/v1"
+    value = "https://selc-d-product-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-d-user-group-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-user-group-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -123,7 +123,7 @@ app_settings = [
   },
  {
    name  = "SELFCARE_USER_URL"
-   value = "https://selc-d-user-ms-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+   value = "https://selc-d-user-ms-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
  }
 ]
 
