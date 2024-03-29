@@ -14,12 +14,27 @@ tags = {
 }
 
 container_app = {
-  min_replicas = 1
+  min_replicas = 0
   max_replicas = 1
-  scale_rules  = []
+  scale_rules = [
+    {
+      custom = {
+        metadata = {
+          "desiredReplicas" = "1"
+          "start"           = "0 8 * * MON-FRI"
+          "end"             = "0 19 * * MON-FRI"
+          "timezone"        = "Europe/Rome"
+        }
+        type = "cron"
+      }
+      name = "cron-scale-rule"
+    }
+  ]
   cpu          = 0.5
   memory       = "1Gi"
 }
+
+workload_profile_name = null
 
 app_settings = [
   {
@@ -88,7 +103,7 @@ app_settings = [
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://dev01.pnpg.internal.dev.selfcare.pagopa.it/ms-product/v1"
+    value = "https://selc-d-pnpg-product-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"

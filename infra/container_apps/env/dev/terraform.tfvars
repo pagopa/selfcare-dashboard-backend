@@ -1,5 +1,5 @@
 env_short           = "d"
-private_dns_name    = "selc-d-dashboard-backend-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+private_dns_name    = "selc-d-dashboard-backend-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
 dns_zone_prefix     = "dev.selfcare"
 api_dns_zone_prefix = "api.dev.selfcare"
 
@@ -12,9 +12,22 @@ tags = {
 }
 
 container_app = {
-  min_replicas = 1
+  min_replicas = 0
   max_replicas = 1
-  scale_rules  = []
+  scale_rules = [
+    {
+      custom = {
+        metadata = {
+          "desiredReplicas" = "1"
+          "start"           = "0 8 * * MON-FRI"
+          "end"             = "0 19 * * MON-FRI"
+          "timezone"        = "Europe/Rome"
+        }
+        type = "cron"
+      }
+      name = "cron-scale-rule"
+    }
+  ]
   cpu          = 0.5
   memory       = "1Gi"
 }
@@ -74,23 +87,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-d-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-ms-core-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-d-ms-core-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-ms-core-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-d-party-reg-proxy-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-party-reg-proxy-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc.internal.dev.selfcare.pagopa.it/ms-product/v1"
+    value = "https://selc-d-product-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-d-user-group-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-user-group-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -110,8 +123,8 @@ app_settings = [
   },
   {
    name  = "SELFCARE_USER_URL"
-   value = "https://selc-d-user-ms-ca.gentleflower-c63e62fe.westeurope.azurecontainerapps.io"
-  },
+   value = "https://selc-d-user-ms-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+ },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
     value = "v1"

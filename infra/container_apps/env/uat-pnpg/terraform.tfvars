@@ -21,6 +21,8 @@ container_app = {
   memory       = "1Gi"
 }
 
+workload_profile_name = null
+
 app_settings = [
   {
     name  = "APPLICATIONINSIGHTS_ROLE_NAME"
