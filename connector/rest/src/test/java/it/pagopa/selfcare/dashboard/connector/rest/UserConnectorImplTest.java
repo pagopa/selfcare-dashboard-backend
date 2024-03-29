@@ -3,10 +3,10 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
@@ -18,8 +18,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
@@ -56,8 +59,8 @@ class UserConnectorImplTest {
     UserMapper userMapper = new UserMapperImpl();
 
     @BeforeEach
-    void setup(){
-        userConnector = new UserConnectorImpl(userApiRestClient,userInstitutionApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
+    void setup() {
+        userConnector = new UserConnectorImpl(userApiRestClient, userInstitutionApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
     }
 
 
@@ -92,18 +95,6 @@ class UserConnectorImplTest {
         return userProductsResponse;
     }
 
-    private static List<OnboardedProductResponse> getOnboardedProduct() {
-        OnboardedProductResponse onboardedProductResponse = new OnboardedProductResponse();
-        onboardedProductResponse.setProductId("prod-pagopa");
-        onboardedProductResponse.setRole(PartyRole.MANAGER);
-        onboardedProductResponse.setStatus(OnboardedProductState.ACTIVE);
-        OnboardedProductResponse onboardedProductResponse2 = new OnboardedProductResponse();
-        onboardedProductResponse2.setProductId("prod-pagopa");
-        onboardedProductResponse2.setRole(PartyRole.MANAGER);
-        onboardedProductResponse2.setStatus(OnboardedProductState.PENDING);
-        return List.of(onboardedProductResponse, onboardedProductResponse2);
-    }
-
     @Test
     void suspend() {
 
@@ -115,7 +106,7 @@ class UserConnectorImplTest {
         userConnector.suspendUserProduct(userId, institutionId, productId);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId,  OnboardedProductState.SUSPENDED);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -150,17 +141,19 @@ class UserConnectorImplTest {
     }
 
     @Test
-    void getUserById(){
+    void getUserById() {
 
         //given
-        String userId = "userId";
+        final String userId = "userId";
+        final String institutionId = "institutionId";
+        final List<String> fields = List.of("fields");
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersIdDetailsGet(userId, null)).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersIdDetailsGet(anyString(), anyString(), anyString())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.getUserById(userId, null);
+        User user = userConnector.getUserById(userId, institutionId, fields);
         //then
         assertNotNull(user);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, null);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, fields.get(0), institutionId);
     }
     @Test
     void verifyUserExist_UserExists() {
@@ -190,17 +183,18 @@ class UserConnectorImplTest {
     }
 
     @Test
-    void search(){
+    void search() {
         //given
         String fiscalCode = "fiscalCode";
+        final String institutionId = "institutionId";
         UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersSearchPost(any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
+        when(userApiRestClient._usersSearchPost(any(), any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
         //when
-        User user = userConnector.searchByFiscalCode(fiscalCode);
+        User user = userConnector.searchByFiscalCode(fiscalCode, institutionId);
         //then
         assertNotNull(user);
         ArgumentCaptor<SearchUserDto> searchUserDtoArgumentCaptor = ArgumentCaptor.forClass(SearchUserDto.class);
-        verify(userApiRestClient, times(1))._usersSearchPost(searchUserDtoArgumentCaptor.capture());
+        verify(userApiRestClient, times(1))._usersSearchPost(eq(institutionId), searchUserDtoArgumentCaptor.capture());
         SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
         assertEquals(fiscalCode, captured.getFiscalCode());
     }
@@ -287,6 +281,99 @@ class UserConnectorImplTest {
         assertEquals(1, result.size());
         verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null);
         verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void getProducts_returnsUserInstitution() {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+        UserInstitutionResponse userInstitutionResponse = new UserInstitutionResponse();
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+                eq(institutionId),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(userId)
+        )).thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
+
+        // when
+        UserInstitution result = userConnector.getProducts(institutionId, userId);
+
+        // then
+        assertNotNull(result);
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
+    }
+
+    @Test
+    void getProducts_throwsResourceNotFoundException() {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+                eq(institutionId),
+                any(),
+                any(),
+                any(),
+                any(),
+                eq(userId)
+        )).thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        // when
+        Executable executable = () -> userConnector.getProducts(institutionId, userId);
+
+        // then
+        assertThrows(ResourceNotFoundException.class, executable);
+        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
+    }
+
+    @Test
+    void testCreateOrUpdateUserByFiscalCode() {
+        // Arrange
+        when(userApiRestClient._usersPost(Mockito.any()))
+                .thenReturn(ResponseEntity.ok("userId"));
+
+        UserToCreate userDto = new UserToCreate();
+        userDto.setName("Name");
+        userDto.setProductRoles(new HashSet<>());
+        userDto.setSurname("Doe");
+        userDto.setTaxCode("Tax Code");
+        userDto.setEmail("jane.doe@example.org");
+
+        CreateUserDto.Role role = new CreateUserDto.Role();
+        role.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role.setProductRole("admin");
+
+        CreateUserDto.Role role2 = new CreateUserDto.Role();
+        role2.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role2.setProductRole("admin2");
+        // Act
+        userConnector.createOrUpdateUserByFiscalCode("institutionId", "productId",  userDto, List.of(role, role2));
+
+        // Assert that nothing has changed
+        verify(userApiRestClient)._usersPost(Mockito.any());
+        assertEquals("Doe", userDto.getSurname());
+        assertEquals("Name", userDto.getName());
+        assertEquals("Tax Code", userDto.getTaxCode());
+        assertEquals("jane.doe@example.org", userDto.getEmail());
+    }
+
+    @Test
+    void testCreateOrUpdateUserByUserId() {
+        // Arrange
+        when(userApiRestClient._usersUserIdPost(eq("userId"), any()))
+                .thenReturn(ResponseEntity.ok().build());
+
+        CreateUserDto.Role role = new CreateUserDto.Role();
+        role.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role.setProductRole("admin");
+
+        // Act
+        userConnector.createOrUpdateUserByUserId("institutionId", "productId", "userId", List.of(role));
+
+        // Assert that nothing has changed
+        verify(userApiRestClient)._usersUserIdPost(eq("userId"), any());
     }
 
 }

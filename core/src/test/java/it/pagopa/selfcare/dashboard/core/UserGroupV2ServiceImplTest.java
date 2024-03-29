@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
@@ -12,7 +11,6 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -23,17 +21,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.security.Principal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
@@ -598,18 +593,18 @@ class UserGroupV2ServiceImplTest {
 
         when(userGroupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
-        when(userApiConnector.getUserById(anyString(), any()))
+        when(userApiConnector.getUserById(anyString(), anyString(), any()))
                 .thenAnswer(invocation -> {
                     User userMock = new User();
                     userMock.setId(invocation.getArgument(0, String.class));
                     return userMock;
                 });
-        when(userApiConnector.getUserById(eq(createdBy.getId()), any()))
+        when(userApiConnector.getUserById(eq(createdBy.getId()), anyString(), any()))
                 .thenAnswer(invocation -> {
                     createdByMock.setId(invocation.getArgument(0, String.class));
                     return createdByMock;
                 });
-        when(userApiConnector.getUserById(eq(modifiedBy.getId()), any()))
+        when(userApiConnector.getUserById(eq(modifiedBy.getId()), anyString(), any()))
                 .thenAnswer(invocation -> {
                     modifiedByMock.setId(invocation.getArgument(0, String.class));
                     return modifiedByMock;
@@ -631,7 +626,7 @@ class UserGroupV2ServiceImplTest {
         verify(userGroupConnector, times(1))
                 .getUserGroupById(anyString());
         verify(userApiConnector, times(6))
-                .getUserById(any(), anyList());
+                .getUserById(any(), any(),anyList());
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
@@ -686,13 +681,13 @@ class UserGroupV2ServiceImplTest {
 
         when(userGroupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
-        when(userApiConnector.getUserById(anyString(), any()))
+        when(userApiConnector.getUserById(anyString(), any(), any()))
                 .thenAnswer(invocation -> {
                     User userMock = new User();
                     userMock.setId(invocation.getArgument(0, String.class));
                     return userMock;
                 });
-        when(userApiConnector.getUserById(any(), any()))
+        when(userApiConnector.getUserById(any(), any(), any()))
                 .thenAnswer(invocation -> {
                     createdByMock.setId(invocation.getArgument(0, String.class));
                     return createdByMock;
@@ -744,7 +739,7 @@ class UserGroupV2ServiceImplTest {
 
         when(userApiConnector.getUsers(any(), any(), any()))
                 .thenReturn(List.of(userInfoMock4));
-        when(userApiConnector.getUserById(anyString(), any()))
+        when(userApiConnector.getUserById(anyString(), any(), any()))
                 .thenAnswer(invocation -> {
                     User userMock = new User();
                     userMock.setId(invocation.getArgument(0, String.class));
@@ -771,9 +766,9 @@ class UserGroupV2ServiceImplTest {
 
         when(userGroupConnector.getUserGroupById(any()))
                 .thenReturn(foundGroup);
-        when(userApiConnector.getUserById(eq(createdById), any()))
+        when(userApiConnector.getUserById(eq(createdById), any(), any()))
                 .thenReturn(createdByMock);
-        when(userApiConnector.getUserById(eq(modifiedById), any()))
+        when(userApiConnector.getUserById(eq(modifiedById), any(), any()))
                 .thenReturn(modifiedByMock);
         //when
         UserGroupInfo groupInfo = userV2GroupServiceImpl.getUserGroupById(groupId, institutionId);

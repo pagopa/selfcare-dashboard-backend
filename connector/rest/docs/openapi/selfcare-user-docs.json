@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "User API (development)",
+    "title": "user-ms API",
     "version": "1.0.0"
   },
   "paths": {
@@ -372,7 +372,7 @@
         "tags": [
           "User Controller"
         ],
-        "summary": "Create or Update user",
+        "summary": "Create user by tax code",
         "requestBody": {
           "content": {
             "application/json": {
@@ -386,7 +386,11 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/json": {}
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
             }
           },
           "401": {
@@ -565,6 +569,15 @@
           "User Controller"
         ],
         "summary": "Search user by fiscalCode",
+        "parameters": [
+          {
+            "name": "institutionId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -671,6 +684,13 @@
           },
           {
             "name": "field",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "institutionId",
             "in": "query",
             "schema": {
               "type": "string"
@@ -860,6 +880,52 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/MutableUserFieldsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "401": {
+            "description": "Not Authorized"
+          },
+          "403": {
+            "description": "Not Allowed"
+          }
+        },
+        "security": [
+          {
+            "SecurityScheme": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}": {
+      "post": {
+        "tags": [
+          "User Controller"
+        ],
+        "summary": "Create user by userId - Using for addUserRole",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUserRoleDto"
               }
             }
           }
@@ -1095,6 +1161,28 @@
   },
   "components": {
     "schemas": {
+      "AddUserRoleDto": {
+        "required": [
+          "institutionId",
+          "product"
+        ],
+        "type": "object",
+        "properties": {
+          "institutionId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "institutionDescription": {
+            "type": "string"
+          },
+          "institutionRootName": {
+            "type": "string"
+          }
+        }
+      },
       "CertifiableFieldResourceOfLocalDate": {
         "type": "object",
         "properties": {
@@ -1158,7 +1246,7 @@
             "$ref": "#/components/schemas/User"
           },
           "product": {
-            "$ref": "#/components/schemas/Product"
+            "$ref": "#/components/schemas/Product1"
           },
           "institutionDescription": {
             "type": "string"
@@ -1288,6 +1376,28 @@
           }
         }
       },
+      "Product1": {
+        "required": [
+          "productId",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PartyRole"
+          },
+          "tokenId": {
+            "type": "string"
+          },
+          "productRole": {
+            "type": "string"
+          }
+        }
+      },
       "QueueEvent": {
         "enum": [
           "ADD",
@@ -1302,7 +1412,6 @@
         "type": "object",
         "properties": {
           "fiscalCode": {
-            "pattern": "\\S",
             "type": "string"
           }
         }

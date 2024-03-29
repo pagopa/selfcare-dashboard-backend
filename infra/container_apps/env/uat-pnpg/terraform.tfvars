@@ -110,10 +110,14 @@ app_settings = [
     name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
     value = "dev.portalefatturazione.pagopa.it"
   },
-    {
+  {
       name  = "SELFCARE_USER_URL"
       value = "https://selc-u-pnpg-user-ms-ca.redground-be752d1f.westeurope.azurecontainerapps.io"
-    }
+  },
+  {
+    name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
+    value = "v1"
+  }
 ]
 
 secrets_names = {
