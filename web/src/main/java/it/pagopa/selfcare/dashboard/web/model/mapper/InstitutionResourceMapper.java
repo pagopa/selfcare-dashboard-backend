@@ -1,12 +1,14 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
+import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
+import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -15,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,4 +85,43 @@ public interface InstitutionResourceMapper {
         return null;
     }
 
+    @Mapping(target = "name", source = "institutionInfo.description")
+    @Mapping(target = "aooParent", source = "institutionInfo.aooParentCode")
+    @Mapping(target = "subUnitType", source = "institutionInfo.subunitType")
+    @Mapping(target = "subUnitCode", source = "institutionInfo.subunitCode")
+    @Mapping(target = "rootParent", expression = "java(toRootParent(institutionInfo))")
+    @Mapping(target = "roles", expression = "java(toRoles(productGrantedAuthorities, isBillingToken))")
+    ExchangeTokenServiceV2.Institution toInstitution(InstitutionInfo institutionInfo, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken);
+
+    @Named("toRootParent")
+    default ExchangeTokenServiceV2.RootParent toRootParent(InstitutionInfo institutionInfo) {
+        ExchangeTokenServiceV2.RootParent rootParent = new ExchangeTokenServiceV2.RootParent();
+        if(institutionInfo != null) {
+            rootParent.setId(institutionInfo.getId());
+            rootParent.setDescription(institutionInfo.getDescription());
+        }
+        return rootParent;
+    }
+
+    default List<ExchangeTokenServiceV2.Role> toRoles(List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken) {
+        List<ExchangeTokenServiceV2.Role> roles = new ArrayList<>();
+
+        for (ProductGrantedAuthority authority : productGrantedAuthorities) {
+            roles.addAll(constructRole(authority, isBillingToken));
+        }
+        return roles;
+    }
+
+    default List<ExchangeTokenServiceV2.Role> constructRole(ProductGrantedAuthority productGrantedAuthority, boolean isBillingToken) {
+        return productGrantedAuthority.getProductRoles().stream()
+                .map(productRoleCode -> {
+                    ExchangeTokenServiceV2.Role role = new ExchangeTokenServiceV2.Role();
+                    role.setPartyRole(productGrantedAuthority.getPartyRole());
+                    role.setProductRole(productRoleCode);
+                    if (isBillingToken) {
+                        role.setProductId(productGrantedAuthority.getProductId());
+                    }
+                    return role;
+                }).toList();
+    }
 }

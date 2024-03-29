@@ -121,7 +121,7 @@ app_settings = [
     name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
     value = "dev.portalefatturazione.pagopa.it"
   },
- {
+  {
    name  = "SELFCARE_USER_URL"
    value = "https://selc-d-user-ms-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
  }
