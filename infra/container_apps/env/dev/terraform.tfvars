@@ -124,7 +124,11 @@ app_settings = [
   {
    name  = "SELFCARE_USER_URL"
    value = "https://selc-d-user-ms-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
- }
+ },
+  {
+    name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
+    value = "v1"
+  }
 ]
 
 secrets_names = {
