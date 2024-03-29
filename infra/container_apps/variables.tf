@@ -78,3 +78,9 @@ variable "api_dns_zone_prefix" {
   default     = "api.selfcare"
   description = "The dns subdomain."
 }
+
+variable "workload_profile_name" {
+  type        = string
+  description = "Workload Profile name to use"
+  default     = "Consumption"
+}
