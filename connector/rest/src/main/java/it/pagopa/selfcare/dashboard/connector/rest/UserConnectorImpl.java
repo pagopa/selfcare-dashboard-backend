@@ -72,8 +72,10 @@ public class UserConnectorImpl implements UserApiConnector {
                 userId
         ).getBody();
 
-        if (Objects.isNull(institutionResponses) || institutionResponses.size() != 1)
+
+        if (CollectionUtils.isEmpty(institutionResponses) || institutionResponses.size() != 1){
             throw new ResourceNotFoundException(String.format("InstitutionId %s and userId %s not found", institutionId, userId));
+        }
 
         log.debug("getProducts result = {}", institutionResponses);
         log.trace("getProducts end");
