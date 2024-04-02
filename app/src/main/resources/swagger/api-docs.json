@@ -4741,6 +4741,16 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "productRoles",
+          "in" : "query",
+          "description" : "productRoles",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {

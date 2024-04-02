@@ -178,16 +178,18 @@ class UserV2ServiceImplTest {
     @Test
     void getUsersByInstitutionId_returnsExpectedUsers() {
         // given
-        String institutionId = "inst1";
-        String productId = "prod1";
-        String loggedUserId = "loggedUserId";
+        final String institutionId = "inst1";
+        final String productId = "prod1";
+        final String loggedUserId = "loggedUserId";
+        List<String> productRoles = List.of("productRole");
         UserInfo expectedUser = new UserInfo();
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
 
         when(userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(List.of(expectedUser));
         // when
-        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId,productRoles, loggedUserId);
 
         // then
         assertNotNull(users);
@@ -199,16 +201,18 @@ class UserV2ServiceImplTest {
     @Test
     void getUsersByInstitutionId_emptyList() {
         // given
-        String institutionId = "inst1";
-        String productId = "prod1";
-        String loggedUserId = "loggedUserId";
+        final String institutionId = "inst1";
+        final String productId = "prod1";
+        final String loggedUserId = "loggedUserId";
+        final List<String> productRoles = List.of("productRole");
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
 
         when(userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(Collections.emptyList());
         // when
-        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
 
         // then
         assertNotNull(users);

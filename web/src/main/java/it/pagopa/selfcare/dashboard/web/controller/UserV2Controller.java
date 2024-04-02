@@ -156,12 +156,13 @@ public class UserV2Controller {
     public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
                                               @RequestParam(value = "productId", required = false) String productId,
+                                              @RequestParam(value = "productRoles", required = false) List<String> productRoles,
                                               Authentication authentication) {
         log.trace("getUsers start");
         log.debug("getUsers for institution: {} and product: {}", institutionId, productId);
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
 
-        Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, loggedUserId);
+        Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
         List<ProductUserResource> result = userInfos.stream()
                 .map(UserMapper::toProductUser)
                 .toList();

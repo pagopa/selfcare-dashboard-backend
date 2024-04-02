@@ -218,8 +218,8 @@ class UserV2ControllerTest {
     @Test
     void getUsers_institutionIdProductIdValid() throws Exception {
         // given
-        String institutionId = "institutionId";
-        String productId = "productId";
+        final String institutionId = "institutionId";
+        final String productId = "productId";
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
 
@@ -227,7 +227,7 @@ class UserV2ControllerTest {
         userInfo.setId(randomUUID().toString());
         List<UserInfo> userInfos = List.of(userInfo);
 
-        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, "userId")).thenReturn(userInfos);
+        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, null, "userId")).thenReturn(userInfos);
 
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -247,7 +247,7 @@ class UserV2ControllerTest {
         assertNotNull(resources);
         assertFalse(resources.isEmpty());
         verify(userServiceMock, times(1))
-                .getUsersByInstitutionId(institutionId, productId, "userId");
+                .getUsersByInstitutionId(institutionId, productId, null, "userId");
         verifyNoMoreInteractions(userServiceMock);
     }
 
