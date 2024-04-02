@@ -1,5 +1,5 @@
 env_short = "u"
-private_dns_name = "selc-u-dashboard-backend-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+private_dns_name = "selc-u-dashboard-backend-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "uat.selfcare"
 api_dns_zone_prefix = "api.uat.selfcare"
 
@@ -74,15 +74,15 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-u-ms-core-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-ms-core-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-u-ms-core-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-ms-core-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-u-party-reg-proxy-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-party-reg-proxy-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
@@ -90,7 +90,7 @@ app_settings = [
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-u-user-group-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-user-group-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -110,7 +110,7 @@ app_settings = [
   },
   {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-u-user-ms-ca.calmsky-143987c1.westeurope.azurecontainerapps.io"
+      value = "https://selc-u-user-ms-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
