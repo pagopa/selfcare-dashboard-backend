@@ -1372,7 +1372,10 @@
             "type": "string"
           },
           "productRole": {
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -1394,7 +1397,10 @@
             "type": "string"
           },
           "productRole": {
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

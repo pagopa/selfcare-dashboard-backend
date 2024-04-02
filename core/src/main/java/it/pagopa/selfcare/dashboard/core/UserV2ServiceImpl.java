@@ -8,18 +8,18 @@ import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Executable;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -123,6 +123,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     public String createUsers(String institutionId, String productId, UserToCreate userDto) {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
+        verifyOnboardingStatus(institutionId, productId);
         List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles());
         String userId = userApiConnector.createOrUpdateUserByFiscalCode(institutionId, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
@@ -133,10 +134,21 @@ public class UserV2ServiceImpl implements UserV2Service {
     public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles) {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
+        verifyOnboardingStatus(institutionId, productId);
         List<CreateUserDto.Role> role = retrieveRole(productId, productRoles);
         userApiConnector.createOrUpdateUserByUserId(institutionId, productId, userId, role);
         log.trace("createOrUpdateUserByUserId end");
     }
+
+    private void verifyOnboardingStatus(String institutionId, String productId) {
+        Institution institution = msCoreConnector.getInstitution(institutionId);
+        if (institution.getOnboarding() == null || institution.getOnboarding().stream()
+                .noneMatch(onboarding -> onboarding.getProductId().equals(productId) && onboarding.getStatus().equals(RelationshipState.ACTIVE))
+        ) {
+            throw new InvalidOnboardingStatusException("The product is not active for the institution");
+        }
+    }
+
     /**
      * This method is used to retrieve a list of roles for a given product.
      * It maps each product role to a CreateUserDto.Role object, which includes the label and party role.
