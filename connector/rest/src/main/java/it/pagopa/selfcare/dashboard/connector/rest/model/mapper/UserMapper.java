@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -35,6 +35,14 @@ public interface UserMapper {
         return null;
     }
 
+    @Named("toCertifiedField")
+    default CertifiedField<String> toCertifiedField(CertifiableFieldResponseString field){
+        if(field != null && field.getCertified() != null){
+            return new CertifiedField<>(Certification.valueOf(field.getCertified().name()), field.getValue());
+        }
+        return null;
+    }
+
     @Named("toWorkContacts")
     default Map<String, WorkContactResource> toWorkContacts(Map<String, WorkContact> workContactMap){
         Map<String, WorkContactResource> resourceMap = new HashMap<>();
@@ -45,6 +53,10 @@ public interface UserMapper {
         return null;
     }
 
+    @Mapping(target = "name",  expression = "java(toCertifiedField(response.getName()))")
+    @Mapping(target = "familyName",  expression = "java(toCertifiedField(response.getFamilyName()))")
+    @Mapping(target = "email",  expression = "java(toCertifiedField(response.getEmail()))")
+    @Mapping(target = "workContacts", expression = "java(toCertifiedWorkContact(response.getWorkContacts()))")
     User toUser(UserDetailResponse response);
 
     @Mapping(target = "id", source = "userId")
@@ -80,6 +92,19 @@ public interface UserMapper {
         certifiedField.setCertification(Certification.NONE);
         certifiedField.setValue(field);
         return certifiedField;
+    }
+
+    @Named("toCertifiedWorkContact")
+    default Map<String, WorkContact> toCertifiedWorkContact(Map<String, WorkContactResponse> workContacts){
+        Map<String, WorkContact> resourceMap = new HashMap<>();
+        if(workContacts != null && !workContacts.isEmpty()){
+            workContacts.forEach((key, value) -> {
+                WorkContact workContact = new WorkContact();
+                workContact.setEmail(toCertifiedField(value.getEmail()));
+                resourceMap.put(key, workContact);
+            });
+        }
+        return resourceMap;
     }
 
     @Named("toProductInfoMap")

@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
+import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,6 +14,9 @@ import java.util.Objects;
 @Mapper(componentModel = "spring")
 public interface UserMapperV2 {
 
+    @Mapping(target = "name", expression = "java(toCertifiedFieldResource(model.getName()))")
+    @Mapping(target = "familyName", expression = "java(toCertifiedFieldResource(model.getFamilyName()))")
+    @Mapping(target = "email", expression = "java(toCertifiedFieldResource(model.getEmail()))")
     UserResource toUserResource(User model);
 
     @Mapping(source = "userDto.name", target = "name", qualifiedByName = "mapCertifiedField")
@@ -20,6 +24,17 @@ public interface UserMapperV2 {
     @Mapping(target = "workContacts", expression = "java(getEmail(userDto, institutionId))")
     @Mapping(source = "userDto.surname", target = "familyName", qualifiedByName = "mapCertifiedField")
     MutableUserFieldsDto fromUpdateUser(String institutionId, UpdateUserDto userDto);
+
+    @Named("toCertifiedFieldResource")
+    default CertifiedFieldResource<String> toCertifiedFieldResource(CertifiedField<String> certifiedField){
+        CertifiedFieldResource<String> resource = null;
+        if (certifiedField!= null){
+            resource = new CertifiedFieldResource<>();
+            resource.setValue(certifiedField.getValue());
+            resource.setCertified(Certification.isCertified(certifiedField.getCertification()));
+        }
+        return resource;
+    }
 
     @Named("mapCertifiedField")
     default <T> CertifiedField<T> mapCertifiedField(T certifiedField) {
