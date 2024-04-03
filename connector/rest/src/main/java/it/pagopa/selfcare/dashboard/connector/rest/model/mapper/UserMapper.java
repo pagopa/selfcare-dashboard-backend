@@ -8,10 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -37,7 +34,7 @@ public interface UserMapper {
 
     @Named("toCertifiedField")
     default CertifiedField<String> toCertifiedField(CertifiableFieldResponseString field){
-        if(field != null && field.getCertified() != null){
+        if(Objects.nonNull(field) && Objects.nonNull(field.getCertified())){
             return new CertifiedField<>(Certification.valueOf(field.getCertified().name()), field.getValue());
         }
         return null;
