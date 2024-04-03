@@ -372,7 +372,7 @@
         "tags": [
           "User Controller"
         ],
-        "summary": "Create user by tax code",
+        "summary": "The createOrUpdateByFiscalCode function is used to create a new user or update an existing one.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -910,7 +910,7 @@
         "tags": [
           "User Controller"
         ],
-        "summary": "Create user by userId - Using for addUserRole",
+        "summary": "The createOrUpdateByUserId function is used to update existing user adding userRole.",
         "parameters": [
           {
             "name": "userId",
@@ -1212,7 +1212,7 @@
             "type": "string"
           },
           "certified": {
-            "type": "boolean"
+            "$ref": "#/components/schemas/CertificationEnum"
           }
         }
       },
