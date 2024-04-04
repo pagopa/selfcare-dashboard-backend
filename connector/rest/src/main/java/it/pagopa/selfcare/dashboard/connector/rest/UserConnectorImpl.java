@@ -234,7 +234,6 @@ public class UserConnectorImpl implements UserApiConnector {
     @Override
     public void createOrUpdateUserByUserId(String institutionId, String productId, String userId, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         log.trace("createOrUpdateUserByUserId start");
-        log.debug("createOrUpdateUserByUserId userId = {}", userId);
 
         AddUserRoleDto addUserRoleDto = AddUserRoleDto.builder()
                 .institutionId(institutionId)
