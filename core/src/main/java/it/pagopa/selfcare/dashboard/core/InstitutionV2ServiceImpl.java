@@ -87,7 +87,7 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
             } else {
                 institution.getOnboarding().forEach(product -> {
                     product.setAuthorized(userInstitution.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())));
-                    userInstitution.getProducts().stream().filter(prodUser -> product.getProductId().equals(prodUser.getProductId())).findAny().ifPresentOrElse(userProd -> product.setUserRole(userProd.getRole().name()), () -> product.setUserRole(null));
+                    userInstitution.getProducts().stream().filter(prodUser -> product.getProductId().equals(prodUser.getProductId())).findAny().ifPresentOrElse(userProd -> product.setUserRole(userProd.getRole().getSelfCareAuthority().name()), () -> product.setUserRole(null));
                 });
             }
         }
