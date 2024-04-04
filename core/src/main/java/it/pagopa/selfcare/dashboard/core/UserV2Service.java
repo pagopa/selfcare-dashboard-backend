@@ -26,7 +26,7 @@ public interface UserV2Service {
 
     void updateUser(String id, String institutionId, MutableUserFieldsDto userDto);
 
-    Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, String loggedUserId);
+    Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, List<String> productRoles, String loggedUserId);
 
     String createUsers(String institutionId, String productId, UserToCreate userToCreate);
 
