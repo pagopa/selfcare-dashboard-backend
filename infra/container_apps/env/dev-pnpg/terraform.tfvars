@@ -1,7 +1,7 @@
 is_pnpg   = true
 env_short = "d"
 
-private_dns_name = "selc-d-pnpg-dashboard-backend-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+private_dns_name = "selc-d-pnpg-dashboard-backend-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "pnpg.dev.selfcare"
 api_dns_zone_prefix = "api-pnpg.dev.selfcare"
 
@@ -33,8 +33,6 @@ container_app = {
   cpu          = 0.5
   memory       = "1Gi"
 }
-
-workload_profile_name = null
 
 app_settings = [
   {
@@ -91,23 +89,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-d-pnpg-ms-core-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-pnpg-ms-core-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-d-pnpg-ms-core-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-pnpg-ms-core-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-d-pnpg-party-reg-proxy-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-pnpg-party-reg-proxy-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc-d-pnpg-product-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-pnpg-product-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-d-pnpg-user-group-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-pnpg-user-group-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -127,7 +125,7 @@ app_settings = [
   },
   {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-pnpg-user-ms-ca.whiteglacier-211c4885.westeurope.azurecontainerapps.io"
+      value = "https://selc-d-pnpg-user-ms-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"

@@ -2,7 +2,7 @@ name: Swagger Detect Conflict and Update
 on:
   pull_request:
     branches:
-      - release-dev
+      - main
     types: [ opened, synchronize, reopened ]
     
 permissions:
@@ -18,4 +18,4 @@ jobs:
         uses: pagopa/selfcare-commons/github-actions-template/swagger-detect-conflict-spring@main
         with:
           path_openapi_docs: app/src/main/resources/swagger/api-docs.json
-          branch_ref: release-dev
+          branch_ref: main
