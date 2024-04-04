@@ -1,5 +1,5 @@
 env_short = "p"
-private_dns_name = "selc-p-dashboard-backend-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+private_dns_name = "selc-p-dashboard-backend-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "selfcare"
 api_dns_zone_prefix = "api.selfcare"
 
@@ -87,23 +87,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-p-ms-core-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-core-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-p-ms-core-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-core-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-p-party-reg-proxy-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-party-reg-proxy-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc.internal.selfcare.pagopa.it/ms-product/v1"
+    value = "https://selc-p-product-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-user-group-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-user-group-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -123,7 +123,7 @@ app_settings = [
   },
   {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-p-user-ms-ca.bluedune-cc0f8752.westeurope.azurecontainerapps.io"
+      value = "https://selc-p-user-ms-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
