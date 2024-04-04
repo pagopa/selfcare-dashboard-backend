@@ -8,9 +8,12 @@ import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -228,6 +231,14 @@ class UserV2ServiceImplTest {
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
         Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnector.getProduct(productId)).thenReturn(product);
         doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
 
@@ -248,10 +259,34 @@ class UserV2ServiceImplTest {
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("role1"));
         Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnector.getProduct(productId)).thenReturn(product);
 
         // when
         Assertions.assertThrows(InvalidProductRoleException.class, () -> userService.addUserProductRoles(institutionId, productId, userId, productRoles));
+
+        verifyNoInteractions(userApiConnector);
+    }
+
+    @Test
+    void addUserProductRoles_invalidOnboardingStatus() {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        Set<String> productRoles = new HashSet<>(List.of("operator"));
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(new Institution());
+
+        // when
+        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userService.addUserProductRoles(institutionId, productId, userId, productRoles));
 
         verifyNoInteractions(userApiConnector);
     }
@@ -268,9 +303,18 @@ class UserV2ServiceImplTest {
 
         Product product = getProduct();
 
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
         when(productsConnector.getProduct(productId)).thenReturn(product);
 
         when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
         // when
         String userId = userService.createUsers(institutionId, productId, userToCreate);
 
@@ -278,6 +322,26 @@ class UserV2ServiceImplTest {
         assertNotNull(userId);
         verify(userApiConnector, times(1))
                 .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList());
+        verifyNoMoreInteractions(userApiConnector);
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithOnboardingNotActive() {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        UserToCreate userToCreate = new UserToCreate();
+        HashSet<String> productRoles = new HashSet<>();
+        productRoles.add("operator");
+        userToCreate.setProductRoles(productRoles);
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(new Institution());
+
+        // when
+        assertThrows(InvalidOnboardingStatusException.class, () -> userService.createUsers(institutionId, productId, userToCreate));
+
+        // then
+        verify(msCoreConnectorMock, times(1)).getInstitution(institutionId);
         verifyNoMoreInteractions(userApiConnector);
     }
 
