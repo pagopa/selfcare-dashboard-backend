@@ -2268,9 +2268,9 @@
     "/v2/products/{productId}/back-office" : {
       "get" : {
         "tags" : [ "products" ],
-        "summary" : "retrieveProductBackoffice",
+        "summary" : "Service to trigger token exchange and redirect to product's back office URL",
         "description" : "Service to trigger token exchange and redirect to product's back office URL",
-        "operationId" : "retrieveProductBackofficeUsingGET_1",
+        "operationId" : "v2RetrieveProductBackofficeUsingGET",
         "parameters" : [ {
           "name" : "productId",
           "in" : "path",
