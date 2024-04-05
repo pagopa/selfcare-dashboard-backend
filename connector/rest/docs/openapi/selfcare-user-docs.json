@@ -1424,9 +1424,7 @@
       },
       "User": {
         "required": [
-          "familyName",
           "fiscalCode",
-          "name",
           "institutionEmail"
         ],
         "type": "object",
