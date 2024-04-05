@@ -1,6 +1,19 @@
 name: Release - dashboard-backend
 
 on:
+  push:
+    branches:
+      - main
+      - releases/*
+    paths:
+      - 'app/**'
+      - 'connector/**'
+      - 'connector-api/**'
+      - 'core/**'
+      - 'infra/**'
+      - 'web/**'
+      - 'pom.xml'
+
   workflow_dispatch:
     inputs:
       env:
@@ -10,19 +23,6 @@ on:
         - dev
         - uat
         - prod
-
-  push:
-    branches:
-      - main
-      - releases/*
-    paths:
-      - '!.devops/**'
-      - '!helm/**'
-      - '!**.md'
-      - '!**ignore'
-      - '!infra/repository/**'
-      - '!.terraform-version'
-      - '!CODEOWNERS'
 
 jobs:
 
