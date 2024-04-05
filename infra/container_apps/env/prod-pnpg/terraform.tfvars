@@ -1,6 +1,6 @@
 is_pnpg   = true
 env_short = "p"
-private_dns_name = "selc-p-pnpg-dashboard-backend-ca.redbeach-5da5166f5.westeurope.azurecontainerapps.io"
+private_dns_name = "selc-p-pnpg-dashboard-backend-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
 dns_zone_prefix    = "imprese.notifichedigitali"
 api_dns_zone_prefix = "api-pnpg.selfcare"
 external_domain     = "it"
@@ -125,7 +125,7 @@ app_settings = [
   },
   {
       name  = "SELFCARE_USER_URL"
-      value = "https://selc-p-pnpg-user-ms-ca.redbeach-5da5166f5.westeurope.azurecontainerapps.io"
+      value = "https://selc-p-pnpg-user-ms-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
