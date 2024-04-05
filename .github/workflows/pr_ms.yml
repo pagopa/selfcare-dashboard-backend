@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
 
   pull_request:
+    branches:
+      - main
+      - releases/**
     types:
       - synchronize
       - reopened
