@@ -29,7 +29,7 @@ public interface UserApiConnector {
 
     Boolean hasPermission(String institutionId, String permission, String productId);
 
-    void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto);
+    void updateUser(String userId, String institutionId, UpdateUserRequestDto userDto);
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId);
 

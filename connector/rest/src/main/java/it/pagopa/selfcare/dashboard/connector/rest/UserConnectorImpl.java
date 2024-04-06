@@ -5,7 +5,6 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
@@ -138,10 +137,10 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public void updateUser(String userId, String institutionId, MutableUserFieldsDto userDto) {
+    public void updateUser(String userId, String institutionId, UpdateUserRequestDto userDto) {
         log.trace("updateUser start");
         log.debug("updateUser userId = {}, institutionId = {}, userDto = {}", userId, institutionId, userDto);
-        userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toMutableUserFieldsDto(userDto));
+        userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toUpdateUserRequest(userDto));
         log.trace("updateUser end");
     }
 
@@ -224,7 +223,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
     private Product1 buildProduct(String productId, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         return Product1.builder()
-                .productRole(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
+                .productRoles(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
                 .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(roles.get(0).getPartyRole().name()))
                 .productId(productId)
                 .build();
@@ -237,7 +236,7 @@ public class UserConnectorImpl implements UserApiConnector {
         AddUserRoleDto addUserRoleDto = AddUserRoleDto.builder()
                 .institutionId(institutionId)
                 .product(Product.builder()
-                        .productRole(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
+                        .productRoles(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
                         .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(roles.get(0).getPartyRole().name()))
                         .productId(productId)
                         .build())

@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserToCreate;
+import it.pagopa.selfcare.dashboard.connector.model.user.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +21,7 @@ public interface UserV2Service {
 
     User searchUserByFiscalCode(String fiscalCode, String institutionId);
 
-    void updateUser(String id, String institutionId, MutableUserFieldsDto userDto);
+    void updateUser(String id, String institutionId, UpdateUserRequestDto userDto);
 
     Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, List<String> productRoles, String loggedUserId);
 

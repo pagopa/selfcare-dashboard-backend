@@ -108,10 +108,6 @@ public class UserMapper {
                 resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
                 resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
                 resource.setEmail(CertifiedFieldMapper.toValue(model.getUser().getEmail()));
-                Optional.ofNullable(model.getUser().getWorkContact(model.getInstitutionId()))
-                        .map(WorkContact::getEmail)
-                        .map(CertifiedFieldMapper::toValue)
-                        .ifPresent(resource::setEmail);
             }
             if (model.getProducts() != null) {
                 resource.setProducts(model.getProducts().values().stream()

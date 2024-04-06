@@ -19,11 +19,7 @@ public interface UserMapperV2 {
     @Mapping(target = "email", expression = "java(toCertifiedFieldResource(model.getEmail()))")
     UserResource toUserResource(User model);
 
-    @Mapping(source = "userDto.name", target = "name", qualifiedByName = "mapCertifiedField")
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "workContacts", expression = "java(getEmail(userDto, institutionId))")
-    @Mapping(source = "userDto.surname", target = "familyName", qualifiedByName = "mapCertifiedField")
-    MutableUserFieldsDto fromUpdateUser(String institutionId, UpdateUserDto userDto);
+    UpdateUserRequestDto fromUpdateUser(UpdateUserDto userDto);
 
     @Named("toCertifiedFieldResource")
     default CertifiedFieldResource<String> toCertifiedFieldResource(CertifiedField<String> certifiedField){

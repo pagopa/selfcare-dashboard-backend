@@ -147,9 +147,7 @@ class UserV2ServiceImplTest {
         //given
         final String institutionId = "institutionId";
         final String userId = "userId";
-        final MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
-        WorkContact workContact = mockInstance(new WorkContact());
-        user.setWorkContacts(Map.of(institutionId, workContact));
+        final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
         Institution institutionMock = mockInstance(new Institution());
         when(msCoreConnectorMock.getInstitution(Mockito.anyString()))
                 .thenReturn(institutionMock);
@@ -169,7 +167,7 @@ class UserV2ServiceImplTest {
         //given
         final String institutionId = "institutionId";
         final String userId = "userId";
-        final MutableUserFieldsDto user = mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
+        final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
         //when
         Executable executable = () -> userService.updateUser(userId, institutionId, user);
         //then
