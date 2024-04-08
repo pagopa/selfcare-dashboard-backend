@@ -232,12 +232,12 @@ class UserConnectorImplTest {
         // given
         final String userId = "userId";
         final String institutionId = "institutionId";
-        final var user = new MutableUserFieldsDto();
+        final var user = new UpdateUserRequestDto();
         // when
         userConnector.updateUser(userId, institutionId, user);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdUserRegistryPut(userId, institutionId, it.pagopa.selfcare.user.generated.openapi.v1.dto.MutableUserFieldsDto.builder().build());
+                ._usersIdUserRegistryPut(userId, institutionId,new UpdateUserRequest());
         verifyNoMoreInteractions(userApiRestClient);
     }
 

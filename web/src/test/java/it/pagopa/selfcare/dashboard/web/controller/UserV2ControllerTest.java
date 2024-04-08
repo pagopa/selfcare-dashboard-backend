@@ -210,7 +210,7 @@ class UserV2ControllerTest {
                 .andExpect(content().string(emptyString()));
         //then
         verify(userServiceMock, times(1))
-                .updateUser(eq(id), eq(institutionId), any(MutableUserFieldsDto.class));
+                .updateUser(eq(id), eq(institutionId), any(UpdateUserRequestDto.class));
 
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }

@@ -93,7 +93,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     }
 
     @Override
-    public void updateUser(String id, String institutionId, MutableUserFieldsDto userDto) {
+    public void updateUser(String id, String institutionId, UpdateUserRequestDto userDto) {
         log.trace("updateUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "updateUser id = {}, institutionId = {}, userDto = {}", id, institutionId, userDto);
         Assert.notNull(id, "UUID is required");

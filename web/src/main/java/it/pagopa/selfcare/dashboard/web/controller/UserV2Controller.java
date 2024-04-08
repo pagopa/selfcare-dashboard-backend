@@ -145,7 +145,7 @@ public class UserV2Controller {
                            UpdateUserDto updateUserDto) {
         log.trace("updateUser start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "userId = {}, institutionId = {}, userDto = {}", userId, institutionId, updateUserDto);
-        userService.updateUser(userId, institutionId, userMapperV2.fromUpdateUser(institutionId, updateUserDto));
+        userService.updateUser(userId, institutionId, userMapperV2.fromUpdateUser(updateUserDto));
         log.trace("updateUser end");
     }
 
