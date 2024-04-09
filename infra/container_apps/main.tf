@@ -16,6 +16,7 @@ module "container_app_dashboard_backend" {
   env_short          = var.env_short
   container_app      = var.container_app
   container_app_name = "dashboard-backend"
+  container_app_environment_name = local.container_app_environment_name
   image_name         = "selfcare-dashboard-backend"
   image_tag          = var.image_tag
   app_settings       = var.app_settings
