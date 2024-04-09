@@ -1,8 +1,8 @@
 is_pnpg   = true
 env_short = "d"
 
-private_dns_name = "selc-d-pnpg-dashboard-backend-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
-dns_zone_prefix    = "pnpg.dev.selfcare"
+private_dns_name    = "selc-d-pnpg-dashboard-backend-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
+dns_zone_prefix     = "pnpg.dev.selfcare"
 api_dns_zone_prefix = "api-pnpg.dev.selfcare"
 
 tags = {
@@ -30,8 +30,8 @@ container_app = {
       name = "cron-scale-rule"
     }
   ]
-  cpu          = 0.5
-  memory       = "1Gi"
+  cpu    = 0.5
+  memory = "1Gi"
 }
 
 app_settings = [
@@ -120,12 +120,12 @@ app_settings = [
     value = "https://dev.portalefatturazione.pagopa.it/auth?selfcareToken=<IdentityToken>"
   },
   {
-    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
+    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE"
     value = "dev.portalefatturazione.pagopa.it"
   },
   {
-      name  = "SELFCARE_USER_URL"
-      value = "https://selc-d-pnpg-user-ms-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
+    name  = "SELFCARE_USER_URL"
+    value = "https://selc-d-pnpg-user-ms-ca.yellowdesert-85d3792d.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
@@ -134,12 +134,12 @@ app_settings = [
 ]
 
 secrets_names = {
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = "appinsights-connection-string"
-    "BLOB_STORAGE_CONN_STRING"                        = "web-storage-connection-string"
-    "USER_REGISTRY_API_KEY"                           = "user-registry-api-key"
-    "SUPPORT_API_KEY"                                 = "zendesk-support-api-key"
-    "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"                  = "jwt-exchange-private-key"
-    "JWT_TOKEN_EXCHANGE_KID"                          = "jwt-exchange-kid"
-    "JWT_TOKEN_PUBLIC_KEY"                            = "jwt-public-key"
-    "USERVICE_USER_REGISTRY_API_KEY"                  = "user-registry-api-key"
+  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "appinsights-connection-string"
+  "BLOB_STORAGE_CONN_STRING"              = "web-storage-connection-string"
+  "USER_REGISTRY_API_KEY"                 = "user-registry-api-key"
+  "SUPPORT_API_KEY"                       = "zendesk-support-api-key"
+  "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"        = "jwt-exchange-private-key"
+  "JWT_TOKEN_EXCHANGE_KID"                = "jwt-exchange-kid"
+  "JWT_TOKEN_PUBLIC_KEY"                  = "jwt-public-key"
+  "USERVICE_USER_REGISTRY_API_KEY"        = "user-registry-api-key"
 }
