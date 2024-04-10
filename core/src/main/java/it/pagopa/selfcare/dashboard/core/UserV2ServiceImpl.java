@@ -14,8 +14,8 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -27,14 +27,28 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserV2ServiceImpl implements UserV2Service {
 
     private final MsCoreConnector msCoreConnector;
     private final UserGroupV2Service userGroupService;
     private final UserApiConnector userApiConnector;
     private final ProductsConnector productsConnector;
+
+    private final List<RelationshipState> allowedStates;
     private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
+
+    public UserV2ServiceImpl(
+            MsCoreConnector msCoreConnector,
+            UserGroupV2Service userGroupService,
+            UserApiConnector userApiConnector, ProductsConnector productsConnector,
+            @Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates
+    ) {
+        this.msCoreConnector = msCoreConnector;
+        this.userGroupService = userGroupService;
+        this.userApiConnector = userApiConnector;
+        this.productsConnector = productsConnector;
+        this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
+    }
 
 
     @Override
@@ -114,6 +128,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
         userInfoFilter.setProductRoles(productRoles);
+        userInfoFilter.setAllowedStates(allowedStates);
         Collection<UserInfo> result = userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
         log.info("getUsersByInstitutionId result size = {}", result.size());
         log.trace("getUsersByInstitutionId end");
