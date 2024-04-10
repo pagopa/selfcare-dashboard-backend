@@ -1,7 +1,7 @@
-is_pnpg   = true
-env_short = "p"
-private_dns_name = "selc-p-pnpg-dashboard-backend-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
-dns_zone_prefix    = "imprese.notifichedigitali"
+is_pnpg             = true
+env_short           = "p"
+private_dns_name    = "selc-p-pnpg-dashboard-backend-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
+dns_zone_prefix     = "imprese.notifichedigitali"
 api_dns_zone_prefix = "api-pnpg.selfcare"
 external_domain     = "it"
 
@@ -89,23 +89,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-p-pnpg-ms-core-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-ms-core-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-p-pnpg-ms-core-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-ms-core-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-p-pnpg-party-reg-proxy-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-party-reg-proxy-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc-p-pnpg-product-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-product-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-pnpg-user-group-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-pnpg-user-group-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -120,12 +120,12 @@ app_settings = [
     value = "https://portalefatturazione.pagopa.it/auth?selfcareToken=<IdentityToken>"
   },
   {
-    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
+    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE"
     value = "portalefatturazione.pagopa.it"
   },
   {
-      name  = "SELFCARE_USER_URL"
-      value = "https://selc-p-pnpg-user-ms-ca.redbeach-5da5166f.westeurope.azurecontainerapps.io"
+    name  = "SELFCARE_USER_URL"
+    value = "https://selc-p-pnpg-user-ms-ca.calmmoss-0be48755.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
@@ -134,12 +134,12 @@ app_settings = [
 ]
 
 secrets_names = {
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = "appinsights-connection-string"
-    "BLOB_STORAGE_CONN_STRING"                        = "web-storage-connection-string"
-    "USER_REGISTRY_API_KEY"                           = "user-registry-api-key"
-    "SUPPORT_API_KEY"                                 = "zendesk-support-api-key"
-    "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"                  = "jwt-exchange-private-key"
-    "JWT_TOKEN_EXCHANGE_KID"                          = "jwt-exchange-kid"
-    "JWT_TOKEN_PUBLIC_KEY"                            = "jwt-public-key"
-    "USERVICE_USER_REGISTRY_API_KEY"                  = "user-registry-api-key"
+  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "appinsights-connection-string"
+  "BLOB_STORAGE_CONN_STRING"              = "web-storage-connection-string"
+  "USER_REGISTRY_API_KEY"                 = "user-registry-api-key"
+  "SUPPORT_API_KEY"                       = "zendesk-support-api-key"
+  "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"        = "jwt-exchange-private-key"
+  "JWT_TOKEN_EXCHANGE_KID"                = "jwt-exchange-kid"
+  "JWT_TOKEN_PUBLIC_KEY"                  = "jwt-public-key"
+  "USERVICE_USER_REGISTRY_API_KEY"        = "user-registry-api-key"
 }

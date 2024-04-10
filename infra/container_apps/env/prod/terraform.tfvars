@@ -1,6 +1,6 @@
-env_short = "p"
-private_dns_name = "selc-p-dashboard-backend-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
-dns_zone_prefix    = "selfcare"
+env_short           = "p"
+private_dns_name    = "selc-p-dashboard-backend-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
+dns_zone_prefix     = "selfcare"
 api_dns_zone_prefix = "api.selfcare"
 
 tags = {
@@ -87,23 +87,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-p-ms-core-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-core-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-p-ms-core-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-ms-core-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-p-party-reg-proxy-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-party-reg-proxy-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc-p-product-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-product-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-user-group-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
+    value = "https://selc-p-user-group-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -118,12 +118,12 @@ app_settings = [
     value = "https://portalefatturazione.pagopa.it/auth?selfcareToken=<IdentityToken>"
   },
   {
-    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
+    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE"
     value = "portalefatturazione.pagopa.it"
   },
   {
-      name  = "SELFCARE_USER_URL"
-      value = "https://selc-p-user-ms-ca.salmonstone-7f910b8f.westeurope.azurecontainerapps.io"
+    name  = "SELFCARE_USER_URL"
+    value = "https://selc-p-user-ms-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
@@ -132,13 +132,13 @@ app_settings = [
 ]
 
 secrets_names = {
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = "appinsights-connection-string"
-    "BLOB_STORAGE_CONN_STRING"                        = "web-storage-connection-string"
-    "USER_REGISTRY_API_KEY"                           = "user-registry-api-key"
-    "BACKOFFICE_PAGO_PA_API_KEY"                      = "pagopa-backoffice-api-key"
-    "SUPPORT_API_KEY"                                 = "zendesk-support-api-key"
-    "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"                  = "jwt-exchange-private-key"
-    "JWT_TOKEN_EXCHANGE_KID"                          = "jwt-exchange-kid"
-    "JWT_TOKEN_PUBLIC_KEY"                            = "jwt-public-key"
-    "USERVICE_USER_REGISTRY_API_KEY"                  = "user-registry-api-key"
+  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "appinsights-connection-string"
+  "BLOB_STORAGE_CONN_STRING"              = "web-storage-connection-string"
+  "USER_REGISTRY_API_KEY"                 = "user-registry-api-key"
+  "BACKOFFICE_PAGO_PA_API_KEY"            = "pagopa-backoffice-api-key"
+  "SUPPORT_API_KEY"                       = "zendesk-support-api-key"
+  "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"        = "jwt-exchange-private-key"
+  "JWT_TOKEN_EXCHANGE_KID"                = "jwt-exchange-kid"
+  "JWT_TOKEN_PUBLIC_KEY"                  = "jwt-public-key"
+  "USERVICE_USER_REGISTRY_API_KEY"        = "user-registry-api-key"
 }

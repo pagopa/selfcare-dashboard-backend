@@ -1,5 +1,5 @@
 env_short           = "d"
-private_dns_name    = "selc-d-dashboard-backend-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+private_dns_name    = "selc-d-dashboard-backend-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
 dns_zone_prefix     = "dev.selfcare"
 api_dns_zone_prefix = "api.dev.selfcare"
 
@@ -28,8 +28,8 @@ container_app = {
       name = "cron-scale-rule"
     }
   ]
-  cpu          = 0.5
-  memory       = "1Gi"
+  cpu    = 0.5
+  memory = "1Gi"
 }
 
 app_settings = [
@@ -87,23 +87,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-d-ms-core-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-ms-core-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-d-ms-core-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-ms-core-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-d-party-reg-proxy-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-party-reg-proxy-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc-d-product-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-product-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-d-user-group-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+    value = "https://selc-d-user-group-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -118,13 +118,13 @@ app_settings = [
     value = "https://dev.portalefatturazione.pagopa.it/auth?selfcareToken=<IdentityToken>"
   },
   {
-    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE" 
+    name  = "TOKEN_EXCHANGE_BILLING_AUDIENCE"
     value = "dev.portalefatturazione.pagopa.it"
   },
   {
-   name  = "SELFCARE_USER_URL"
-   value = "https://selc-d-user-ms-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
- },
+    name  = "SELFCARE_USER_URL"
+    value = "https://selc-d-user-ms-ca.politewater-9af33050.westeurope.azurecontainerapps.io"
+  },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
     value = "v1"
@@ -132,13 +132,13 @@ app_settings = [
 ]
 
 secrets_names = {
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"           = "appinsights-connection-string"
-    "BLOB_STORAGE_CONN_STRING"                        = "web-storage-connection-string"
-    "USER_REGISTRY_API_KEY"                           = "user-registry-api-key"
-    "BACKOFFICE_PAGO_PA_API_KEY"                      = "pagopa-backoffice-api-key"
-    "SUPPORT_API_KEY"                                 = "zendesk-support-api-key"
-    "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"                  = "jwt-exchange-private-key"
-    "JWT_TOKEN_EXCHANGE_KID"                          = "jwt-exchange-kid"
-    "JWT_TOKEN_PUBLIC_KEY"                            = "jwt-public-key"
-    "USERVICE_USER_REGISTRY_API_KEY"                  = "user-registry-api-key"
+  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "appinsights-connection-string"
+  "BLOB_STORAGE_CONN_STRING"              = "web-storage-connection-string"
+  "USER_REGISTRY_API_KEY"                 = "user-registry-api-key"
+  "BACKOFFICE_PAGO_PA_API_KEY"            = "pagopa-backoffice-api-key"
+  "SUPPORT_API_KEY"                       = "zendesk-support-api-key"
+  "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"        = "jwt-exchange-private-key"
+  "JWT_TOKEN_EXCHANGE_KID"                = "jwt-exchange-kid"
+  "JWT_TOKEN_PUBLIC_KEY"                  = "jwt-public-key"
+  "USERVICE_USER_REGISTRY_API_KEY"        = "user-registry-api-key"
 }
