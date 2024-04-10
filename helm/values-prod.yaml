@@ -45,4 +45,4 @@ configEnvSpecific:
   JWT_TOKEN_EXCHANGE_ISSUER: "https://selfcare.pagopa.it"
   PUBLIC_FILE_STORAGE_BASE_URL: "https://selcpcheckoutsa.z6.web.core.windows.net"
   PAGO_PA_BACKOFFICE_URL: "https://api.platform.pagopa.it/apiconfig/auth/api/v1"
-  SELFCARE_USER_URL: "https://selc-p-user-ms-ca.livelydesert-633675bb.westeurope.azurecontainerapps.io"
+  SELFCARE_USER_URL: "https://selc-p-user-ms-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
