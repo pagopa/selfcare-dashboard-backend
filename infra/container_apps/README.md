@@ -35,6 +35,7 @@ Deploy container on a Container App instance.
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_dns_zone_prefix"></a> [api\_dns\_zone\_prefix](#input\_api\_dns\_zone\_prefix) | The dns subdomain. | `string` | `"api.selfcare"` | no |
 | <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | n/a | <pre>list(object({<br>    name  = string<br>    value = string<br>  }))</pre> | n/a | yes |
+| <a name="input_cae_name"></a> [cae\_name](#input\_cae\_name) | Container App Environment name | `string` | `"cae-cp"` | no |
 | <a name="input_container_app"></a> [container\_app](#input\_container\_app) | Container App configuration | <pre>object({<br>    min_replicas = number<br>    max_replicas = number<br><br>    scale_rules = list(object({<br>      name = string<br>      custom = object({<br>        metadata = map(string)<br>        type     = string<br>      })<br>    }))<br><br>    cpu    = number<br>    memory = string<br>  })</pre> | n/a | yes |
 | <a name="input_dns_zone_prefix"></a> [dns\_zone\_prefix](#input\_dns\_zone\_prefix) | The dns subdomain. | `string` | `"selfcare"` | no |
 | <a name="input_env_short"></a> [env\_short](#input\_env\_short) | Environment short name | `string` | n/a | yes |

@@ -1,9 +1,11 @@
-is_pnpg             = true
-env_short           = "u"
-private_dns_name    = "selc-u-pnpg-dashboard-backend-ca.calmforest-ffe47bf1.westeurope.azurecontainerapps.io"
-dns_zone_prefix     = "imprese.uat.notifichedigitali"
-api_dns_zone_prefix = "api-pnpg.uat.selfcare"
-external_domain     = "it"
+is_pnpg               = true
+env_short             = "u"
+private_dns_name      = "selc-u-pnpg-dashboard-backend-ca.calmforest-ffe47bf1.westeurope.azurecontainerapps.io"
+dns_zone_prefix       = "imprese.uat.notifichedigitali"
+api_dns_zone_prefix   = "api-pnpg.uat.selfcare"
+external_domain       = "it"
+cae_name              = "cae"
+workload_profile_name = "Consumption"
 
 tags = {
   CreatedBy   = "Terraform"
