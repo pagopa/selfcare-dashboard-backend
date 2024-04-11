@@ -251,7 +251,7 @@ class UserConnectorImplTest {
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         userInfoFilter.setRole(SelfCareAuthority.ADMIN);
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null)))
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED"))))
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         // when
@@ -259,7 +259,7 @@ class UserConnectorImplTest {
 
         // then
         assertTrue(result.isEmpty());
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null));
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED")));
         verifyNoMoreInteractions(userApiRestClient);
     }
 
