@@ -34,7 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static java.util.UUID.randomUUID;
 import static org.hamcrest.Matchers.emptyString;
 import static org.junit.jupiter.api.Assertions.*;
@@ -225,6 +227,15 @@ class UserV2ControllerTest {
 
         UserInfo userInfo = mockInstance(new UserInfo());
         userInfo.setId(randomUUID().toString());
+        Map<String, ProductInfo> map = new HashMap<>();
+        ProductInfo productInfo = new ProductInfo();
+        RoleInfo roleInfo = new RoleInfo();
+        roleInfo.setSelcRole(ADMIN);
+        roleInfo.setRole("role");
+        roleInfo.setStatus(ACTIVE.name());
+        productInfo.setRoleInfos(List.of(roleInfo));
+        map.put("productId", productInfo);
+        userInfo.setProducts(map);
         List<UserInfo> userInfos = List.of(userInfo);
 
         when(userServiceMock.getUsersByInstitutionId(institutionId, productId, null, "userId")).thenReturn(userInfos);

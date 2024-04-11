@@ -33,4 +33,4 @@ logging:
 
 dashboard:
   security:
-    connector: ${B4F_DASHBOARD_SECURITY_CONNECTOR:v1}
+    connector: ${B4F_DASHBOARD_SECURITY_CONNECTOR:v2}

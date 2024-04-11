@@ -27,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -162,13 +163,12 @@ public class UserV2Controller {
         log.debug("getUsers for institution: {} and product: {}", institutionId, productId);
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
 
+        List<ProductUserResource> response = new ArrayList<>();
         Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
-        List<ProductUserResource> result = userInfos.stream()
-                .map(UserMapper::toProductUser)
-                .toList();
-        log.debug("getUsers result = {}", result);
+        userInfos.forEach(userInfo -> response.addAll(UserMapper.toProductUsers(userInfo)));
+        log.debug("getUsers result = {}", response);
         log.trace("getUsers end");
 
-        return result;
+        return response;
     }
 }

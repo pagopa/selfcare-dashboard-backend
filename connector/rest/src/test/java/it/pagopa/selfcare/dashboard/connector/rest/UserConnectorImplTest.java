@@ -248,6 +248,7 @@ class UserConnectorImplTest {
         String loggedUserId = "loggedUserId";
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         userInfoFilter.setRole(SelfCareAuthority.ADMIN);
 
         when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),anyList(), eq(null)))
