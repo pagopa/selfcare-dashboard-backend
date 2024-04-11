@@ -15,9 +15,7 @@ import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -145,6 +143,29 @@ public class UserMapper {
         return resource;
     }
 
+    public static List<ProductUserResource> toProductUsers(UserInfo model) {
+        List<ProductUserResource> response = new ArrayList<>();
+        if (model != null && model.getProducts() != null && !model.getProducts().isEmpty()) {
+            model.getProducts().forEach((s, productInfo) -> {
+                ProductUserResource resource = new ProductUserResource();
+                resource.setId(UUID.fromString(model.getId()));
+                resource.setRole(model.getRole());
+                resource.setStatus(model.getStatus());
+                if (model.getUser() != null) {
+                    resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
+                    resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
+                    Optional.ofNullable(model.getUser().getWorkContacts())
+                            .map(map -> map.get(model.getUserMailUuid()))
+                            .map(WorkContact::getEmail)
+                            .map(CertifiedFieldMapper::toValue)
+                            .ifPresent(resource::setEmail);
+                }
+                resource.setProduct(UserMapper.toUserProductInfoResource(productInfo));
+                response.add(resource);
+            });
+        }
+        return response;
+    }
 
     public static it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto, String institutionId) {
         it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto model = null;
