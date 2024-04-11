@@ -90,3 +90,9 @@ variable "cae_name" {
   description = "Container App Environment name"
   default     = "cae-cp"
 }
+
+variable "suffix_increment" {
+  type        = string
+  description = "Suffix increment Container App Environment name"
+  default     = ""
+}

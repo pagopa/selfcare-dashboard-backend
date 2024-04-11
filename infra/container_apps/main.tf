@@ -14,6 +14,7 @@ module "container_app_dashboard_backend" {
   is_pnpg = var.is_pnpg
 
   env_short                      = var.env_short
+  resource_group_name            = local.ca_resource_group_name
   container_app                  = var.container_app
   container_app_name             = "dashboard-backend"
   container_app_environment_name = local.container_app_environment_name

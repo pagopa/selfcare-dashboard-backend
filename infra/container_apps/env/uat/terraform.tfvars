@@ -1,9 +1,9 @@
-env_short             = "u"
-private_dns_name      = "selc-u-dashboard-backend-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
-dns_zone_prefix       = "uat.selfcare"
-api_dns_zone_prefix   = "api.uat.selfcare"
-cae_name              = "cae"
-workload_profile_name = "Consumption"
+env_short           = "u"
+private_dns_name    = "selc-u-dashboard-backend-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+dns_zone_prefix     = "uat.selfcare"
+api_dns_zone_prefix = "api.uat.selfcare"
+suffix_increment    = "-001"
+cae_name            = "cae-001"
 
 tags = {
   CreatedBy   = "Terraform"
@@ -76,23 +76,23 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-u-ms-core-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-ms-core-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-u-ms-core-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-ms-core-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-u-party-reg-proxy-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-party-reg-proxy-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_PRODUCT_URL"
-    value = "https://selc-u-product-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-product-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-u-user-group-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-user-group-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -112,7 +112,7 @@ app_settings = [
   },
   {
     name  = "SELFCARE_USER_URL"
-    value = "https://selc-u-user-ms-ca.agreeablesky-f71e6306.westeurope.azurecontainerapps.io"
+    value = "https://selc-u-user-ms-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
