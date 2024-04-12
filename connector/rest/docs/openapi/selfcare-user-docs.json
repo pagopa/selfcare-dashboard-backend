@@ -1,7 +1,7 @@
 {
   "openapi" : "3.0.3",
   "info" : {
-    "title" : "User API (development)",
+    "title" : "user-ms API",
     "version" : "1.0.0"
   },
   "servers" : [ {
@@ -316,8 +316,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       },
       "post" : {
         "tags" : [ "User Controller" ],
@@ -341,8 +350,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/emails" : {
@@ -377,8 +395,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/ids" : {
@@ -408,8 +435,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/notification" : {
@@ -449,8 +485,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/search" : {
@@ -483,8 +528,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{id}" : {
@@ -521,8 +575,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{id}/details" : {
@@ -559,8 +622,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{id}/institution/{institutionId}/product/{productId}/status" : {
@@ -599,8 +671,17 @@
         "responses" : {
           "204" : {
             "description" : "No Content"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{id}/status" : {
@@ -651,8 +732,17 @@
             "content" : {
               "application/json" : { }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{id}/user-registry" : {
@@ -688,8 +778,17 @@
             "content" : {
               "application/json" : { }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{userId}" : {
@@ -719,8 +818,17 @@
             "content" : {
               "application/json" : { }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{userId}/institution/{institutionId}" : {
@@ -797,8 +905,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{userId}/institutions" : {
@@ -838,8 +955,17 @@
                 }
               }
             }
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     },
     "/users/{userId}/institutions/{institutionId}/products/{productId}" : {
@@ -871,8 +997,17 @@
         "responses" : {
           "204" : {
             "description" : "No Content"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "401" : {
+            "description" : "Not Authorized"
           }
-        }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
       }
     }
   },
@@ -893,6 +1028,9 @@
             "type" : "string"
           },
           "institutionRootName" : {
+            "type" : "string"
+          },
+          "userMailUuid" : {
             "type" : "string"
           },
           "hasToSendEmail" : {
@@ -1043,7 +1181,6 @@
         "type" : "object",
         "properties" : {
           "fiscalCode" : {
-            "pattern" : "\\S",
             "type" : "string"
           }
         }
