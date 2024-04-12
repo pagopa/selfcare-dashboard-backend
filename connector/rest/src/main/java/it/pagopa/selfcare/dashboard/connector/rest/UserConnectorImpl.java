@@ -50,6 +50,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
         List<InstitutionBase> result = userInfoResponse.getInstitutions().stream()
                 .map(institutionMapper::toInstitutionBase)
+                .sorted(Comparator.comparing(InstitutionBase::getName))
                 .toList();
         log.debug("getUserProducts result = {}", result);
         log.trace("getUserProducts end");

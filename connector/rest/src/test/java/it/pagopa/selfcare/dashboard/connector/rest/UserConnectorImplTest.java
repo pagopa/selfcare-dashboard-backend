@@ -77,10 +77,11 @@ class UserConnectorImplTest {
         when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
         List<InstitutionBase> result = userConnector.getUserInstitutions("userID");
-        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(3, result.size());
         Assertions.assertEquals(ACTIVE.name(), result.get(0).getStatus());
-        Assertions.assertEquals("institutionId", result.get(0).getId());
-        Assertions.assertEquals("institutionName", result.get(0).getName());
+        Assertions.assertEquals("a", result.get(0).getName());
+        Assertions.assertEquals("b", result.get(1).getName());
+        Assertions.assertEquals("c", result.get(2).getName());
     }
 
     private static UserInfoResponse getUserProductsResponse() {
@@ -88,10 +89,23 @@ class UserConnectorImplTest {
         userProductsResponse.setUserId("userId");
         UserInstitutionRoleResponse institutionProducts = new UserInstitutionRoleResponse();
         institutionProducts.setInstitutionId("institutionId");
-        institutionProducts.setInstitutionName("institutionName");
+        institutionProducts.setInstitutionName("c");
         institutionProducts.setStatus(OnboardedProductState.ACTIVE);
         institutionProducts.setRole(PartyRole.MANAGER);
-        userProductsResponse.setInstitutions(List.of(institutionProducts));
+
+        UserInstitutionRoleResponse institutionProducts2 = new UserInstitutionRoleResponse();
+        institutionProducts2.setInstitutionId("institutionId2");
+        institutionProducts2.setInstitutionName("b");
+        institutionProducts2.setStatus(OnboardedProductState.ACTIVE);
+        institutionProducts2.setRole(PartyRole.MANAGER);
+
+        UserInstitutionRoleResponse institutionProducts3 = new UserInstitutionRoleResponse();
+        institutionProducts3.setInstitutionId("institutionId3");
+        institutionProducts3.setInstitutionName("a");
+        institutionProducts3.setStatus(OnboardedProductState.ACTIVE);
+        institutionProducts3.setRole(PartyRole.MANAGER);
+
+        userProductsResponse.setInstitutions(List.of(institutionProducts, institutionProducts2,institutionProducts3));
         return userProductsResponse;
     }
 
