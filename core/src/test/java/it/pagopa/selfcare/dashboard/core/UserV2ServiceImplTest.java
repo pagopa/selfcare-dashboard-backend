@@ -322,7 +322,7 @@ class UserV2ServiceImplTest {
         assertNotNull(userId);
         ArgumentCaptor<List<CreateUserDto.Role>> captorRoles = ArgumentCaptor.forClass(List.class);
         verify(userApiConnector, times(1))
-                .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), captorRoles.capture());
+                .createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), captorRoles.capture());
         assertEquals(captorRoles.getValue().get(0).getProductRole(), productRole);
 
         verifyNoMoreInteractions(userApiConnector);
