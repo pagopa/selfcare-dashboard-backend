@@ -177,6 +177,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         return productRoles.stream().map(productRole -> {
             EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
             CreateUserDto.Role role = new CreateUserDto.Role();
+            role.setProductRole(productRole);
             role.setLabel(Product.getLabel(productRole, roleMappings).orElse(null));
             Optional<PartyRole> partyRole = Product.getPartyRole(productRole, roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
