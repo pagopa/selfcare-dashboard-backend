@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
@@ -35,8 +35,8 @@ public interface UserApiConnector {
 
     List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId);
 
-    String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, List<CreateUserDto.Role> role);
+    String createOrUpdateUserByFiscalCode(Institution institution, String productId, UserToCreate userDto, List<CreateUserDto.Role> role);
 
-    void createOrUpdateUserByUserId(String institutionId, String productId, String userId, List<CreateUserDto.Role> role);
+    void createOrUpdateUserByUserId(Institution institution, String productId, String userId, List<CreateUserDto.Role> role);
 
 }

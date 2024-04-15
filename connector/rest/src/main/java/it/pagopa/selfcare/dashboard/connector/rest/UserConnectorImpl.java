@@ -4,6 +4,7 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
@@ -193,27 +194,34 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public String createOrUpdateUserByFiscalCode(String institutionId, String productId, UserToCreate userDto, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
+    public String createOrUpdateUserByFiscalCode(Institution institution, String productId, UserToCreate userDto, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
         if(roles == null || roles.isEmpty()) {
             throw new IllegalArgumentException("Role list cannot be empty");
         }
 
-        CreateUserDto createUserDto = buildCreateUserDto(institutionId, productId, userDto, roles);
+        CreateUserDto createUserDto = buildCreateUserDto(institution, productId, userDto, roles);
         String userId = userApiRestClient._usersPost(createUserDto).getBody();
 
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
     }
 
-    private CreateUserDto buildCreateUserDto(String institutionId, String productId, UserToCreate userDto, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
-        return CreateUserDto.builder()
-                .institutionId(institutionId)
+    private CreateUserDto buildCreateUserDto(Institution institution, String productId, UserToCreate userDto, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
+        var builder = CreateUserDto.builder()
+                .institutionId(institution.getId())
+                .institutionDescription(institution.getDescription())
                 .user(buildUser(userDto))
-                .product(buildProduct(productId, roles))
-                .build();
+                .product(buildProduct(productId, roles));
+
+        if (!Objects.isNull(institution.getRootParent())) {
+            builder.institutionRootName(institution.getRootParent().getDescription());
+        }
+
+        return builder.build();
     }
+
     private it.pagopa.selfcare.user.generated.openapi.v1.dto.User buildUser(UserToCreate userDto) {
         return it.pagopa.selfcare.user.generated.openapi.v1.dto.User.builder()
                 .fiscalCode(userDto.getTaxCode())
@@ -231,17 +239,24 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public void createOrUpdateUserByUserId(String institutionId, String productId, String userId, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
+    public void createOrUpdateUserByUserId(Institution institution, String productId, String userId, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         log.trace("createOrUpdateUserByUserId start");
 
-        AddUserRoleDto addUserRoleDto = AddUserRoleDto.builder()
-                .institutionId(institutionId)
+        var addUserRoleDtoBuilder = AddUserRoleDto.builder()
+                .institutionId(institution.getId())
+                .institutionDescription(institution.getDescription())
                 .product(Product.builder()
                         .productRoles(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
                         .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(roles.get(0).getPartyRole().name()))
                         .productId(productId)
-                        .build())
-                .build();
+                        .build());
+
+        if(!Objects.isNull(institution.getRootParent())){
+            addUserRoleDtoBuilder.institutionRootName(institution.getRootParent().getDescription());
+        }
+
+        AddUserRoleDto addUserRoleDto = addUserRoleDtoBuilder.build();
+
         userApiRestClient._usersUserIdPost(userId, addUserRoleDto);
         log.trace("createOrUpdateUserByUserId end");
     }
