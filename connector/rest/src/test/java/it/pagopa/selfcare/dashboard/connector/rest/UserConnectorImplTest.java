@@ -2,9 +2,10 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RootParentResponse;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
-import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
@@ -363,8 +364,15 @@ class UserConnectorImplTest {
         CreateUserDto.Role role2 = new CreateUserDto.Role();
         role2.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
         role2.setProductRole("admin2");
+
+        RootParentResponse response = new RootParentResponse();
+        response.setDescription("rootDescription");
+        Institution institution = new Institution();
+        institution.setId("id");
+        institution.setDescription("description");
+        institution.setRootParent(response);
         // Act
-        userConnector.createOrUpdateUserByFiscalCode("institutionId", "productId",  userDto, List.of(role, role2));
+        userConnector.createOrUpdateUserByFiscalCode(institution,  "productId",  userDto, List.of(role, role2));
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersPost(Mockito.any());
@@ -384,8 +392,15 @@ class UserConnectorImplTest {
         role.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
         role.setProductRole("admin");
 
+        RootParentResponse response = new RootParentResponse();
+        response.setDescription("rootDescription");
+        Institution institution = new Institution();
+        institution.setId("id");
+        institution.setDescription("description");
+        institution.setRootParent(response);
+
         // Act
-        userConnector.createOrUpdateUserByUserId("institutionId", "productId", "userId", List.of(role));
+        userConnector.createOrUpdateUserByUserId(institution, "productId", "userId", List.of(role));
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersUserIdPost(eq("userId"), any());

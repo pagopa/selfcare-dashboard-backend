@@ -139,9 +139,9 @@ public class UserV2ServiceImpl implements UserV2Service {
     public String createUsers(String institutionId, String productId, UserToCreate userDto) {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
-        verifyOnboardingStatus(institutionId, productId);
+        Institution institution = verifyOnboardingStatus(institutionId, productId);
         List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles());
-        String userId = userApiConnector.createOrUpdateUserByFiscalCode(institutionId, productId, userDto, role);
+        String userId = userApiConnector.createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
     }
@@ -150,19 +150,20 @@ public class UserV2ServiceImpl implements UserV2Service {
     public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles) {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
-        verifyOnboardingStatus(institutionId, productId);
+        Institution institution = verifyOnboardingStatus(institutionId, productId);
         List<CreateUserDto.Role> role = retrieveRole(productId, productRoles);
-        userApiConnector.createOrUpdateUserByUserId(institutionId, productId, userId, role);
+        userApiConnector.createOrUpdateUserByUserId(institution, productId, userId, role);
         log.trace("createOrUpdateUserByUserId end");
     }
 
-    private void verifyOnboardingStatus(String institutionId, String productId) {
+    private Institution verifyOnboardingStatus(String institutionId, String productId) {
         Institution institution = msCoreConnector.getInstitution(institutionId);
         if (institution.getOnboarding() == null || institution.getOnboarding().stream()
                 .noneMatch(onboarding -> onboarding.getProductId().equals(productId) && onboarding.getStatus().equals(RelationshipState.ACTIVE))
         ) {
             throw new InvalidOnboardingStatusException("The product is not active for the institution");
         }
+        else return institution;
     }
 
     /**

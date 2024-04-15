@@ -239,14 +239,14 @@ class UserV2ServiceImplTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnector.getProduct(productId)).thenReturn(product);
-        doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
+        doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
 
         // when
         userService.addUserProductRoles(institutionId, productId, userId, productRoles);
 
         // then
         verify(userApiConnector, times(1))
-                .createOrUpdateUserByUserId(eq(institutionId), eq(productId), eq(userId), anyList());
+                .createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
         verifyNoMoreInteractions(userApiConnector);
     }
 
@@ -311,7 +311,7 @@ class UserV2ServiceImplTest {
 
         when(productsConnector.getProduct(productId)).thenReturn(product);
 
-        when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
+        when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
@@ -322,8 +322,9 @@ class UserV2ServiceImplTest {
         assertNotNull(userId);
         ArgumentCaptor<List<CreateUserDto.Role>> captorRoles = ArgumentCaptor.forClass(List.class);
         verify(userApiConnector, times(1))
-                .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), captorRoles.capture());
+                .createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), captorRoles.capture());
         assertEquals(captorRoles.getValue().get(0).getProductRole(), productRole);
+
         verifyNoMoreInteractions(userApiConnector);
     }
 
