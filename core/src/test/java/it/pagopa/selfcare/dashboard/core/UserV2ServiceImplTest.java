@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -294,9 +295,10 @@ class UserV2ServiceImplTest {
         // given
         final String institutionId = "institutionId";
         final String productId = "productId";
+        final String productRole = "operator";
         UserToCreate userToCreate = new UserToCreate();
         HashSet<String> productRoles = new HashSet<>();
-        productRoles.add("operator");
+        productRoles.add(productRole);
         userToCreate.setProductRoles(productRoles);
 
         Product product = getProduct();
@@ -318,8 +320,11 @@ class UserV2ServiceImplTest {
 
         // then
         assertNotNull(userId);
+        ArgumentCaptor<List<CreateUserDto.Role>> captorRoles = ArgumentCaptor.forClass(List.class);
         verify(userApiConnector, times(1))
-                .createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), anyList());
+                .createOrUpdateUserByFiscalCode(eq(institutionId), eq(productId), eq(userToCreate), captorRoles.capture());
+        assertEquals(captorRoles.getValue().get(0).getProductRole(), productRole);
+
         verifyNoMoreInteractions(userApiConnector);
     }
 
