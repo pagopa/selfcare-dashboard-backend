@@ -127,7 +127,7 @@ app_settings = [
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
-    value = "v1"
+    value = "v2"
   }
 ]
 
