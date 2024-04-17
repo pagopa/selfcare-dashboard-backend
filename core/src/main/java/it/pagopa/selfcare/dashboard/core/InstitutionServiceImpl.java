@@ -89,7 +89,6 @@ class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Institution getInstitutionById(String institutionId) {
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
         Institution result = msCoreConnector.getInstitution(institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
