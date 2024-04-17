@@ -85,6 +85,17 @@ class InstitutionServiceImpl implements InstitutionService {
         return result;
     }
 
+
+    @Override
+    public Institution getInstitutionById(String institutionId) {
+        log.trace("getInstitution start");
+        log.debug("getInstitution institutionId = {}", institutionId);
+        Institution result = msCoreConnector.getInstitution(institutionId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
+        log.trace("getInstitution end");
+        return result;
+    }
+
     @Override
     public void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
         log.trace("updateInstitutionGeographicTaxonomy start");

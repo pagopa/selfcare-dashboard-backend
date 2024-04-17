@@ -106,11 +106,12 @@ public class ExchangeTokenServiceV2 {
         final ProductGrantedAuthority productGrantedAuthority = Optional.ofNullable(productGrantedAuthorityMap.get(productId))
                 .orElseThrow(() -> new IllegalArgumentException(String.format("A Product Granted SelfCareAuthority is required for product '%s' and institution '%s'", productId, institutionId)));
 
-        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
-        Assert.notNull(institutionInfo, "Institution info is required");
-        Institution institution = institutionResourceMapper.toInstitution(institutionInfo, List.of(productGrantedAuthority), false);
-        retrieveAndSetGroups(institution, institutionId, productId, userId);
-        TokenExchangeClaims claims = retrieveAndSetClaims(authentication.getCredentials().toString(), institution, userId);
+
+        it.pagopa.selfcare.dashboard.connector.model.institution.Institution institution = institutionService.getInstitutionById(institutionId);
+        Assert.notNull(institution, "Institution info is required");
+        ExchangeTokenServiceV2.Institution institutionExchange = institutionResourceMapper.toInstitution(institution, List.of(productGrantedAuthority), false);
+        retrieveAndSetGroups(institutionExchange, institutionId, productId, userId);
+        TokenExchangeClaims claims = retrieveAndSetClaims(authentication.getCredentials().toString(), institutionExchange, userId);
 
         Product product = productsConnector.getProduct(productId);
 
@@ -144,9 +145,9 @@ public class ExchangeTokenServiceV2 {
 
         Map<String, ProductGrantedAuthority> productGrantedAuthorityMap = retrieveProductsFromInstitutionAndUser(institutionId, userId);
         addProductIfIsInvoiceable(productGrantedAuthorityMap, invoiceableProductList, productGrantedAuthorities);
-        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
+        it.pagopa.selfcare.dashboard.connector.model.institution.Institution institutionInfo = institutionService.getInstitutionById(institutionId);
         Assert.notNull(institutionInfo, "Institution info is required");
-        Institution institution = institutionResourceMapper.toInstitution(institutionInfo, productGrantedAuthorities, true);
+        ExchangeTokenServiceV2.Institution institution = institutionResourceMapper.toInstitution(institutionInfo, productGrantedAuthorities, true);
 
         retrieveAndSetGroups(institution, institutionId, null, userId);
 

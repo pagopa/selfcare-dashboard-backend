@@ -85,16 +85,16 @@ public interface InstitutionResourceMapper {
         return null;
     }
 
-    @Mapping(target = "name", source = "institutionInfo.description")
-    @Mapping(target = "aooParent", source = "institutionInfo.aooParentCode")
-    @Mapping(target = "subUnitType", source = "institutionInfo.subunitType")
-    @Mapping(target = "subUnitCode", source = "institutionInfo.subunitCode")
-    @Mapping(target = "rootParent", expression = "java(toRootParent(institutionInfo))")
+    @Mapping(target = "name", source = "institution.description")
+    @Mapping(target = "aooParent", source = "institution.aooParentCode")
+    @Mapping(target = "subUnitType", source = "institution.subunitType")
+    @Mapping(target = "subUnitCode", source = "institution.subunitCode")
+    @Mapping(target = "rootParent", expression = "java(toRootParent(institution))")
     @Mapping(target = "roles", expression = "java(toRoles(productGrantedAuthorities, isBillingToken))")
-    ExchangeTokenServiceV2.Institution toInstitution(InstitutionInfo institutionInfo, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken);
+    ExchangeTokenServiceV2.Institution toInstitution(it.pagopa.selfcare.dashboard.connector.model.institution.Institution institution, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken);
 
     @Named("toRootParent")
-    default ExchangeTokenServiceV2.RootParent toRootParent(InstitutionInfo institutionInfo) {
+    default ExchangeTokenServiceV2.RootParent toRootParent(it.pagopa.selfcare.dashboard.connector.model.institution.Institution institutionInfo) {
         ExchangeTokenServiceV2.RootParent rootParent = new ExchangeTokenServiceV2.RootParent();
         if(institutionInfo != null) {
             rootParent.setId(institutionInfo.getId());
