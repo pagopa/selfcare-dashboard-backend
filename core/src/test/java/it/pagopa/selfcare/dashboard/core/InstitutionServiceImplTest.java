@@ -86,6 +86,22 @@ class InstitutionServiceImplTest {
     }
 
     @Test
+    void getInstitutionById() {
+        // Given
+        String institutionId = "institutionId";
+        Institution institution = new Institution();
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        // When
+        Institution result = institutionService.getInstitutionById(institutionId);
+
+        // Then
+        verify(msCoreConnectorMock, times(1)).getInstitution(institutionId);
+        assertEquals(institution, result);
+    }
+
+
+    @Test
     void getInstitution() {
         // given
         String institutionId = "institutionId";
@@ -370,7 +386,7 @@ class InstitutionServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(productId, capturedFilter.getProductId());
         assertNull(capturedFilter.getProductRoles());
-        assertNull( capturedFilter.getUserId());
+        assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getAllowedStates());
         ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
         verify(userRegistryConnector, times(1))
@@ -1079,7 +1095,7 @@ class InstitutionServiceImplTest {
             assertDoesNotThrow(executable);
             verify(msCoreConnectorMock, times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(userId), createUserDtoCaptor.capture(), eq("setTitle"));
-           createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
+            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
                 createUserDto.getRoles().forEach(role -> {
                     if (role.getLabel().equals(role1.getLabel())) {
                         Assertions.assertEquals(role.getPartyRole(), role1.getPartyRole());
@@ -1173,7 +1189,7 @@ class InstitutionServiceImplTest {
     }
 
     @Test
-    void rejectOnboardingRequest(){
+    void rejectOnboardingRequest() {
         // given
         String tokenId = UUID.randomUUID().toString();
         Mockito.doNothing()
@@ -1186,7 +1202,7 @@ class InstitutionServiceImplTest {
     }
 
     @Test
-    void rejectOnboardingRequest_hasNullToken(){
+    void rejectOnboardingRequest_hasNullToken() {
         // given
         String tokenId = null;
         // when
@@ -1243,7 +1259,7 @@ class InstitutionServiceImplTest {
     }
 
     @Test
-    void findInstitutionByIdTest2(){
+    void findInstitutionByIdTest2() {
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
@@ -1262,7 +1278,7 @@ class InstitutionServiceImplTest {
     }
 
     @Test
-    void findInstitutionByIdTest(){
+    void findInstitutionByIdTest() {
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
