@@ -7,38 +7,28 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionProducts;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.client.CoreDelegationApiRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.client.CoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
-import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -50,7 +40,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
@@ -63,11 +52,10 @@ import java.util.function.Function;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.*;
+import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE;
+import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -302,12 +290,12 @@ class CoreConnectorImplTest {
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
         Delegation delegation = dummyDelegation();
 
-        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any()))
+        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
         // then
         assertNotNull(delegationList);
         assertEquals(1, delegationList.size());
@@ -321,7 +309,7 @@ class CoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getBrokerName(), delegationList.get(0).getBrokerName());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null);
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null,null, null);
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -333,18 +321,18 @@ class CoreConnectorImplTest {
 
         when(delegationResponseEntity.getBody()).thenReturn(null);
 
-        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any()))
+        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
         // then
         assertNotNull(delegationList);
         assertEquals(0, delegationList.size());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null);
+                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -1432,100 +1420,6 @@ class CoreConnectorImplTest {
         verifyNoMoreInteractions(coreUserApiRestClientMock);
     }
 
-    @Test
-    void getOnboardingRequestInfo() {
-        // given
-        final TokenResponse tokenInfoMock = mockInstance(new TokenResponse(), "setId", "setLegals");
-        InstitutionResponse institutionMock = mockInstance(new InstitutionResponse());
-        institutionMock.setOnboarding(List.of());
-        tokenInfoMock.setId(UUID.randomUUID().toString());
-        final LegalsResponse managerLegalsResponse = mockInstance(new LegalsResponse(), "setRole");
-        managerLegalsResponse.setRole(LegalsResponse.RoleEnum.valueOf(PartyRole.MANAGER.name()));
-        final LegalsResponse adminLegalsResponse = mockInstance(new LegalsResponse(), "setRole");
-        adminLegalsResponse.setRole(LegalsResponse.RoleEnum.valueOf(PartyRole.DELEGATE.name()));
-        tokenInfoMock.setLegals(List.of(managerLegalsResponse, adminLegalsResponse));
-        when(coreManagementApiRestClient._getTokenUsingGET(any()))
-                .thenReturn(ResponseEntity.ok(tokenInfoMock));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(any())).thenReturn(ResponseEntity.ok(institutionMock));
-        final Relationship managerRelationshipMock = mockInstance(new Relationship());
-        // when
-        final OnboardingRequestInfo result = msCoreConnector.getOnboardingRequestInfo(tokenInfoMock.getId());
-        // then
-        assertNotNull(result);
-        assertNotNull(result.getInstitutionInfo());
-        assertNotNull(result.getManager());
-        assertEquals(managerLegalsResponse.getPartyId(), result.getManager().getId());
-        assertEquals(ADMIN, result.getManager().getRole());
-        assertNotNull(result.getAdmins());
-        assertEquals(1, result.getAdmins().size());
-        assertEquals(adminLegalsResponse.getPartyId(), result.getAdmins().get(0).getId());
-        assertEquals(ADMIN, result.getAdmins().get(0).getRole());
-        verify(coreManagementApiRestClient, times(1))
-                ._getTokenUsingGET(tokenInfoMock.getId());
-        verifyNoMoreInteractions(coreManagementApiRestClient);
-    }
-
-    @Test
-    void getOnboardingRequestInfo_hasNullToken() {
-        // given
-        String tokenId = null;
-        // when
-        Executable executable = () -> msCoreConnector.getOnboardingRequestInfo(tokenId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
-        verifyNoInteractions(coreManagementApiRestClient, coreInstitutionApiRestClient);
-    }
-
-    @Test
-    void approveOnboardingRequest() {
-        // given
-        String tokenId = UUID.randomUUID().toString();
-        when(coreOnboardingApiRestClient._approveOnboardingUsingPOST(anyString())).thenReturn(ResponseEntity.ok().build());
-        // when
-        msCoreConnector.approveOnboardingRequest(tokenId);
-        // then
-        verify(coreOnboardingApiRestClient, times(1))
-                ._approveOnboardingUsingPOST(tokenId);
-        verifyNoMoreInteractions(coreOnboardingApiRestClient);
-    }
-
-    @Test
-    void approveOnboardingRequest_hasNullToken() {
-        // given
-        String tokenId = null;
-        // when
-        Executable executable = () -> msCoreConnector.approveOnboardingRequest(tokenId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
-        verifyNoInteractions(coreOnboardingApiRestClient);
-    }
-
-    @Test
-    void rejectOnboardingRequest() {
-        // given
-        String tokenId = UUID.randomUUID().toString();
-        when(coreOnboardingApiRestClient._onboardingRejectUsingDELETE(anyString())).thenReturn(ResponseEntity.ok().build());
-        // when
-        msCoreConnector.rejectOnboardingRequest(tokenId);
-        // then
-        verify(coreOnboardingApiRestClient, times(1))
-                ._onboardingRejectUsingDELETE(tokenId);
-        verifyNoMoreInteractions(coreOnboardingApiRestClient);
-    }
-
-    @Test
-    void rejectOnboardingRequest_hasNullToken() {
-        // given
-        String tokenId = null;
-        // when
-        Executable executable = () -> msCoreConnector.rejectOnboardingRequest(tokenId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
-        verifyNoInteractions(coreOnboardingApiRestClient);
-    }
 
     @Test
     void getGeographicTaxonomyList_nullInstitutionId() {

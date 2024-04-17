@@ -9,12 +9,13 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
-import it.pagopa.selfcare.dashboard.connector.model.product.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User.Fields;
-import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +47,6 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES;
-import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_TOKEN_ID_MESSAGE;
 import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_INSTITUTION_MESSAGE;
 import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_UPDATE_RESOURCE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -1102,99 +1102,6 @@ class InstitutionServiceImplTest {
                 .getProduct(productId);
         verifyNoInteractions(userRegistryConnector);
         verifyNoMoreInteractions(productsConnectorMock);
-    }
-
-    @Test
-    void getOnboardingRequestInfo() {
-        // given
-        final String tokenId = "tokenId";
-        final OnboardingRequestInfo onboardingRequestInfoMock = mockInstance(new OnboardingRequestInfo(), "setAdmins");
-        final UserInfo adminMock = mockInstance(new UserInfo());
-        onboardingRequestInfoMock.setAdmins(List.of(adminMock));
-        when(msCoreConnectorMock.getOnboardingRequestInfo(any()))
-                .thenReturn(onboardingRequestInfoMock);
-        User userMock = mockInstance(new User(), "setId");
-        WorkContact contact = mockInstance(new WorkContact());
-        Map<String, WorkContact> workContact = new HashMap<>();
-        workContact.put(onboardingRequestInfoMock.getInstitutionInfo().getId(), contact);
-        userMock.setWorkContacts(workContact);
-        when(userRegistryConnector.getUserByInternalId(any(), any()))
-                .thenAnswer(invocation -> {
-                    userMock.setId(invocation.getArgument(0, String.class));
-                    return userMock;
-                });
-        // when
-        final OnboardingRequestInfo result = institutionService.getOnboardingRequestInfo(tokenId);
-        // then
-        assertNotNull(result);
-        assertNotNull(result.getManager().getUser());
-        assertEquals(result.getManager().getId(), result.getManager().getUser().getId());
-        assertNotNull(result.getAdmins().get(0).getUser());
-        assertEquals(result.getAdmins().get(0).getId(), result.getAdmins().get(0).getUser().getId());
-        verify(msCoreConnectorMock, times(1))
-                .getOnboardingRequestInfo(tokenId);
-        ArgumentCaptor<String> userIdCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
-        verify(userRegistryConnector, times(2))
-                .getUserByInternalId(userIdCaptor.capture(), filedsCaptor.capture());
-        EnumSet<Fields> capturedFields = filedsCaptor.getValue();
-        List<String> userIds = userIdCaptor.getAllValues();
-        assertEquals(userIds, List.of(onboardingRequestInfoMock.getManager().getId(), onboardingRequestInfoMock.getAdmins().get(0).getId()));
-        assertTrue(capturedFields.contains(name));
-        assertTrue(capturedFields.contains(familyName));
-        assertTrue(capturedFields.contains(workContacts));
-        assertTrue(capturedFields.contains(fiscalCode));
-    }
-
-    @Test
-    void approveOnboardingRequest() {
-        // given
-        String tokenId = UUID.randomUUID().toString();
-        Mockito.doNothing()
-                .when(msCoreConnectorMock).approveOnboardingRequest(anyString());
-        // when
-        institutionService.approveOnboardingRequest(tokenId);
-        // then
-        verify(msCoreConnectorMock, times(1))
-                .approveOnboardingRequest(tokenId);
-        verifyNoMoreInteractions(msCoreConnectorMock);
-    }
-
-    @Test
-    void approveOnboardingRequest_hasNullToken() {
-        // given
-        String tokenId = null;
-        // when
-        Executable executable = () -> institutionService.approveOnboardingRequest(tokenId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
-    }
-
-    @Test
-    void rejectOnboardingRequest(){
-        // given
-        String tokenId = UUID.randomUUID().toString();
-        Mockito.doNothing()
-                .when(msCoreConnectorMock).rejectOnboardingRequest(anyString());
-        // when
-        institutionService.rejectOnboardingRequest(tokenId);
-        // then
-        verify(msCoreConnectorMock, times(1)).rejectOnboardingRequest(tokenId);
-        verifyNoMoreInteractions(msCoreConnectorMock);
-    }
-
-    @Test
-    void rejectOnboardingRequest_hasNullToken(){
-        // given
-        String tokenId = null;
-        // when
-        Executable executable = () -> institutionService.rejectOnboardingRequest(tokenId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_TOKEN_ID_MESSAGE, e.getMessage());
-        verifyNoMoreInteractions(msCoreConnectorMock);
     }
 
     @Test

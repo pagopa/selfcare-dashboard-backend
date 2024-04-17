@@ -12,12 +12,10 @@ import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
@@ -207,10 +205,10 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public List<Delegation> getDelegations(String from, String to, String productId) {
+    public List<Delegation> getDelegations(String institutionId, String brokerId, String productId, String search, String taxCode, String mode, String order, Integer page, Integer size) {
         log.trace("getDelegations start");
-        log.debug("getDelegations productId = {}, type = {}", from, productId);
-        List<DelegationResponse> delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET(from, to, productId, null).getBody();
+        log.debug("getDelegations productId = {}, type = {}", institutionId, productId);
+        List<DelegationResponse> delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET(institutionId, brokerId, productId, search, taxCode, mode, order, page, size).getBody();
 
         if (Objects.isNull(delegationsResponse))
             return List.of();
@@ -412,61 +410,6 @@ class CoreConnectorImpl implements MsCoreConnector {
         Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
         coreUserApiRestClient._deleteRelationshipUsingDELETE(relationshipId);
         log.trace("delete end");
-    }
-
-    @Override
-    public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
-        log.trace("getOnboardingRequestInfo start");
-        log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        final OnboardingRequestInfo onboardingRequestInfo = new OnboardingRequestInfo();
-        onboardingRequestInfo.setAdmins(new ArrayList<>());
-        TokenResponse tokenInfo = coreManagementApiRestClient._getTokenUsingGET(tokenId).getBody();
-        if (tokenInfo != null) {
-            onboardingRequestInfo.setProductId(tokenInfo.getProductId());
-            tokenInfo.getLegals().forEach(relationshipBinding -> {
-                final UserInfo userInfo = new UserInfo();
-                userInfo.setId(relationshipBinding.getPartyId());
-                userInfo.setStatus(relationshipBinding.getRole().toString());
-                userInfo.setRole(relationshipBinding.getRole().equals(LegalsResponse.RoleEnum.OPERATOR) ? SelfCareAuthority.LIMITED : SelfCareAuthority.ADMIN);
-                if (LegalsResponse.RoleEnum.MANAGER.equals(relationshipBinding.getRole())) {
-                    onboardingRequestInfo.setManager(userInfo);
-                } else {
-                    onboardingRequestInfo.getAdmins().add(userInfo);
-                }
-            });
-            InstitutionResponse institutionResponse = coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(tokenInfo.getInstitutionId()).getBody();
-            InstitutionInfo institutionInfo = institutionMapper.toInstitutionInfo(institutionResponse, tokenInfo.getInstitutionUpdate());
-            institutionInfo.setStatus(RelationshipState.valueOf(tokenInfo.getStatus().name()));
-            if (institutionResponse != null && !CollectionUtils.isEmpty(institutionResponse.getOnboarding())) {
-                institutionResponse.getOnboarding().stream()
-                        .filter(onboarding -> onboarding.getProductId().equals(tokenInfo.getProductId()))
-                        .findFirst()
-                        .ifPresent(onboardedProductResponse -> institutionInfo.setBilling(institutionMapper.toBilling(onboardedProductResponse.getBilling())));
-            }
-            onboardingRequestInfo.setInstitutionInfo(institutionInfo);
-            log.debug("getOnboardingRequestInfo result = {}", onboardingRequestInfo);
-            log.trace("getOnboardingRequestInfo end");
-        }
-        return onboardingRequestInfo;
-    }
-
-    @Override
-    public void approveOnboardingRequest(String tokenId) {
-        log.trace("approveOnboardingRequest start");
-        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        coreOnboardingApiRestClient._approveOnboardingUsingPOST(tokenId);
-        log.trace("retrieveOnboardingRequest end");
-    }
-
-    @Override
-    public void rejectOnboardingRequest(String tokenId) {
-        log.trace("rejectOnboardingRequest start");
-        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        coreOnboardingApiRestClient._onboardingRejectUsingDELETE(tokenId);
-        log.trace("rejectOnboardingRequest end");
     }
 
     @Override

@@ -35,10 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -344,7 +341,7 @@ public class InstitutionController {
                                                                    @RequestParam(name = "productId", required = false) String productId) {
         log.trace("getDelegationsUsingFrom start");
         log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", institutionId, productId);
-        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, null, productId).stream()
+        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, null, productId, null, null, null, null, null, null).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
         log.debug("getDelegationsUsingFrom result = {}", result);
@@ -368,10 +365,28 @@ public class InstitutionController {
     public ResponseEntity<List<DelegationResource>> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
                                                                    @PathVariable("institutionId") String institutionId,
                                                                    @ApiParam("${swagger.dashboard.delegation.model.productId}")
-                                                                   @RequestParam(name = "productId", required = false) String productId) {
+                                                                   @RequestParam(name = "productId", required = false) String productId,
+                                                                   @ApiParam("${swagger.dashboard.delegation.model.description}")
+                                                                   @RequestParam(name = "search", required = false) String search,
+                                                                   @ApiParam("${swagger.dashboard.delegation.model.taxCode}")
+                                                                   @RequestParam(name = "taxCode", required = false) String taxCode,
+                                                                   @ApiParam("${swagger.dashboard.delegation.delegations.mode}")
+                                                                   @RequestParam(name = "mode", required = false) GetDelegationsMode mode,
+                                                                   @ApiParam("${swagger.dashboard.delegation.delegations.order}")
+                                                                   @RequestParam(name = "order", required = false) Order order,
+                                                                   @RequestParam(name = "page", required = false) Integer page,
+                                                                   @RequestParam(name = "size", required = false) Integer size) {
         log.trace("getDelegationsUsingTo start");
         log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
-        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId, productId).stream()
+        String modeFilter = null;
+        String orderFilter = null;
+        if(Objects.nonNull(mode)){
+            modeFilter = mode.name();
+        }
+        if(Objects.nonNull(order)){
+            orderFilter = order.name();
+        }
+        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId,  productId, search, taxCode, modeFilter, orderFilter, page, size).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
         log.debug("getDelegationsUsingTo result = {}", result);

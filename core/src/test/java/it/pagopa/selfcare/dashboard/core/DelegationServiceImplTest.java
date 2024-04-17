@@ -49,17 +49,17 @@ class DelegationServiceImplTest {
         Delegation delegation = dummyDelegation();
         List<Delegation> delegationList = new ArrayList<>();
         delegationList.add(delegation);
-        when(delegationConnector.getDelegations(any(),any(),any())).thenReturn(delegationList);
+        when(delegationConnector.getDelegations(any(),any(),any(),any(),any(),any(),any(),any(),any())).thenReturn(delegationList);
 
         //when
-        delegationList = delegationServiceImpl.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        delegationList = delegationServiceImpl.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
 
         //then
         assertNotNull(delegationList);
         assertNotNull(delegationList.getClass());
         assertEquals(1, delegationList.size());
         verify(delegationConnector, times(1))
-                .getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+                .getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
         verifyNoMoreInteractions(delegationConnector);
     }
 

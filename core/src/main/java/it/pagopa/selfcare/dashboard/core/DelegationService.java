@@ -10,6 +10,6 @@ public interface DelegationService {
 
     DelegationId createDelegation(DelegationRequest delegation);
 
-    List<Delegation> getDelegations(String from, String to, String productId);
+    List<Delegation> getDelegations(String from, String to, String productId, String search, String taxCode, String mode, String order, Integer page, Integer size);
 
 }

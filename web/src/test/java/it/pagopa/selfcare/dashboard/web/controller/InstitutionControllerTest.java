@@ -557,7 +557,7 @@ class InstitutionControllerTest {
         // Given
         Delegation expectedDelegation = dummyDelegation();
 
-        when(delegationService.getDelegations(any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
@@ -581,7 +581,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(expectedDelegation.getInstitutionId(), null, expectedDelegation.getProductId());
+                .getDelegations(expectedDelegation.getInstitutionId(), null, expectedDelegation.getProductId(), null, null, null, null, null, null);
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -593,7 +593,7 @@ class InstitutionControllerTest {
         // Given
         Delegation expectedDelegation = dummyDelegation();
 
-        when(delegationService.getDelegations(any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
@@ -617,7 +617,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId());
+                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId(), null, null, null, null, null, null);
         verifyNoMoreInteractions(delegationService);
     }
 
