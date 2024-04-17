@@ -522,8 +522,14 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct.setProductId(productId);
         onboardedProduct.setProductRole(productRole);
 
+
+        OnboardedProduct onboardedProduct2 = new OnboardedProduct();
+        onboardedProduct2.setRole(MANAGER);
+        onboardedProduct2.setProductId(productId);
+        onboardedProduct2.setProductRole("admin2");
+
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(List.of(onboardedProduct));
+        userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
         Institution institutionMock = mockInstance(new Institution());
         institutionMock.setId(institutionId);
         when( institutionServiceMock.getInstitutionById(any())).thenReturn(institutionMock);
@@ -559,7 +565,7 @@ class ExchangeTokenServiceV2Test {
         assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
         checkNotNullFields(institution, "parentDescription", "rootParent");
-        assertEquals(1, institution.getRoles().size());
+        assertEquals(2, institution.getRoles().size());
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
         assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));

@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
+import it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
@@ -42,8 +43,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 @Service
@@ -207,12 +209,16 @@ public class ExchangeTokenServiceV2 {
 
 
     private Map<String, ProductGrantedAuthority> retrieveProductsFromInstitutionAndUser(UserInstitution userInstitution) {
-        return userInstitution
+        Map<String, ProductGrantedAuthority> map = new HashMap<>();
+        userInstitution
                 .getProducts()
                 .stream()
-                .collect(Collectors.toMap(
-                        it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct::getProductId,
-                        product -> new ProductGrantedAuthority(product.getRole(), List.of(product.getProductRole()), product.getProductId())));
+                .collect(groupingBy(OnboardedProduct::getProductId))
+                .forEach((key, value) -> map.put(key, new ProductGrantedAuthority(
+                        value.get(0).getRole(),
+                        value.stream().map(OnboardedProduct::getProductRole).toList(),
+                        key)));
+        return map;
     }
 
 
