@@ -12,9 +12,9 @@ import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
 import it.pagopa.selfcare.dashboard.core.UserService;
@@ -102,15 +102,18 @@ public class ExchangeTokenServiceV2 {
         }
         SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
         String userId = selfCareUser.getId();
-        Map<String, ProductGrantedAuthority> productGrantedAuthorityMap = retrieveProductsFromInstitutionAndUser(institutionId, userId);
+        UserInstitution userInstitution = userApiConnector.getProducts(institutionId, userId);
+
+        Map<String, ProductGrantedAuthority> productGrantedAuthorityMap = retrieveProductsFromInstitutionAndUser(userInstitution);
         final ProductGrantedAuthority productGrantedAuthority = Optional.ofNullable(productGrantedAuthorityMap.get(productId))
                 .orElseThrow(() -> new IllegalArgumentException(String.format("A Product Granted SelfCareAuthority is required for product '%s' and institution '%s'", productId, institutionId)));
 
-        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
-        Assert.notNull(institutionInfo, "Institution info is required");
-        Institution institution = institutionResourceMapper.toInstitution(institutionInfo, List.of(productGrantedAuthority), false);
-        retrieveAndSetGroups(institution, institutionId, productId, userId);
-        TokenExchangeClaims claims = retrieveAndSetClaims(authentication.getCredentials().toString(), institution, userId);
+
+        it.pagopa.selfcare.dashboard.connector.model.institution.Institution institution = institutionService.getInstitutionById(institutionId);
+        Assert.notNull(institution, "Institution info is required");
+        ExchangeTokenServiceV2.Institution institutionExchange = institutionResourceMapper.toInstitution(institution, List.of(productGrantedAuthority), false);
+        retrieveAndSetGroups(institutionExchange, institutionId, productId, userId);
+        TokenExchangeClaims claims = retrieveAndSetClaims(authentication.getCredentials().toString(), institutionExchange, userId, userInstitution.getUserMailUuid());
 
         Product product = productsConnector.getProduct(productId);
 
@@ -142,15 +145,17 @@ public class ExchangeTokenServiceV2 {
 
         final List<ProductGrantedAuthority> productGrantedAuthorities = new ArrayList<>();
 
-        Map<String, ProductGrantedAuthority> productGrantedAuthorityMap = retrieveProductsFromInstitutionAndUser(institutionId, userId);
+        UserInstitution userInstitution = userApiConnector.getProducts(institutionId, userId);
+
+        Map<String, ProductGrantedAuthority> productGrantedAuthorityMap = retrieveProductsFromInstitutionAndUser(userInstitution);
         addProductIfIsInvoiceable(productGrantedAuthorityMap, invoiceableProductList, productGrantedAuthorities);
-        InstitutionInfo institutionInfo = institutionService.getInstitution(institutionId);
+        it.pagopa.selfcare.dashboard.connector.model.institution.Institution institutionInfo = institutionService.getInstitutionById(institutionId);
         Assert.notNull(institutionInfo, "Institution info is required");
-        Institution institution = institutionResourceMapper.toInstitution(institutionInfo, productGrantedAuthorities, true);
+        ExchangeTokenServiceV2.Institution institution = institutionResourceMapper.toInstitution(institutionInfo, productGrantedAuthorities, true);
 
         retrieveAndSetGroups(institution, institutionId, null, userId);
 
-        TokenExchangeClaims claims = retrieveAndSetClaims(credentials, institution, userId);
+        TokenExchangeClaims claims = retrieveAndSetClaims(credentials, institution, userId, userInstitution.getUserMailUuid());
         claims.setAudience(billingAudience);
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
@@ -176,7 +181,7 @@ public class ExchangeTokenServiceV2 {
                 .toList();
     }
 
-    private TokenExchangeClaims retrieveAndSetClaims(String credential, Institution institution, String userId) {
+    private TokenExchangeClaims retrieveAndSetClaims(String credential, Institution institution, String userId, String userMailUuid) {
         Claims selcClaims = jwtService.getClaims(credential);
         Assert.notNull(selcClaims, "Session token claims is required");
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
@@ -184,7 +189,7 @@ public class ExchangeTokenServiceV2 {
         claims.setIssuer(issuer);
         User user = userService.getUserByInternalId(UUID.fromString(userId));
 
-        String email = Optional.ofNullable(user.getWorkContact(institution.getId()))
+        String email = Optional.ofNullable(user.getWorkContact(userMailUuid))
                 .map(workContract -> Objects.nonNull(workContract.getEmail())
                         ? workContract.getEmail().getValue()
                         : ""
@@ -201,8 +206,8 @@ public class ExchangeTokenServiceV2 {
     }
 
 
-    private Map<String, ProductGrantedAuthority> retrieveProductsFromInstitutionAndUser(String institutionId, String userId) {
-        return this.userApiConnector.getProducts(institutionId, userId)
+    private Map<String, ProductGrantedAuthority> retrieveProductsFromInstitutionAndUser(UserInstitution userInstitution) {
+        return userInstitution
                 .getProducts()
                 .stream()
                 .collect(Collectors.toMap(

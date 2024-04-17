@@ -68,7 +68,7 @@ class InstitutionServiceImpl implements InstitutionService {
                 ? Optional.empty()
                 : Optional.of(EnumSet.copyOf(Arrays.stream(allowedStates)
                 .map(RelationshipState::valueOf)
-                .collect(Collectors.toList())));
+                .toList()));
         this.userRegistryConnector = userRegistryConnector;
         this.productsConnector = productsConnector;
         this.msCoreConnector = msCoreConnector;
@@ -80,6 +80,16 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
         InstitutionInfo result = msCoreConnector.getOnBoardedInstitution(institutionId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
+        log.trace("getInstitution end");
+        return result;
+    }
+
+
+    @Override
+    public Institution getInstitutionById(String institutionId) {
+        log.trace("getInstitution start");
+        Institution result = msCoreConnector.getInstitution(institutionId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
@@ -352,7 +362,7 @@ class InstitutionServiceImpl implements InstitutionService {
                             .filter(product -> userAuthProducts.containsKey(product.getProductId()))
                             .peek(product -> product.setAuthorized(true))
                             .peek(product -> product.setUserRole(LIMITED.name()))
-                            .collect(Collectors.toList()));
+                            .toList());
                 } else {
                     institution.getOnboarding().forEach(product -> {
                         product.setAuthorized(userAuthProducts.containsKey(product.getProductId()));

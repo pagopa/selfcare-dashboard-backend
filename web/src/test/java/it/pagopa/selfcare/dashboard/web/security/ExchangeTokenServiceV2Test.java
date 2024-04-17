@@ -8,10 +8,13 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
@@ -31,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -228,8 +232,8 @@ class ExchangeTokenServiceV2Test {
         TestSecurityContextHolder.setAuthentication(authentication);
 
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
-        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
-        when(institutionServiceMock.getInstitution(any()))
+        Institution institutionInfo = mockInstance(new Institution());
+        when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         final Pageable pageable = Pageable.ofSize(100);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -310,7 +314,7 @@ class ExchangeTokenServiceV2Test {
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .getInstitutionById(institutionId);
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
     }
 
@@ -354,9 +358,9 @@ class ExchangeTokenServiceV2Test {
                         .setIssuedAt(iat)
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
-        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        Institution institutionInfo = mockInstance(new Institution());
         institutionInfo.setId(institutionId);
-        when(institutionServiceMock.getInstitution(any()))
+        when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
@@ -430,7 +434,7 @@ class ExchangeTokenServiceV2Test {
         verify(jwtServiceMock, times(1))
                 .getClaims(any());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
                 .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
@@ -465,9 +469,9 @@ class ExchangeTokenServiceV2Test {
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         UserService userService = mock(UserService.class);
-        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        Institution institutionInfo = mockInstance(new Institution());
         institutionInfo.setId(institutionId);
-        when(institutionServiceMock.getInstitution(any()))
+        when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
@@ -520,7 +524,9 @@ class ExchangeTokenServiceV2Test {
 
         UserInstitution userInstitution = new UserInstitution();
         userInstitution.setProducts(List.of(onboardedProduct));
-
+        Institution institutionMock = mockInstance(new Institution());
+        institutionMock.setId(institutionId);
+        when( institutionServiceMock.getInstitutionById(any())).thenReturn(institutionMock);
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector, new InstitutionResourceMapperImpl());
@@ -552,7 +558,7 @@ class ExchangeTokenServiceV2Test {
         assertNotNull(institution);
         assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
-        checkNotNullFields(institution);
+        checkNotNullFields(institution, "parentDescription", "rootParent");
         assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
@@ -561,7 +567,7 @@ class ExchangeTokenServiceV2Test {
         verify(jwtServiceMock, times(1))
                 .getClaims(any());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
                 .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
@@ -610,7 +616,7 @@ class ExchangeTokenServiceV2Test {
         SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
-        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        Institution institutionInfo = mockInstance(new Institution());
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
 
@@ -626,7 +632,7 @@ class ExchangeTokenServiceV2Test {
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
 
-        when(institutionServiceMock.getInstitution(any()))
+        when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
 
         OnboardedProduct onboardedProduct = new OnboardedProduct();
@@ -689,7 +695,7 @@ class ExchangeTokenServiceV2Test {
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .getInstitutionById(institutionId);
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
     }
 
@@ -731,9 +737,9 @@ class ExchangeTokenServiceV2Test {
                         .setIssuedAt(iat)
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
-        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        Institution institutionInfo = mockInstance(new Institution());
         institutionInfo.setId(institutionId);
-        when(institutionServiceMock.getInstitution(any()))
+        when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
@@ -763,7 +769,12 @@ class ExchangeTokenServiceV2Test {
         user.setWorkContacts(workContactMap);
         when(userService.getUserByInternalId(any())).thenReturn(user);
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setRole(MANAGER);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        onboardedProduct.setProductId("productId");
+        onboardedProduct.setProductRole("admin");
+        userInstitution.setProducts(List.of(onboardedProduct));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
@@ -800,7 +811,7 @@ class ExchangeTokenServiceV2Test {
         verify(jwtServiceMock, times(1))
                 .getClaims(any());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
                 .getUserGroups(Optional.of(institutionId), Optional.empty(), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
@@ -833,9 +844,9 @@ class ExchangeTokenServiceV2Test {
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         UserService userService = mock(UserService.class);
-        InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
+        Institution institutionInfo = mockInstance(new Institution());
         institutionInfo.setId(institutionId);
-        when(institutionServiceMock.getInstitution(any()))
+        when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
@@ -885,7 +896,6 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(EMPTY_LIST);
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
-
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userService, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
@@ -913,7 +923,7 @@ class ExchangeTokenServiceV2Test {
         assertNotNull(institution);
         assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
-        checkNotNullFields(institution);
+        checkNotNullFields(institution, "parentDescription", "rootParent");
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
         assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
@@ -921,7 +931,7 @@ class ExchangeTokenServiceV2Test {
         verify(jwtServiceMock, times(1))
                 .getClaims(any());
         verify(institutionServiceMock, times(1))
-                .getInstitution(institutionId);
+                .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
                 .getUserGroups(Optional.of(institutionId), Optional.empty(), Optional.of(userId), Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
@@ -966,10 +976,8 @@ class ExchangeTokenServiceV2Test {
             institution.setSubUnitCode(organizationClaim.get("subUnitCode").toString());
             institution.setSubUnitType(organizationClaim.get("subUnitType").toString());
             institution.setAooParent(organizationClaim.get("aooParent").toString());
-            institution.setParentDescription(organizationClaim.get("parentDescription").toString());
             institution.setOriginId(organizationClaim.get("ipaCode").toString());
-            ExchangeTokenServiceV2.RootParent rootParent = new ExchangeTokenServiceV2.RootParent();
-            rootParent.setDescription(organizationClaim.get("parentDescription").toString());
+            ExchangeTokenServiceV2.RootParent rootParent = (ExchangeTokenServiceV2.RootParent) organizationClaim.get("rootParent.description");
             institution.setRootParent(rootParent);
             return institution;
         }
