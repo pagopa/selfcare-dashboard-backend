@@ -78,11 +78,12 @@ class UserConnectorImplTest {
         when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
         List<InstitutionBase> result = userConnector.getUserInstitutions("userID");
-        Assertions.assertEquals(3, result.size());
+        Assertions.assertEquals(4, result.size());
         Assertions.assertEquals(ACTIVE.name(), result.get(0).getStatus());
         Assertions.assertEquals("a", result.get(0).getName());
         Assertions.assertEquals("b", result.get(1).getName());
         Assertions.assertEquals("c", result.get(2).getName());
+        Assertions.assertNull(result.get(3).getName());
     }
 
     private static UserInfoResponse getUserProductsResponse() {
@@ -100,13 +101,20 @@ class UserConnectorImplTest {
         institutionProducts2.setStatus(OnboardedProductState.ACTIVE);
         institutionProducts2.setRole(PartyRole.MANAGER);
 
+        UserInstitutionRoleResponse institutionProducts4 = new UserInstitutionRoleResponse();
+        institutionProducts4.setInstitutionId("institutionId3");
+        institutionProducts4.setStatus(OnboardedProductState.ACTIVE);
+        institutionProducts4.setRole(PartyRole.MANAGER);
+
         UserInstitutionRoleResponse institutionProducts3 = new UserInstitutionRoleResponse();
         institutionProducts3.setInstitutionId("institutionId3");
         institutionProducts3.setInstitutionName("a");
         institutionProducts3.setStatus(OnboardedProductState.ACTIVE);
         institutionProducts3.setRole(PartyRole.MANAGER);
 
-        userProductsResponse.setInstitutions(List.of(institutionProducts, institutionProducts2,institutionProducts3));
+
+
+        userProductsResponse.setInstitutions(List.of(institutionProducts, institutionProducts2,institutionProducts4, institutionProducts3));
         return userProductsResponse;
     }
 
