@@ -37,7 +37,7 @@ class DelegationServiceImpl implements DelegationService {
     public List<Delegation> getDelegations(String from, String to, String productId, String search, String taxCode, String mode, String order, Integer page, Integer size) {
         log.trace("getDelegations start");
         log.debug("getDelegations from = {}, to = {}, productId = {}", from, to, productId);
-        List<Delegation> result = msCoreConnector.getDelegations(from, to, productId, search, taxCode, order, mode, page, size);
+        List<Delegation> result = msCoreConnector.getDelegations(from, to, productId, search, taxCode, mode, order, page, size);
         log.debug("getDelegations result = {}", result);
         log.trace("getDelegations end");
         return result;
