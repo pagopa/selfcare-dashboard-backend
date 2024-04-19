@@ -96,9 +96,9 @@ public interface InstitutionResourceMapper {
     @Named("toRootParent")
     default ExchangeTokenServiceV2.RootParent toRootParent(it.pagopa.selfcare.dashboard.connector.model.institution.Institution institutionInfo) {
         ExchangeTokenServiceV2.RootParent rootParent = new ExchangeTokenServiceV2.RootParent();
-        if(institutionInfo != null) {
-            rootParent.setId(institutionInfo.getId());
-            rootParent.setDescription(institutionInfo.getDescription());
+        if(institutionInfo != null && institutionInfo.getRootParent() != null) {
+            rootParent.setId(institutionInfo.getRootParent().getId());
+            rootParent.setDescription(institutionInfo.getRootParent().getDescription());
         }
         return rootParent;
     }
