@@ -378,14 +378,10 @@ public class InstitutionController {
                                                                    @RequestParam(name = "size", required = false) Integer size) {
         log.trace("getDelegationsUsingTo start");
         log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
-        String modeFilter = null;
-        String orderFilter = null;
-        if(Objects.nonNull(mode)){
-            modeFilter = mode.name();
-        }
-        if(Objects.nonNull(order)){
-            orderFilter = order.name();
-        }
+
+        String modeFilter = Objects.isNull(mode) ? null : mode.name();
+        String orderFilter = Objects.isNull(order) ? null : order.name();
+
         ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId,  productId, search, taxCode, modeFilter, orderFilter, page, size).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
