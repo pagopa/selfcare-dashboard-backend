@@ -349,7 +349,7 @@ public class InstitutionController {
 
         ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(delegationParameters).stream()
                 .map(delegationMapper::toDelegationResource)
-                .collect(Collectors.toList()));
+                .toList());
         log.debug("getDelegationsUsingFrom result = {}", result);
         log.trace("getDelegationsUsingFrom end");
         return result;
@@ -398,7 +398,7 @@ public class InstitutionController {
 
         ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(delegationParameters).stream()
                 .map(delegationMapper::toDelegationResource)
-                .collect(Collectors.toList()));
+                .toList());
         log.debug("getDelegationsUsingTo result = {}", result);
         log.trace("getDelegationsUsingTo end");
         return result;
