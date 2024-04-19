@@ -9,13 +9,12 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
+import it.pagopa.selfcare.dashboard.connector.model.product.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User.Fields;
+import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import org.junit.jupiter.api.Assertions;
@@ -47,6 +46,7 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES;
+import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.REQUIRED_TOKEN_ID_MESSAGE;
 import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_INSTITUTION_MESSAGE;
 import static it.pagopa.selfcare.dashboard.core.PnPGInstitutionServiceImpl.REQUIRED_UPDATE_RESOURCE_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -84,6 +84,22 @@ class InstitutionServiceImplTest {
     void beforeEach() {
         SecurityContextHolder.clearContext();
     }
+
+    @Test
+    void getInstitutionById() {
+        // Given
+        String institutionId = "institutionId";
+        Institution institution = new Institution();
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        // When
+        Institution result = institutionService.getInstitutionById(institutionId);
+
+        // Then
+        verify(msCoreConnectorMock, times(1)).getInstitution(institutionId);
+        assertEquals(institution, result);
+    }
+
 
     @Test
     void getInstitution() {
@@ -370,7 +386,7 @@ class InstitutionServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(productId, capturedFilter.getProductId());
         assertNull(capturedFilter.getProductRoles());
-        assertNull( capturedFilter.getUserId());
+        assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getAllowedStates());
         ArgumentCaptor<EnumSet<Fields>> filedsCaptor = ArgumentCaptor.forClass(EnumSet.class);
         verify(userRegistryConnector, times(1))
@@ -1079,7 +1095,7 @@ class InstitutionServiceImplTest {
             assertDoesNotThrow(executable);
             verify(msCoreConnectorMock, times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(userId), createUserDtoCaptor.capture(), eq("setTitle"));
-           createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
+            createUserDtoCaptor.getValue().getRoles().forEach(role1 -> {
                 createUserDto.getRoles().forEach(role -> {
                     if (role.getLabel().equals(role1.getLabel())) {
                         Assertions.assertEquals(role.getPartyRole(), role1.getPartyRole());
@@ -1150,7 +1166,7 @@ class InstitutionServiceImplTest {
     }
 
     @Test
-    void findInstitutionByIdTest2(){
+    void findInstitutionByIdTest2() {
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
@@ -1169,7 +1185,7 @@ class InstitutionServiceImplTest {
     }
 
     @Test
-    void findInstitutionByIdTest(){
+    void findInstitutionByIdTest() {
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
