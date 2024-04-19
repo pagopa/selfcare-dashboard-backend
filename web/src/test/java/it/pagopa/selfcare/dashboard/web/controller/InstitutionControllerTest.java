@@ -621,6 +621,39 @@ class InstitutionControllerTest {
         verifyNoMoreInteractions(delegationService);
     }
 
+    @Test
+    void getDelegationsUsingTo_shouldGetDataWithFilters() throws Exception {
+        // Given
+        Delegation expectedDelegation = dummyDelegation();
+
+        when(delegationService.getDelegations(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        // When
+
+        MvcResult result = mvc
+                .perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&mode=FULL&order=ASC", expectedDelegation.getBrokerId(), expectedDelegation.getProductId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andReturn();
+
+        List<DelegationResource> resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        // Then
+        assertThat(resource).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
+        DelegationResource actual = resource.get(0);
+        assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
+        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
+        assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
+        assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
+        assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
+
+        verify(delegationService, times(1))
+                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId(), null, null, "FULL", "ASC", null, null);
+        verifyNoMoreInteractions(delegationService);
+    }
+
     private Delegation dummyDelegation() {
         Delegation delegation = new Delegation();
         delegation.setInstitutionId("from");
