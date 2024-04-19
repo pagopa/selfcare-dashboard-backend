@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -205,10 +206,20 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
-    public List<Delegation> getDelegations(String institutionId, String brokerId, String productId, String search, String taxCode, String mode, String order, Integer page, Integer size) {
+    public List<Delegation> getDelegations(GetDelegationParameters delegationParameters) {
         log.trace("getDelegations start");
-        log.debug("getDelegations productId = {}, type = {}", institutionId, productId);
-        List<DelegationResponse> delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET(institutionId, brokerId, productId, search, taxCode, mode, order, page, size).getBody();
+        log.debug("getDelegations productId = {}, type = {}", delegationParameters.getFrom(), delegationParameters.getProductId());
+        List<DelegationResponse> delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET(
+                delegationParameters.getFrom(),
+                delegationParameters.getTo(),
+                delegationParameters.getProductId(),
+                delegationParameters.getSearch(),
+                delegationParameters.getTaxCode(),
+                delegationParameters.getMode(),
+                delegationParameters.getOrder(),
+                delegationParameters.getPage(),
+                delegationParameters.getSize())
+                .getBody();
 
         if (Objects.isNull(delegationsResponse))
             return List.of();

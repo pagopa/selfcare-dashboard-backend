@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
@@ -341,7 +342,12 @@ public class InstitutionController {
                                                                    @RequestParam(name = "productId", required = false) String productId) {
         log.trace("getDelegationsUsingFrom start");
         log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", institutionId, productId);
-        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(institutionId, null, productId, null, null, null, null, null, null).stream()
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .from(institutionId)
+                .productId(productId)
+                .build();
+
+        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(delegationParameters).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
         log.debug("getDelegationsUsingFrom result = {}", result);
@@ -379,10 +385,18 @@ public class InstitutionController {
         log.trace("getDelegationsUsingTo start");
         log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
 
-        String modeFilter = Objects.isNull(mode) ? null : mode.name();
-        String orderFilter = Objects.isNull(order) ? null : order.name();
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .to(institutionId)
+                .productId(productId)
+                .search(search)
+                .taxCode(taxCode)
+                .mode(Objects.nonNull(mode) ? mode.name() : null)
+                .order(Objects.nonNull(order) ? order.name() : null)
+                .page(page)
+                .size(size)
+                .build();
 
-        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(null, institutionId,  productId, search, taxCode, modeFilter, orderFilter, page, size).stream()
+        ResponseEntity<List<DelegationResource>> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegations(delegationParameters).stream()
                 .map(delegationMapper::toDelegationResource)
                 .collect(Collectors.toList()));
         log.debug("getDelegationsUsingTo result = {}", result);

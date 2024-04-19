@@ -17,7 +17,7 @@ import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -288,14 +288,14 @@ class CoreConnectorImplTest {
         List<DelegationResponse> delegationResponseList = new ArrayList<>();
         delegationResponseList.add(delegationResponse);
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
-        Delegation delegation = dummyDelegation();
+        GetDelegationParameters parameters = dummyDelegationParameters();
 
         when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
+        List<Delegation> delegationList = msCoreConnector.getDelegations(dummyDelegationParameters());
         // then
         assertNotNull(delegationList);
         assertEquals(1, delegationList.size());
@@ -309,7 +309,7 @@ class CoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getBrokerName(), delegationList.get(0).getBrokerName());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null,null, null);
+                ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -317,7 +317,7 @@ class CoreConnectorImplTest {
     void getDelegationUsingFrom_shouldGetEmptyData() {
         // given
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = mock(ResponseEntity.class);
-        Delegation delegation = dummyDelegation();
+        GetDelegationParameters parameters = dummyDelegationParameters();
 
         when(delegationResponseEntity.getBody()).thenReturn(null);
 
@@ -326,13 +326,13 @@ class CoreConnectorImplTest {
 
 
         // when
-        List<Delegation> delegationList = msCoreConnector.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
+        List<Delegation> delegationList = msCoreConnector.getDelegations(dummyDelegationParameters());
         // then
         assertNotNull(delegationList);
         assertEquals(0, delegationList.size());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId(), null, null, null, null, null, null);
+                ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -347,17 +347,6 @@ class CoreConnectorImplTest {
         delegationResponse.setInstitutionName("setInstitutionFromName");
         delegationResponse.setBrokerName("brokerName");
         return delegationResponse;
-    }
-
-    private Delegation dummyDelegation() {
-        Delegation delegation = new Delegation();
-        delegation.setInstitutionId("from");
-        delegation.setBrokerId("to");
-        delegation.setId("setId");
-        delegation.setProductId("setProductId");
-        delegation.setType(DelegationType.PT);
-        delegation.setInstitutionName("setInstitutionFromName");
-        return delegation;
     }
 
     @Test
@@ -1549,6 +1538,19 @@ class CoreConnectorImplTest {
         // then
         verify(coreInstitutionApiRestClient, times(1))
                 ._getUserInstitutionRelationshipsUsingGET(anyString(), any(), any(), any(), any(), any());
+    }
+
+    private GetDelegationParameters dummyDelegationParameters() {
+        return GetDelegationParameters.builder()
+                .to("to")
+                .productId("setProductId")
+                .taxCode("taxCode")
+                .search("name")
+                .mode("FULL")
+                .order("ASC")
+                .page(0)
+                .size(1000)
+                .build();
     }
 
 }

@@ -7,6 +7,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
@@ -557,7 +558,7 @@ class InstitutionControllerTest {
         // Given
         Delegation expectedDelegation = dummyDelegation();
 
-        when(delegationService.getDelegations(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
@@ -581,7 +582,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(expectedDelegation.getInstitutionId(), null, expectedDelegation.getProductId(), null, null, null, null, null, null);
+                .getDelegations(dummyDelegationParametersFrom());
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -592,13 +593,16 @@ class InstitutionControllerTest {
     void getDelegationsUsingTo_shouldGetData() throws Exception {
         // Given
         Delegation expectedDelegation = dummyDelegation();
+        GetDelegationParameters delegationParameters = dummyDelegationParametersTo();
 
-        when(delegationService.getDelegations(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}", expectedDelegation.getBrokerId(), expectedDelegation.getProductId()))
+                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
+                                delegationParameters.getTo(), delegationParameters.getProductId(), delegationParameters.getSearch(),
+                                delegationParameters.getTaxCode(), delegationParameters.getPage(), delegationParameters.getSize()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
@@ -617,21 +621,25 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId(), null, null, null, null, null, null);
+                .getDelegations(dummyDelegationParametersTo());
         verifyNoMoreInteractions(delegationService);
     }
 
     @Test
-    void getDelegationsUsingTo_shouldGetDataWithFilters() throws Exception {
+    void getDelegationsUsingTo_shouldGetDataWithoutFilters() throws Exception {
         // Given
         Delegation expectedDelegation = dummyDelegation();
 
-        when(delegationService.getDelegations(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .to("to")
+                .build();
+
+        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&mode=FULL&order=ASC", expectedDelegation.getBrokerId(), expectedDelegation.getProductId()))
+                        .get(BASE_URL + "/{institutionId}/institutions", expectedDelegation.getBrokerId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
@@ -650,7 +658,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId(), null, null, "FULL", "ASC", null, null);
+                .getDelegations(delegationParameters);
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -663,6 +671,26 @@ class InstitutionControllerTest {
         delegation.setType(DelegationType.PT);
         delegation.setInstitutionName("setInstitutionFromName");
         return delegation;
+    }
+
+    private GetDelegationParameters dummyDelegationParametersTo() {
+        return GetDelegationParameters.builder()
+                .to("to")
+                .productId("setProductId")
+                .taxCode("taxCode")
+                .search("name")
+                .mode("FULL")
+                .order("ASC")
+                .page(0)
+                .size(1000)
+                .build();
+    }
+
+    private GetDelegationParameters dummyDelegationParametersFrom() {
+        return GetDelegationParameters.builder()
+                .from("from")
+                .productId("setProductId")
+                .build();
     }
 
 }

@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -29,7 +30,7 @@ public interface MsCoreConnector {
 
     List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type);
 
-    List<Delegation> getDelegations(String institutionId, String brokerId, String productId, String search, String taxCode, String mode, String order, Integer page, Integer size);
+    List<Delegation> getDelegations(GetDelegationParameters delegationParameters);
 
     void updateUser(String userId, String institutionId);
 
