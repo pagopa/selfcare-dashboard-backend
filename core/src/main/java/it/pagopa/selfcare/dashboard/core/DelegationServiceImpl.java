@@ -37,7 +37,6 @@ class DelegationServiceImpl implements DelegationService {
     @Override
     public List<Delegation> getDelegations(GetDelegationParameters delegationParameters) {
         log.trace("getDelegations start");
-        log.debug("getDelegations from = {}, to = {}, productId = {}", delegationParameters.getFrom(), delegationParameters.getTo(), delegationParameters.getProductId());
         List<Delegation> result = msCoreConnector.getDelegations(delegationParameters);
         log.debug("getDelegations result = {}", result);
         log.trace("getDelegations end");
