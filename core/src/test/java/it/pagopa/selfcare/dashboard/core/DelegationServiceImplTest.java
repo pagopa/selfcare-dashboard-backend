@@ -77,8 +77,8 @@ class DelegationServiceImplTest {
                 .productId("product-io")
                 .taxCode("taxCode")
                 .search("name")
-                .mode("FULL")
-                .order("ASC")
+                .mode(GetDelegationsMode.FULL.name())
+                .order(Order.ASC.name())
                 .page(0)
                 .size(1000)
                 .build();

@@ -14,10 +14,8 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
@@ -1546,8 +1544,8 @@ class CoreConnectorImplTest {
                 .productId("setProductId")
                 .taxCode("taxCode")
                 .search("name")
-                .mode("FULL")
-                .order("ASC")
+                .mode(GetDelegationsMode.FULL.name())
+                .order(Order.ASC.name())
                 .page(0)
                 .size(1000)
                 .build();

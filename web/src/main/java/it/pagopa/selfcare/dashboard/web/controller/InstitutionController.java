@@ -7,6 +7,8 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationsMode;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;

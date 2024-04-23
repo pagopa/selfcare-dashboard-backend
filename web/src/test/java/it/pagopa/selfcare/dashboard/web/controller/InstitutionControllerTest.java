@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
@@ -679,8 +677,8 @@ class InstitutionControllerTest {
                 .productId("setProductId")
                 .taxCode("taxCode")
                 .search("name")
-                .mode("FULL")
-                .order("ASC")
+                .mode(GetDelegationsMode.FULL.name())
+                .order(Order.ASC.name())
                 .page(0)
                 .size(1000)
                 .build();
