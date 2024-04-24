@@ -12,6 +12,7 @@ import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -213,6 +214,7 @@ public class ExchangeTokenServiceV2 {
         userInstitution
                 .getProducts()
                 .stream()
+                .filter(product -> product.getStatus().equals(RelationshipState.ACTIVE))
                 .collect(groupingBy(OnboardedProduct::getProductId))
                 .forEach((key, value) -> map.put(key, new ProductGrantedAuthority(
                         value.get(0).getRole(),
