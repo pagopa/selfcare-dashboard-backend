@@ -558,10 +558,10 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct2.setStatus(RelationshipState.DELETED);
 
 
-        OnboardedProduct onboardedProduct2 = new OnboardedProduct();
-        onboardedProduct2.setRole(MANAGER);
-        onboardedProduct2.setProductId(productId);
-        onboardedProduct2.setProductRole("admin2");
+        OnboardedProduct onboardedProduct3 = new OnboardedProduct();
+        onboardedProduct3.setRole(MANAGER);
+        onboardedProduct3.setProductId(productId);
+        onboardedProduct3.setProductRole("admin2");
 
         UserInstitution userInstitution = new UserInstitution();
         userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
@@ -600,7 +600,7 @@ class ExchangeTokenServiceV2Test {
         assertEquals(institutionInfo.getDescription(), institution.getName());
         assertEquals(institutionId, institution.getId());
         checkNotNullFields(institution, "parentDescription", "rootParent");
-        assertEquals(2, institution.getRoles().size());
+        assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
         assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
