@@ -253,9 +253,17 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
         onboardedProduct.setProductRole("productRole");
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+
+        OnboardedProduct onboardedProduct2 = new OnboardedProduct();
+        onboardedProduct2.setRole(MANAGER);
+        onboardedProduct2.setProductId(productId);
+        onboardedProduct2.setProductRole("productRole");
+        onboardedProduct2.setStatus(RelationshipState.DELETED);
+
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(List.of(onboardedProduct));
+        userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
@@ -296,6 +304,7 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
         onboardedProduct.setProductRole("productRole");
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
 
         UserInstitution userInstitution = new UserInstitution();
         userInstitution.setProducts(List.of(onboardedProduct));
@@ -390,10 +399,29 @@ class ExchangeTokenServiceV2Test {
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
         onboardedProduct.setProductRole("productRole");
 
+        OnboardedProduct onboardedProduct2 = new OnboardedProduct();
+        onboardedProduct2.setRole(MANAGER);
+        onboardedProduct2.setProductId(productId);
+        onboardedProduct2.setStatus(RelationshipState.ACTIVE);
+        onboardedProduct2.setProductRole("productRole2");
+
+        OnboardedProduct onboardedProduct3 = new OnboardedProduct();
+        onboardedProduct3.setRole(MANAGER);
+        onboardedProduct3.setProductId(productId);
+        onboardedProduct3.setStatus(RelationshipState.DELETED);
+        onboardedProduct3.setProductRole("productRole3");
+
+        OnboardedProduct onboardedProduct4 = new OnboardedProduct();
+        onboardedProduct4.setRole(MANAGER);
+        onboardedProduct4.setProductId(productId);
+        onboardedProduct4.setStatus(RelationshipState.DELETED);
+        onboardedProduct4.setProductRole("productRole4");
+
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(List.of(onboardedProduct));
+        userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
@@ -429,7 +457,7 @@ class ExchangeTokenServiceV2Test {
         assertEquals(institutionId, institution.getId());
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         assertNotNull(institution.getRoles());
-        assertEquals(1, institution.getRoles().size());
+        assertEquals(2, institution.getRoles().size());
         assertFalse(exchangedClaims.containsKey("groups"));
         verify(jwtServiceMock, times(1))
                 .getClaims(any());
@@ -521,6 +549,13 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
         onboardedProduct.setProductRole(productRole);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+
+        OnboardedProduct onboardedProduct2 = new OnboardedProduct();
+        onboardedProduct2.setRole(MANAGER);
+        onboardedProduct2.setProductId(productId);
+        onboardedProduct2.setProductRole(productRole+"2");
+        onboardedProduct2.setStatus(RelationshipState.DELETED);
 
 
         OnboardedProduct onboardedProduct2 = new OnboardedProduct();
@@ -644,6 +679,7 @@ class ExchangeTokenServiceV2Test {
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
         onboardedProduct.setProductRole("productRole");
 
         UserInstitution userInstitution = new UserInstitution();
@@ -682,6 +718,7 @@ class ExchangeTokenServiceV2Test {
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
         onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
         onboardedProduct.setProductRole("productRole");
 
         UserInstitution userInstitution = new UserInstitution();
