@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
+import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,12 +20,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.rmi.AccessException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,8 +36,7 @@ import java.util.Map;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
+import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -173,7 +175,7 @@ class InstitutionV2ServiceImplTest {
     }
 
     @Test
-    void findInstitutionByIdTest3(){
+    void findInstitutionById(){
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
         when(principal.getId()).thenReturn("UserId");
@@ -186,25 +188,35 @@ class InstitutionV2ServiceImplTest {
         Institution institution = new Institution();
         institution.setExternalId("externalId");
         institution.setDescription("description");
-        OnboardedProduct onboardedProduct = new OnboardedProduct();
-        onboardedProduct.setProductId("productId");
-        institution.setOnboarding(Collections.singletonList(onboardedProduct));
+        OnboardedProduct onboardedInstitutionProduct = new OnboardedProduct();
+        onboardedInstitutionProduct.setProductId("productId");
+        OnboardedProduct onboardedInstitutionProduct2 = new OnboardedProduct();
+        onboardedInstitutionProduct2.setProductId("productId2");
+        institution.setOnboarding(List.of(onboardedInstitutionProduct, onboardedInstitutionProduct2));
         when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
 
         it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct onboardedProduct1 = new it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct();
         onboardedProduct1.setRole(MANAGER);
         onboardedProduct1.setProductId("productId");
+        onboardedProduct1.setStatus(ACTIVE);
+        it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct onboardedProduct2 = new it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct();
+        onboardedProduct2.setRole(MANAGER);
+        onboardedProduct2.setProductId("productId2");
+        onboardedProduct2.setStatus(DELETED);
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(List.of(onboardedProduct1));
+        userInstitution.setProducts(List.of(onboardedProduct1, onboardedProduct2));
         when(userApiConnectorMock.getProducts("institutionId", "UserId")).thenReturn(userInstitution);
 
         Institution institutionResponse = institutionV2Service.findInstitutionById("institutionId");
         Assertions.assertEquals("description", institutionResponse.getDescription());
         Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+        assertEquals(2, institution.getOnboarding().size());
+        assertTrue(institution.getOnboarding().get(0).isAuthorized());
+        assertFalse(institution.getOnboarding().get(1).isAuthorized());
     }
 
     @Test
-    void findInstitutionByIdTest(){
+    void findInstitutionById_shouldThrowAccessDeniedException(){
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
         when(principal.getId()).thenReturn("UserId");
@@ -214,16 +226,28 @@ class InstitutionV2ServiceImplTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Institution institution = new Institution();
-        institution.setExternalId("externalId");
-        institution.setDescription("description");
-        OnboardedProduct onboardedProduct = new OnboardedProduct();
-        onboardedProduct.setProductId("productId");
-        institution.setOnboarding(Collections.singletonList(onboardedProduct));
-        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
-        Institution institutionResponse = institutionV2Service.findInstitutionById("institutionId");
-        Assertions.assertEquals("description", institutionResponse.getDescription());
-        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+        Assertions.assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById("institutionId"));
+    }
+
+    @Test
+    void findInstitutionById_shouldThrowInstitutionNotFoundException(){
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn("UserId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(
+                principal,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct onboardedProduct1 = new it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct();
+        onboardedProduct1.setRole(MANAGER);
+        onboardedProduct1.setProductId("productId");
+        UserInstitution userInstitution = new UserInstitution();
+        userInstitution.setProducts(List.of(onboardedProduct1));
+        when(userApiConnectorMock.getProducts("institutionId", "UserId")).thenReturn(userInstitution);
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.findInstitutionById("institutionId"));
     }
 
 }
