@@ -1,23 +1,21 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.product.BackOfficeConfigurations;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.web.model.product.BackOfficeConfigurationsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.SubProductResource;
+import it.pagopa.selfcare.product.entity.BackOfficeConfigurations;
+import it.pagopa.selfcare.product.entity.Product;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ProductsMapper {
 
     public static ProductsResource toResource(ProductTree model) {
-        Product
         ProductsResource resource = null;
         if (model != null) {
             resource = new ProductsResource();
@@ -29,10 +27,6 @@ public class ProductsMapper {
             resource.setDescription(model.getNode().getDescription());
             resource.setUrlPublic(model.getNode().getUrlPublic());
             resource.setUrlBO(model.getNode().getUrlBO());
-            resource.setActivatedAt(model.getNode().getActivatedAt());
-            resource.setAuthorized(model.getNode().isAuthorized());
-            resource.setUserRole(model.getNode().getUserRole());
-            resource.setProductOnBoardingStatus(model.getNode().getOnBoardingStatus());
             resource.setStatus(model.getNode().getStatus());
             resource.setDelegable(model.getNode().isDelegable());
             resource.setInvoiceable(model.getNode().isInvoiceable());
@@ -40,7 +34,7 @@ public class ProductsMapper {
             if (model.getChildren() != null) {
                 resource.setChildren(model.getChildren().stream()
                         .map(ProductsMapper::toChildren)
-                        .collect(Collectors.toList()));
+                        .toList());
             }
         }
 
@@ -52,7 +46,6 @@ public class ProductsMapper {
         if (model != null) {
             resource = new SubProductResource();
             resource.setId(model.getId());
-            resource.setProductOnBoardingStatus(model.getOnBoardingStatus());
             resource.setStatus(model.getStatus());
             resource.setDelegable(model.isDelegable());
             resource.setInvoiceable(model.isInvoiceable());
@@ -72,7 +65,7 @@ public class ProductsMapper {
         if (backOfficeEnvironmentConfigurations != null) {
             resource = backOfficeEnvironmentConfigurations.entrySet().stream()
                     .map(ProductsMapper::toProductBackOfficeConfigurations)
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return resource;
     }
@@ -94,7 +87,7 @@ public class ProductsMapper {
         if (roleMappings != null) {
             resource = roleMappings.entrySet().stream()
                     .map(ProductsMapper::toProductRoleMappingsResource)
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return resource;
     }
@@ -110,7 +103,7 @@ public class ProductsMapper {
             if (entry.getValue().getRoles() != null) {
                 resource.setProductRoles(entry.getValue().getRoles().stream()
                         .map(ProductsMapper::toProductRoleResource)
-                        .collect(Collectors.toList()));
+                        .toList());
             }
         }
         return resource;

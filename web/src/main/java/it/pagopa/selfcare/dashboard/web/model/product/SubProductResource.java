@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.product;
 
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
+import it.pagopa.selfcare.product.entity.ProductStatus;
 import lombok.Data;
 
 @Data
