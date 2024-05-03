@@ -1,9 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 
 import java.util.List;
 import java.util.Map;

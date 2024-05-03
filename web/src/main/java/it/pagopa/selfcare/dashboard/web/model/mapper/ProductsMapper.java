@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class ProductsMapper {
 
     public static ProductsResource toResource(ProductTree model) {
+        Product
         ProductsResource resource = null;
         if (model != null) {
             resource = new ProductsResource();

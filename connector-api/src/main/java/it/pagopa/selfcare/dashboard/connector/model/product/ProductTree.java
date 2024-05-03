@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.model.product;
 
+import it.pagopa.selfcare.product.entity.Product;
 import lombok.Data;
 
 import java.util.List;

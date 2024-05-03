@@ -7,38 +7,31 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionProducts;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.UserProductsResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.ProductInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.RoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
-import it.pagopa.selfcare.dashboard.connector.rest.client.CoreDelegationApiRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.client.CoreUserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.*;
 import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.relationship.Relationship;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -50,7 +43,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
@@ -63,8 +55,6 @@ import java.util.function.Function;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.commons.utils.TestUtils.*;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.*;
@@ -766,6 +756,7 @@ class CoreConnectorImplTest {
     void party2SelcRoleMapping(PartyRole partyRole) {
         // when
         SelfCareAuthority authority = partyRole.getSelfCareAuthority();
+        it.pagopa.selfcare.commons.base.security.PartyRole
         // then
         assertEquals(PARTY_2_SELC_ROLE.apply(partyRole), authority);
     }

@@ -12,6 +12,7 @@ jobs:
   swagger_conflict_update:  
     runs-on: ubuntu-20.04
     permissions: write-all
+    secrets: inherit
     name: Swagger Detect Conflict and Update
     steps:
       - id: swagger-conflict-update

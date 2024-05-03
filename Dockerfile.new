@@ -2,7 +2,21 @@ FROM maven:3-eclipse-temurin-17@sha256:0d328fa6843bb26b60cf44d69833f241ffe96218f
 
 COPY . .
 
-RUN mvn clean package -DskipTests=true
+RUN echo "<settings>\n" \
+         "<servers>\n" \
+         "<server>\n" \
+         "<id>\${repositoryOnboarding}</id>\n" \
+         "<username>\${repoLogin}</username>\n" \
+         "<password>\${repoPwd}</password>\n" \
+         "</server>\n" \
+         "</servers>\n" \
+         "</settings>\n" > settings.xml
+
+ARG REPO_ONBOARDING
+ARG REPO_USERNAME
+ARG REPO_PASSWORD
+
+RUN mvn --global-settings settings.xml -DrepositoryOnboarding=${REPO_ONBOARDING} -DrepoLogin=${REPO_USERNAME} -DrepoPwd=${REPO_PASSWORD} clean package -DskipTests=true
 
 FROM openjdk:17-jdk@sha256:528707081fdb9562eb819128a9f85ae7fe000e2fbaeaf9f87662e7b3f38cb7d8 AS runtime
 
