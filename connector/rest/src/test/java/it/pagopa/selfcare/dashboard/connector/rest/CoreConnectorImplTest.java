@@ -109,7 +109,7 @@ class CoreConnectorImplTest {
         mapper.setTimeZone(TimeZone.getDefault());
     }
 
-    private static final Function<PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> switch (partyRole) {
+    private static final Function<it.pagopa.selfcare.commons.base.security.PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> switch (partyRole) {
         case MANAGER, DELEGATE, SUB_DELEGATE -> ADMIN;
         default -> LIMITED;
     };
@@ -752,11 +752,10 @@ class CoreConnectorImplTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PartyRole.class)
-    void party2SelcRoleMapping(PartyRole partyRole) {
+    @EnumSource(value = it.pagopa.selfcare.commons.base.security.PartyRole.class)
+    void party2SelcRoleMapping(it.pagopa.selfcare.commons.base.security.PartyRole partyRole) {
         // when
         SelfCareAuthority authority = partyRole.getSelfCareAuthority();
-        it.pagopa.selfcare.commons.base.security.PartyRole
         // then
         assertEquals(PARTY_2_SELC_ROLE.apply(partyRole), authority);
     }
@@ -859,7 +858,7 @@ class CoreConnectorImplTest {
         userInfoFilter.setRole(selfCareAuthority);
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         List<String> partyRoles = new ArrayList<>();
-        for (PartyRole partyRole : PartyRole.values()) {
+        for (it.pagopa.selfcare.commons.base.security.PartyRole partyRole : it.pagopa.selfcare.commons.base.security.PartyRole.values()) {
             if (userInfoFilter.getRole().equals(PARTY_2_SELC_ROLE.apply(partyRole))) {
                 partyRoles.add(partyRole.name());
             }

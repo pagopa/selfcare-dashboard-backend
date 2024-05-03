@@ -366,11 +366,11 @@ class UserConnectorImplTest {
         userDto.setEmail("jane.doe@example.org");
 
         CreateUserDto.Role role = new CreateUserDto.Role();
-        role.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
         role.setProductRole("admin");
 
         CreateUserDto.Role role2 = new CreateUserDto.Role();
-        role2.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role2.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
         role2.setProductRole("admin2");
 
         RootParentResponse response = new RootParentResponse();
@@ -397,7 +397,7 @@ class UserConnectorImplTest {
                 .thenReturn(ResponseEntity.ok().build());
 
         CreateUserDto.Role role = new CreateUserDto.Role();
-        role.setPartyRole(it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER);
+        role.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
         role.setProductRole("admin");
 
         RootParentResponse response = new RootParentResponse();
