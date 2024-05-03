@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
@@ -9,14 +8,18 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
-import it.pagopa.selfcare.dashboard.connector.model.product.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User.Fields;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -224,7 +227,7 @@ class InstitutionServiceImplTest {
 
     @Test
     void getProductsTree() {
-        ProductTree product = mockInstance(new ProductTree());
+        ProductTree product = mock(ProductTree.class);
         List<ProductTree> productList = List.of(product);
         when(productsConnectorMock.getProductsTree())
                 .thenReturn(productList);
@@ -511,7 +514,7 @@ class InstitutionServiceImplTest {
 
         when(msCoreConnectorMock.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock1));
-        Product product1 = mockInstance(new Product(), "setId");
+        Product product1 = new Product();
         product1.setId(productId1);
 
         Map<String, Product> idToProductMap = Map.of(productId1, product1);
@@ -613,7 +616,10 @@ class InstitutionServiceImplTest {
         userInfoMock.setProducts(map);
         when(msCoreConnectorMock.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock));
-        final ProductTree productTree = mockInstance(new ProductTree(), 2, "setChildren");
+        final ProductTree productTree = new ProductTree();
+        Product productParentMock = new Product();
+        productParentMock.setId("id1");
+        productTree.setNode(productParentMock);
         productTree.setChildren(Collections.emptyList());
         when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(productTree));
@@ -680,9 +686,13 @@ class InstitutionServiceImplTest {
 
         when(msCoreConnectorMock.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock));
-        final ProductTree productTreeMock = mockInstance(new ProductTree(), 1, "setChildren");
-        final Product productChildMock = mockInstance(new Product(), 2);
+        final ProductTree productTreeMock = new ProductTree();
+        final Product productChildMock = new Product();
+        productChildMock.setId("id2");
         productTreeMock.setChildren(List.of(productChildMock));
+        final Product productParentMock = new Product();
+        productParentMock.setId("id1");
+        productTreeMock.setNode(productParentMock);
         when(productsConnectorMock.getProductsTree())
                 .thenReturn(List.of(productTreeMock));
         // when
@@ -751,11 +761,11 @@ class InstitutionServiceImplTest {
         userInfoMock2.setProducts(products2);
         when(msCoreConnectorMock.getUsers(any(), any()))
                 .thenReturn(List.of(userInfoMock1, userInfoMock2));
-        Product product1 = mockInstance(new Product(), 1, "setId");
+        Product product1 = new Product();
         product1.setId(productId1);
-        Product product2 = mockInstance(new Product(), 2, "setId");
+        Product product2 = new Product();
         product2.setId(productId2);
-        Product product3 = mockInstance(new Product(), 3, "setId");
+        Product product3 = new Product();
         product3.setId(productId3);
         Map<String, Product> idToProductMap = Map.of(productId1, product1, productId2, product2, productId3, product3);
         when(productsConnectorMock.getProductsTree())
@@ -884,15 +894,15 @@ class InstitutionServiceImplTest {
             roleMock3.setProductRole(productRoleCode3);
             createUserDto.setRoles(Set.of(roleMock1, roleMock2, roleMock3));
         }
-        Product product = mockInstance(new Product());
+        Product product = new Product();
         product.setId(productId);
-        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRoleCode1);
         productRole1.setLabel(productRoleLabel1);
-        ProductRoleInfo.ProductRole productRole2 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole2 = new ProductRole();
         productRole2.setCode(productRoleCode2);
         productRole2.setLabel(productRoleLabel2);
-        ProductRoleInfo.ProductRole productRole3 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole3 = new ProductRole();
         productRole3.setCode(productRoleCode3);
         productRole3.setLabel(productRoleLabel3);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
@@ -948,18 +958,18 @@ class InstitutionServiceImplTest {
         userId.setId(id);
         CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
         CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
-        roleMock1.setPartyRole(OPERATOR);
+        roleMock1.setPartyRole(PartyRole.OPERATOR);
         roleMock1.setProductRole(productRoleCode1);
         createUserDto.setRoles(Set.of(roleMock1));
-        Product product = mockInstance(new Product());
+        Product product = new Product();
         product.setId(productId);
-        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRoleCode1);
         productRole1.setLabel(productRoleLabel1);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
         productRoleInfo.setRoles(List.of(productRole1));
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
-        map.put(OPERATOR, productRoleInfo);
+        map.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(map);
         when(userRegistryConnector.saveUser(any()))
                 .thenReturn(userId);
@@ -1053,10 +1063,10 @@ class InstitutionServiceImplTest {
         String productRoleCode3 = "productRoleCode3";
         String productRoleLabel3 = "productRoleLabel3";
         String userId = UUID.randomUUID().toString();
-        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
-        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
-        CreateUserDto.Role roleMock2 = mockInstance(new CreateUserDto.Role(), "setProductRole");
-        CreateUserDto.Role roleMock3 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        CreateUserDto createUserDto = new CreateUserDto();
+        CreateUserDto.Role roleMock1 = new CreateUserDto.Role();
+        CreateUserDto.Role roleMock2 = new CreateUserDto.Role();
+        CreateUserDto.Role roleMock3 = new CreateUserDto.Role();
         if (PartyRole.MANAGER.equals(partyRole) || PartyRole.DELEGATE.equals(partyRole)) {
             roleMock1.setPartyRole(partyRole);
             roleMock1.setProductRole(productRoleCode1);
@@ -1070,15 +1080,15 @@ class InstitutionServiceImplTest {
             roleMock3.setProductRole(productRoleCode3);
             createUserDto.setRoles(Set.of(roleMock1, roleMock2, roleMock3));
         }
-        Product product = mockInstance(new Product());
+        Product product = new Product();
         product.setId(productId);
-        ProductRoleInfo.ProductRole productRole1 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRoleCode1);
         productRole1.setLabel(productRoleLabel1);
-        ProductRoleInfo.ProductRole productRole2 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole2 = new ProductRole();
         productRole2.setCode(productRoleCode2);
         productRole2.setLabel(productRoleLabel2);
-        ProductRoleInfo.ProductRole productRole3 = new ProductRoleInfo.ProductRole();
+        ProductRole productRole3 = new ProductRole();
         productRole3.setCode(productRoleCode3);
         productRole3.setLabel(productRoleLabel3);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();

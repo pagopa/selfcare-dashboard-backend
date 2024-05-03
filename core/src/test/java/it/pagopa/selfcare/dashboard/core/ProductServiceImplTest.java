@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +53,7 @@ class ProductServiceImplTest {
         Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.any()))
                 .thenReturn(roleMappingsMocked);
         // when
-        Map<PartyRole, ProductRoleInfo> roleMappings = productService.getProductRoles(productId);
+        Map<it.pagopa.selfcare.onboarding.common.PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo> roleMappings = productService.getProductRoles(productId);
         // then
         Assertions.assertSame(roleMappingsMocked, roleMappings);
         Mockito.verify(productsConnectorMock, Mockito.times(1))

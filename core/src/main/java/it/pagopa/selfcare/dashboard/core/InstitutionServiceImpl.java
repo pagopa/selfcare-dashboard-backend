@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
@@ -11,10 +10,15 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
-import it.pagopa.selfcare.dashboard.connector.model.product.*;
+import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
+import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
+import it.pagopa.selfcare.dashboard.connector.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -254,11 +258,11 @@ class InstitutionServiceImpl implements InstitutionService {
         Assert.hasText(productId, A_PRODUCT_ID_IS_REQUIRED);
         Assert.notNull(user, AN_USER_IS_REQUIRED);
 
-        Product product = productsConnector.getProduct(productId);
+        it.pagopa.selfcare.product.entity.Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
-            EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
-            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings).orElse(null));
-            Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
+            Map<it.pagopa.selfcare.onboarding.common.PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            role.setLabel(ProductMapper.getLabel(role.getProductRole(), roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = ProductMapper.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
@@ -282,9 +286,9 @@ class InstitutionServiceImpl implements InstitutionService {
 
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
-            EnumMap<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
-            role.setLabel(Product.getLabel(role.getProductRole(), roleMappings).orElse(null));
-            Optional<PartyRole> partyRole = Product.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
+            Map<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+            role.setLabel(ProductMapper.getLabel(role.getProductRole(), roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = ProductMapper.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
