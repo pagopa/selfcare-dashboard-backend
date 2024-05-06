@@ -5,11 +5,11 @@ import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +30,7 @@ public interface MsCoreConnector {
 
     List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type);
 
-    List<Delegation> getDelegations(String from, String to, String productId);
+    List<Delegation> getDelegations(GetDelegationParameters delegationParameters);
 
     void updateUser(String userId, String institutionId);
 
@@ -51,12 +51,6 @@ public interface MsCoreConnector {
     void activate(String relationshipId);
 
     void delete(String relationshipId);
-
-    OnboardingRequestInfo getOnboardingRequestInfo(String tokenId);
-
-    void approveOnboardingRequest(String tokenId);
-
-    void rejectOnboardingRequest(String tokenId);
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 }
