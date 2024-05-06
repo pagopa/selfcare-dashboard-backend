@@ -20,7 +20,7 @@ jobs:
     uses: pagopa/selfcare-commons/.github/workflows/call_code_review_spring.yml@main
     name: 'Code Review'
     secrets: inherit
-    if: github.base_ref == 'main' && github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request'
     with:
       pr_number: ${{ github.event.pull_request.number }}
       source_branch: ${{ github.head_ref }}
