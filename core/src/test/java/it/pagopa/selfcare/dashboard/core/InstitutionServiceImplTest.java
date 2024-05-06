@@ -667,17 +667,27 @@ class InstitutionServiceImplTest {
         String userId = "userId1";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setUserId(userId);
-        UserInfo userInfoMock = mockInstance(new UserInfo(), "setProducts");
-        final ProductInfo productInfoMock1 = mockInstance(new ProductInfo(), 1, "setRoleInfos");
-        final ProductInfo productInfoMock2 = mockInstance(new ProductInfo(), 2, "setRoleInfos");
+        UserInfo userInfoMock = new UserInfo();
+        final ProductInfo productInfoMock1 = new ProductInfo();
+        productInfoMock1.setId("id1");
+        final ProductInfo productInfoMock2 = new ProductInfo();
+        productInfoMock2.setId("id2");
         final Map<String, ProductInfo> productInfoMapMock = new HashMap<>();
         productInfoMapMock.put(productInfoMock1.getId(), productInfoMock1);
         productInfoMapMock.put(productInfoMock2.getId(), productInfoMock2);
         userInfoMock.setProducts(productInfoMapMock);
         userInfoMock.setId("userId1");
-        User userMock = mockInstance(new User());
+        userInfoMock.setRole(ADMIN);
+        userInfoMock.setStatus("ACTIVE");
+        userInfoMock.setInstitutionId("institutionId");
+        userInfoMock.setUserMailUuid("UUID");
+        User userMock = new User();
         userMock.setId("userId1");
-        WorkContact contact = mockInstance(new WorkContact());
+        userMock.setFiscalCode("fiscalCode");
+        userMock.setName(new CertifiedField<>());
+        userMock.setFamilyName(new CertifiedField<>());
+        userMock.setEmail(new CertifiedField<>());
+        WorkContact contact = new WorkContact();
         Map<String, WorkContact> workContact = new HashMap<>();
         workContact.put(institutionId, contact);
         userMock.setWorkContacts(workContact);
@@ -910,6 +920,7 @@ class InstitutionServiceImplTest {
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
         map.put(partyRole, productRoleInfo);
         product.setRoleMappings(map);
+        product.setTitle("setTitle");
         when(userRegistryConnector.saveUser(any()))
                 .thenReturn(userId);
         when(productsConnectorMock.getProduct(anyString()))
@@ -917,7 +928,7 @@ class InstitutionServiceImplTest {
         // when
         Executable executable = () -> institutionService.createUsers(institutionId, productId, createUserDto);
         // then
-        if (PartyRole.SUB_DELEGATE.equals(partyRole) || OPERATOR.equals(partyRole)) {
+        if (PartyRole.SUB_DELEGATE.equals(partyRole) || PartyRole.OPERATOR.equals(partyRole)) {
             assertDoesNotThrow(executable);
             verify(userRegistryConnector, times(1))
                     .saveUser(createUserDto.getUser());
@@ -956,8 +967,8 @@ class InstitutionServiceImplTest {
         UUID id = UUID.randomUUID();
         UserId userId = new UserId();
         userId.setId(id);
-        CreateUserDto createUserDto = mockInstance(new CreateUserDto(), "setRole");
-        CreateUserDto.Role roleMock1 = mockInstance(new CreateUserDto.Role(), "setProductRole");
+        CreateUserDto createUserDto = new CreateUserDto();
+        CreateUserDto.Role roleMock1 = new CreateUserDto.Role();
         roleMock1.setPartyRole(PartyRole.OPERATOR);
         roleMock1.setProductRole(productRoleCode1);
         createUserDto.setRoles(Set.of(roleMock1));
@@ -971,6 +982,7 @@ class InstitutionServiceImplTest {
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
         map.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(map);
+        product.setTitle("setTitle");
         when(userRegistryConnector.saveUser(any()))
                 .thenReturn(userId);
         when(productsConnectorMock.getProduct(anyString()))
@@ -1096,12 +1108,13 @@ class InstitutionServiceImplTest {
         EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
         map.put(partyRole, productRoleInfo);
         product.setRoleMappings(map);
+        product.setTitle("setTitle");
         when(productsConnectorMock.getProduct(anyString()))
                 .thenReturn(product);
         // when
         Executable executable = () -> institutionService.addUserProductRoles(institutionId, productId, userId, createUserDto);
         // then
-        if (PartyRole.SUB_DELEGATE.equals(partyRole) || OPERATOR.equals(partyRole)) {
+        if (PartyRole.SUB_DELEGATE.equals(partyRole) || PartyRole.OPERATOR.equals(partyRole)) {
             assertDoesNotThrow(executable);
             verify(msCoreConnectorMock, times(1))
                     .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.eq(userId), createUserDtoCaptor.capture(), eq("setTitle"));
