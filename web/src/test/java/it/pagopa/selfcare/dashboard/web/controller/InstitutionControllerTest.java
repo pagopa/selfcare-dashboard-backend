@@ -650,6 +650,7 @@ class InstitutionControllerTest {
         DelegationResource actual = resource.get(0);
         assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
         assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getInstitutionRootName()).isEqualTo(expectedDelegation.getInstitutionRootName());
         assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
         assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
         assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
