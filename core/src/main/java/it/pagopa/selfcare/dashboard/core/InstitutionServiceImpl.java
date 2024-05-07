@@ -297,40 +297,6 @@ class InstitutionServiceImpl implements InstitutionService {
         log.trace("addProductUser end");
     }
 
-
-    @Override
-    public OnboardingRequestInfo getOnboardingRequestInfo(String tokenId) {
-        log.trace("getOnboardingRequestInfo start");
-        log.debug("getOnboardingRequestInfo tokenId = {}", tokenId);
-        final OnboardingRequestInfo onboardingRequestInfo = msCoreConnector.getOnboardingRequestInfo(tokenId);
-        // In case of PT onboarding, the field manager is empty
-        if(Objects.nonNull(onboardingRequestInfo.getInstitutionInfo()) && !InstitutionType.PT.equals(onboardingRequestInfo.getInstitutionInfo().getInstitutionType())) {
-            onboardingRequestInfo.getManager().setUser(userRegistryConnector.getUserByInternalId(onboardingRequestInfo.getManager().getId(), USER_FIELD_LIST_ENHANCED));
-        }
-        onboardingRequestInfo.getAdmins().forEach(userInfo -> userInfo.setUser(userRegistryConnector.getUserByInternalId(userInfo.getId(), USER_FIELD_LIST_ENHANCED)));
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnboardingRequestInfo result = {}", onboardingRequestInfo);
-        log.trace("getOnboardingRequestInfo end");
-        return onboardingRequestInfo;
-    }
-
-    @Override
-    public void approveOnboardingRequest(String tokenId) {
-        log.trace("approveOnboardingRequest start");
-        log.debug("approveOnboardingRequest tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        msCoreConnector.approveOnboardingRequest(tokenId);
-        log.trace("approveOnboardingRequest end");
-    }
-
-    @Override
-    public void rejectOnboardingRequest(String tokenId) {
-        log.trace("rejectOnboardingRequest start");
-        log.debug("rejectOnboardingRequest tokenId = {}", tokenId);
-        Assert.hasText(tokenId, REQUIRED_TOKEN_ID_MESSAGE);
-        msCoreConnector.rejectOnboardingRequest(tokenId);
-        log.trace("rejectOnboardingRequest end");
-    }
-
     @Override
     public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updateInstitutionResource) {
         log.trace("updateInstitutionDescription start");

@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
@@ -561,7 +560,7 @@ class InstitutionControllerTest {
         // Given
         Delegation expectedDelegation = dummyDelegation();
 
-        when(delegationService.getDelegations(any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
@@ -585,7 +584,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(expectedDelegation.getInstitutionId(), null, expectedDelegation.getProductId());
+                .getDelegations(dummyDelegationParametersFrom());
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -596,13 +595,16 @@ class InstitutionControllerTest {
     void getDelegationsUsingTo_shouldGetData() throws Exception {
         // Given
         Delegation expectedDelegation = dummyDelegation();
+        GetDelegationParameters delegationParameters = dummyDelegationParametersTo();
 
-        when(delegationService.getDelegations(any(), any(), any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
                 .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}", expectedDelegation.getBrokerId(), expectedDelegation.getProductId()))
+                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
+                                delegationParameters.getTo(), delegationParameters.getProductId(), delegationParameters.getSearch(),
+                                delegationParameters.getTaxCode(), delegationParameters.getPage(), delegationParameters.getSize()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
@@ -621,7 +623,45 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(null, expectedDelegation.getBrokerId(), expectedDelegation.getProductId());
+                .getDelegations(dummyDelegationParametersTo());
+        verifyNoMoreInteractions(delegationService);
+    }
+
+    @Test
+    void getDelegationsUsingTo_shouldGetDataWithoutFilters() throws Exception {
+        // Given
+        Delegation expectedDelegation = dummyDelegation();
+
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .to("to")
+                .build();
+
+        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
+        // When
+
+        MvcResult result = mvc
+                .perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/institutions", expectedDelegation.getBrokerId()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andReturn();
+
+        List<DelegationResource> resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        // Then
+        assertThat(resource).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
+        DelegationResource actual = resource.get(0);
+        assertThat(actual.getId()).isEqualTo(expectedDelegation.getId());
+        assertThat(actual.getInstitutionName()).isEqualTo(expectedDelegation.getInstitutionName());
+        assertThat(actual.getInstitutionRootName()).isEqualTo(expectedDelegation.getInstitutionRootName());
+        assertThat(actual.getBrokerName()).isEqualTo(expectedDelegation.getBrokerName());
+        assertThat(actual.getBrokerId()).isEqualTo(expectedDelegation.getBrokerId());
+        assertThat(actual.getProductId()).isEqualTo(expectedDelegation.getProductId());
+        assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
+
+        verify(delegationService, times(1))
+                .getDelegations(delegationParameters);
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -634,6 +674,26 @@ class InstitutionControllerTest {
         delegation.setType(DelegationType.PT);
         delegation.setInstitutionName("setInstitutionFromName");
         return delegation;
+    }
+
+    private GetDelegationParameters dummyDelegationParametersTo() {
+        return GetDelegationParameters.builder()
+                .to("to")
+                .productId("setProductId")
+                .taxCode("taxCode")
+                .search("name")
+                .mode(GetDelegationsMode.FULL.name())
+                .order(Order.ASC.name())
+                .page(0)
+                .size(1000)
+                .build();
+    }
+
+    private GetDelegationParameters dummyDelegationParametersFrom() {
+        return GetDelegationParameters.builder()
+                .from("from")
+                .productId("setProductId")
+                .build();
     }
 
 }

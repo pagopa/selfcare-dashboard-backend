@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,17 +46,17 @@ class DelegationServiceImplTest {
         Delegation delegation = dummyDelegation();
         List<Delegation> delegationList = new ArrayList<>();
         delegationList.add(delegation);
-        when(delegationConnector.getDelegations(any(),any(),any())).thenReturn(delegationList);
+        when(delegationConnector.getDelegations(any())).thenReturn(delegationList);
 
         //when
-        delegationList = delegationServiceImpl.getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+        delegationList = delegationServiceImpl.getDelegations(dummyDelegationParametersTo());
 
         //then
         assertNotNull(delegationList);
         assertNotNull(delegationList.getClass());
         assertEquals(1, delegationList.size());
         verify(delegationConnector, times(1))
-                .getDelegations(delegation.getInstitutionId(), delegation.getBrokerId(), delegation.getProductId());
+                .getDelegations(dummyDelegationParametersTo());
         verifyNoMoreInteractions(delegationConnector);
     }
 
@@ -72,6 +69,19 @@ class DelegationServiceImplTest {
         delegation.setType(DelegationType.PT);
         delegation.setInstitutionName("setInstitutionFromName");
         return delegation;
+    }
+
+    private GetDelegationParameters dummyDelegationParametersTo() {
+        return GetDelegationParameters.builder()
+                .to("to")
+                .productId("product-io")
+                .taxCode("taxCode")
+                .search("name")
+                .mode(GetDelegationsMode.FULL.name())
+                .order(Order.ASC.name())
+                .page(0)
+                .size(1000)
+                .build();
     }
 
 }
