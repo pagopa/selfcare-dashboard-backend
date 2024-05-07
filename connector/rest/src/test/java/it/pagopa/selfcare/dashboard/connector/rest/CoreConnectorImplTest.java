@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
@@ -27,6 +26,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.ProductState;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.BrokerMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -105,7 +105,7 @@ class CoreConnectorImplTest {
         mapper.setTimeZone(TimeZone.getDefault());
     }
 
-    private static final Function<PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> switch (partyRole) {
+    private static final Function<it.pagopa.selfcare.commons.base.security.PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> switch (partyRole) {
         case MANAGER, DELEGATE, SUB_DELEGATE -> ADMIN;
         default -> LIMITED;
     };
@@ -737,8 +737,8 @@ class CoreConnectorImplTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PartyRole.class)
-    void party2SelcRoleMapping(PartyRole partyRole) {
+    @EnumSource(value = it.pagopa.selfcare.commons.base.security.PartyRole.class)
+    void party2SelcRoleMapping(it.pagopa.selfcare.commons.base.security.PartyRole partyRole) {
         // when
         SelfCareAuthority authority = partyRole.getSelfCareAuthority();
         // then
@@ -843,7 +843,7 @@ class CoreConnectorImplTest {
         userInfoFilter.setRole(selfCareAuthority);
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         List<String> partyRoles = new ArrayList<>();
-        for (PartyRole partyRole : PartyRole.values()) {
+        for (it.pagopa.selfcare.commons.base.security.PartyRole partyRole : it.pagopa.selfcare.commons.base.security.PartyRole.values()) {
             if (userInfoFilter.getRole().equals(PARTY_2_SELC_ROLE.apply(partyRole))) {
                 partyRoles.add(partyRole.name());
             }

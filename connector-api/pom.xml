@@ -20,6 +20,20 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
         </dependency>
+        <dependency>
+            <groupId>it.pagopa.selfcare</groupId>
+            <artifactId>onboarding-sdk-product</artifactId>
+            <version>0.1.10</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>selfcare-onboarding</id>
+            <name>Selfcare Onboarding SDK</name>
+            <url>https://maven.pkg.github.com/pagopa/selfcare-onboarding</url>
+        </repository>
+    </repositories>
 
 </project>

@@ -26,7 +26,7 @@ public class RelationshipController {
     }
 
 
-    @PostMapping(value = "/{relationshipId}/suspend")
+    @PostMapping(value = "/{relationshipId}/suspend", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}")
     @PreAuthorize("hasPermission(#relationshipId, 'relationshipId', 'ADMIN')")
@@ -42,7 +42,7 @@ public class RelationshipController {
     }
 
 
-    @PostMapping(value = "/{relationshipId}/activate")
+    @PostMapping(value = "/{relationshipId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}")
     @PreAuthorize("hasPermission(#relationshipId, 'relationshipId', 'ADMIN')")
@@ -57,7 +57,7 @@ public class RelationshipController {
 
     }
 
-    @DeleteMapping(value = "/{relationshipId}")
+    @DeleteMapping(value = "/{relationshipId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}")
     @PreAuthorize("hasPermission(#relationshipId, 'relationshipId', 'ADMIN')")

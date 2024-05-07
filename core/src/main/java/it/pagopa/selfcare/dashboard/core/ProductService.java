@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 
 import java.util.Map;
 

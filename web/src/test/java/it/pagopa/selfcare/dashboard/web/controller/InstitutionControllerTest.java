@@ -7,7 +7,6 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
@@ -25,6 +24,7 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
+import it.pagopa.selfcare.product.entity.Product;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -68,11 +68,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/v1/institutions";
-    private static final ProductTree PRODUCT;
+    private static final ProductTree PRODUCT_TREE;
+    private static final Product PRODUCT;
 
     static {
-        PRODUCT = mockInstance(new ProductTree());
-        PRODUCT.setChildren(List.of(mockInstance(new Product())));
+        PRODUCT_TREE = new ProductTree();
+        PRODUCT = new Product();
+        PRODUCT.setId("id1");
+        PRODUCT_TREE.setChildren(List.of(PRODUCT));
+        PRODUCT_TREE.setNode(PRODUCT);
     }
 
     @Autowired
@@ -202,7 +206,7 @@ class InstitutionControllerTest {
         // given
         String institutionId = "institutionId";
         when(institutionServiceMock.getProductsTree())
-                .thenReturn(singletonList(PRODUCT));
+                .thenReturn(List.of(PRODUCT_TREE));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/products", institutionId)
@@ -383,7 +387,7 @@ class InstitutionControllerTest {
         String institutionId = "institutionId";
         String productId = "productId";
         SelfCareAuthority role = SelfCareAuthority.ADMIN;
-        final UserInfo userInfoModel = mockInstance(new UserInfo());
+        final UserInfo userInfoModel = new UserInfo();
         userInfoModel.setId(randomUUID().toString());
         when(institutionServiceMock.getInstitutionProductUsers(any(), any(), any(), any()))
                 .thenReturn(singletonList(userInfoModel));

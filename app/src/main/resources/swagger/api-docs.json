@@ -6180,16 +6180,6 @@
         "title" : "ProductsResource",
         "type" : "object",
         "properties" : {
-          "activatedAt" : {
-            "type" : "string",
-            "description" : "Date the products was activated",
-            "format" : "date-time"
-          },
-          "authorized" : {
-            "type" : "boolean",
-            "description" : "flag indicating whether the logged user has the authorization to manage the product",
-            "example" : false
-          },
           "backOfficeEnvironmentConfigurations" : {
             "type" : "array",
             "description" : "Environment-specific configurations for back-office redirection with Token Exchange",
@@ -6234,11 +6224,6 @@
             "type" : "string",
             "description" : "Product logo's background color"
           },
-          "productOnBoardingStatus" : {
-            "type" : "string",
-            "description" : "Product's onBoarding status",
-            "enum" : [ "ACTIVE", "INACTIVE", "PENDING" ]
-          },
           "status" : {
             "type" : "string",
             "description" : "Product's status",
@@ -6255,10 +6240,6 @@
           "urlPublic" : {
             "type" : "string",
             "description" : "URL that redirects to the public information webpage of the product"
-          },
-          "userRole" : {
-            "type" : "string",
-            "description" : "Logged user's role"
           }
         }
       },

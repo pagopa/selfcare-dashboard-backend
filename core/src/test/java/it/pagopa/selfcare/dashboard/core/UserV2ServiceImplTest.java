@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
@@ -10,11 +9,13 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -350,9 +351,9 @@ class UserV2ServiceImplTest {
 
     private static Product getProduct() {
         Product product = new Product();
-        EnumMap<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+        Map<PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
-        ProductRoleInfo.ProductRole productRole = new ProductRoleInfo.ProductRole();
+        ProductRole productRole = new ProductRole();
         productRole.setCode("operator");
         productRole.setLabel("operator");
         productRoleInfo.setRoles(List.of(productRole));

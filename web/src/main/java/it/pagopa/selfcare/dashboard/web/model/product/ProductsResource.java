@@ -1,11 +1,9 @@
 package it.pagopa.selfcare.dashboard.web.model.product;
 
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductStatus;
+import it.pagopa.selfcare.product.entity.ProductStatus;
 import lombok.Data;
 
-import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,18 +32,6 @@ public class ProductsResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.urlBO}")
     private String urlBO;
-
-    @ApiModelProperty("${swagger.dashboard.products.model.activatedAt}")
-    private OffsetDateTime activatedAt;
-
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.authorized}")
-    private boolean authorized;
-
-    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
-    private String userRole;
-
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.productOnBoardingStatus}")
-    private ProductOnBoardingStatus productOnBoardingStatus;
 
     @ApiModelProperty(value = "${swagger.dashboard.products.model.status}")
     private ProductStatus status;

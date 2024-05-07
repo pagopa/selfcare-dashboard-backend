@@ -48,7 +48,7 @@ public class ProductController {
         this.brokerResourceMapper = brokerResourceMapper;
     }
 
-    @GetMapping(value = "/{productId}/roles")
+    @GetMapping(value = "/{productId}/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductRoles}")
     public Collection<ProductRoleMappingsResource> getProductRoles(@ApiParam("${swagger.dashboard.products.model.id}")
@@ -63,7 +63,7 @@ public class ProductController {
         return result;
     }
 
-    @GetMapping(value = "/{productId}/back-office")
+    @GetMapping(value = "/{productId}/back-office", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
@@ -85,7 +85,7 @@ public class ProductController {
 
     }
 
-    @GetMapping(value = "/{productId}/brokers/{institutionType}")
+    @GetMapping(value = "/{productId}/brokers/{institutionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductBrokers}")
     public Collection<BrokerResource> getProductBrokers(@ApiParam("${swagger.dashboard.products.model.id}")

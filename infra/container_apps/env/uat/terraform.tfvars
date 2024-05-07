@@ -87,10 +87,6 @@ app_settings = [
     value = "https://selc-u-party-reg-proxy-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
   {
-    name  = "MS_PRODUCT_URL"
-    value = "https://selc-u-product-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
-  },
-  {
     name  = "MS_USER_GROUP_URL"
     value = "https://selc-u-user-group-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
   },
@@ -117,17 +113,22 @@ app_settings = [
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
     value = "v2"
+  },
+  {
+    name  = "PRODUCT_STORAGE_CONTAINER"
+    value = "selc-u-product"
   }
 ]
 
 secrets_names = {
-  "APPLICATIONINSIGHTS_CONNECTION_STRING" = "appinsights-connection-string"
-  "BLOB_STORAGE_CONN_STRING"              = "web-storage-connection-string"
-  "USER_REGISTRY_API_KEY"                 = "user-registry-api-key"
-  "BACKOFFICE_PAGO_PA_API_KEY"            = "pagopa-backoffice-api-key"
-  "SUPPORT_API_KEY"                       = "zendesk-support-api-key"
-  "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"        = "jwt-exchange-private-key"
-  "JWT_TOKEN_EXCHANGE_KID"                = "jwt-exchange-kid"
-  "JWT_TOKEN_PUBLIC_KEY"                  = "jwt-public-key"
-  "USERVICE_USER_REGISTRY_API_KEY"        = "user-registry-api-key"
+  "APPLICATIONINSIGHTS_CONNECTION_STRING"  = "appinsights-connection-string"
+  "BLOB_STORAGE_CONN_STRING"               = "web-storage-connection-string"
+  "USER_REGISTRY_API_KEY"                  = "user-registry-api-key"
+  "BACKOFFICE_PAGO_PA_API_KEY"             = "pagopa-backoffice-api-key"
+  "SUPPORT_API_KEY"                        = "zendesk-support-api-key"
+  "JWT_TOKEN_EXCHANGE_PRIVATE_KEY"         = "jwt-exchange-private-key"
+  "JWT_TOKEN_EXCHANGE_KID"                 = "jwt-exchange-kid"
+  "JWT_TOKEN_PUBLIC_KEY"                   = "jwt-public-key"
+  "USERVICE_USER_REGISTRY_API_KEY"         = "user-registry-api-key"
+  "BLOB_STORAGE_PRODUCT_CONNECTION_STRING" = "blob-storage-product-connection-string"
 }

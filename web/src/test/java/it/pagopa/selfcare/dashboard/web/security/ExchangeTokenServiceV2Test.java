@@ -3,20 +3,15 @@ package it.pagopa.selfcare.dashboard.web.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
-import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
@@ -25,6 +20,10 @@ import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -56,7 +54,6 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -232,13 +229,13 @@ class ExchangeTokenServiceV2Test {
         TestSecurityContextHolder.setAuthentication(authentication);
 
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
-        Institution institutionInfo = mockInstance(new Institution());
+        Institution institutionInfo = new Institution();
         when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         final Pageable pageable = Pageable.ofSize(100);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
-        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
-        UserInfo user = mockInstance(new UserInfo());
+        UserGroupInfo groupInfo = new UserGroupInfo();
+        UserInfo user = new UserInfo();
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
         final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
@@ -346,12 +343,12 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
 
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
-        Product product = mockInstance(new Product());
-        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        Product product = new Product();
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRole);
         productRoleInfo.setRoles(List.of(productRole1));
-        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
         product.setIdentityTokenAudience(realm);
@@ -367,8 +364,14 @@ class ExchangeTokenServiceV2Test {
                         .setIssuedAt(iat)
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
-        Institution institutionInfo = mockInstance(new Institution());
+        Institution institutionInfo = new Institution();
         institutionInfo.setId(institutionId);
+        institutionInfo.setDescription("description");
+        institutionInfo.setTaxCode("taxCode");
+        institutionInfo.setSubunitCode("subunitCode");
+        institutionInfo.setSubunitType("subunitType");
+        institutionInfo.setAooParentCode("AOO");
+        institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -497,15 +500,22 @@ class ExchangeTokenServiceV2Test {
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         UserService userService = mock(UserService.class);
-        Institution institutionInfo = mockInstance(new Institution());
+        Institution institutionInfo = new Institution();
         institutionInfo.setId(institutionId);
+        institutionInfo.setDescription("description");
+        institutionInfo.setTaxCode("taxCode");
+        institutionInfo.setSubunitCode("subunitCode");
+        institutionInfo.setSubunitType("subunitType");
+        institutionInfo.setAooParentCode("AOO");
+        institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
-        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
-        UserInfo user = mockInstance(new UserInfo());
+        UserGroupInfo groupInfo = new UserGroupInfo();
+        UserInfo user = new UserInfo();
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
+        groupInfo.setId("id");
         final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
             groupInfos.add(groupInfo);
@@ -513,12 +523,12 @@ class ExchangeTokenServiceV2Test {
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
-        Product product = mockInstance(new Product());
-        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        Product product = new Product();
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRole);
         productRoleInfo.setRoles(List.of(productRole1));
-        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
         product.setIdentityTokenAudience(realm);
@@ -565,8 +575,14 @@ class ExchangeTokenServiceV2Test {
 
         UserInstitution userInstitution = new UserInstitution();
         userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
-        Institution institutionMock = mockInstance(new Institution());
+        Institution institutionMock = new Institution();
         institutionMock.setId(institutionId);
+        institutionMock.setDescription("description");
+        institutionMock.setTaxCode("taxCode");
+        institutionMock.setSubunitCode("subunitCode");
+        institutionMock.setSubunitType("subunitType");
+        institutionMock.setAooParentCode("AOO");
+        institutionMock.setOriginId("id");
         when( institutionServiceMock.getInstitutionById(any())).thenReturn(institutionMock);
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
@@ -657,12 +673,12 @@ class ExchangeTokenServiceV2Test {
         SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
-        Institution institutionInfo = mockInstance(new Institution());
+        Institution institutionInfo = new Institution();
         UserGroupService groupServiceMock = mock(UserGroupService.class);
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
 
-        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
-        UserInfo user = mockInstance(new UserInfo());
+        UserGroupInfo groupInfo = new UserGroupInfo();
+        UserInfo user = new UserInfo();
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
         final Pageable pageable = Pageable.ofSize(100);
@@ -759,12 +775,12 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
 
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
-        Product product = mockInstance(new Product());
-        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        Product product = new Product();
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRole);
         productRoleInfo.setRoles(List.of(productRole1));
-        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
         ProductTree productTree = new ProductTree();
@@ -780,8 +796,14 @@ class ExchangeTokenServiceV2Test {
                         .setIssuedAt(iat)
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
-        Institution institutionInfo = mockInstance(new Institution());
+        Institution institutionInfo = new Institution();
         institutionInfo.setId(institutionId);
+        institutionInfo.setDescription("description");
+        institutionInfo.setTaxCode("taxCode");
+        institutionInfo.setSubunitCode("subunitCode");
+        institutionInfo.setSubunitType("subunitType");
+        institutionInfo.setAooParentCode("AOO");
+        institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
@@ -887,15 +909,22 @@ class ExchangeTokenServiceV2Test {
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         UserService userService = mock(UserService.class);
-        Institution institutionInfo = mockInstance(new Institution());
+        Institution institutionInfo = new Institution();
         institutionInfo.setId(institutionId);
+        institutionInfo.setDescription("description");
+        institutionInfo.setTaxCode("taxCode");
+        institutionInfo.setSubunitCode("subunitCode");
+        institutionInfo.setSubunitType("subunitType");
+        institutionInfo.setAooParentCode("AOO");
+        institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitutionById(any()))
                 .thenReturn(institutionInfo);
         UserGroupService groupServiceMock = mock(UserGroupService.class);
-        UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
-        UserInfo user = mockInstance(new UserInfo());
+        UserGroupInfo groupInfo = new UserGroupInfo();
+        UserInfo user = new UserInfo();
         user.setId(userId.toString());
         groupInfo.setMembers(List.of(user));
+        groupInfo.setId("id");
         final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
             groupInfos.add(groupInfo);
@@ -903,12 +932,12 @@ class ExchangeTokenServiceV2Test {
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
-        Product product = mockInstance(new Product());
-        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo());
-        ProductRoleInfo.ProductRole productRole1 = mockInstance(new ProductRoleInfo.ProductRole(), 1, "setCode");
+        Product product = new Product();
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        ProductRole productRole1 = new ProductRole();
         productRole1.setCode(productRole);
         productRoleInfo.setRoles(List.of(productRole1));
-        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class);
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<>(PartyRole.class);
         roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
         product.setRoleMappings(roleMappings);
         ProductTree productTree = new ProductTree();

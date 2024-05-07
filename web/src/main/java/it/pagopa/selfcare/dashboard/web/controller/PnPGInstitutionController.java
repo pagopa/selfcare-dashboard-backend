@@ -27,7 +27,7 @@ public class PnPGInstitutionController {
         this.pnPGInstitutionService = pnPGInstitutionService;
     }
 
-    @GetMapping(value = "/{institutionId}/products")
+    @GetMapping(value = "/{institutionId}/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
     public List<PartyProduct> getPnPGInstitutionProducts(@ApiParam("${swagger.dashboard.institutions.model.id}")
