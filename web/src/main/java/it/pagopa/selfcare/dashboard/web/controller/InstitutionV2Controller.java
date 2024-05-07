@@ -13,7 +13,6 @@ import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;

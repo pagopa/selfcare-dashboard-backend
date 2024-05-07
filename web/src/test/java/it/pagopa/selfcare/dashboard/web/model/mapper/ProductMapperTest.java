@@ -1,13 +1,15 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
-import it.pagopa.selfcare.dashboard.connector.model.product.BackOfficeConfigurations;
-import it.pagopa.selfcare.dashboard.connector.model.product.Product;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.web.model.product.BackOfficeConfigurationsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.BackOfficeConfigurations;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -24,10 +26,10 @@ class ProductMapperTest {
     void toResource_notNull() {
         // given
         ProductTree product = new ProductTree();
-        Product node = mockInstance(new Product(), "setBackOfficeEnvironmentConfigurations");
+        Product node = new Product();
         node.setId("Node");
         node.setBackOfficeEnvironmentConfigurations(Map.of("test", mockInstance(new BackOfficeConfigurations())));
-        Product children = mockInstance(new Product());
+        Product children = new Product();
         children.setId("children");
         product.setNode(node);
         product.setChildren(List.of(children));
@@ -41,16 +43,11 @@ class ProductMapperTest {
         assertEquals(product.getNode().getDescription(), resource.getDescription());
         assertEquals(product.getNode().getUrlPublic(), resource.getUrlPublic());
         assertEquals(product.getNode().getUrlBO(), resource.getUrlBO());
-        assertEquals(product.getNode().getActivatedAt(), resource.getActivatedAt());
-        assertEquals(product.getNode().getOnBoardingStatus(), resource.getProductOnBoardingStatus());
-        assertEquals(product.getNode().isAuthorized(), resource.isAuthorized());
-        assertEquals(product.getNode().getUserRole(), resource.getUserRole());
         assertEquals(product.getNode().isDelegable(), resource.isDelegable());
         assertEquals(product.getNode().isInvoiceable(), resource.isInvoiceable());
         assertNotNull(resource.getBackOfficeEnvironmentConfigurations());
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
-        assertEquals(product.getChildren().get(0).getOnBoardingStatus(), resource.getChildren().get(0).getProductOnBoardingStatus());
         assertEquals(product.getChildren().get(0).getStatus(), resource.getChildren().get(0).getStatus());
         assertEquals(product.getChildren().get(0).getDepictImageUrl(), resource.getChildren().get(0).getImageUrl());
         assertEquals(product.getChildren().get(0).getLogo(), resource.getChildren().get(0).getLogo());
@@ -75,7 +72,7 @@ class ProductMapperTest {
     @Test
     void toProductRoleResource_null() {
         // given
-        ProductRoleInfo.ProductRole input = null;
+        ProductRole input = null;
         // when
         ProductRoleMappingsResource.ProductRoleResource output = ProductsMapper.toProductRoleResource(input);
         // then
@@ -86,7 +83,7 @@ class ProductMapperTest {
     @Test
     void toProductRoleResource_notNull() {
         // given
-        ProductRoleInfo.ProductRole input = mockInstance(new ProductRoleInfo.ProductRole());
+        ProductRole input = mockInstance(new ProductRole());
         // when
         ProductRoleMappingsResource.ProductRoleResource output = ProductsMapper.toProductRoleResource(input);
         // then
@@ -124,7 +121,7 @@ class ProductMapperTest {
     void toProductRoleMappingsResource_fromEntry_notNull() {
         // given
         ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo(), "setRoles");
-        productRoleInfo.setRoles(List.of(mockInstance(new ProductRoleInfo.ProductRole())));
+        productRoleInfo.setRoles(List.of(mockInstance(new ProductRole())));
         Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.DELEGATE, productRoleInfo);
         // when
         ProductRoleMappingsResource output = ProductsMapper.toProductRoleMappingsResource(input);
@@ -133,7 +130,7 @@ class ProductMapperTest {
         assertNotNull(output.getProductRoles());
         assertEquals(productRoleInfo.getRoles().size(), output.getProductRoles().size());
         assertEquals(input.getKey(), output.getPartyRole());
-        assertEquals(input.getKey().getSelfCareAuthority(), output.getSelcRole());
+        assertEquals(SelfCareAuthority.ADMIN, output.getSelcRole());
         assertEquals(input.getValue().isMultiroleAllowed(), output.isMultiroleAllowed());
     }
 

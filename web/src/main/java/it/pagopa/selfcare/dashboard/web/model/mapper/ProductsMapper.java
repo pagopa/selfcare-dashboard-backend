@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
+import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.web.model.product.BackOfficeConfigurationsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
@@ -99,7 +100,7 @@ public class ProductsMapper {
         if (entry != null) {
             resource = new ProductRoleMappingsResource();
             resource.setPartyRole(entry.getKey());
-            resource.setSelcRole(entry.getKey().getSelfCareAuthority());
+            resource.setSelcRole(entry.getKey() != PartyRole.OPERATOR ? SelfCareAuthority.ADMIN : SelfCareAuthority.LIMITED);
             resource.setMultiroleAllowed(entry.getValue().isMultiroleAllowed());
             if (entry.getValue().getRoles() != null) {
                 resource.setProductRoles(entry.getValue().getRoles().stream()

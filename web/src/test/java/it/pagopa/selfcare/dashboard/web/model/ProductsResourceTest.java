@@ -49,7 +49,6 @@ class ProductsResourceTest {
         productsResource.setDescription(null);
         productsResource.setLogoBgColor(null);
         productsResource.setUrlBO(null);
-        productsResource.setProductOnBoardingStatus(null);
         productsResource.setStatus(null);
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(productsResource);

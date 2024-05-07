@@ -2,9 +2,7 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.connector.model.product.ProductRoleInfo;
 import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
@@ -13,6 +11,8 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +63,7 @@ class ProductControllerTest {
         // given
         String productId = "prod1";
         when(productServiceMock.getProductRoles(anyString()))
-                .thenReturn(new EnumMap<PartyRole, ProductRoleInfo>(PartyRole.class) {{
+                .thenReturn(new EnumMap<PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo>(PartyRole.class) {{
                     put(PartyRole.MANAGER, new ProductRoleInfo());
                     put(PartyRole.OPERATOR, new ProductRoleInfo());
                 }});

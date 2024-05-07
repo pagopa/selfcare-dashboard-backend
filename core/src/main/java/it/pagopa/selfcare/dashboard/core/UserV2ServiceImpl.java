@@ -8,7 +8,7 @@ import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundExceptio
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.connector.model.product.mapper.ProductMapper;
+import it.pagopa.selfcare.dashboard.connector.model.product.mapper.ProductMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
@@ -177,8 +177,8 @@ public class UserV2ServiceImpl implements UserV2Service {
             Map<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
             CreateUserDto.Role role = new CreateUserDto.Role();
             role.setProductRole(productRole);
-            role.setLabel(ProductMapper.getLabel(productRole, roleMappings).orElse(null));
-            Optional<PartyRole> partyRole = ProductMapper.getPartyRole(productRole, roleMappings, PARTY_ROLE_WHITE_LIST);
+            role.setLabel(ProductMapperImpl.getLabel(productRole, roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = ProductMapperImpl.getPartyRole(productRole, roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole))));
             return role;

@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.core.config;
 
 import it.pagopa.selfcare.azurestorage.AzureBlobClient;
 import it.pagopa.selfcare.azurestorage.AzureBlobClientDefault;
+import it.pagopa.selfcare.dashboard.connector.config.DashboardConfig;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.product.service.ProductServiceCacheable;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +11,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class DashboardConfig {
+public class BffDashboardConfig {
 
-    private final it.pagopa.selfcare.dashboard.connector.config.DashboardConfig config;
+    private final DashboardConfig config;
 
     @Bean
     public ProductService productService(){

@@ -12,7 +12,7 @@ import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundExceptio
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
-import it.pagopa.selfcare.dashboard.connector.model.product.mapper.ProductMapper;
+import it.pagopa.selfcare.dashboard.connector.model.product.mapper.ProductMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
@@ -261,8 +261,8 @@ class InstitutionServiceImpl implements InstitutionService {
         it.pagopa.selfcare.product.entity.Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
             Map<it.pagopa.selfcare.onboarding.common.PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
-            role.setLabel(ProductMapper.getLabel(role.getProductRole(), roleMappings).orElse(null));
-            Optional<PartyRole> partyRole = ProductMapper.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
+            role.setLabel(ProductMapperImpl.getLabel(role.getProductRole(), roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = ProductMapperImpl.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
@@ -287,8 +287,8 @@ class InstitutionServiceImpl implements InstitutionService {
         Product product = productsConnector.getProduct(productId);
         user.getRoles().forEach(role -> {
             Map<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
-            role.setLabel(ProductMapper.getLabel(role.getProductRole(), roleMappings).orElse(null));
-            Optional<PartyRole> partyRole = ProductMapper.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
+            role.setLabel(ProductMapperImpl.getLabel(role.getProductRole(), roleMappings).orElse(null));
+            Optional<PartyRole> partyRole = ProductMapperImpl.getPartyRole(role.getProductRole(), roleMappings, PARTY_ROLE_WHITE_LIST);
             role.setPartyRole(partyRole.orElseThrow(() ->
                     new InvalidProductRoleException(String.format("Product role '%s' is not valid", role.getProductRole()))));
         });
