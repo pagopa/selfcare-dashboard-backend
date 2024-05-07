@@ -65,7 +65,7 @@ public class InstitutionController {
     }
 
 
-    @PutMapping(value = "/{institutionId}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{institutionId}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.saveInstitutionLogo}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
@@ -84,7 +84,7 @@ public class InstitutionController {
     }
 
 
-    @GetMapping("")
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
     public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
@@ -103,7 +103,7 @@ public class InstitutionController {
     }
 
 
-    @GetMapping("/{institutionId}")
+    @GetMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
@@ -121,7 +121,7 @@ public class InstitutionController {
         return result;
     }
 
-    @PutMapping("/{institutionId}/geographicTaxonomy")
+    @PutMapping(value = "/{institutionId}/geographicTaxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
@@ -140,7 +140,7 @@ public class InstitutionController {
         log.trace("updateInstitutionsGeographicTaxonomy end");
     }
 
-    @GetMapping(value = "/{institutionId}/geographicTaxonomy")
+    @GetMapping(value = "/{institutionId}/geographicTaxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionGeographicTaxonomy}")
     public List<GeographicTaxonomyResource> getInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
@@ -161,7 +161,7 @@ public class InstitutionController {
      * @deprecated since it's not used
      */
     @Deprecated(forRemoval = true, since = "1.5")
-    @GetMapping(value = "/{institutionId}/users")
+    @GetMapping(value = "/{institutionId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
@@ -191,7 +191,7 @@ public class InstitutionController {
     }
 
 
-    @GetMapping(value = "/{institutionId}/users/{userId}")
+    @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
@@ -212,7 +212,7 @@ public class InstitutionController {
         return result;
     }
 
-    @GetMapping(value = "/products")
+    @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
     public List<ProductsResource> getProductsTree() {
@@ -230,7 +230,7 @@ public class InstitutionController {
         return result;
     }
 
-    @GetMapping(value = "/{institutionId}/products/{productId}/users")
+    @GetMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
@@ -261,7 +261,7 @@ public class InstitutionController {
     }
 
 
-    @PostMapping(value = "/{institutionId}/products/{productId}/users")
+    @PostMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -285,7 +285,7 @@ public class InstitutionController {
         return result;
     }
 
-    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")
+    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -308,7 +308,7 @@ public class InstitutionController {
         log.trace("addUserProductRoles end");
     }
 
-    @PutMapping(value = "/{institutionId}")
+    @PutMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionDescription}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
@@ -336,7 +336,7 @@ public class InstitutionController {
      * * Code: 400, Message: Bad Request, DataType: Problem
      */
     @ApiOperation(value = "${swagger.dashboard.institutions.partners}", notes = "${swagger.dashboard.institutions.partners}")
-    @GetMapping(value = "/{institutionId}/partners")
+    @GetMapping(value = "/{institutionId}/partners", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public ResponseEntity<List<DelegationResource>> getDelegationsUsingFrom(@ApiParam("${swagger.dashboard.delegation.model.from}")
                                                                    @PathVariable("institutionId") String institutionId,
@@ -368,7 +368,7 @@ public class InstitutionController {
      * * Code: 400, Message: Bad Request, DataType: Problem
      */
     @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
-    @GetMapping(value = "/{institutionId}/institutions")
+    @GetMapping(value = "/{institutionId}/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
     public ResponseEntity<List<DelegationResource>> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
                                                                    @PathVariable("institutionId") String institutionId,

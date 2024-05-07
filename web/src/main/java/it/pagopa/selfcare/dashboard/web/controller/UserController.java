@@ -39,7 +39,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/search")
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}")
     @ApiResponse(responseCode = "404",
@@ -64,7 +64,7 @@ public class UserController {
         return result;
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
@@ -82,7 +82,7 @@ public class UserController {
         log.trace("updateUser end");
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.saveUser}")
     public UserIdResource saveUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
@@ -100,7 +100,7 @@ public class UserController {
         return result;
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}")
     public UserResource getUserByInternalId(@ApiParam("${swagger.dashboard.user.model.id}")
@@ -117,7 +117,7 @@ public class UserController {
         return result;
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.deleteUserById}")
     public void deleteUserById(@ApiParam("${swagger.dashboard.user.model.id}")

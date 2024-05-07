@@ -28,7 +28,7 @@ public class ProductV2Controller {
         this.exchangeTokenService = exchangeTokenServiceV2;
     }
 
-    @GetMapping(value = "/{productId}/back-office")
+    @GetMapping(value = "/{productId}/back-office", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "${swagger.dashboard.product.api.retrieveProductBackoffice}", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}", nickname = "v2RetrieveProductBackofficeUsingGET")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")

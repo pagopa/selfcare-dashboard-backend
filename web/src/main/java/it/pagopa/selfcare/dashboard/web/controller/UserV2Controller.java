@@ -41,7 +41,7 @@ public class UserV2Controller {
     private final UserV2Service userService;
     private final UserMapperV2 userMapperV2;
 
-    @PostMapping(value = "/{userId}/suspend")
+    @PostMapping(value = "/{userId}/suspend", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}", nickname = "v2SuspendRelationshipUsingPOST")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -58,7 +58,7 @@ public class UserV2Controller {
 
     }
 
-    @PostMapping(value = "/{userId}/activate")
+    @PostMapping(value = "/{userId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}", nickname = "v2ActivateRelationshipUsingPOST")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -74,7 +74,7 @@ public class UserV2Controller {
 
     }
 
-    @DeleteMapping(value = "/{userId}")
+    @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}", nickname = "v2DeleteRelationshipByIdUsingDELETE")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -88,7 +88,7 @@ public class UserV2Controller {
         log.trace("deleteUser end");
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}", nickname = "v2GetUserByIdUsingGET")
     public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
@@ -107,7 +107,7 @@ public class UserV2Controller {
         return userMapperV2.toUserResource(user);
     }
 
-    @PostMapping(value = "/search")
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.search}", nickname = "v2SearchUserByFiscalCodeUsingPOST")
     @ApiResponse(responseCode = "404",
@@ -131,7 +131,7 @@ public class UserV2Controller {
         return userMapperV2.toUserResource(user);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}", nickname = "v2UpdateUserUsingPUT")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
@@ -150,7 +150,7 @@ public class UserV2Controller {
         log.trace("updateUser end");
     }
 
-    @GetMapping(value = "/institution/{institutionId}")
+    @GetMapping(value = "/institution/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}", nickname = "v2GetUsersUsingGET")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")

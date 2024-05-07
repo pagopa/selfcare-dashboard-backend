@@ -33,7 +33,7 @@ public class DelegationController {
         this.delegationMapper = delegationMapper;
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.delegation.api.createDelegation}")
     @ApiResponses({

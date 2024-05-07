@@ -33,7 +33,7 @@ public class TokenV2Controller {
     }
 
 
-    @GetMapping(value = "exchange")
+    @GetMapping(value = "exchange", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "${swagger.dashboard.token.api.exchange}", notes = "${swagger.dashboard.token.api.exchange}", nickname = "v2Exchange")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
@@ -61,7 +61,7 @@ public class TokenV2Controller {
         return identityToken;
     }
 
-    @GetMapping(value = "exchange/fatturazione")
+    @GetMapping(value = "exchange/fatturazione", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.billingToken}")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")

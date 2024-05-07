@@ -45,7 +45,7 @@ public class InstitutionV2Controller {
     private final InstitutionResourceMapper institutionResourceMapper;
     private final UserMapperV2 userMapperV2;
 
-    @GetMapping(value = "/{institutionId}/users/{userId}")
+    @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}", nickname = "v2RetrieveInstitutionUser")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
@@ -68,7 +68,7 @@ public class InstitutionV2Controller {
         return result;
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}", nickname = "v2RetrieveUserInstitutions")
     public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
@@ -86,7 +86,7 @@ public class InstitutionV2Controller {
         return result;
     }
 
-    @PostMapping(value = "/{institutionId}/products/{productId}/users")
+    @PostMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}", nickname = "v2PostCreateInstitutionProductUser")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -111,7 +111,7 @@ public class InstitutionV2Controller {
         return result;
     }
 
-    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}")
+    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}", nickname = "v2AddUserProductRole")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
@@ -134,7 +134,7 @@ public class InstitutionV2Controller {
         log.trace("addUserProductRoles end");
     }
 
-    @GetMapping("/{institutionId}")
+    @GetMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "${swagger.dashboard.institutions.api.getInstitution}", notes = "${swagger.dashboard.institutions.api.getInstitution}", nickname = "v2GetInstitution")
     @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")

@@ -33,7 +33,7 @@ public class UserGroupController {
         this.groupService = groupService;
     }
 
-    @PostMapping(value = "/")
+    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.createUserGroup}")
     @ApiResponses({
@@ -52,7 +52,7 @@ public class UserGroupController {
         return result;
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.deleteUserGroup}")
     public void deleteUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
@@ -65,7 +65,7 @@ public class UserGroupController {
 
     }
 
-    @PostMapping("/{id}/activate")
+    @PostMapping(value = "/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.activateUserGroup}")
     public void activateUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
@@ -77,7 +77,7 @@ public class UserGroupController {
         log.trace("activateGroup end");
     }
 
-    @PostMapping("/{id}/suspend")
+    @PostMapping(value = "/{id}/suspend", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.suspendUserGroup}")
     public void suspendUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
@@ -89,7 +89,7 @@ public class UserGroupController {
         log.trace("suspendGroup end");
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.updateUserGroup}")
     @ApiResponses({
@@ -108,7 +108,7 @@ public class UserGroupController {
         log.trace("updateUserGroup end");
     }
 
-    @PostMapping(value = "/{id}/members/{userId}")
+    @PostMapping(value = "/{id}/members/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.addMember}")
     public void addMemberToUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
@@ -123,7 +123,7 @@ public class UserGroupController {
         log.trace("addMemberToUserGroup end");
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroup}")
     public UserGroupResource getUserGroupById(@ApiParam("${swagger.dashboard.user-group.model.id}")
@@ -142,7 +142,7 @@ public class UserGroupController {
     }
 
 
-    @GetMapping(value = "")
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroups}")
     public Page<UserGroupPlainResource> getUserGroups(@ApiParam("${swagger.dashboard.user-group.model.institutionId}")
@@ -164,7 +164,7 @@ public class UserGroupController {
         return groups;
     }
 
-    @DeleteMapping(value = "/{userGroupId}/members/{userId}")
+    @DeleteMapping(value = "/{userGroupId}/members/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.deleteMember}")
     public void deleteMemberFromUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
