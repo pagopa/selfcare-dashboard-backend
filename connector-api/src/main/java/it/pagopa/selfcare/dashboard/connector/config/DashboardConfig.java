@@ -8,7 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource("classpath:config/dashboard-config.properties")
-@ConfigurationProperties(prefix = "mscore")
+@ConfigurationProperties(prefix = "dashboard")
 @Data
 @ToString
 public class DashboardConfig {
