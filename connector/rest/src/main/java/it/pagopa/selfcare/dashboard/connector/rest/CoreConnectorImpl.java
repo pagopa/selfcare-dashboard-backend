@@ -394,35 +394,6 @@ class CoreConnectorImpl implements MsCoreConnector {
                 }).collect(Collectors.groupingBy(Person::getRole));
     }
 
-
-    @Override
-    public void suspend(String relationshipId) {
-        log.trace("suspend start");
-        log.debug("suspend relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        coreUserApiRestClient._suspendRelationshipUsingPOST(relationshipId);
-        log.trace("suspend end");
-    }
-
-
-    @Override
-    public void activate(String relationshipId) {
-        log.trace("activate start");
-        log.debug("activate relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        coreUserApiRestClient._activateRelationshipUsingPOST(relationshipId);
-        log.trace("activate end");
-    }
-
-    @Override
-    public void delete(String relationshipId) {
-        log.trace("delete start");
-        log.debug("delete relationshipId = {}", relationshipId);
-        Assert.hasText(relationshipId, REQUIRED_RELATIONSHIP_MESSAGE);
-        coreUserApiRestClient._deleteRelationshipUsingDELETE(relationshipId);
-        log.trace("delete end");
-    }
-
     @Override
     public List<PartyProduct> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");

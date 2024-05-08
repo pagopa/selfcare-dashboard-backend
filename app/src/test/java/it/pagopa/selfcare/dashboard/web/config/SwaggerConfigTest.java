@@ -57,9 +57,6 @@ class SwaggerConfigTest {
     private ProductService productServiceMock;
 
     @MockBean
-    private RelationshipService relationshipServiceMock;
-
-    @MockBean
     private UserService userServiceMock;
 
     @MockBean
