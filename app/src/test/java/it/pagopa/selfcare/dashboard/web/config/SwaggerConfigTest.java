@@ -24,7 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(classes = {
         SwaggerConfig.class,
@@ -45,9 +46,6 @@ class SwaggerConfigTest {
 
     @MockBean
     private InstitutionV2Service institutionV2Service;
-
-    @MockBean
-    private PnPGInstitutionService pnPGInstitutionService;
 
     @MockBean
     private ExchangeTokenServiceV2 exchangeTokenServiceV2Mock;
