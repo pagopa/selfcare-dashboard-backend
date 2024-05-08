@@ -46,11 +46,5 @@ public interface MsCoreConnector {
 
     void checkExistingRelationshipRoles(String institutionId, String productId, CreateUserDto userDto, String userId);
 
-    void suspend(String relationshipId);
-
-    void activate(String relationshipId);
-
-    void delete(String relationshipId);
-
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 }
