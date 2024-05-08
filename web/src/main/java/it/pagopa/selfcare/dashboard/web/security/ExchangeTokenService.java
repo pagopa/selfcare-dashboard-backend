@@ -15,7 +15,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
@@ -57,14 +57,14 @@ public class ExchangeTokenService {
     private final Duration duration;
     private final String kid;
     private final InstitutionService institutionService;
-    private final UserGroupService groupService;
+    private final UserGroupV2Service groupService;
     public final UserService userService;
     private final ProductsConnector productsConnector;
     private final String issuer;
 
     public ExchangeTokenService(JwtService jwtService,
                                 InstitutionService institutionService,
-                                UserGroupService groupService,
+                                UserGroupV2Service groupService,
                                 ProductsConnector productConnector,
                                 ExchangeTokenProperties properties,
                                 UserService userService) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -208,9 +208,7 @@ public class ExchangeTokenService {
     }
 
     private void retrieveAndSetGroups(Institution institution, String institutionId, String productId, SelfCareUser principal) {
-        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
-                Optional.ofNullable(productId),
-                Optional.of(UUID.fromString(principal.getId())),
+        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, UUID.fromString(principal.getId()),
                 Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
         if (groupInfos.hasNext()) {
             log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s and product %s. The Identity Token will contain only the first 100 records",

@@ -16,7 +16,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.WorkContact;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.core.UserService;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
@@ -238,7 +238,7 @@ class ExchangeTokenServiceTest {
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
         final Pageable pageable = Pageable.ofSize(100);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
         UserInfo user = mockInstance(new UserInfo());
         user.setId(userId.toString());
@@ -280,7 +280,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = mock(JwtService.class);
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
@@ -346,7 +346,7 @@ class ExchangeTokenServiceTest {
         institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
@@ -408,7 +408,7 @@ class ExchangeTokenServiceTest {
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
+                .getUserGroups(institutionId, productId, userId, Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
@@ -451,7 +451,7 @@ class ExchangeTokenServiceTest {
         institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         UserGroupInfo groupInfo = new UserGroupInfo();
         groupInfo.setId("id");
         UserInfo user = new UserInfo();
@@ -535,7 +535,7 @@ class ExchangeTokenServiceTest {
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.of(productId), Optional.of(userId), Pageable.ofSize(100));
+                .getUserGroups(institutionId, productId, userId, Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
@@ -583,7 +583,7 @@ class ExchangeTokenServiceTest {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         InstitutionInfo institutionInfo = mockInstance(new InstitutionInfo());
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
 
         UserGroupInfo groupInfo = mockInstance(new UserGroupInfo());
@@ -626,7 +626,7 @@ class ExchangeTokenServiceTest {
         JwtService jwtServiceMock = mock(JwtService.class);
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         ExchangeTokenService exchangeTokenService = new ExchangeTokenService(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
@@ -690,7 +690,7 @@ class ExchangeTokenServiceTest {
         institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
                 .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
@@ -752,7 +752,7 @@ class ExchangeTokenServiceTest {
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.empty(), Optional.of(userId), Pageable.ofSize(100));
+                .getUserGroups(institutionId, null, userId, Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
@@ -793,7 +793,7 @@ class ExchangeTokenServiceTest {
         institutionInfo.setOriginId("id");
         when(institutionServiceMock.getInstitution(any()))
                 .thenReturn(institutionInfo);
-        UserGroupService groupServiceMock = mock(UserGroupService.class);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         UserGroupInfo groupInfo = new UserGroupInfo();
         groupInfo.setId("id");
         UserInfo user =new UserInfo();
@@ -874,7 +874,7 @@ class ExchangeTokenServiceTest {
         verify(institutionServiceMock, times(1))
                 .getInstitution(institutionId);
         verify(groupServiceMock, times(1))
-                .getUserGroups(Optional.of(institutionId), Optional.empty(), Optional.of(userId), Pageable.ofSize(100));
+                .getUserGroups(institutionId, null, userId, Pageable.ofSize(100));
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock, groupServiceMock);
     }
 
