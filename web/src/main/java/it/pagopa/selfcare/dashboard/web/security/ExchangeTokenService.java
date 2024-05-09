@@ -16,7 +16,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.core.UserGroupService;
-import it.pagopa.selfcare.dashboard.core.UserService;
+import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.product.entity.Product;
@@ -58,7 +58,7 @@ public class ExchangeTokenService {
     private final String kid;
     private final InstitutionService institutionService;
     private final UserGroupService groupService;
-    public final UserService userService;
+    public final UserV2Service userService;
     private final ProductsConnector productsConnector;
     private final String issuer;
 
@@ -67,7 +67,7 @@ public class ExchangeTokenService {
                                 UserGroupService groupService,
                                 ProductsConnector productConnector,
                                 ExchangeTokenProperties properties,
-                                UserService userService) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                                UserV2Service userService) throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.billingUrl = properties.getBillingUrl();
         this.billingAudience = properties.getBillingAudience();
         this.jwtService = jwtService;
@@ -168,7 +168,7 @@ public class ExchangeTokenService {
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setIssuer(issuer);
-        User user = userService.getUserByInternalId(UUID.fromString(principal.getId()));
+        User user = userService.getUserById(principal.getId(), null, null);
 
         String email = Optional.ofNullable(user.getWorkContact(institution.getId()))
                 .map(workContract -> Objects.nonNull(workContract.getEmail())
