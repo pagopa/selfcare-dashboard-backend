@@ -6,11 +6,9 @@ import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
-import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Test;
@@ -24,13 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -53,10 +50,6 @@ class ProductControllerTest {
 
     @MockBean
     private BrokerService brokerServiceMock;
-
-    @MockBean
-    private ExchangeTokenService exchangeTokenServiceMock;
-
 
     @Test
     void getProductRoles() throws Exception {
@@ -82,36 +75,6 @@ class ProductControllerTest {
         verify(productServiceMock, times(1))
                 .getProductRoles(productId);
         verifyNoMoreInteractions(productServiceMock);
-        verifyNoInteractions(exchangeTokenServiceMock);
-    }
-
-
-    @Test
-    void retrieveProductBackoffice() throws Exception {
-        // given
-        String productId = "prod1";
-        String institutionId = "inst1";
-        final String identityToken = "identityToken";
-        final String backOfficeUrl = "back-office-url#token=";
-        when(exchangeTokenServiceMock.exchange(any(), any(), any()))
-                .thenReturn(new ExchangedToken(identityToken, backOfficeUrl + "<IdentityToken>"));
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{productId}/back-office", productId)
-                .queryParam("institutionId", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andReturn();
-        // then
-        URI response = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
-        assertTrue(response.toString().contains(identityToken));
-        assertTrue(response.toString().contains(backOfficeUrl));
-
-        verify(exchangeTokenServiceMock, times(1))
-                .exchange(institutionId, productId, Optional.empty());
-        verifyNoMoreInteractions(exchangeTokenServiceMock);
-        verifyNoInteractions(productServiceMock);
     }
 
     @Test
@@ -147,7 +110,6 @@ class ProductControllerTest {
         verify(brokerServiceMock, times(1))
                 .findAllByInstitutionType(institutionType);
         verifyNoMoreInteractions(brokerServiceMock);
-        verifyNoInteractions(exchangeTokenServiceMock);
     }
 
     @Test
@@ -162,7 +124,6 @@ class ProductControllerTest {
         // then
         assertEquals(400, result.getResponse().getStatus());
         Mockito.verifyNoInteractions(brokerServiceMock);
-        Mockito.verifyNoInteractions(exchangeTokenServiceMock);
     }
 
 }
