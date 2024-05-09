@@ -59,9 +59,6 @@ class SwaggerConfigTest {
     private BrokerService brokerService;
 
     @MockBean
-    private UserGroupService userGroupServiceMock;
-
-    @MockBean
     private DelegationService delegationServiceMock;
 
     @MockBean
