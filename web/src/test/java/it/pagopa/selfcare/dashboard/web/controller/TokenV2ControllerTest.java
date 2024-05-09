@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
-import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

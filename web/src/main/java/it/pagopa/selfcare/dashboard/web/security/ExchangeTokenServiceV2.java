@@ -17,8 +17,8 @@ import it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
-import it.pagopa.selfcare.dashboard.core.UserService;
+import it.pagopa.selfcare.dashboard.core.UserGroupService;
+import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
@@ -62,8 +62,8 @@ public class ExchangeTokenServiceV2 {
     private final Duration duration;
     private final String kid;
     private final InstitutionService institutionService;
-    private final UserGroupV2Service groupService;
-    public final UserService userService;
+    private final UserGroupService groupService;
+    public final UserV2Service userService;
     public final UserApiConnector userApiConnector;
 
     private final ProductsConnector productsConnector;
@@ -73,10 +73,10 @@ public class ExchangeTokenServiceV2 {
 
     public ExchangeTokenServiceV2(JwtService jwtService,
                                   InstitutionService institutionService,
-                                  UserGroupV2Service groupService,
+                                  UserGroupService groupService,
                                   ProductsConnector productConnector,
                                   ExchangeTokenProperties properties,
-                                  UserService userService,
+                                  UserV2Service userService,
                                   UserApiConnector userApiConnector,
                                   InstitutionResourceMapper institutionResourceMapper)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -190,7 +190,7 @@ public class ExchangeTokenServiceV2 {
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setIssuer(issuer);
-        User user = userService.getUserByInternalId(UUID.fromString(userId));
+        User user = userService.getUserById(userId, null, null);
 
         String email = Optional.ofNullable(user.getWorkContact(userMailUuid))
                 .map(workContract -> Objects.nonNull(workContract.getEmail())
@@ -234,7 +234,9 @@ public class ExchangeTokenServiceV2 {
     }
 
     private void retrieveAndSetGroups(Institution institution, String institutionId, String productId, String userId) {
-        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, UUID.fromString(userId),
+        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(Optional.of(institutionId),
+                Optional.ofNullable(productId),
+                Optional.of(UUID.fromString(userId)),
                 Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
         if (groupInfos.hasNext()) {
             log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s and product %s. The Identity Token will contain only the first 100 records",
