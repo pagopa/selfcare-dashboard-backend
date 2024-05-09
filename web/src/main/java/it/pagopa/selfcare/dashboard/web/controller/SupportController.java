@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.core.SupportService;
@@ -34,32 +33,17 @@ public class SupportController {
     }
 
     @Tags({@Tag(name = "external-v2"), @Tag(name = "support")})
-    @PostMapping(produces = MediaType.TEXT_HTML_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
-    public String sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
+    public SupportResponse sendSupportRequest(@RequestBody @Valid SupportRequestDto supportRequestDto,
                                      Authentication authentication) {
         log.trace("sendSupportRequest start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
         final SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
-        String url = supportService.sendRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
-        log.debug("sendSupportRequest result = {}", url);
+        final SupportResponse supportResponse = supportService.sendRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
+        log.debug("sendSupportRequest result = {}", supportResponse.toString());
         log.trace("sendSupportRequest end");
-        return url;
+        return supportResponse;
     }
 
-    @Deprecated
-    @PostMapping(value = "/request", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.support.api.sendRequest}")
-    public SupportResponse getSupportRedirectUrl(@RequestBody @Valid SupportRequestDto supportRequestDto,
-                                                 Authentication authentication) {
-        log.trace("sendSupportRequest start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "sendSupportRequest request = {}", supportRequestDto);
-        final SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
-        final String url = supportService.getSupportRequest(supportMapper.toZendeskRequest(supportRequestDto, selfCareUser));
-        log.debug("sendSupportRequest result = {}", url);
-        log.trace("sendSupportRequest end");
-        return SupportResponse.builder().redirectUrl(url).build();
-    }
 }

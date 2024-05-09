@@ -1,13 +1,13 @@
 package it.pagopa.selfcare.dashboard.connector.model.support;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
+@ToString
 @NoArgsConstructor @AllArgsConstructor
 public class SupportResponse {
     private String redirectUrl;
+    private String jwt;
+    private String actionUrl;
 }
