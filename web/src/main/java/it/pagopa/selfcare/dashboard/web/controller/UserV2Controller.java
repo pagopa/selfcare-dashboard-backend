@@ -49,11 +49,12 @@ public class UserV2Controller {
                                     @PathVariable("userId") String userId,
                                     @ApiParam("${swagger.dashboard.support.model.institutionId}")
                                     @RequestParam(value = "institutionId") String institutionId,
-                                    @RequestParam(value = "productId") String productId) {
+                                    @RequestParam(value = "productId") String productId,
+                                    @RequestParam(value = "productRole", required = false) String productRole) {
 
         log.trace("suspendUser start");
-        log.debug("suspendUser {} for institution: {} and product: {}", userId, institutionId, productId);
-        userService.suspendUserProduct(userId, institutionId, productId);
+        log.debug("suspendUser {} for institution: {}, productId: {} and productRole: {}", userId, institutionId, productId, productRole);
+        userService.suspendUserProduct(userId, institutionId, productId, productRole);
         log.trace("suspendUser end");
 
     }
@@ -65,11 +66,12 @@ public class UserV2Controller {
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                      @PathVariable("userId") String userId,
                                      @RequestParam(value = "institutionId") String institutionId,
-                                     @RequestParam(value = "productId") String productId) {
+                                     @RequestParam(value = "productId") String productId,
+                                     @RequestParam(value = "productRole", required = false) String productRole) {
 
         log.trace("activateUser start");
-        log.debug("activateUser {} for institution: {} and product: {}", userId, institutionId, productId);
-        userService.activateUserProduct(userId, institutionId, productId);
+        log.debug("activateUser {} for institution: {}, productId: {} and productRole: {}", userId, institutionId, productId, productRole);
+        userService.activateUserProduct(userId, institutionId, productId, productRole);
         log.trace("activateUser end");
 
     }
@@ -81,10 +83,11 @@ public class UserV2Controller {
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.id}")
                                        @PathVariable("userId") String userId,
                                        @RequestParam(value = "institutionId") String institutionId,
-                                       @RequestParam(value = "productId") String productId) {
+                                       @RequestParam(value = "productId") String productId,
+                                       @RequestParam(value = "productRole", required = false) String productRole) {
         log.trace("deleteUser start");
-        log.debug("deleteUser {} for institution: {} and product: {}", userId, institutionId, productId);
-        userService.deleteUserProduct(userId, institutionId, productId);
+        log.debug("deleteUser {} for institution: {}, productId: {} and productRole: {}", userId, institutionId, productId, productRole);
+        userService.deleteUserProduct(userId, institutionId, productId, productRole);
         log.trace("deleteUser end");
     }
 
