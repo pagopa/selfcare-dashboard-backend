@@ -115,26 +115,26 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public void suspendUserProduct(String userId, String institutionId, String productId) {
+    public void suspendUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("suspend start");
         log.debug("suspend userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED);
+        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
         log.trace("suspend end");
     }
 
     @Override
-    public void activateUserProduct(String userId, String institutionId, String productId) {
+    public void activateUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("activate start");
         log.debug("activate userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE);
+        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
         log.trace("activate end");
     }
 
     @Override
-    public void deleteUserProduct(String userId, String institutionId, String productId) {
+    public void deleteUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("delete start");
         log.debug("delete userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED);
+        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
         log.trace("delete end");
     }
 

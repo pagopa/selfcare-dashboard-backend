@@ -11,11 +11,11 @@ public interface UserV2Service {
 
     Collection<InstitutionBase> getInstitutions(String userId);
 
-    void deleteUserProduct(String userId, String institutionId, String productId);
+    void deleteUserProduct(String userId, String institutionId, String productId, String productRole);
 
-    void activateUserProduct(String userId, String institutionId, String productId);
+    void activateUserProduct(String userId, String institutionId, String productId, String productRole);
 
-    void suspendUserProduct(String userId, String institutionId, String productId);
+    void suspendUserProduct(String userId, String institutionId, String productId, String productRole);
 
     User getUserById(String userId, String institutionId, List<String> fields);
 

@@ -660,6 +660,13 @@
           "schema" : {
             "type" : "string"
           }
+        },{
+          "name" : "productRole",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
         }, {
           "name" : "status",
           "in" : "query",

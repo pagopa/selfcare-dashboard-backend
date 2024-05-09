@@ -61,28 +61,28 @@ public class UserV2ServiceImpl implements UserV2Service {
     }
 
     @Override
-    public void deleteUserProduct(String userId, String institutionId, String productId) {
+    public void deleteUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("delete start");
-        log.debug("delete userId = {} for institutionId = {} and product = {}", userId, institutionId, productId);
-        userApiConnector.deleteUserProduct(userId, institutionId, productId);
+        log.debug("delete userId = {} for institutionId = {}, productId = {} and productRole = {}", userId, institutionId, productId, productRole);
+        userApiConnector.deleteUserProduct(userId, institutionId, productId, productRole);
         userGroupService.deleteMembersByUserId(userId, institutionId, productId);
         log.trace("delete end");
     }
 
     @Override
-    public void activateUserProduct(String userId, String institutionId, String productId) {
+    public void activateUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("activate start");
-        log.debug("activate userId = {} for institutionId = {} and product = {}", userId, institutionId, productId);
-        userApiConnector.activateUserProduct(userId, institutionId, productId);
+        log.debug("activate userId = {} for institutionId = {}, productId = {} and productRole = {}", userId, institutionId, productId, productRole);
+        userApiConnector.activateUserProduct(userId, institutionId, productId, productRole);
         log.trace("activate end");
 
     }
 
     @Override
-    public void suspendUserProduct(String userId, String institutionId, String productId) {
+    public void suspendUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("suspend start");
         log.debug("suspend userId = {} for institutionId = {} and product = {}", userId, institutionId, productId);
-        userApiConnector.suspendUserProduct(userId, institutionId, productId);
+        userApiConnector.suspendUserProduct(userId, institutionId, productId, productRole);
         log.trace("suspend end");
     }
 
