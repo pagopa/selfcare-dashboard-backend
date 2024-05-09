@@ -3,7 +3,6 @@ package it.pagopa.selfcare.dashboard.web.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.core.*;
 import it.pagopa.selfcare.dashboard.web.model.mapper.*;
-import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenService;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +50,7 @@ class SwaggerConfigTest {
     private ExchangeTokenServiceV2 exchangeTokenServiceV2Mock;
 
     @MockBean
-    private ExchangeTokenService exchangeTokenServiceMock;
-
-    @MockBean
     private ProductService productServiceMock;
-
-    @MockBean
-    private UserService userServiceMock;
 
     @MockBean
     private UserV2Service userServiceV2Mock;
