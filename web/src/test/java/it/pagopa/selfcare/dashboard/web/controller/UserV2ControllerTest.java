@@ -83,11 +83,14 @@ class UserV2ControllerTest {
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/{userId}/suspend", userId)
                         .queryParam("institutionId", institutionid )
                         .queryParam("productId", productId)
+                        .queryParam("productRole", productRole)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -95,7 +98,7 @@ class UserV2ControllerTest {
         // then
         assertEquals(0, result.getResponse().getContentLength());
         Mockito.verify(userServiceMock, Mockito.times(1))
-                .suspendUserProduct(userId, institutionid, productId);
+                .suspendUserProduct(userId, institutionid, productId, productRole);
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -106,11 +109,14 @@ class UserV2ControllerTest {
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/{userId}/activate", userId)
                         .queryParam("institutionId", institutionid )
                         .queryParam("productId", productId)
+                        .queryParam("productRole", productRole)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -118,7 +124,7 @@ class UserV2ControllerTest {
         // then
         assertEquals(0, result.getResponse().getContentLength());
         Mockito.verify(userServiceMock, Mockito.times(1))
-                .activateUserProduct(userId, institutionid, productId);
+                .activateUserProduct(userId, institutionid, productId, productRole);
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -128,11 +134,14 @@ class UserV2ControllerTest {
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .delete(BASE_URL + "/{userId}", userId)
                         .queryParam("institutionId", institutionid )
                         .queryParam("productId", productId)
+                        .queryParam("productRole", productRole)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
@@ -140,7 +149,7 @@ class UserV2ControllerTest {
         // then
         assertEquals(0, result.getResponse().getContentLength());
         Mockito.verify(userServiceMock, Mockito.times(1))
-                .deleteUserProduct(userId, institutionid, productId);
+                .deleteUserProduct(userId, institutionid, productId, productRole);
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 

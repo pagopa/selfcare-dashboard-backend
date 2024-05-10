@@ -19,11 +19,11 @@ public interface UserApiConnector {
 
     User searchByFiscalCode(String fiscalCode, String institutionId);
 
-    void suspendUserProduct(String userId, String institutionId, String productId);
+    void suspendUserProduct(String userId, String institutionId, String productId, String productRole);
 
-    void activateUserProduct(String userId, String institutionId, String productId);
+    void activateUserProduct(String userId, String institutionId, String productId, String productRole);
 
-    void deleteUserProduct(String userId, String institutionId, String productId);
+    void deleteUserProduct(String userId, String institutionId, String productId, String productRole);
 
     UserInstitution getProducts(String institutionId, String userId);
 

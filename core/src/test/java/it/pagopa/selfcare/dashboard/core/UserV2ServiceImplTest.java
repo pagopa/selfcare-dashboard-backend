@@ -76,10 +76,12 @@ class UserV2ServiceImplTest {
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
-        userService.suspendUserProduct(userId, institutionid, productId);
+        userService.suspendUserProduct(userId, institutionid, productId, productRole);
         Mockito.verify(userApiConnector, Mockito.times(1))
-                .suspendUserProduct(userId, institutionid, productId);
+                .suspendUserProduct(userId, institutionid, productId, productRole);
         Mockito.verifyNoMoreInteractions(userApiConnector);
     }
 
@@ -90,11 +92,13 @@ class UserV2ServiceImplTest {
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
-        userService.activateUserProduct(userId, institutionid, productId);
+        userService.activateUserProduct(userId, institutionid, productId, productRole);
         // then
         Mockito.verify(userApiConnector, Mockito.times(1))
-                .activateUserProduct(userId, institutionid, productId);
+                .activateUserProduct(userId, institutionid, productId, productRole);
         Mockito.verifyNoMoreInteractions(userApiConnector);
     }
 
@@ -104,11 +108,13 @@ class UserV2ServiceImplTest {
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         //when
-        userService.deleteUserProduct(userId, institutionid, productId);
+        userService.deleteUserProduct(userId, institutionid, productId, productRole);
         //then
         Mockito.verify(userApiConnector, Mockito.times(1))
-                .deleteUserProduct(userId, institutionid, productId);
+                .deleteUserProduct(userId, institutionid, productId, productRole);
         Mockito.verify(userGroupService, Mockito.times(1))
                 .deleteMembersByUserId(userId, institutionid, productId);
         Mockito.verifyNoMoreInteractions(userApiConnector, userGroupService);

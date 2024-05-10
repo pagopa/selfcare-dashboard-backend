@@ -125,11 +125,12 @@ class UserConnectorImplTest {
         String userId = "userId";
         String institutionId = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
         // when
-        userConnector.suspendUserProduct(userId, institutionId, productId);
+        userConnector.suspendUserProduct(userId, institutionId, productId, productRole);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -140,11 +141,13 @@ class UserConnectorImplTest {
         String userId = "userId";
         String institutionId = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
-        userConnector.activateUserProduct(userId, institutionId, productId);
+        userConnector.activateUserProduct(userId, institutionId, productId, productRole);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -155,11 +158,13 @@ class UserConnectorImplTest {
         String userId = "userId";
         String institutionId = "id1";
         String productId = "prod-pagopa";
+        String productRole = "admin";
+
         // when
-        userConnector.deleteUserProduct(userId, institutionId, productId);
+        userConnector.deleteUserProduct(userId, institutionId, productId, productRole);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED);
+                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
