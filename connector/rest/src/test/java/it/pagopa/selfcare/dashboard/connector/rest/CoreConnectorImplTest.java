@@ -257,14 +257,12 @@ class CoreConnectorImplTest {
         // given
         final String productId = "prod";
         final String type = "PT";
-        Institution institution = new Institution();
-        institution.setId("id");
-        institution.setDescription("description");
         BrokerInfo brokerInfo = new BrokerInfo();
-        brokerInfo.setCode("id");
+        brokerInfo.setCode("taxCode");
         brokerInfo.setDescription("description");
         BrokerResponse brokerResponse = new BrokerResponse();
         brokerResponse.setDescription("description");
+        brokerResponse.setTaxCode("taxCode");
         when(brokerMapper.fromInstitutions(anyList())).thenReturn(List.of(brokerInfo));
         when(coreInstitutionApiRestClient._getInstitutionBrokersUsingGET(any(), any()))
                 .thenReturn(ResponseEntity.of(Optional.of(List.of(brokerResponse))));
@@ -274,8 +272,8 @@ class CoreConnectorImplTest {
         assertNotNull(response);
         assertEquals(1, response.size());
         assertNotNull(response.get(0));
-        assertEquals(response.get(0).getCode(), institution.getId());
-        assertEquals(response.get(0).getDescription(), institution.getDescription());
+        assertEquals(response.get(0).getCode(), brokerInfo.getCode());
+        assertEquals(response.get(0).getDescription(), brokerResponse.getDescription());
 
     }
 

@@ -4450,6 +4450,9 @@
           "numberOfDelegations" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "taxCode" : {
+            "type" : "string"
           }
         }
       },

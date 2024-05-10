@@ -19,7 +19,7 @@ public interface BrokerMapper {
     @Mapping(source = "id", target = "code")
     BrokerInfo fromInstitution(Institution institution);
 
-    @Mapping(source = "id", target = "code")
+    @Mapping(source = "taxCode", target = "code")
     BrokerInfo fromInstitution(BrokerResponse institutions);
 
     List<BrokerInfo> fromInstitutions(List<BrokerResponse> institutions);
