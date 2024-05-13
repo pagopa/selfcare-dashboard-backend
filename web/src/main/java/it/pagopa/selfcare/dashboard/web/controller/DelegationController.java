@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +40,7 @@ public class DelegationController {
     @ApiResponses({
             @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
     })
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#delegationRequest.getFrom(), #delegationRequest.getProductId()), 'ADMIN')")
     public DelegationIdResource createDelegation(@RequestBody @Valid DelegationRequestDto delegationRequest) {
         log.trace("createDelegation start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createDelegation request = {}", delegationRequest);
