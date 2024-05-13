@@ -94,17 +94,18 @@ public class UserV2Controller {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}", nickname = "v2GetUserByIdUsingGET")
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("id") String userId,
                                     @ApiParam("${swagger.dashboard.institutions.model.id}")
                                     @RequestParam(value = "institutionId")
-                                    String institutionI,
+                                    String institutionId,
                                     @ApiParam("${swagger.dashboard.user.model.fields}")
                                     @RequestParam(value = "fields", required = false)
                                     List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
-        User user = userService.getUserById(userId, institutionI, fields);
+        User user = userService.getUserById(userId, institutionId, fields);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return userMapperV2.toUserResource(user);
