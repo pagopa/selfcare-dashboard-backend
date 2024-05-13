@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +35,7 @@ public class UserGroupV2Controller {
     @ApiResponses({
             @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
     })
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#group.getInstitutionId(), #group.getProductId()), 'ADMIN')")
     public UserGroupIdResource createUserGroup(@RequestBody @Valid CreateUserGroupDto group) {
         log.trace("createGroup start");
         log.debug("createGroup group = {}", group);
