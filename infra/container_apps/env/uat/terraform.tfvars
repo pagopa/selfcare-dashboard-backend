@@ -76,19 +76,19 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-u-ms-core-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+    value = "http://selc-u-ms-core-ca"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-u-ms-core-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+    value = "http://selc-u-ms-core-ca"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-u-party-reg-proxy-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+    value = "http://selc-u-party-reg-proxy-ca"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-u-user-group-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+    value = "http://selc-u-user-group-ca"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -108,7 +108,7 @@ app_settings = [
   },
   {
     name  = "SELFCARE_USER_URL"
-    value = "https://selc-u-user-ms-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+    value = "http://selc-u-user-ms-ca"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"

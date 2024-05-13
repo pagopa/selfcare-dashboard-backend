@@ -87,19 +87,19 @@ app_settings = [
   },
   {
     name  = "MS_CORE_URL"
-    value = "https://selc-p-ms-core-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
+    value = "http://selc-p-ms-core-ca"
   },
   {
     name  = "USERVICE_PARTY_PROCESS_URL"
-    value = "https://selc-p-ms-core-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
+    value = "http://selc-p-ms-core-ca"
   },
   {
     name  = "USERVICE_PARTY_REGISTRY_PROXY_URL"
-    value = "https://selc-p-party-reg-proxy-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
+    value = "http://selc-p-party-reg-proxy-ca"
   },
   {
     name  = "MS_USER_GROUP_URL"
-    value = "https://selc-p-user-group-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
+    value = "http://selc-p-user-group-ca"
   },
   {
     name  = "USERVICE_USER_REGISTRY_URL"
@@ -119,7 +119,7 @@ app_settings = [
   },
   {
     name  = "SELFCARE_USER_URL"
-    value = "https://selc-p-user-ms-ca.greensand-62fc96da.westeurope.azurecontainerapps.io"
+    value = "http://selc-p-user-ms-ca"
   },
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
