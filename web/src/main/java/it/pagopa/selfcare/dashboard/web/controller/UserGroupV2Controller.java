@@ -102,6 +102,7 @@ public class UserGroupV2Controller {
     @PostMapping(value = "/{id}/members/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.addMember}")
+    @PreAuthorize("hasPermission(#id, 'UserGroupResource', 'ADMIN')")
     public void addMemberToUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                      @PathVariable("id") String id,
                                      @ApiParam("${swagger.dashboard.user.model.id}")
