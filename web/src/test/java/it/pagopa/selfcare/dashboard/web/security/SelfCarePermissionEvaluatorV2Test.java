@@ -3,7 +3,10 @@ package it.pagopa.selfcare.dashboard.web.security;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -29,6 +32,9 @@ class SelfCarePermissionEvaluatorV2Test {
 
     @MockBean
     UserApiConnector userApiConnector;
+
+    @MockBean
+    UserGroupConnector userGroupConnector;
 
     @Autowired
     SelfCarePermissionEvaluatorV2 permissionEvaluator;
@@ -172,6 +178,42 @@ class SelfCarePermissionEvaluatorV2Test {
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
         // then
         assertTrue(hasPermission);
+    }
+
+    @Test
+    void hasPermission_withTargetId_targetTypeUserGroupResource_permitted() {
+        // given
+        Serializable targetId = "groupId";
+        String targetType = UserGroupResource.class.getSimpleName();
+        String  permission = ADMIN.toString();
+        UserGroupInfo userGroupResource = new UserGroupInfo();
+        userGroupResource.setId(targetId.toString());
+        userGroupResource.setInstitutionId("institutionId");
+        userGroupResource.setProductId("productId");
+        when(userGroupConnector.getUserGroupById(targetId.toString())).thenReturn(userGroupResource);
+        when(userApiConnector.hasPermission(userGroupResource.getInstitutionId(), permission, userGroupResource.getProductId())).thenReturn(true);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", permission);
+        boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
+        // then
+        assertTrue(hasPermission);
+    }
+
+    @Test
+    void hasPermission_withTargetId_targetTypeUserGroupResource_not_permitted() {
+        // given
+        Serializable targetId = "groupId";
+        String targetType = UserGroupResource.class.getSimpleName();
+        String  permission = ADMIN.toString();
+        UserGroupInfo userGroupResource = new UserGroupInfo();
+        userGroupResource.setId(targetId.toString());
+        userGroupResource.setInstitutionId("institutionId");
+        userGroupResource.setProductId("productId");
+        when(userGroupConnector.getUserGroupById(targetId.toString())).thenReturn(userGroupResource);
+        when(userApiConnector.hasPermission(userGroupResource.getInstitutionId(), permission, userGroupResource.getProductId())).thenReturn(false);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", permission);
+        boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);
+        // then
+        assertFalse(hasPermission);
     }
 
 }
