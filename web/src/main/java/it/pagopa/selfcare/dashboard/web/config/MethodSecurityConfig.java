@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.config;
 
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.web.security.SelfCarePermissionEvaluator;
 import it.pagopa.selfcare.dashboard.web.security.SelfCarePermissionEvaluatorV2;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,13 +18,18 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     private final MsCoreConnector msCoreConnector;
     private final UserApiConnector userApiConnector;
+
+    private final UserGroupConnector userGroupConnector;
+
     private final String securityConnectorType;
 
     public MethodSecurityConfig(MsCoreConnector msCoreConnector,
                                 UserApiConnector userApiConnector,
+                                UserGroupConnector userGroupConnector,
                                 @Value("${dashboard.security.connector}") String securityConnectorType) {
         this.msCoreConnector = msCoreConnector;
         this.userApiConnector = userApiConnector;
+        this.userGroupConnector = userGroupConnector;
         this.securityConnectorType = securityConnectorType;
     }
 
@@ -33,7 +39,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
         if(securityConnectorType.equalsIgnoreCase("v1")) {
             expressionHandler.setPermissionEvaluator(new SelfCarePermissionEvaluator(msCoreConnector));
         }else {
-            expressionHandler.setPermissionEvaluator(new SelfCarePermissionEvaluatorV2(userApiConnector));
+            expressionHandler.setPermissionEvaluator(new SelfCarePermissionEvaluatorV2(userApiConnector, userGroupConnector));
         }
         return expressionHandler;
     }
