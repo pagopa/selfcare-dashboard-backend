@@ -119,6 +119,7 @@ public class UserV2Controller {
                     @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
                             schema = @Schema(implementation = Problem.class))
             })
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
     public UserResource search(@ApiParam("${swagger.dashboard.user.model.searchUserDto}")
                                @RequestBody
                                @Valid
