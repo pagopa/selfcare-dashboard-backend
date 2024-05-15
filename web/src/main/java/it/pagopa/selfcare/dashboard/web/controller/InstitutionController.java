@@ -4,42 +4,38 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationsMode;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
-import it.pagopa.selfcare.dashboard.web.model.*;
+import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
+import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyResource;
+import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.web.model.UpdateInstitutionDto;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
-import it.pagopa.selfcare.dashboard.web.model.mapper.*;
-import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GeographicTaxonomyMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
-import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
-import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -84,25 +80,6 @@ public class InstitutionController {
     }
 
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}")
-    public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
-
-        log.trace("getInstitutions start");
-        String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<InstitutionInfo> institutions =  institutionService.getInstitutions(userId);
-
-        List<InstitutionBaseResource> result = institutions.stream()
-                .map(institutionResourceMapper::toResource)
-                .collect(Collectors.toList());
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
-        log.trace("getInstitutions end");
-
-        return result;
-    }
-
-
     @GetMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
@@ -135,7 +112,7 @@ public class InstitutionController {
         log.trace("updateInstitutionGeographicTaxonomy start");
         log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomyListDto);
         GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
-        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).collect(Collectors.toList()));
+        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
         institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         log.trace("updateInstitutionsGeographicTaxonomy end");
     }
@@ -151,65 +128,10 @@ public class InstitutionController {
         List<GeographicTaxonomyResource> geographicTaxonomies = institutionService.getGeographicTaxonomyList(institutionId)
                 .stream()
                 .map(GeographicTaxonomyMapper::toResource)
-                .collect(Collectors.toList());
+                .toList();
         log.debug("getInstitutionGeographicTaxonomy result = {}", geographicTaxonomies);
         log.trace("getInstitutionGeographicTaxonomy end");
         return geographicTaxonomies;
-    }
-
-    /**
-     * @deprecated since it's not used
-     */
-    @Deprecated(forRemoval = true, since = "1.5")
-    @GetMapping(value = "/{institutionId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
-    public List<InstitutionUserResource> getInstitutionUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                             @PathVariable("institutionId")
-                                                             String institutionId,
-                                                             @ApiParam("${swagger.dashboard.products.model.id}")
-                                                             @RequestParam(value = "productId", required = false)
-                                                             Optional<String> productId,
-                                                             @ApiParam("${swagger.dashboard.user.model.role}")
-                                                             @RequestParam(value = "role", required = false)
-                                                             Optional<SelfCareAuthority> role,
-                                                             @ApiParam("${swagger.dashboard.user.model.productRoles}")
-                                                             @RequestParam(value = "productRoles", required = false)
-                                                             Optional<Set<String>> productRoles) {
-
-        log.trace("getInstitutionUsers start");
-        log.debug("getInstitutionUsers institutionId = {}, role = {}, productId = {}", institutionId, role, productId);
-        Collection<UserInfo> userInfos = institutionService.getInstitutionUsers(institutionId, productId, role, productRoles);
-        List<InstitutionUserResource> result = userInfos.stream()
-                .map(UserMapper::toInstitutionUser)
-                .collect(Collectors.toList());
-        log.debug("getInstitutionUsers result = {}", result);
-        log.trace("getInstitutionUsers end");
-
-        return result;
-    }
-
-
-    @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
-    public InstitutionUserDetailsResource getInstitutionUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                             @PathVariable("institutionId")
-                                                                     String institutionId,
-                                                             @ApiParam("${swagger.dashboard.user.model.id}")
-                                                             @PathVariable("userId")
-                                                                     String userId) {
-
-        log.trace("getInstitutionUser start");
-        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
-        UserInfo userInfo = institutionService.getInstitutionUser(institutionId, userId);
-        InstitutionUserDetailsResource result = UserMapper.toInstitutionUserDetails(userInfo);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
-        log.trace("getInstitutionUser end");
-
-        return result;
     }
 
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -222,90 +144,12 @@ public class InstitutionController {
         List<ProductTree> products = institutionService.getProductsTree();
         List<ProductsResource> result = products.stream()
                 .map(ProductsMapper::toResource)
-                .collect(Collectors.toList());
+                .toList();
         log.debug("getProducts result = {}", result);
         log.debug("getProducts result = {}", result);
         log.trace("getProducts end");
 
         return result;
-    }
-
-    @GetMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProductUsers}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
-    public List<ProductUserResource> getInstitutionProductUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                                @PathVariable("institutionId")
-                                                                        String institutionId,
-                                                                @ApiParam("${swagger.dashboard.products.model.id}")
-                                                                @PathVariable("productId")
-                                                                        String productId,
-                                                                @ApiParam("${swagger.dashboard.user.model.role}")
-                                                                @RequestParam(value = "role", required = false)
-                                                                        Optional<SelfCareAuthority> role,
-                                                                @ApiParam("${swagger.dashboard.user.model.productRoles}")
-                                                                @RequestParam(value = "productRoles", required = false)
-                                                                        Optional<Set<String>> productRoles) {
-
-        log.trace("getInstitutionProductUsers start");
-        log.debug("getInstitutionProductUsers institutionId = {}, productId = {}, role = {}", institutionId, productId, role);
-
-        Collection<UserInfo> userInfos = institutionService.getInstitutionProductUsers(institutionId, productId, role, productRoles);
-        List<ProductUserResource> result = userInfos.stream()
-                .map(UserMapper::toProductUser)
-                .collect(Collectors.toList());
-        log.debug("getInstitutionProductUsers result = {}", result);
-        log.trace("getInstitutionProductUsers end");
-
-        return result;
-    }
-
-
-    @PostMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
-    public UserIdResource createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                       @PathVariable("institutionId")
-                                                               String institutionId,
-                                                       @ApiParam("${swagger.dashboard.products.model.id}")
-                                                       @PathVariable("productId")
-                                                               String productId,
-                                                       @ApiParam("${swagger.dashboard.user.model.role}")
-                                                       @RequestBody
-                                                       @Valid
-                                                               CreateUserDto user) {
-
-        log.trace("createInstitutionProductUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "createInstitutionProductUser institutionId = {}, productId = {}, user = {}", institutionId, productId, user);
-        UserId userId = institutionService.createUsers(institutionId, productId, UserMapper.fromCreateUserDto(user, institutionId));
-        UserIdResource result = UserMapper.toIdResource(userId);
-        log.debug("createInstitutionProductUser result = {}", result);
-        log.trace("createInstitutionProductUser end");
-        return result;
-    }
-
-    @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
-    public void addUserProductRoles(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                    @PathVariable("institutionId")
-                                            String institutionId,
-                                    @ApiParam("${swagger.dashboard.products.model.id}")
-                                    @PathVariable("productId")
-                                            String productId,
-                                    @ApiParam("${swagger.dashboard.user.model.id}")
-                                    @PathVariable("userId")
-                                            String userId,
-                                    @ApiParam("${swagger.dashboard.user.model.productRoles}")
-                                    @RequestBody
-                                    @Valid
-                                            UserProductRoles userProductRoles) {
-        log.trace("addUserProductRoles start");
-        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
-        institutionService.addUserProductRoles(institutionId, productId, userId, UserMapper.toCreateUserDto(userProductRoles));
-        log.trace("addUserProductRoles end");
     }
 
     @PutMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)

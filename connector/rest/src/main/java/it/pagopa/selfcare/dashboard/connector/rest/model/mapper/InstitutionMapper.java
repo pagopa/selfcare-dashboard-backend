@@ -2,14 +2,13 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 
 import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
-import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.*;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductOnBoardingStatus;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionRoleResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionRoleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -29,19 +28,6 @@ public interface InstitutionMapper {
     @Mapping(target = "userRole", expression = "java(institutionProducts.getRole().name())")
     @Mapping(target = "status", expression = "java(institutionProducts.getStatus().name())")
     InstitutionBase toInstitutionBase(UserInstitutionRoleResponse institutionProducts);
-
-    @Mapping(target = "id", source = "institutionId")
-    @Mapping(target = "description", source = "institutionName")
-    @Mapping(target = "parentDescription", source = "institutionRootName")
-    @Mapping(target = "status", source = ".", qualifiedByName = "toStatus")
-    InstitutionInfo toInstitutionInfo(InstitutionProducts institutionProducts);
-
-    List<InstitutionInfo> toInstitutionInfo(List<OnboardedInstitutionResponse> institutionResponse);
-
-    @Mapping(target = "status", expression = "java(getState(institutionResponse.getState()))")
-    @Mapping(target = "category", expression = "java(getCategory(institutionResponse.getAttributes()))")
-    @Mapping(target = "geographicTaxonomies", expression = "java(getGeographicTaxonomies(institutionResponse.getGeographicTaxonomies()))")
-    InstitutionInfo toInstitutionInfo(OnboardedInstitutionResponse institutionResponse);
 
     @Mapping(target = "institutionType", expression = "java(toInstitutionType(institutionResponse.getInstitutionType()))")
     @Mapping(target = "description" , source = "institutionUpdate.description")
@@ -116,15 +102,5 @@ public interface InstitutionMapper {
             return RelationshipState.valueOf(state);
         }
         return null;
-    }
-
-    @Named("toStatus")
-    default RelationshipState toStatus(InstitutionProducts institutionProducts) {
-        return institutionProducts.getProducts().stream()
-                .map(Product::getStatus)
-                .sorted()
-                .findFirst()
-                .map(statusEnum -> RelationshipState.valueOf(statusEnum.name()))
-                .orElse(null);
     }
 }
