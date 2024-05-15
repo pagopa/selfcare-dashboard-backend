@@ -113,7 +113,6 @@ class CoreConnectorImplTest {
     void getInstitution_nullResponse() {
         // given
         String institutionId = "institutionId";
-        InstitutionResponse instResp = mockInstance(new InstitutionResponse());
         // when
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok().build());
         Institution institution = msCoreConnector.getInstitution(institutionId);

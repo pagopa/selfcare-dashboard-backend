@@ -123,7 +123,7 @@ class InstitutionControllerTest {
                     return institution;
                 });
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{institutionId}", institutionId)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE))

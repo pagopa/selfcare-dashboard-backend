@@ -5,19 +5,22 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
 
@@ -28,23 +31,12 @@ class InstitutionServiceImpl implements InstitutionService {
     static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
     static final String REQUIRED_GEOGRAPHIC_TAXONOMIES = "An object of geographic taxonomy list is required";
     static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution update resource is required";
-
-    private final Optional<EnumSet<RelationshipState>> allowedStates;
-    private final UserRegistryConnector userRegistryConnector;
     private final MsCoreConnector msCoreConnector;
     private final ProductsConnector productsConnector;
 
     @Autowired
-    public InstitutionServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
-                                  UserRegistryConnector userRegistryConnector,
-                                  ProductsConnector productsConnector,
+    public InstitutionServiceImpl(ProductsConnector productsConnector,
                                   MsCoreConnector msCoreConnector) {
-        this.allowedStates = allowedStates == null || allowedStates.length == 0
-                ? Optional.empty()
-                : Optional.of(EnumSet.copyOf(Arrays.stream(allowedStates)
-                .map(RelationshipState::valueOf)
-                .toList()));
-        this.userRegistryConnector = userRegistryConnector;
         this.productsConnector = productsConnector;
         this.msCoreConnector = msCoreConnector;
     }
