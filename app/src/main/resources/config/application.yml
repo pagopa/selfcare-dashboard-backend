@@ -34,3 +34,13 @@ logging:
 dashboard:
   security:
     connector: ${B4F_DASHBOARD_SECURITY_CONNECTOR:v2}
+
+resilience4j:
+  retry:
+    retry-aspect-order: 1
+    instances:
+      retryTimeout:
+        max-attempts: 3
+        wait-duration: 5s
+        retry-exceptions:
+          - feign.RetryableException
