@@ -50,6 +50,7 @@ public class UserGroupV2Controller {
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.deleteUserGroup}")
+    @PreAuthorize("hasPermission(#id, 'UserGroupResource', 'ADMIN')")
     public void deleteUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                 @PathVariable("id") String id) {
         log.trace("deleteGroup start");
