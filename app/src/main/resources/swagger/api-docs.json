@@ -957,6 +957,150 @@
         } ]
       }
     },
+    "/v2/institutions/{institutionId}/institutions" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "Retrieve list of delegation using to",
+        "description" : "Retrieve list of delegation using to",
+        "operationId" : "getDelegationsUsingToUsingGET_1",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Technical partner's identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "search",
+          "in" : "query",
+          "description" : "Institution's name to search",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "taxCode",
+          "in" : "query",
+          "description" : "Institution's tax code",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "mode",
+          "in" : "query",
+          "description" : "Mode (full or normal) to retrieve institution's delegations",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "FULL", "NORMAL" ]
+          }
+        }, {
+          "name" : "order",
+          "in" : "query",
+          "description" : "Order to show response NONE, ASC, DESC",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ASC", "DESC", "NONE" ]
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "page",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "minimum" : 0,
+            "exclusiveMinimum" : false,
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "minimum" : 1,
+            "exclusiveMinimum" : false,
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DelegationWithPagination"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/v2/institutions/{institutionId}/products/{productId}/users" : {
       "post" : {
         "tags" : [ "institutions" ],
@@ -3324,6 +3468,76 @@
           }
         }
       },
+      "DelegationWithInfo" : {
+        "title" : "DelegationWithInfo",
+        "type" : "object",
+        "properties" : {
+          "brokerId" : {
+            "type" : "string"
+          },
+          "brokerName" : {
+            "type" : "string"
+          },
+          "brokerTaxCode" : {
+            "type" : "string"
+          },
+          "brokerType" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "institutionId" : {
+            "type" : "string"
+          },
+          "institutionName" : {
+            "type" : "string"
+          },
+          "institutionRootName" : {
+            "type" : "string"
+          },
+          "institutionType" : {
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
+          "productId" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "taxCode" : {
+            "type" : "string"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "AOO", "PT", "UO" ]
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "DelegationWithPagination" : {
+        "title" : "DelegationWithPagination",
+        "type" : "object",
+        "properties" : {
+          "delegations" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DelegationWithInfo"
+            }
+          },
+          "pageInfo" : {
+            "$ref" : "#/components/schemas/PageInfo"
+          }
+        }
+      },
       "GeographicTaxonomy" : {
         "title" : "GeographicTaxonomy",
         "type" : "object",
@@ -3732,6 +3946,28 @@
           },
           "userRole" : {
             "type" : "string"
+          }
+        }
+      },
+      "PageInfo" : {
+        "title" : "PageInfo",
+        "type" : "object",
+        "properties" : {
+          "pageNo" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "pageSize" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         }
       },
