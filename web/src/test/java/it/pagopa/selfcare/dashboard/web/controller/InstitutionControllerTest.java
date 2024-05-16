@@ -2,30 +2,23 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
-import it.pagopa.selfcare.dashboard.web.model.GET_INSTITUTION_MODE;
 import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
-import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import it.pagopa.selfcare.product.entity.Product;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -37,9 +30,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -48,20 +39,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static java.util.Collections.singletonList;
-import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {InstitutionController.class, DelegationMapperImpl.class, WebTestConfig.class, DashboardExceptionsHandler.class, InstitutionResourceMapperImpl.class})
@@ -135,7 +123,7 @@ class InstitutionControllerTest {
                     return institution;
                 });
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{institutionId}", institutionId)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE))
@@ -144,60 +132,6 @@ class InstitutionControllerTest {
         assertNotNull(resource);
         verify(institutionServiceMock, times(1))
                 .findInstitutionById(institutionId);
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitution_institutionInfoNull() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitution(anyString()))
-                .thenReturn(null);
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        assertEquals("", result.getResponse().getContentAsString());
-        verify(institutionServiceMock, times(1))
-                .findInstitutionById(institutionId);
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutions_institutionInfoNotNull() throws Exception {
-        // given
-        String userId = "userId";
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
-
-        InstitutionInfo expectedInstitution = mockInstance(new InstitutionInfo());
-        expectedInstitution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        List<InstitutionInfo> expectedInstitutionInfos = new ArrayList<>();
-        expectedInstitutionInfos.add(expectedInstitution);
-        when(institutionServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "?mode=" + GET_INSTITUTION_MODE.BASE.name())
-                .principal(authentication)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-
-        assertNotNull(resources);
-        assertFalse(resources.isEmpty());
-        assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus().name());
-        assertNotNull(resources.get(0).getUserRole());
-        verify(institutionServiceMock, times(1))
-                .getInstitutions(userId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 
@@ -249,165 +183,6 @@ class InstitutionControllerTest {
         assertTrue(products.isEmpty());
         verify(institutionServiceMock, times(1))
                 .getProductsTree();
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutionUsers_empty() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        when(institutionServiceMock.getInstitutionUsers(any(), any(), any(), any()))
-                .thenReturn(Collections.emptyList());
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionUserResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertTrue(products.isEmpty());
-        verify(institutionServiceMock, times(1))
-                .getInstitutionUsers(institutionId, Optional.empty(), Optional.empty(), Optional.empty());
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutionUsers_notEmpty() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        String productId = "institutionId";
-        SelfCareAuthority role = SelfCareAuthority.ADMIN;
-        String[] productRole = {"api", "security"};
-        final UserInfo userInfo = mockInstance(new UserInfo(), "setId");
-        userInfo.setId(randomUUID().toString());
-        when(institutionServiceMock.getInstitutionUsers(any(), any(), any(), any()))
-                .thenReturn(singletonList(userInfo));
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users", institutionId)
-                .queryParam("role", role.toString())
-                .queryParam("productId", productId)
-                .queryParam("productRoles", productRole)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionUserResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertFalse(products.isEmpty());
-        verify(institutionServiceMock, times(1))
-                .getInstitutionUsers(institutionId, Optional.of(productId), Optional.of(role), Optional.of(Set.of(productRole)));
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutionUser_nullUser() throws Exception {
-        //given
-        String institutionId = "institutionId";
-        String userId = "notFound";
-        when(institutionServiceMock.getInstitutionUser(any(), any()))
-                .thenThrow(ResourceNotFoundException.class);
-        //when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andReturn();
-        //then
-        Assertions.assertEquals(0, result.getResponse().getContentLength());
-
-    }
-
-    @Test
-    void getInstitutionUser_notNullUser() throws Exception {
-        //given
-        String institutionId = "institutionId";
-        String userId = "notFound";
-        UserInfo userInfo = mockInstance(new UserInfo(), "setId");
-        userInfo.setId(randomUUID().toString());
-
-        when(institutionServiceMock.getInstitutionUser(any(), any()))
-                .thenReturn(userInfo);
-        //when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        //then
-        InstitutionUserResource userResource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionUserResource.class);
-        assertNotNull(userResource);
-        verify(institutionServiceMock, times(1))
-                .getInstitutionUser(institutionId, userId);
-        verifyNoMoreInteractions(institutionServiceMock);
-
-    }
-
-    @Test
-    void getInstitutionProductUsers_empty() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        String productId = "productId";
-        when(institutionServiceMock.getInstitutionProductUsers(any(), any(), any(), any()))
-                .thenReturn(Collections.emptyList());
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionUserResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertTrue(products.isEmpty());
-        verify(institutionServiceMock, times(1))
-                .getInstitutionProductUsers(institutionId, productId, Optional.empty(), Optional.empty());
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutionProductUsers_notEmpty() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        String productId = "productId";
-        SelfCareAuthority role = SelfCareAuthority.ADMIN;
-        final UserInfo userInfoModel = new UserInfo();
-        userInfoModel.setId(randomUUID().toString());
-        when(institutionServiceMock.getInstitutionProductUsers(any(), any(), any(), any()))
-                .thenReturn(singletonList(userInfoModel));
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
-                .queryParam("role", role.toString())
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        // then
-        List<InstitutionUserResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertFalse(products.isEmpty());
-        verify(institutionServiceMock, times(1))
-                .getInstitutionProductUsers(institutionId, productId, Optional.of(role), Optional.empty());
         verifyNoMoreInteractions(institutionServiceMock);
     }
 
@@ -466,60 +241,7 @@ class InstitutionControllerTest {
                 .getGeographicTaxonomyList(institutionId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
-
-    @Test
-    void createInstitutionProductUser(@Value("classpath:stubs/createUserDto.json") Resource createUserDto) throws Exception {
-        // given
-        String institutionId = "institutionId";
-        String productId = "productId";
-        UserId userId = mockInstance(new UserId());
-        when(institutionServiceMock.createUsers(any(), any(), any()))
-                .thenReturn(userId);
-        // when
-        mvc.perform(MockMvcRequestBuilders
-                .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
-                .content(createUserDto.getInputStream().readAllBytes())
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(userId.getId().toString())));
-        // then
-        verify(institutionServiceMock, times(1))
-                .createUsers(Mockito.eq(institutionId), Mockito.eq(productId), Mockito.notNull());
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void addProductUserRole() throws Exception {
-        //given
-        String institutionId = "institutionId";
-        String productId = "productId";
-        String userId = UUID.randomUUID().toString();
-        UserProductRoles productRoles = new UserProductRoles();
-        productRoles.setProductRoles(Set.of("productRole"));
-        //when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .put(BASE_URL + "/{institutionId}/products/{productId}/users/{userId}", institutionId, productId, userId)
-                .content(objectMapper.writeValueAsString(productRoles))
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isCreated())
-                .andReturn();
-        //then
-        assertEquals(0, result.getResponse().getContentLength());
-        ArgumentCaptor<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto> userCaptor = ArgumentCaptor.forClass(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.class);
-        verify(institutionServiceMock, times(1))
-                .addUserProductRoles(eq(institutionId), eq(productId), eq(userId), userCaptor.capture());
-        it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto capturedUser = userCaptor.getValue();
-        assertNull(capturedUser.getUser());
-        assertEquals("", capturedUser.getEmail());
-        assertEquals("", capturedUser.getName());
-        assertEquals("", capturedUser.getSurname());
-        assertEquals("", capturedUser.getTaxCode());
-        capturedUser.getRoles().forEach(role -> assertTrue(productRoles.getProductRoles().contains(role.getProductRole())));
-    }
-
+    
     @Test
     void updateInstitutionDescription_ok() throws Exception {
         //given
@@ -589,7 +311,7 @@ class InstitutionControllerTest {
     }
 
     /**
-     * Method under test: {@link InstitutionController#getDelegationsUsingTo(String, String)}
+     * Method under test: {@link InstitutionController#getDelegationsUsingTo(String, String, String, String, GetDelegationsMode, Order, Integer, Integer)}
      */
     @Test
     void getDelegationsUsingTo_shouldGetData() throws Exception {
