@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -135,6 +136,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public UserGroupInfo getUserGroupById(String id) {
         log.trace("getUserGroupById start");
         log.debug("getUseGroupById id = {}", id);
@@ -167,6 +169,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public Page<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", filter.getInstitutionId(), filter.getProductId(), filter.getUserId(), pageable);

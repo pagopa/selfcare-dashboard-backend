@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
@@ -41,6 +42,7 @@ public class UserConnectorImpl implements UserApiConnector {
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
         UserInfoResponse userInfoResponse = userApiRestClient._usersUserIdInstitutionsGet(userId, null,
@@ -59,6 +61,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public UserInstitution getProducts(String institutionId, String userId) {
         log.trace("getProducts start");
         List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
@@ -81,6 +84,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public Boolean hasPermission(String institutionId, String permission, String productId) {
         log.trace("permissionInstitutionIdPermissionGet start");
         log.debug("permissionInstitutionIdPermissionGet institutionId = {}, permission = {}, productId = {}", institutionId, permission, productId);
@@ -94,6 +98,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public User getUserById(String userId, String institutionId, List<String> fields) {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
@@ -105,6 +110,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public User searchByFiscalCode(String fiscalCode, String institutionId) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
@@ -147,6 +153,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, userInfoFilter = {}", institutionId, userInfoFilter);
@@ -173,6 +180,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId) {
         log.trace("retrieveFilteredUser start");
         log.debug("retrieveFilteredUser userId = {}, institutionId = {}, productId = {}", userId, institutionId, productId);

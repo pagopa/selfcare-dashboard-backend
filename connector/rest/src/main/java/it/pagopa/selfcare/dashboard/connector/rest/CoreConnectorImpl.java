@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
@@ -57,6 +58,7 @@ class CoreConnectorImpl implements MsCoreConnector {
     static final String REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE = "An object of geographic taxonomy list is required";
 
     @Override
+    @Retry(name = "retryTimeout")
     public Institution getInstitution(String institutionId) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", institutionId);
@@ -94,6 +96,7 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type) {
         log.trace("findInstitutionsByProductAndType start");
         log.debug("findInstitutionsByProductAndType productId = {}, type = {}", productId, type);
@@ -107,6 +110,7 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<Delegation> getDelegations(GetDelegationParameters delegationParameters) {
         log.trace("getDelegations start");
         log.debug("getDelegations productId = {}, type = {}", delegationParameters.getFrom(), delegationParameters.getProductId());
@@ -146,6 +150,7 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
         log.trace("getGeographicTaxonomyList start");
         log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
@@ -165,6 +170,7 @@ class CoreConnectorImpl implements MsCoreConnector {
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<PartyProduct> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");
         log.debug("getInstitutionProducts institutionId = {}", institutionId);
