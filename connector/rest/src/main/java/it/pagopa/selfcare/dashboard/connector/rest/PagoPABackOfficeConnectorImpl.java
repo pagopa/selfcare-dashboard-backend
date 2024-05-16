@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import io.github.resilience4j.retry.annotation.Retry;
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Brokers;
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPsp;
 import it.pagopa.selfcare.dashboard.connector.api.PagoPABackOfficeConnector;
@@ -33,6 +34,7 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<BrokerInfo> getBrokersEC(int page, int limit) {
         log.trace("getBrokersEC start");
         ResponseEntity<Brokers> responseBrokersEC = backofficeStationApiClient._getBrokers(page, null, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
@@ -43,6 +45,7 @@ public class PagoPABackOfficeConnectorImpl implements PagoPABackOfficeConnector 
     }
 
     @Override
+    @Retry(name = "retryTimeout")
     public List<BrokerInfo> getBrokersPSP(int page, int limit) {
         log.trace("getBrokersPSP start");
         ResponseEntity<BrokersPsp> responseBrokersPSP = backofficeChannelApiClient._getBrokersPsp(page, null, limit, null, null, null, DEFAULT_ORDER_DIRECTION);
