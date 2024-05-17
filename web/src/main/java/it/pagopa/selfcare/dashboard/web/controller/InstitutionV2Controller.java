@@ -26,6 +26,7 @@ import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -179,7 +180,7 @@ public class InstitutionV2Controller {
                                                                           @RequestParam(name = "page", required = false) @Min(0) Integer page,
                                                                           @RequestParam(name = "size", required = false) @Min(1) Integer size) {
         log.trace("getDelegationsUsingToV2 start");
-        log.debug("getDelegationsUsingToV2 institutionId = {}, institutionDto{}", institutionId, productId);
+        log.debug("getDelegationsUsingToV2 institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(productId));
 
         GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
                 .to(institutionId)
