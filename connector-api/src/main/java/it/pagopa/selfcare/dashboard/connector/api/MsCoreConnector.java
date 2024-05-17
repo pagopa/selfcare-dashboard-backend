@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -26,6 +23,8 @@ public interface MsCoreConnector {
     List<BrokerInfo> findInstitutionsByProductAndType(String productId, String type);
 
     List<Delegation> getDelegations(GetDelegationParameters delegationParameters);
+
+    DelegationWithPagination getDelegationsV2(GetDelegationParameters delegationParameters);
 
     void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies);
 

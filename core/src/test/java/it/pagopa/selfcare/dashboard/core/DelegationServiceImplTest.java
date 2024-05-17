@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +62,29 @@ class DelegationServiceImplTest {
         verifyNoMoreInteractions(delegationConnector);
     }
 
+    @Test
+    void getDelegationsV2() {
+        //given
+        DelegationWithInfo delegation = dummyDelegationWithInfo();
+        List<DelegationWithInfo> delegationList = new ArrayList<>();
+        delegationList.add(delegation);
+        PageInfo pageInfo = new PageInfo(1000, 0, 1, 1);
+        DelegationWithPagination delegationWithPagination= new DelegationWithPagination(delegationList, pageInfo);
+
+        when(delegationConnector.getDelegationsV2(any())).thenReturn(delegationWithPagination);
+
+        //when
+        DelegationWithPagination response = delegationServiceImpl.getDelegationsV2(dummyDelegationParametersTo());
+
+        //then
+        assertNotNull(response);
+        assertEquals(1, response.getDelegations().size());
+        assertEquals(delegation, response.getDelegations().get(0));
+        verify(delegationConnector, times(1))
+                .getDelegationsV2(dummyDelegationParametersTo());
+        verifyNoMoreInteractions(delegationConnector);
+    }
+
     private Delegation dummyDelegation() {
         Delegation delegation = new Delegation();
         delegation.setInstitutionId("from");
@@ -68,6 +93,26 @@ class DelegationServiceImplTest {
         delegation.setProductId("setProductId");
         delegation.setType(DelegationType.PT);
         delegation.setInstitutionName("setInstitutionFromName");
+        return delegation;
+    }
+
+    private DelegationWithInfo dummyDelegationWithInfo() {
+        DelegationWithInfo delegation = new DelegationWithInfo();
+        delegation.setId("setId");
+        delegation.setInstitutionId("from");
+        delegation.setInstitutionName("setInstitutionFromName");
+        delegation.setBrokerId("to");
+        delegation.setBrokerName("setInstitutionFromRootName");
+        delegation.setBrokerTaxCode("brokerTaxCode");
+        delegation.setBrokerType("brokerType");
+        delegation.setProductId("setProductId");
+        delegation.setInstitutionRootName("setInstitutionRootName");
+        delegation.setType(DelegationType.PT);
+        delegation.setCreatedAt(OffsetDateTime.now().minusDays(2));
+        delegation.setUpdatedAt(OffsetDateTime.now());
+        delegation.setInstitutionType(InstitutionType.PT);
+        delegation.setStatus("ACTIVE");
+        delegation.setTaxCode("taxCode");
         return delegation;
     }
 

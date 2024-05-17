@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.PageInfo;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
@@ -258,6 +259,40 @@ class CoreConnectorImplTest {
 
         verify(coreDelegationApiRestClient, times(1))
                 ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
+        verifyNoMoreInteractions(coreDelegationApiRestClient);
+    }
+
+    @Test
+    void getDelegationsV2_shouldGetData() {
+        // given
+        DelegationResponse delegationResponse = dummyDelegationResponse();
+        List<DelegationResponse> delegationResponseList = new ArrayList<>();
+        delegationResponseList.add(delegationResponse);
+        PageInfo pageInfo = new PageInfo(1L, 0L, 1L, 1L);
+        DelegationWithPaginationResponse delegationWithPaginationResponse = new DelegationWithPaginationResponse(delegationResponseList, pageInfo);
+        ResponseEntity<DelegationWithPaginationResponse> delegationResponseEntity = new ResponseEntity<>(delegationWithPaginationResponse, null, HttpStatus.OK);
+        GetDelegationParameters parameters = dummyDelegationParameters();
+
+        when(coreDelegationApiRestClient._getDelegationsUsingGET1(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(delegationResponseEntity);
+
+
+        // when
+        DelegationWithPagination response = msCoreConnector.getDelegationsV2(dummyDelegationParameters());
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.getDelegations().size());
+
+        assertEquals(delegationResponseList.get(0).getId(), response.getDelegations().get(0).getId());
+        assertEquals(delegationResponseList.get(0).getInstitutionId(), response.getDelegations().get(0).getInstitutionId());
+        assertEquals(delegationResponseList.get(0).getBrokerId(), response.getDelegations().get(0).getBrokerId());
+        assertEquals(delegationResponseList.get(0).getProductId(), response.getDelegations().get(0).getProductId());
+        assertEquals(delegationResponseList.get(0).getType().toString(), response.getDelegations().get(0).getType().toString());
+        assertEquals(delegationResponseList.get(0).getInstitutionName(), response.getDelegations().get(0).getInstitutionName());
+        assertEquals(delegationResponseList.get(0).getBrokerName(), response.getDelegations().get(0).getBrokerName());
+
+        verify(coreDelegationApiRestClient, times(1))
+                ._getDelegationsUsingGET1(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 

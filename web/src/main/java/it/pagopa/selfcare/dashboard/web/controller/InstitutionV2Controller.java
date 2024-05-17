@@ -5,9 +5,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationWithPagination;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationsMode;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
@@ -21,15 +26,19 @@ import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -44,6 +53,7 @@ public class InstitutionV2Controller {
     private final UserV2Service userService;
     private final InstitutionResourceMapper institutionResourceMapper;
     private final UserMapperV2 userMapperV2;
+    private final DelegationService delegationService;
 
     @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
@@ -150,5 +160,43 @@ public class InstitutionV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
+    }
+
+    @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
+    @GetMapping(value = "/{institutionId}/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    public ResponseEntity<DelegationWithPagination> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
+                                                                          @PathVariable("institutionId") String institutionId,
+                                                                          @ApiParam("${swagger.dashboard.delegation.model.productId}")
+                                                                          @RequestParam(name = "productId", required = false) String productId,
+                                                                          @ApiParam("${swagger.dashboard.delegation.model.description}")
+                                                                          @RequestParam(name = "search", required = false) String search,
+                                                                          @ApiParam("${swagger.dashboard.delegation.model.taxCode}")
+                                                                          @RequestParam(name = "taxCode", required = false) String taxCode,
+                                                                          @ApiParam("${swagger.dashboard.delegation.delegations.mode}")
+                                                                          @RequestParam(name = "mode", required = false) GetDelegationsMode mode,
+                                                                          @ApiParam("${swagger.dashboard.delegation.delegations.order}")
+                                                                          @RequestParam(name = "order", required = false) Order order,
+                                                                          @RequestParam(name = "page", required = false) @Min(0) Integer page,
+                                                                          @RequestParam(name = "size", required = false) @Min(1) Integer size) {
+        log.trace("getDelegationsUsingToV2 start");
+        log.debug("getDelegationsUsingToV2 institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(productId));
+
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .to(institutionId)
+                .productId(productId)
+                .search(search)
+                .taxCode(taxCode)
+                .mode(Objects.nonNull(mode) ? mode.name() : null)
+                .order(Objects.nonNull(order) ? order.name() : null)
+                .page(page)
+                .size(size)
+                .build();
+
+        ResponseEntity<DelegationWithPagination> result = ResponseEntity.status(HttpStatus.OK).body(delegationService.getDelegationsV2(delegationParameters));
+        log.debug("getDelegationsUsingToV2 result = {}", result);
+        log.trace("getDelegationsUsingToV2 end");
+        return result;
+
     }
 }

@@ -7,10 +7,9 @@ import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.auth.AuthInfo;
 import it.pagopa.selfcare.dashboard.connector.model.auth.ProductRole;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationRequest;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.PageInfo;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -135,6 +134,34 @@ class CoreConnectorImpl implements MsCoreConnector {
         log.debug("getDelegations result = {}", delegations);
         log.trace("getDelegations end");
         return delegations;
+    }
+
+    @Override
+    public DelegationWithPagination getDelegationsV2(GetDelegationParameters delegationParameters) {
+        log.trace("getDelegationsV2 start");
+        log.debug("getDelegationsV2 productId = {}, type = {}", delegationParameters.getFrom(), delegationParameters.getProductId());
+        DelegationWithPaginationResponse delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET1(
+                        delegationParameters.getFrom(),
+                        delegationParameters.getTo(),
+                        delegationParameters.getProductId(),
+                        delegationParameters.getSearch(),
+                        delegationParameters.getTaxCode(),
+                        delegationParameters.getMode(),
+                        delegationParameters.getOrder(),
+                        delegationParameters.getPage(),
+                        delegationParameters.getSize())
+                .getBody();
+
+        assert delegationsResponse != null;
+
+        List<DelegationWithInfo> delegations = delegationsResponse.getDelegations().stream()
+                .map(delegationMapper::toDelegationsWithInfo)
+                .toList();
+        PageInfo pageInfo = delegationMapper.toPageInfo(delegationsResponse.getPageInfo());
+        DelegationWithPagination delegationWithPagination = new DelegationWithPagination(delegations, pageInfo);
+        log.debug("getDelegationsV2 result = {}", delegations);
+        log.trace("getDelegationsV2 end");
+        return delegationWithPagination;
     }
 
     @Override

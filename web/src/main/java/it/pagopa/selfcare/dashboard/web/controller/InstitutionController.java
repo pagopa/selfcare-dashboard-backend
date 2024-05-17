@@ -47,7 +47,6 @@ public class InstitutionController {
     private final InstitutionService institutionService;
     private final InstitutionResourceMapper institutionResourceMapper;
     private final DelegationService delegationService;
-
     private final DelegationMapper delegationMapper;
 
 
