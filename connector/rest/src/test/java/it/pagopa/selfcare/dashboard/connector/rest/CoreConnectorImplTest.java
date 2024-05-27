@@ -216,7 +216,7 @@ class CoreConnectorImplTest {
         ResponseEntity<List<DelegationResponse>> delegationResponseEntity = new ResponseEntity<>(delegationResponseList, null, HttpStatus.OK);
         GetDelegationParameters parameters = dummyDelegationParameters();
 
-        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
@@ -235,7 +235,7 @@ class CoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getBrokerName(), delegationList.get(0).getBrokerName());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
+                ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -247,7 +247,7 @@ class CoreConnectorImplTest {
 
         when(delegationResponseEntity.getBody()).thenReturn(null);
 
-        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(coreDelegationApiRestClient._getDelegationsUsingGET(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
@@ -258,7 +258,7 @@ class CoreConnectorImplTest {
         assertEquals(0, delegationList.size());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
+                ._getDelegationsUsingGET(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -273,7 +273,7 @@ class CoreConnectorImplTest {
         ResponseEntity<DelegationWithPaginationResponse> delegationResponseEntity = new ResponseEntity<>(delegationWithPaginationResponse, null, HttpStatus.OK);
         GetDelegationParameters parameters = dummyDelegationParameters();
 
-        when(coreDelegationApiRestClient._getDelegationsUsingGET1(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        when(coreDelegationApiRestClient._getDelegationsUsingGET1(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(delegationResponseEntity);
 
 
@@ -292,7 +292,7 @@ class CoreConnectorImplTest {
         assertEquals(delegationResponseList.get(0).getBrokerName(), response.getDelegations().get(0).getBrokerName());
 
         verify(coreDelegationApiRestClient, times(1))
-                ._getDelegationsUsingGET1(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getMode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
+                ._getDelegationsUsingGET1(parameters.getFrom(), parameters.getTo(), parameters.getProductId(), parameters.getSearch(), parameters.getTaxCode(), parameters.getOrder(), parameters.getPage(), parameters.getSize());
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
 
@@ -519,7 +519,6 @@ class CoreConnectorImplTest {
                 .productId("setProductId")
                 .taxCode("taxCode")
                 .search("name")
-                .mode(GetDelegationsMode.FULL.name())
                 .order(Order.ASC.name())
                 .page(0)
                 .size(1000)

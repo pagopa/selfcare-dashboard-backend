@@ -498,25 +498,6 @@
             "type" : "string"
           }
         }, {
-          "name" : "taxCode",
-          "in" : "query",
-          "description" : "Institution's tax code",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "mode",
-          "in" : "query",
-          "description" : "Mode (full or normal) to retrieve institution's delegations",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "FULL", "NORMAL" ]
-          }
-        }, {
           "name" : "order",
           "in" : "query",
           "description" : "Order to show response NONE, ASC, DESC",
@@ -989,25 +970,6 @@
           "style" : "form",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "taxCode",
-          "in" : "query",
-          "description" : "Institution's tax code",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "mode",
-          "in" : "query",
-          "description" : "Mode (full or normal) to retrieve institution's delegations",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "FULL", "NORMAL" ]
           }
         }, {
           "name" : "order",

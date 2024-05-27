@@ -2,7 +2,10 @@ package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -311,7 +314,7 @@ class InstitutionControllerTest {
     }
 
     /**
-     * Method under test: {@link InstitutionController#getDelegationsUsingTo(String, String, String, String, GetDelegationsMode, Order, Integer, Integer)}
+     * Method under test: {@link InstitutionController#getDelegationsUsingTo(String, String, String, Order, Integer, Integer)}
      */
     @Test
     void getDelegationsUsingTo_shouldGetData() throws Exception {
@@ -402,9 +405,7 @@ class InstitutionControllerTest {
         return GetDelegationParameters.builder()
                 .to("to")
                 .productId("setProductId")
-                .taxCode("taxCode")
                 .search("name")
-                .mode(GetDelegationsMode.FULL.name())
                 .order(Order.ASC.name())
                 .page(0)
                 .size(1000)

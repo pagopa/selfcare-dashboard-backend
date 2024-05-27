@@ -11,7 +11,6 @@ public class GetDelegationParameters {
     private String productId;
     private String search;
     private String taxCode;
-    private String mode;
     private String order;
     private Integer page;
     private Integer size;

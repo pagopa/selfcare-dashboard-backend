@@ -119,7 +119,6 @@ class CoreConnectorImpl implements MsCoreConnector {
                 delegationParameters.getProductId(),
                 delegationParameters.getSearch(),
                 delegationParameters.getTaxCode(),
-                delegationParameters.getMode(),
                 delegationParameters.getOrder(),
                 delegationParameters.getPage(),
                 delegationParameters.getSize())
@@ -146,7 +145,6 @@ class CoreConnectorImpl implements MsCoreConnector {
                         delegationParameters.getProductId(),
                         delegationParameters.getSearch(),
                         delegationParameters.getTaxCode(),
-                        delegationParameters.getMode(),
                         delegationParameters.getOrder(),
                         delegationParameters.getPage(),
                         delegationParameters.getSize())
