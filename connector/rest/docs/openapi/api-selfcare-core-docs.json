@@ -90,16 +90,6 @@
             "type" : "string"
           }
         }, {
-          "name" : "mode",
-          "in" : "query",
-          "description" : "Mode (full or normal) to retreieve institution's delegations",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "FULL", "NORMAL" ]
-          }
-        }, {
           "name" : "order",
           "in" : "query",
           "description" : "Order to show response NONE, ASC, DESC",
@@ -398,16 +388,6 @@
           "style" : "form",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "mode",
-          "in" : "query",
-          "description" : "Mode (full or normal) to retreieve institution's delegations",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "FULL", "NORMAL" ]
           }
         }, {
           "name" : "order",
@@ -2552,6 +2532,9 @@
           "recipientCode" : {
             "type" : "string"
           },
+          "taxCodeInvoicing" : {
+            "type" : "string"
+          },
           "vatNumber" : {
             "type" : "string"
           }
@@ -2567,6 +2550,9 @@
           "recipientCode" : {
             "type" : "string"
           },
+          "taxCodeInvoicing" : {
+            "type" : "string"
+          },
           "vatNumber" : {
             "type" : "string"
           }
@@ -2580,6 +2566,9 @@
             "type" : "boolean"
           },
           "recipientCode" : {
+            "type" : "string"
+          },
+          "taxCodeInvoicing" : {
             "type" : "string"
           },
           "vatNumber" : {
@@ -3449,9 +3438,6 @@
             "type" : "string"
           },
           "taxCode" : {
-            "type" : "string"
-          },
-          "taxCodeSfe" : {
             "type" : "string"
           },
           "updatedAt" : {

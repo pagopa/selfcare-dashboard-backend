@@ -326,7 +326,7 @@ class InstitutionV2ControllerTest {
         // Given
         DelegationWithInfo expectedDelegation = dummyDelegation();
         PageInfo exptectedPageInfo = new PageInfo(10, 0, 1, 1);
-        GetDelegationParameters delegationParameters = createDelegationParameters(null, "to", "prod-id", "taxCode", "search", GetDelegationsMode.FULL, Order.ASC, 0, 10);
+        GetDelegationParameters delegationParameters = createDelegationParameters(null, "to", "prod-id", "search", Order.ASC, 0, 10);
         DelegationWithPagination expectedDelegationWithPagination = new DelegationWithPagination(List.of(expectedDelegation), exptectedPageInfo);
 
         when(delegationServiceMock.getDelegationsV2(any())).thenReturn(expectedDelegationWithPagination);
@@ -384,15 +384,13 @@ class InstitutionV2ControllerTest {
     }
 
     private GetDelegationParameters createDelegationParameters(String from, String to, String productId,
-                                                               String search, String taxCode, GetDelegationsMode mode,
-                                                               Order order, Integer page, Integer size) {
+                                                               String search, Order order,
+                                                               Integer page, Integer size) {
         return GetDelegationParameters.builder()
                 .from(from)
                 .to(to)
                 .productId(productId)
                 .search(search)
-                .taxCode(taxCode)
-                .mode(mode.name())
                 .order(order.name())
                 .page(page)
                 .size(size)

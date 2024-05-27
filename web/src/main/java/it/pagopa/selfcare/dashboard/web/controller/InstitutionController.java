@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
-import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationsMode;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -219,10 +218,6 @@ public class InstitutionController {
                                                                    @RequestParam(name = "productId", required = false) String productId,
                                                                    @ApiParam("${swagger.dashboard.delegation.model.description}")
                                                                    @RequestParam(name = "search", required = false) String search,
-                                                                   @ApiParam("${swagger.dashboard.delegation.model.taxCode}")
-                                                                   @RequestParam(name = "taxCode", required = false) String taxCode,
-                                                                   @ApiParam("${swagger.dashboard.delegation.delegations.mode}")
-                                                                   @RequestParam(name = "mode", required = false) GetDelegationsMode mode,
                                                                    @ApiParam("${swagger.dashboard.delegation.delegations.order}")
                                                                    @RequestParam(name = "order", required = false) Order order,
                                                                    @RequestParam(name = "page", required = false) Integer page,
@@ -234,8 +229,6 @@ public class InstitutionController {
                 .to(institutionId)
                 .productId(productId)
                 .search(search)
-                .taxCode(taxCode)
-                .mode(Objects.nonNull(mode) ? mode.name() : null)
                 .order(Objects.nonNull(order) ? order.name() : null)
                 .page(page)
                 .size(size)
