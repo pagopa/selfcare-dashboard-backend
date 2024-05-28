@@ -233,7 +233,7 @@ class UserConnectorImplTest {
         String institutionId = "institutionId";
         String permission = "ADMIN";
         String productId = "productId";
-        when(userPermissionRestClient._authorizeInstitutionIdGet(institutionId, PermissionTypeEnum.ADMIN, productId)).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
+        when(userPermissionRestClient._authorizeGet(PermissionTypeEnum.ADMIN, institutionId, productId)).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(institutionId, permission, productId);
         //then
@@ -247,7 +247,7 @@ class UserConnectorImplTest {
         String institutionId = "institutionId";
         String permission = "ADMIN";
         String productId = "productId";
-        when(userPermissionRestClient._authorizeInstitutionIdGet(institutionId, PermissionTypeEnum.ADMIN, productId)).thenReturn(new ResponseEntity<>(false, HttpStatus.OK));
+        when(userPermissionRestClient._authorizeGet(PermissionTypeEnum.ADMIN, institutionId, productId)).thenReturn(new ResponseEntity<>(false, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(institutionId, permission, productId);
         //then

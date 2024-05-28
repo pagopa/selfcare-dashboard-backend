@@ -90,7 +90,7 @@ public class UserConnectorImpl implements UserApiConnector {
         log.debug("permissionInstitutionIdPermissionGet institutionId = {}, permission = {}, productId = {}", institutionId, permission, productId);
 
         PermissionTypeEnum permissionTypeEnum = PermissionTypeEnum.fromValue(permission);
-        Boolean result = userPermissionRestClient._authorizeInstitutionIdGet(institutionId, permissionTypeEnum, productId).getBody();
+        Boolean result = userPermissionRestClient._authorizeGet(permissionTypeEnum, institutionId, productId).getBody();
 
         log.debug("permissionInstitutionIdPermissionGet result = {}", result);
         log.trace("permissionInstitutionIdPermissionGet end");

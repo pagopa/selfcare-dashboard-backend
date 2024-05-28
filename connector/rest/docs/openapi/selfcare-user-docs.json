@@ -1,7 +1,7 @@
 {
   "openapi" : "3.0.3",
   "info" : {
-    "title" : "user-ms API",
+    "title" : "User API",
     "version" : "1.0.0"
   },
   "servers" : [ {
@@ -12,16 +12,14 @@
     "description" : "Auto generated value"
   } ],
   "paths" : {
-    "/authorize/{institutionId}" : {
+    "/authorize" : {
       "get" : {
         "tags" : [ "User Permission Controller" ],
         "summary" : "Get permission for a user in an institution",
         "parameters" : [ {
           "name" : "institutionId",
-          "in" : "path",
-          "required" : true,
+          "in" : "query",
           "schema" : {
-            "minLength" : 1,
             "type" : "string"
           }
         }, {
@@ -660,10 +658,9 @@
           "schema" : {
             "type" : "string"
           }
-        },{
+        }, {
           "name" : "productRole",
           "in" : "query",
-          "required" : false,
           "schema" : {
             "type" : "string"
           }
@@ -1136,7 +1133,7 @@
         "type" : "string"
       },
       "Product" : {
-        "required" : [ "productId", "role" ],
+        "required" : [ "productId", "role", "productRoles" ],
         "type" : "object",
         "properties" : {
           "productId" : {
@@ -1158,7 +1155,7 @@
         }
       },
       "Product1" : {
-        "required" : [ "productId", "role" ],
+        "required" : [ "productId", "role", "productRoles" ],
         "type" : "object",
         "properties" : {
           "productId" : {
@@ -1193,6 +1190,7 @@
         }
       },
       "UpdateUserRequest" : {
+        "required" : [ "email" ],
         "type" : "object",
         "properties" : {
           "name" : {
