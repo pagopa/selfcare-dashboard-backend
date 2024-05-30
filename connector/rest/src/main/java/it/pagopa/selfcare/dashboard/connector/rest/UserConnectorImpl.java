@@ -180,6 +180,20 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    public List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
+
+        return Optional.ofNullable(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId,
+                                null,
+                                List.of(userInfoFilter.getProductId()),
+                                null,
+                                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(),
+                                loggedUserId)
+                        .getBody()).map(userInstitutionResponses -> userInstitutionResponses.stream()
+                        .map(UserInstitutionResponse::getUserId).toList())
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
     @Retry(name = "retryTimeout")
     public List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId) {
         log.trace("retrieveFilteredUser start");

@@ -113,8 +113,7 @@ class UserConnectorImplTest {
         institutionProducts3.setRole(PartyRole.MANAGER);
 
 
-
-        userProductsResponse.setInstitutions(List.of(institutionProducts, institutionProducts2,institutionProducts4, institutionProducts3));
+        userProductsResponse.setInstitutions(List.of(institutionProducts, institutionProducts2, institutionProducts4, institutionProducts3));
         return userProductsResponse;
     }
 
@@ -183,6 +182,7 @@ class UserConnectorImplTest {
         assertNotNull(user);
         verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, fields.get(0), institutionId);
     }
+
     @Test
     void verifyUserExist_UserExists() {
         String userId = "userId";
@@ -190,8 +190,8 @@ class UserConnectorImplTest {
         String productId = "productId";
         when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId))).thenReturn(ResponseEntity.ok(List.of(new UserInstitutionResponse())));
 
-       List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
-       assertEquals(1, response.size());
+        List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
+        assertEquals(1, response.size());
 
         verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
     }
@@ -265,7 +265,7 @@ class UserConnectorImplTest {
         userConnector.updateUser(userId, institutionId, user);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdUserRegistryPut(userId, institutionId,new UpdateUserRequest());
+                ._usersIdUserRegistryPut(userId, institutionId, new UpdateUserRequest());
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -279,7 +279,7 @@ class UserConnectorImplTest {
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         userInfoFilter.setRole(SelfCareAuthority.ADMIN);
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED"))))
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null), eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED"))))
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         // when
@@ -287,7 +287,7 @@ class UserConnectorImplTest {
 
         // then
         assertTrue(result.isEmpty());
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId),  eq(loggedUserId), eq(null), eq(null), eq(null),eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED")));
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null), eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED")));
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -385,7 +385,7 @@ class UserConnectorImplTest {
         institution.setDescription("description");
         institution.setRootParent(response);
         // Act
-        userConnector.createOrUpdateUserByFiscalCode(institution,  "productId",  userDto, List.of(role, role2));
+        userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role, role2));
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersPost(Mockito.any());
@@ -417,6 +417,45 @@ class UserConnectorImplTest {
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersUserIdPost(eq("userId"), any());
+    }
+
+    @Test
+    public void retrieveFilteredUserInstitutionReturnsUserInstitutions() {
+        // Given
+        String institutionId = "institutionId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
+        userInfoFilter.setProductId("productId");
+        String loggedUserId = "loggedUserId";
+        List<UserInstitutionResponse> userInstitutionResponses = List.of(new UserInstitutionResponse(), new UserInstitutionResponse());
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
+                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), loggedUserId))
+                .thenReturn(ResponseEntity.ok(userInstitutionResponses));
+
+        // When
+        List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter, loggedUserId);
+
+        // Then
+        assertEquals(userInstitutionResponses.size(), result.size());
+    }
+
+    @Test
+    public void retrieveFilteredUserInstitutionReturnsEmptyListWhenNoUserInstitutions() {
+        // Given
+        String institutionId = "institutionId";
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId("productId");
+        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
+        String loggedUserId = "loggedUserId";
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
+                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), loggedUserId))
+                .thenReturn(ResponseEntity.ok(List.of()));
+
+        // When
+        List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter, loggedUserId);
+
+        // Then
+        assertEquals(0, result.size());
     }
 
 }
