@@ -180,7 +180,7 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
-    public List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
+    public List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
 
         return Optional.ofNullable(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId,
                                 null,
@@ -189,7 +189,7 @@ public class UserConnectorImpl implements UserApiConnector {
                                 Optional.ofNullable(userInfoFilter.getAllowedStates())
                                         .map(relationshipStates -> relationshipStates.stream().map(Enum::name).toList())
                                         .orElse(null),
-                                loggedUserId)
+                                null)
                         .getBody()).map(userInstitutionResponses -> userInstitutionResponses.stream()
                         .map(UserInstitutionResponse::getUserId).toList())
                 .orElse(Collections.emptyList());
