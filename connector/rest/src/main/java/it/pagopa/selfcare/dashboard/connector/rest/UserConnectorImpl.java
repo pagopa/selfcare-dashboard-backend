@@ -186,7 +186,9 @@ public class UserConnectorImpl implements UserApiConnector {
                                 null,
                                 List.of(userInfoFilter.getProductId()),
                                 null,
-                                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(),
+                                Optional.ofNullable(userInfoFilter.getAllowedStates())
+                                        .map(relationshipStates -> relationshipStates.stream().map(Enum::name).toList())
+                                        .orElse(null),
                                 loggedUserId)
                         .getBody()).map(userInstitutionResponses -> userInstitutionResponses.stream()
                         .map(UserInstitutionResponse::getUserId).toList())
