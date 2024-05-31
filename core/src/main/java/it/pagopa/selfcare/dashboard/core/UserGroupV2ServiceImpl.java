@@ -51,7 +51,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
         userInfoFilter.setProductId(group.getProductId());
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
-        List<String> retrievedId = retrievedIds(group.getInstitutionId(), userInfoFilter);
+        List<String> retrievedId = retrieveIds(group.getInstitutionId(), userInfoFilter);
 
         if (group.getMembers().stream()
                 .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
@@ -82,12 +82,10 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
         log.trace("activate end");
     }
 
-    private List<String> retrievedIds(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
+    private List<String> retrieveIds(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         List<String> retrievedUsers = userApiConnector.retrieveFilteredUserInstitution(
                 institutionId,
-                userInfoFilter, loggedUserId);
+                userInfoFilter);
         return retrievedUsers.stream()
                 .sorted()
                 .toList();
@@ -112,7 +110,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
         userInfoFilter.setProductId(userGroupInfo.getProductId());
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
 
-        List<String> retrievedId = retrievedIds(userGroupInfo.getInstitutionId(), userInfoFilter);
+        List<String> retrievedId = retrieveIds(userGroupInfo.getInstitutionId(), userInfoFilter);
 
         if (group.getMembers().stream()
                 .filter(uuid -> Collections.binarySearch(retrievedId, uuid) >= 0)
@@ -133,7 +131,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(retrievedGroup.getProductId());
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
-        List<String> retrievedIds = retrievedIds(retrievedGroup.getInstitutionId(), userInfoFilter);
+        List<String> retrievedIds = retrieveIds(retrievedGroup.getInstitutionId(), userInfoFilter);
         if (!retrievedIds.contains(userId.toString())) {
             throw new InvalidMemberListException("This user is not allowed for this group");
         }
@@ -166,7 +164,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(userGroupInfo.getProductId());
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
-        List<UserInfo> userInfos = retrievedIds(userGroupInfo.getInstitutionId(), userInfoFilter).stream()
+        List<UserInfo> userInfos = retrieveIds(userGroupInfo.getInstitutionId(), userInfoFilter).stream()
                 .map(id -> {
                     UserInfo userInfo = new UserInfo();
                     userInfo.setId(id);
