@@ -33,7 +33,7 @@ public interface UserApiConnector {
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId);
 
-    List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId);
+    List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 
     List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId);
 

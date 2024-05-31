@@ -426,14 +426,13 @@ class UserConnectorImplTest {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         userInfoFilter.setProductId("productId");
-        String loggedUserId = "loggedUserId";
         List<UserInstitutionResponse> userInstitutionResponses = List.of(new UserInstitutionResponse(), new UserInstitutionResponse());
         when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
-                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), loggedUserId))
+                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), null))
                 .thenReturn(ResponseEntity.ok(userInstitutionResponses));
 
         // When
-        List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter, loggedUserId);
+        List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter);
 
         // Then
         assertEquals(userInstitutionResponses.size(), result.size());
@@ -446,13 +445,12 @@ class UserConnectorImplTest {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId("productId");
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
-        String loggedUserId = "loggedUserId";
         when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
-                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), loggedUserId))
+                userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), null))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
         // When
-        List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter, loggedUserId);
+        List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter);
 
         // Then
         assertEquals(0, result.size());
