@@ -56,7 +56,7 @@ class UserGroupV2ServiceImplTest {
     @Test
     void createGroup() {
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("loggedUserId").build());
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("setId").build());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //given
         CreateUserGroup userGroup = mockInstance(new CreateUserGroup());
@@ -79,9 +79,8 @@ class UserGroupV2ServiceImplTest {
         when(userGroupConnector.createUserGroup(any()))
                 .thenReturn(groupIdMock);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
-        //when
+        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any(), any()))
+                .thenReturn(List.of(id1, id2, id3, id4));   //when
         String groupId = userV2GroupServiceImpl.createUserGroup(userGroup);
         //then
         assertEquals(groupIdMock, groupId);
@@ -89,7 +88,7 @@ class UserGroupV2ServiceImplTest {
                 .createUserGroup(any());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(userGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), filterCaptor.capture(), eq("setId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -122,16 +121,15 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
-        //when
+        when(userApiConnector.retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), any(), eq("loggedUserId")))
+                .thenReturn(List.of("setId", "setId", "setId", "setId"));   //when
         Executable executable = () -> userV2GroupServiceImpl.createUserGroup(userGroup);
         //then
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(userGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -229,24 +227,23 @@ class UserGroupV2ServiceImplTest {
         List<String> userIds = List.of(id1, id2, id3, id4);
         userGroup.setMembers(userIds);
 
-        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "loggedUserId");
         foundGroup.setId(groupId);
         when(userGroupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
+        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "loggedUserId");
+        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "loggedUserId");
+        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "loggedUserId");
+        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "loggedUserId");
 
         userInfoMock1.setId(id1);
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
-        //when
+        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any(), any()))
+                .thenReturn(List.of(id1, id2, id3, id4)); //when
         Executable executable = () -> userV2GroupServiceImpl.updateUserGroup(groupId, userGroup);
         //then
         assertDoesNotThrow(executable);
@@ -255,7 +252,7 @@ class UserGroupV2ServiceImplTest {
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(foundGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -297,9 +294,8 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
-        //when
+        when(userApiConnector.retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), any(), eq("loggedUserId")))
+                .thenReturn(List.of("setId", "setId", "setId", "setId"));   //when
         Executable executable = () -> userV2GroupServiceImpl.updateUserGroup(groupId, userGroup);
         //then
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
@@ -307,7 +303,7 @@ class UserGroupV2ServiceImplTest {
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(foundGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), filterCaptor.capture(), eq("loggedUserId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -346,8 +342,10 @@ class UserGroupV2ServiceImplTest {
 
     @Test
     void addMemberToUserGroup() {
+        UUID userId = randomUUID();
+
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("loggedUserId").build());
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId.toString()).build());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //given
         String groupId = "groupId";
@@ -355,7 +353,6 @@ class UserGroupV2ServiceImplTest {
         String productId = "productId";
         UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
         foundGroup.setId(groupId);
-        UUID userId = randomUUID();
         String id2 = randomUUID().toString();
         String id3 = randomUUID().toString();
         String id4 = randomUUID().toString();
@@ -369,8 +366,6 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
         foundGroup.setMembers(List.of(userInfoMock2, userInfoMock3, userInfoMock4));
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
@@ -380,9 +375,8 @@ class UserGroupV2ServiceImplTest {
         when(userGroupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(members);
-        //when
+        when(userApiConnector.retrieveFilteredUserInstitution(eq(institutionId), any(), eq(userId.toString())))
+                .thenReturn(List.of(userId.toString(), "setId", "setId", "setId"));  //when
         Executable executable = () -> userV2GroupServiceImpl.addMemberToUserGroup(groupId, userId);
         //then
         assertDoesNotThrow(executable);
@@ -392,7 +386,7 @@ class UserGroupV2ServiceImplTest {
                 .getUserGroupById(groupId);
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(institutionId), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture(), eq(userId.toString()));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -429,8 +423,6 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
         foundGroup.setMembers(List.of(userInfoMock2, userInfoMock3, userInfoMock4));
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
@@ -440,9 +432,9 @@ class UserGroupV2ServiceImplTest {
         when(userGroupConnector.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(members);
-        //when
+        when(userApiConnector.retrieveFilteredUserInstitution(eq(institutionId),  any(), eq("loggedUserId")))
+                .thenReturn(List.of("setId", "setId", "setId", "setId"));
+
         Executable executable = () -> userV2GroupServiceImpl.addMemberToUserGroup(groupId, userId);
         //then
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
@@ -451,7 +443,7 @@ class UserGroupV2ServiceImplTest {
                 .getUserGroupById(groupId);
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(institutionId), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture(), eq("loggedUserId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -551,7 +543,7 @@ class UserGroupV2ServiceImplTest {
     @Test
     void getUserGroupById() {
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("loggedUserId").build());
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("setId").build());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //given
         String groupId = "groupId";
@@ -574,10 +566,8 @@ class UserGroupV2ServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
-
-        foundGroup.setMembers(members);
+        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any(), any()))
+                .thenReturn(List.of("setId", "setId", "setId", "setId")); foundGroup.setMembers(members);
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId);
@@ -625,12 +615,12 @@ class UserGroupV2ServiceImplTest {
         assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
         verify(userGroupConnector, times(1))
                 .getUserGroupById(anyString());
-        verify(userApiConnector, times(6))
+        verify(userApiConnector, times(2))
                 .getUserById(any(), any(),anyList());
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(institutionId), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture(), eq("setId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());
@@ -666,8 +656,8 @@ class UserGroupV2ServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        when(userApiConnector.getUsers(anyString(), any(), any()))
-                .thenReturn(List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4));
+        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any(), any()))
+                .thenReturn(List.of("setId", "setId", "setId", "setId"));
 
         foundGroup.setMembers(members);
         foundGroup.setCreatedAt(Instant.now());
@@ -737,8 +727,8 @@ class UserGroupV2ServiceImplTest {
 
         List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
 
-        when(userApiConnector.getUsers(any(), any(), any()))
-                .thenReturn(List.of(userInfoMock4));
+        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any(), any()))
+                .thenReturn(List.of(id1, id2, id3, id4));
         when(userApiConnector.getUserById(anyString(), any(), any()))
                 .thenAnswer(invocation -> {
                     User userMock = new User();
@@ -779,7 +769,7 @@ class UserGroupV2ServiceImplTest {
         assertEquals(foundGroup.getStatus(), groupInfo.getStatus());
         assertEquals(foundGroup.getDescription(), groupInfo.getDescription());
         assertEquals(foundGroup.getName(), groupInfo.getName());
-        assertEquals(1, groupInfo.getMembers().size());
+        assertEquals(4, groupInfo.getMembers().size());
         assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
         assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
         assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
@@ -789,7 +779,7 @@ class UserGroupV2ServiceImplTest {
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
         verify(userApiConnector, times(1))
-                .getUsers(eq(institutionId), filterCaptor.capture(), eq("loggedUserId"));
+                .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture(), eq("loggedUserId"));
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
         assertNull(capturedFilter.getProductRoles());

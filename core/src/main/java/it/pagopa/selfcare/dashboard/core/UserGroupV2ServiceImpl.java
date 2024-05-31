@@ -85,11 +85,10 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
     private List<String> retrievedIds(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        Collection<UserInfo> retrievedUsers = userApiConnector.getUsers(
+        List<String> retrievedUsers = userApiConnector.retrieveFilteredUserInstitution(
                 institutionId,
                 userInfoFilter, loggedUserId);
         return retrievedUsers.stream()
-                .map(UserInfo::getId)
                 .sorted()
                 .toList();
     }
