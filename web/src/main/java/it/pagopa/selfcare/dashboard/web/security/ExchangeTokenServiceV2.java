@@ -54,7 +54,7 @@ public class ExchangeTokenServiceV2 {
 
     private static final String PRIVATE_KEY_HEADER_TEMPLATE = "-----BEGIN %s-----";
     private static final String PRIVATE_KEY_FOOTER_TEMPLATE = "-----END %s-----";
-
+    private static final String ID = "ID";
     private final String billingUrl;
     private final String billingAudience;
     private final PrivateKey jwtSigningKey;
@@ -204,6 +204,8 @@ public class ExchangeTokenServiceV2 {
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
+        claims.setSubject(UUID.fromString(userId).toString());
+        claims.setType(ID);
 
         return claims;
     }
@@ -336,6 +338,7 @@ public class ExchangeTokenServiceV2 {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
         public static final String EMAIL = "email";
+        public static final String TYPE = "typ";
 
         public TokenExchangeClaims(Map<String, Object> map) {
             super(map);
@@ -353,6 +356,11 @@ public class ExchangeTokenServiceV2 {
 
         public Claims setEmail(String email) {
             setValue(EMAIL, email);
+            return this;
+        }
+
+        public Claims setType(String type) {
+            setValue(TYPE, type);
             return this;
         }
 

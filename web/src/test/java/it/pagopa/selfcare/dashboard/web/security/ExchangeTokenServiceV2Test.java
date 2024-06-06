@@ -444,7 +444,7 @@ class ExchangeTokenServiceV2Test {
         TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
         assertNotEquals(jti, exchangedClaims.getId());
         assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
-        assertEquals(sub, exchangedClaims.getSubject());
+        assertEquals(userId.toString(), exchangedClaims.getSubject());
         assertEquals(issuer, exchangedClaims.getIssuer());
         assertEquals(realm, exchangedClaims.getAudience());
         // https://github.com/jwtk/jjwt/issues/122:
@@ -601,7 +601,7 @@ class ExchangeTokenServiceV2Test {
         TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
         assertNotEquals(jti, exchangedClaims.getId());
         assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
-        assertEquals(sub, exchangedClaims.getSubject());
+        assertEquals(userId.toString(), exchangedClaims.getSubject());
         assertEquals(issuer, exchangedClaims.getIssuer());
         assertEquals(realm, exchangedClaims.getAudience());
         // https://github.com/jwtk/jjwt/issues/122:
@@ -857,7 +857,7 @@ class ExchangeTokenServiceV2Test {
         TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
         assertNotEquals(jti, exchangedClaims.getId());
         assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
-        assertEquals(sub, exchangedClaims.getSubject());
+        assertEquals(userId.toString(), exchangedClaims.getSubject());
         assertEquals(issuer, exchangedClaims.getIssuer());
         // https://github.com/jwtk/jjwt/issues/122:
         // The JWT RFC *mandates* NumericDate values are represented as seconds.
@@ -888,7 +888,6 @@ class ExchangeTokenServiceV2Test {
     void billingExchange_ok(PrivateKey privateKey) throws Exception {
         // given
         String jti = "id";
-        String sub = "subject";
         Date iat = Date.from(Instant.now().minusSeconds(1));
         Date exp = Date.from(iat.toInstant().plusSeconds(5));
         String institutionId = "institutionId";
@@ -904,7 +903,6 @@ class ExchangeTokenServiceV2Test {
         when(jwtServiceMock.getClaims(any()))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
-                        .setSubject(sub)
                         .setIssuedAt(iat)
                         .setExpiration(exp));
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
@@ -982,7 +980,7 @@ class ExchangeTokenServiceV2Test {
         TestTokenExchangeClaims exchangedClaims = new TestTokenExchangeClaims(claimsJws.getBody());
         assertNotEquals(jti, exchangedClaims.getId());
         assertNotEquals(0, exp.compareTo(exchangedClaims.getExpiration()));
-        assertEquals(sub, exchangedClaims.getSubject());
+        assertEquals(userId.toString(), exchangedClaims.getSubject());
         assertEquals(issuer, exchangedClaims.getIssuer());
         // https://github.com/jwtk/jjwt/issues/122:
         // The JWT RFC *mandates* NumericDate values are represented as seconds.
