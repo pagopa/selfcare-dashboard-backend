@@ -1,8 +1,6 @@
 name: Swagger Detect Conflict and Update
 on:
   pull_request:
-    branches:
-      - main
     types: [ opened, synchronize, reopened ]
     
 permissions:
@@ -12,11 +10,10 @@ jobs:
   swagger_conflict_update:  
     runs-on: ubuntu-20.04
     permissions: write-all
-    secrets: inherit
-    name: Swagger Detect Conflict and Update
+    name: Swagger Detect Rules and Conflict
     steps:
-      - id: swagger-conflict-update
+      - id: swagger-detect
         uses: pagopa/selfcare-commons/github-actions-template/swagger-detect-conflict-spring@main
         with:
           path_openapi_docs: app/src/main/resources/swagger/api-docs.json
-          branch_ref: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
