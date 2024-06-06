@@ -1,4 +1,4 @@
-name: Swagger Detect Conflict and Update
+name: Swagger Detect Rules and Conflict
 on:
   pull_request:
     types: [ opened, synchronize, reopened ]
