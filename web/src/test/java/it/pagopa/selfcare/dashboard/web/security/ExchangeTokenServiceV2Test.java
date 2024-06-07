@@ -283,10 +283,6 @@ class ExchangeTokenServiceV2Test {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
-        String jti = "id";
-        String sub = "subject";
-        Date iat = Date.from(Instant.now().minusSeconds(1));
-        Date exp = Date.from(iat.toInstant().plusSeconds(5));
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
@@ -591,7 +587,6 @@ class ExchangeTokenServiceV2Test {
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty());
         // then
         assertEquals(product.getUrlBO(), exchangedToken.getBackOfficeUrl());
-        assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(loadPublicKey())
                 .parseClaimsJws(exchangedToken.getIdentityToken());
@@ -604,9 +599,6 @@ class ExchangeTokenServiceV2Test {
         assertEquals(userId.toString(), exchangedClaims.getSubject());
         assertEquals(issuer, exchangedClaims.getIssuer());
         assertEquals(realm, exchangedClaims.getAudience());
-        // https://github.com/jwtk/jjwt/issues/122:
-        // The JWT RFC *mandates* NumericDate values are represented as seconds.
-        // Because java.util.Date requires milliseconds, we need to multiply by 1000:
         assertEquals(exp.toInstant().getEpochSecond(), exchangedClaims.getDesiredExpiration().toInstant().getEpochSecond());
         assertTrue(exchangedClaims.getIssuedAt().after(iat));
         assertTrue(exchangedClaims.getExpiration().after(exp));
