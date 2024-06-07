@@ -1544,6 +1544,15 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "lang",
+          "in" : "query",
+          "description" : "Selected language",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -1864,6 +1873,15 @@
           "name" : "environment",
           "in" : "query",
           "description" : "Back Office environment",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "lang",
+          "in" : "query",
+          "description" : "Selected language",
           "required" : false,
           "style" : "form",
           "schema" : {
@@ -4100,7 +4118,7 @@
           "partyRole" : {
             "type" : "string",
             "description" : "Party role",
-            "enum" : [ "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
+            "enum" : [ "ADMIN_EA", "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
           },
           "productRoles" : {
             "type" : "array",

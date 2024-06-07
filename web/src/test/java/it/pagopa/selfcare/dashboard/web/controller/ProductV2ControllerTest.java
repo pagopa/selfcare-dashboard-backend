@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.net.URI;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,14 +46,16 @@ class ProductV2ControllerTest {
         // given
         String productId = "prod1";
         String institutionId = "inst1";
+        String lang = "en";
         final String identityToken = "identityToken";
         final String backOfficeUrl = "back-office-url#token=";
-        when(exchangeTokenServiceMock.exchange(any(), any(), any()))
+        when(exchangeTokenServiceMock.exchange(any(), any(), any(), anyString()))
                 .thenReturn(new ExchangedToken(identityToken, backOfficeUrl + "<IdentityToken>"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{productId}/back-office", productId)
                 .queryParam("institutionId", institutionId)
+                .queryParam("lang", lang)
                 .contentType(APPLICATION_JSON_VALUE)
                 .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -64,7 +66,7 @@ class ProductV2ControllerTest {
         assertTrue(response.toString().contains(backOfficeUrl));
 
         verify(exchangeTokenServiceMock, times(1))
-                .exchange(institutionId, productId, Optional.empty());
+                .exchange(institutionId, productId, Optional.empty(), lang);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
         verifyNoInteractions(productServiceMock);
     }
