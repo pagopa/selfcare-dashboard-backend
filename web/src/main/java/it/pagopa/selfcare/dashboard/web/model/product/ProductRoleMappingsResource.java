@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.web.model.product;
 
 import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.onboarding.common.PartyRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,7 +11,7 @@ import java.util.List;
 public class ProductRoleMappingsResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.partyRole}")
-    private PartyRole partyRole;
+    private String partyRole;
 
     @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.selcRole}")
     private SelfCareAuthority selcRole;

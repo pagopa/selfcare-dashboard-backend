@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,7 +51,7 @@ public class TokenV2Controller {
         log.trace("exchange start");
         log.debug("exchange institutionId = {}, productId = {}", institutionId, productId);
 
-        String token = exchangeTokenService.exchange(institutionId, productId, environment).getIdentityToken();
+        String token = exchangeTokenService.exchange(institutionId, productId, environment, null).getIdentityToken();
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
@@ -71,15 +72,18 @@ public class TokenV2Controller {
                             @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
                             @RequestParam(value = "environment", required = false)
                             Optional<String> environment,
-                            JwtAuthenticationToken jwtAuthenticationToken) {
+                            JwtAuthenticationToken jwtAuthenticationToken,
+                            @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.lang}")
+                            @RequestParam(value = "lang", required = false)
+                            String lang) {
 
         log.trace("billing exchange start");
-        log.debug("billing exchange institutionId = {}", institutionId);
-        log.info("env parameter: {}", environment);
+        log.debug("billing exchange institutionId = {}", Encode.forJava(institutionId));
+        log.info("env parameter: {}", Encode.forJava(environment.orElse("")));
 
-        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId);
+        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId, lang);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "billing exchange result = {}", location);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "billing exchange result = {}", Encode.forJava(String.valueOf(location)));
         log.trace("billing exchange end");
 
         return location;

@@ -96,7 +96,7 @@ public class ExchangeTokenServiceV2 {
     }
 
 
-    public ExchangedToken exchange(String institutionId, String productId, Optional<String> environment) {
+    public ExchangedToken exchange(String institutionId, String productId, Optional<String> environment, String lang) {
         log.trace("exchange start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -129,12 +129,13 @@ public class ExchangeTokenServiceV2 {
 
         final String urlBO = environment.map(env -> product.getBackOfficeEnvironmentConfigurations().get(env).getUrl())
                 .orElse(product.getUrlBO());
+        final String urlBOLang = Objects.nonNull(lang) ? urlBO.concat("?lang="+lang) : urlBO;
 
         log.trace("exchange end");
-        return new ExchangedToken(jwts, urlBO);
+        return new ExchangedToken(jwts, urlBOLang);
     }
 
-    public ExchangedToken retrieveBillingExchangedToken(String institutionId) {
+    public ExchangedToken retrieveBillingExchangedToken(String institutionId, String lang) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null || authentication.getCredentials() == null) {
             throw new IllegalStateException("Authentication is required");
@@ -165,8 +166,9 @@ public class ExchangeTokenServiceV2 {
         String jwts = createJwts(claims);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
         log.trace("exchange end");
+        final String billingUrlLang = Objects.nonNull(lang) ? billingUrl.concat("?lang=" + lang) : billingUrl;
 
-        return new ExchangedToken(jwts, billingUrl);
+        return new ExchangedToken(jwts, billingUrlLang);
     }
 
     private List<String> retrieveInvoiceableProductList() {
