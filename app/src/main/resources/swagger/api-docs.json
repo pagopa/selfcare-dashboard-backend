@@ -4117,8 +4117,7 @@
           },
           "partyRole" : {
             "type" : "string",
-            "description" : "Party role",
-            "enum" : [ "ADMIN_EA", "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
+            "description" : "Party role, available values: MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA"
           },
           "productRoles" : {
             "type" : "array",
