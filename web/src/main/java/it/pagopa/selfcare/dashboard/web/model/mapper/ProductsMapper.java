@@ -99,7 +99,7 @@ public class ProductsMapper {
         ProductRoleMappingsResource resource = null;
         if (entry != null) {
             resource = new ProductRoleMappingsResource();
-            resource.setPartyRole(entry.getKey());
+            resource.setPartyRole(entry.getKey().name());
             resource.setSelcRole(entry.getKey() != PartyRole.OPERATOR ? SelfCareAuthority.ADMIN : SelfCareAuthority.LIMITED);
             resource.setMultiroleAllowed(entry.getValue().isMultiroleAllowed());
             if (entry.getValue().getRoles() != null) {
