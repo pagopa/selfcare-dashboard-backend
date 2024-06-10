@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -77,8 +78,8 @@ public class TokenV2Controller {
                             String lang) {
 
         log.trace("billing exchange start");
-        log.debug("billing exchange institutionId = {}", institutionId);
-        log.info("env parameter: {}", environment);
+        log.debug("billing exchange institutionId = {}", Encode.forJava(institutionId));
+        log.info("env parameter: {}", Encode.forJava(environment.orElse("")));
 
         final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId, lang);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
