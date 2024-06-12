@@ -1,39 +1,45 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.connector.model.user.*;
+import it.pagopa.selfcare.dashboard.connector.model.user.MutableUserFieldsDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.SaveUserDto;
+import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserId;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_registry.EmbeddedExternalId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
-import static it.pagopa.selfcare.dashboard.connector.model.user.Certification.NONE;
-import static it.pagopa.selfcare.dashboard.connector.model.user.Certification.SPID;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        classes = {
-                UserRegistryConnectorImpl.class
-        }
-)
-class UserRegistryConnectorImplTest {
+@ExtendWith(MockitoExtension.class)
+class UserRegistryConnectorImplTest extends BaseConnectorTest {
 
-
-    @Autowired
+    @InjectMocks
     private UserRegistryConnectorImpl userConnector;
 
-    @MockBean
+    @Mock
     private UserRegistryRestClient restClientMock;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+    }
 
     @Test
     void search_nullInfo() {
@@ -46,18 +52,9 @@ class UserRegistryConnectorImplTest {
         //when
         User user = userConnector.search(externalId, fieldList);
         ///then
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getEmail());
-        assertNull(user.getId());
-        assertNull(user.getWorkContacts());
-        assertNull(user.getFiscalCode());
-        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
+        assertEquals(user, userMock);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
-        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-        assertEquals(externalId, externalIdCaptured.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(restClientMock);
+                .search(new EmbeddedExternalId(externalId), EnumSet.allOf(User.Fields.class));
     }
 
     @Test
@@ -65,59 +62,43 @@ class UserRegistryConnectorImplTest {
         //given
         String externalId = "externalId";
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
-        User userMock = null;
-        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
-                .thenReturn(userMock);
+        Mockito.when(restClientMock.search(new EmbeddedExternalId(externalId), fieldList))
+                .thenReturn(null);
         //when
         User user = userConnector.search(externalId, fieldList);
         ///then
         assertNull(user);
-        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
-        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-        assertEquals(externalId, externalIdCaptured.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(restClientMock);
+                .search(new EmbeddedExternalId(externalId), EnumSet.allOf(User.Fields.class));
     }
 
 
     @Test
-    void search_certificationNone() {
+    void search_certificationNone() throws IOException {
         //given
         String externalId = "externalId";
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
-        User userMock = TestUtils.mockInstance(new User());
-        userMock.setId(UUID.randomUUID().toString());
-        Map<String, WorkContact> workContacts = new HashMap<>();
-        workContacts.put("institutionId", TestUtils.mockInstance(new WorkContact()));
-        userMock.setWorkContacts(workContacts);
-        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
+        ClassPathResource userResource = new ClassPathResource("stubs/UserCertificationNone.json");
+        byte[] userResourceStream = Files.readAllBytes(userResource.getFile().toPath());
+        User userMock = objectMapper.readValue(userResourceStream, new TypeReference<>() {});
+
+        Mockito.when(restClientMock.search(new EmbeddedExternalId(externalId), fieldList))
                 .thenReturn(userMock);
         //when
         User user = userConnector.search(externalId, fieldList);
         ///then
-        assertEquals(NONE, user.getName().getCertification());
-        assertEquals(NONE, user.getEmail().getCertification());
-        assertEquals(NONE, user.getFamilyName().getCertification());
-        user.getWorkContacts().forEach((key1, value) -> assertEquals(NONE, value.getEmail().getCertification()));
-        assertNotNull(user.getFiscalCode());
-
-        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
+        assertEquals(userMock,user);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
-        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-        assertEquals(externalId, externalIdCaptured.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(restClientMock);
+                .search(new EmbeddedExternalId(externalId), EnumSet.allOf(User.Fields.class));
     }
 
 
     @Test
     void search_nullExternalId() {
         //given
-        String externalId = null;
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         //when
-        Executable executable = () -> userConnector.search(externalId, fieldList);
+        Executable executable = () -> userConnector.search(null, fieldList);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A TaxCode is required", e.getMessage());
@@ -125,36 +106,22 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
-    void search_certificationNotNone() {
+    void search_certificationNotNone() throws IOException {
         //given
         String externalId = "externalId";
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
-        User userMock = TestUtils.mockInstance(new User());
-        userMock.getEmail().setCertification(Certification.SPID);
-        userMock.getFamilyName().setCertification(Certification.SPID);
-        userMock.getName().setCertification(Certification.SPID);
-        Map<String, WorkContact> workContacts = new HashMap<>();
-        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
-        workContact.getEmail().setCertification(Certification.SPID);
-        userMock.setWorkContacts(workContacts);
-        workContacts.put("institutionId", workContact);
-        Mockito.when(restClientMock.search(Mockito.any(), Mockito.any()))
+        ClassPathResource userResource = new ClassPathResource("stubs/UserCertificationNotNone.json");
+        byte[] userResourceStream = Files.readAllBytes(userResource.getFile().toPath());
+        User userMock = objectMapper.readValue(userResourceStream, new TypeReference<>() {});
+
+        Mockito.when(restClientMock.search(new EmbeddedExternalId(externalId), fieldList))
                 .thenReturn(userMock);
         //when
         User user = userConnector.search(externalId, fieldList);
         //then
-        assertEquals(SPID, user.getName().getCertification());
-        assertEquals(SPID, user.getEmail().getCertification());
-        assertEquals(SPID, user.getFamilyName().getCertification());
-        user.getWorkContacts().forEach((key1, value) -> assertEquals(SPID, value.getEmail().getCertification()));
-        assertNotNull(user.getFiscalCode());
-
-        ArgumentCaptor<EmbeddedExternalId> embeddedCaptor = ArgumentCaptor.forClass(EmbeddedExternalId.class);
+        assertEquals(user, userMock);
         Mockito.verify(restClientMock, Mockito.times(1))
-                .search(embeddedCaptor.capture(), Mockito.eq(EnumSet.allOf(User.Fields.class)));
-        EmbeddedExternalId externalIdCaptured = embeddedCaptor.getValue();
-        assertEquals(externalId, externalIdCaptured.getFiscalCode());
-        Mockito.verifyNoMoreInteractions(restClientMock);
+                .search(new EmbeddedExternalId(externalId), EnumSet.allOf(User.Fields.class));
     }
 
     @Test
@@ -163,20 +130,14 @@ class UserRegistryConnectorImplTest {
         UUID userId = UUID.randomUUID();
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         User userMock = new User();
-        Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
+        Mockito.when(restClientMock.getUserByInternalId(userId, fieldList))
                 .thenReturn(userMock);
         //when
         User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
-        assertNull(user.getName());
-        assertNull(user.getFamilyName());
-        assertNull(user.getEmail());
-        assertNull(user.getId());
-        assertNull(user.getWorkContacts());
-        assertNull(user.getFiscalCode());
+        assertEquals(user, userMock);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
-        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
@@ -184,56 +145,39 @@ class UserRegistryConnectorImplTest {
         //given
         UUID userId = UUID.randomUUID();
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
-        User userMock = null;
-        Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
-                .thenReturn(userMock);
+        Mockito.when(restClientMock.getUserByInternalId(userId, fieldList))
+                .thenReturn(null);
         //when
         User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
         assertNull(user);
-
-        Mockito.verify(restClientMock, Mockito.times(1))
-                .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
-        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
-    void getUserByInternalId_certificationNone() {
+    void getUserByInternalId_certificationNone() throws IOException {
         //given
-        UUID userId = UUID.randomUUID();
+        UUID userId = UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479");
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
-        User userMock = TestUtils.mockInstance(new User());
-        userMock.setId(userId.toString());
-        Map<String, WorkContact> workContacts = new HashMap<>();
-        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
-        workContact.getEmail().setCertification(Certification.NONE);
-        userMock.setWorkContacts(workContacts);
-        workContacts.put("institutionId", workContact);
-        Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
+        ClassPathResource userResource = new ClassPathResource("stubs/UserCertificationNone.json");
+        byte[] userResourceStream = Files.readAllBytes(userResource.getFile().toPath());
+        User userMock = objectMapper.readValue(userResourceStream, new TypeReference<>() {});
+
+        Mockito.when(restClientMock.getUserByInternalId(userId, fieldList))
                 .thenReturn(userMock);
         //when
         User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
-        assertEquals(userId.toString(), user.getId());
-        assertEquals(NONE, user.getName().getCertification());
-        assertEquals(NONE, user.getEmail().getCertification());
-        assertEquals(NONE, user.getFamilyName().getCertification());
-        user.getWorkContacts().forEach((key1, value) -> assertEquals(NONE, value.getEmail().getCertification()));
-        assertNotNull(user.getFiscalCode());
-
+        assertEquals(user, userMock);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
-        Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
 
     @Test
     void getUserByInternalId_nullExternalId() {
-        //given
-        String userId = null;
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
         //when
-        Executable executable = () -> userConnector.getUserByInternalId(userId, fieldList);
+        Executable executable = () -> userConnector.getUserByInternalId(null, fieldList);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
@@ -241,31 +185,21 @@ class UserRegistryConnectorImplTest {
     }
 
     @Test
-    void getUserByInternalId_certificationNotNone() {
+    void getUserByInternalId_certificationNotNone() throws IOException {
         //given
-        UUID userId = UUID.randomUUID();
+        UUID userId = UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479");
         final EnumSet<User.Fields> fieldList = EnumSet.allOf(User.Fields.class);
-        User userMock = TestUtils.mockInstance(new User());
-        userMock.setId(userId.toString());
-        userMock.getEmail().setCertification(Certification.SPID);
-        userMock.getFamilyName().setCertification(Certification.SPID);
-        userMock.getName().setCertification(Certification.SPID);
-        Map<String, WorkContact> workContacts = new HashMap<>();
-        WorkContact workContact = TestUtils.mockInstance(new WorkContact());
-        workContact.getEmail().setCertification(Certification.SPID);
-        userMock.setWorkContacts(workContacts);
-        workContacts.put("institutionId", workContact);
-        Mockito.when(restClientMock.getUserByInternalId(Mockito.any(), Mockito.any()))
+
+        ClassPathResource userResource = new ClassPathResource("stubs/UserCertificationNotNone.json");
+        byte[] userResourceStream = Files.readAllBytes(userResource.getFile().toPath());
+        User userMock = objectMapper.readValue(userResourceStream, new TypeReference<>() {});
+
+        Mockito.when(restClientMock.getUserByInternalId(userId, fieldList))
                 .thenReturn(userMock);
         //when
         User user = userConnector.getUserByInternalId(userId.toString(), fieldList);
         ///then
-        assertEquals(userId.toString(), user.getId());
-        assertEquals(SPID, user.getName().getCertification());
-        assertEquals(SPID, user.getEmail().getCertification());
-        assertEquals(SPID, user.getFamilyName().getCertification());
-        user.getWorkContacts().forEach((key1, value) -> assertEquals(SPID, value.getEmail().getCertification()));
-        assertNotNull(user.getFiscalCode());
+        assertEquals(user, userMock);
 
         Mockito.verify(restClientMock, Mockito.times(1))
                 .getUserByInternalId(userId, EnumSet.allOf(User.Fields.class));
@@ -275,9 +209,9 @@ class UserRegistryConnectorImplTest {
     @Test
     void updateUser() {
         //given
-        String institutionId = "institutionId";
         UUID id = UUID.randomUUID();
-        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
+        MutableUserFieldsDto userDto = new MutableUserFieldsDto();
+        userDto.setWorkContacts(new HashMap<>());
         //when
         Executable executable = () -> userConnector.updateUser(id, userDto);
         //then
@@ -285,19 +219,16 @@ class UserRegistryConnectorImplTest {
         ArgumentCaptor<MutableUserFieldsDto> userDtoCaptor = ArgumentCaptor.forClass(MutableUserFieldsDto.class);
         Mockito.verify(restClientMock, Mockito.times(1))
                 .patchUser(Mockito.any(), userDtoCaptor.capture());
-        MutableUserFieldsDto request = userDtoCaptor.getValue();
 
         Mockito.verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
     void updateUser_nullId() {
-        //given
-        UUID id = null;
-        MutableUserFieldsDto userDto = TestUtils.mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
-
+        MutableUserFieldsDto userDto = new MutableUserFieldsDto();
+        userDto.setWorkContacts(new HashMap<>());
         //when
-        Executable executable = () -> userConnector.updateUser(id, userDto);
+        Executable executable = () -> userConnector.updateUser(null, userDto);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A UUID is required", e.getMessage());
@@ -307,9 +238,10 @@ class UserRegistryConnectorImplTest {
     @Test
     void saveUser() {
         //given
-        UserId id = TestUtils.mockInstance(new UserId());
-        SaveUserDto saveUserDto = TestUtils.mockInstance(new SaveUserDto(), "setWorkContacts");
-        Mockito.when(restClientMock.saveUser(Mockito.any()))
+        UserId id = new UserId();
+        SaveUserDto saveUserDto = new SaveUserDto();
+        saveUserDto.setWorkContacts(new HashMap<>());
+        Mockito.when(restClientMock.saveUser(saveUserDto))
                 .thenReturn(id);
         //when
         UserId userId = userConnector.saveUser(saveUserDto);

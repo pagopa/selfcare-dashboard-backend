@@ -1,0 +1,7 @@
+{
+  "name": "groupName",
+  "description": "groupDescription",
+  "members": ["string1", "string2"],
+  "institutionId": "institutionId",
+  "productId": "productId"
+}

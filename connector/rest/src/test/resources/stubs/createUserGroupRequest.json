@@ -1,0 +1,8 @@
+{
+  "institutionId": "institutionId",
+  "productId": "productId",
+  "name": "groupName",
+  "description": "groupDescription",
+  "status": "ACTIVE",
+  "members": ["string1", "string2"]
+}

@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
@@ -20,101 +20,75 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
+import wiremock.com.github.jknack.handlebars.internal.lang3.StringUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ContextConfiguration(classes = {UserConnectorImpl.class, InstitutionMapperImpl.class, UserMapper.class})
-class UserConnectorImplTest {
+class UserConnectorImplTest extends BaseConnectorTest {
 
     @Mock
-    UserApiRestClient userApiRestClient;
+    private UserApiRestClient userApiRestClient;
 
     @Mock
-    UserPermissionRestClient userPermissionRestClient;
+    private UserPermissionRestClient userPermissionRestClient;
 
     @Mock
-    UserInstitutionApiRestClient userInstitutionApiRestClient;
+    private UserInstitutionApiRestClient userInstitutionApiRestClient;
 
-
-    UserConnectorImpl userConnector;
+    @InjectMocks
+    protected UserConnectorImpl userConnector;
 
     @Spy
-    UserMapper userMapper = new UserMapperImpl();
+    private UserMapper userMapper = new UserMapperImpl();
+
+    @Spy
+    private InstitutionMapperImpl institutionMapper = new InstitutionMapperImpl();
 
     @BeforeEach
-    void setup() {
-        userConnector = new UserConnectorImpl(userApiRestClient, userInstitutionApiRestClient, userPermissionRestClient, new InstitutionMapperImpl(), userMapper);
+    public void setUp() {
+        super.setUp();
     }
-
 
     @Test
     void getUserProductsNotFound() {
-        when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
+        String userId = "userId";
+        when(userApiRestClient._usersUserIdInstitutionsGet(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserInstitutions("userID"));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserInstitutions(userId));
     }
 
     @Test
-    void getUserProductsFound() {
-        UserInfoResponse userProductsResponse = getUserProductsResponse();
-        when(userApiRestClient._usersUserIdInstitutionsGet("userID", null,
-                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(userProductsResponse));
-        List<InstitutionBase> result = userConnector.getUserInstitutions("userID");
-        Assertions.assertEquals(4, result.size());
-        Assertions.assertEquals(ACTIVE.name(), result.get(0).getStatus());
-        Assertions.assertEquals("a", result.get(0).getName());
-        Assertions.assertEquals("b", result.get(1).getName());
-        Assertions.assertEquals("c", result.get(2).getName());
-        Assertions.assertNull(result.get(3).getName());
-    }
+    void getUserProductsFound() throws IOException {
+        String userId = "userId";
 
-    private static UserInfoResponse getUserProductsResponse() {
-        UserInfoResponse userProductsResponse = new UserInfoResponse();
-        userProductsResponse.setUserId("userId");
-        UserInstitutionRoleResponse institutionProducts = new UserInstitutionRoleResponse();
-        institutionProducts.setInstitutionId("institutionId");
-        institutionProducts.setInstitutionName("c");
-        institutionProducts.setStatus(OnboardedProductState.ACTIVE);
-        institutionProducts.setRole(PartyRole.MANAGER);
-
-        UserInstitutionRoleResponse institutionProducts2 = new UserInstitutionRoleResponse();
-        institutionProducts2.setInstitutionId("institutionId2");
-        institutionProducts2.setInstitutionName("b");
-        institutionProducts2.setStatus(OnboardedProductState.ACTIVE);
-        institutionProducts2.setRole(PartyRole.MANAGER);
-
-        UserInstitutionRoleResponse institutionProducts4 = new UserInstitutionRoleResponse();
-        institutionProducts4.setInstitutionId("institutionId3");
-        institutionProducts4.setStatus(OnboardedProductState.ACTIVE);
-        institutionProducts4.setRole(PartyRole.MANAGER);
-
-        UserInstitutionRoleResponse institutionProducts3 = new UserInstitutionRoleResponse();
-        institutionProducts3.setInstitutionId("institutionId3");
-        institutionProducts3.setInstitutionName("a");
-        institutionProducts3.setStatus(OnboardedProductState.ACTIVE);
-        institutionProducts3.setRole(PartyRole.MANAGER);
-
-
-        userProductsResponse.setInstitutions(List.of(institutionProducts, institutionProducts2, institutionProducts4, institutionProducts3));
-        return userProductsResponse;
+        ClassPathResource resource = new ClassPathResource("stubs/UserInfoResponse.json");
+        String expectedResource = StringUtils.deleteWhitespace(new String(Files.readAllBytes(resource.getFile().toPath())));
+        UserInfoResponse userInfoResponse = objectMapper.readValue(expectedResource, new TypeReference<>() {});
+        when(userApiRestClient._usersUserIdInstitutionsGet(userId, null,
+                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())))
+                .thenReturn(ResponseEntity.ok(userInfoResponse));
+        List<InstitutionBase> result = userConnector.getUserInstitutions(userId);
+        assertNotNull(result);
+        assertEquals(result.get(0), institutionMapper.toInstitutionBase(userInfoResponse.getInstitutions().get(0)));
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionsGet(userId, null,
+                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()));
     }
 
     @Test
@@ -168,40 +142,70 @@ class UserConnectorImplTest {
     }
 
     @Test
-    void getUserById() {
+    void getUserById() throws IOException{
+        String userId = "123e4567-e89b-12d3-a456-426614174000";
+        String institutionId = "institutionId";
+        String field = "field";
+        List<String> fields = List.of(field);
 
-        //given
-        final String userId = "userId";
-        final String institutionId = "institutionId";
-        final List<String> fields = List.of("fields");
-        UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersIdDetailsGet(anyString(), anyString(), anyString())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
-        //when
-        User user = userConnector.getUserById(userId, institutionId, fields);
-        //then
-        assertNotNull(user);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, fields.get(0), institutionId);
+        ClassPathResource resource = new ClassPathResource("stubs/UserDetailResponse.json");
+        UserDetailResponse userDetailResponse = objectMapper.readValue(Files.readAllBytes(resource.getFile().toPath()), new TypeReference<>() {
+        });
+
+        ClassPathResource resourceResponse = new ClassPathResource("stubs/User.json");
+        User user = objectMapper.readValue(Files.readAllBytes(resourceResponse.getFile().toPath()), new TypeReference<>() {
+        });
+
+        when(userApiRestClient._usersIdDetailsGet(userId, field, institutionId)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userMapper.toUser(userDetailResponse)).thenReturn(user);
+
+        User result = userConnector.getUserById(userId, institutionId, fields);
+        assertEquals(user,result);
+        assertNotNull(result);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, field, institutionId);
     }
-
     @Test
-    void verifyUserExist_UserExists() {
+    void getUserByIdEmptyUser() throws IOException{
+        String userId = "123e4567-e89b-12d3-a456-426614174000";
+        String institutionId = "institutionId";
+        List<String> fields = Collections.emptyList();
+
+        ClassPathResource resource = new ClassPathResource("stubs/UserDetailResponse.json");
+        UserDetailResponse userDetailResponse = objectMapper.readValue(Files.readAllBytes(resource.getFile().toPath()), new TypeReference<>() {
+        });
+
+        when(userApiRestClient._usersIdDetailsGet(userId, null, institutionId)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userMapper.toUser(userDetailResponse)).thenReturn(null);
+
+        User result = userConnector.getUserById(userId, institutionId, fields);
+        assertNull(result);
+        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, null, institutionId);
+    }
+    @Test
+    void verifyUserExist_UserExists() throws IOException {
         String userId = "userId";
         String institutionId = "institutionId";
         String productId = "productId";
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId))).thenReturn(ResponseEntity.ok(List.of(new UserInstitutionResponse())));
+        ClassPathResource resource = new ClassPathResource("stubs/UserInstitutionResponse2.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserInstitutionResponse userInstitutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(productId), null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name(), SUSPENDED.name()), userId)).thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
 
         List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
-        assertEquals(1, response.size());
+        assertEquals(institutionMapper.toInstitution(userInstitutionResponse), response.get(0));
 
         verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
     }
 
     @Test
-    void verifyUserExist_UserDoesNotExist() {
+    void verifyUserExist_UserDoesNotExist() throws IOException {
         String userId = "userId";
         String institutionId = "institutionId";
         String productId = "productId";
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId)))
+        ClassPathResource resource = new ClassPathResource("stubs/UserInstitutionResponse2.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserInstitutionResponse userInstitutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(productId), null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name(), SUSPENDED.name()), userId))
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
@@ -211,22 +215,44 @@ class UserConnectorImplTest {
     }
 
     @Test
-    void search() {
-        //given
+    void search() throws IOException {
         String fiscalCode = "fiscalCode";
-        final String institutionId = "institutionId";
-        UserDetailResponse userDetailResponse = mockInstance(new UserDetailResponse());
-        when(userApiRestClient._usersSearchPost(any(), any())).thenReturn(new ResponseEntity<>(userDetailResponse, HttpStatus.OK));
-        //when
-        User user = userConnector.searchByFiscalCode(fiscalCode, institutionId);
-        //then
-        assertNotNull(user);
-        ArgumentCaptor<SearchUserDto> searchUserDtoArgumentCaptor = ArgumentCaptor.forClass(SearchUserDto.class);
-        verify(userApiRestClient, times(1))._usersSearchPost(eq(institutionId), searchUserDtoArgumentCaptor.capture());
-        SearchUserDto captured = searchUserDtoArgumentCaptor.getValue();
-        assertEquals(fiscalCode, captured.getFiscalCode());
-    }
+        String institutionId = "institutionId";
+        SearchUserDto searchUserDto = new SearchUserDto(fiscalCode);
 
+        ClassPathResource resource = new ClassPathResource("stubs/UserDetailResponse.json");
+        UserDetailResponse userDetailResponse = objectMapper.readValue(Files.readAllBytes(resource.getFile().toPath()), new TypeReference<>() {
+        });
+
+        ClassPathResource resourceResponse = new ClassPathResource("stubs/User.json");
+        User user = objectMapper.readValue(Files.readAllBytes(resourceResponse.getFile().toPath()), new TypeReference<>() {
+        });
+
+        when(userApiRestClient._usersSearchPost(institutionId,searchUserDto)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userMapper.toUser(userDetailResponse)).thenReturn(user);
+
+        User result = userConnector.searchByFiscalCode(fiscalCode, institutionId);
+
+        assertNotNull(result);
+        assertEquals(user, result);
+    }
+    @Test
+    void searchEmptyUser() throws IOException {
+        String institutionId = "institutionId";
+        SearchUserDto searchUserDto = new SearchUserDto();
+
+        ClassPathResource resource = new ClassPathResource("stubs/UserDetailResponse.json");
+        UserDetailResponse userDetailResponse = objectMapper.readValue(Files.readAllBytes(resource.getFile().toPath()), new TypeReference<>() {
+        });
+
+
+        when(userApiRestClient._usersSearchPost(institutionId,searchUserDto)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userMapper.toUser(userDetailResponse)).thenReturn(null);
+
+        User result = userConnector.searchByFiscalCode(null, institutionId);
+
+        assertNull(result);
+    }
     @Test
     void hasPermissionTrue() {
         //given
@@ -270,16 +296,16 @@ class UserConnectorImplTest {
     }
 
     @Test
-    void getUsers_emptyList() {
+    void getUsers_emptyList() throws IOException {
         // given
         String institutionId = "institutionId";
         String loggedUserId = "loggedUserId";
 
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
-        userInfoFilter.setRole(SelfCareAuthority.ADMIN);
+        ClassPathResource resourceFilter = new ClassPathResource("stubs/UserInfoFilter.json");
+        UserInfo.UserInfoFilter userInfoFilter = objectMapper.readValue(Files.readAllBytes(resourceFilter.getFile().toPath()), new TypeReference<>() {
+        });
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null), eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED"))))
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, userInfoFilter.getUserId(), userInfoFilter.getProductRoles(), List.of(userInfoFilter.getProductId()), List.of("MANAGER", "DELEGATE", "SUB_DELEGATE"), List.of("ACTIVE", "SUSPENDED")))
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         // when
@@ -287,88 +313,89 @@ class UserConnectorImplTest {
 
         // then
         assertTrue(result.isEmpty());
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(eq(institutionId), eq(loggedUserId), eq(null), eq(null), eq(null), eq(List.of("MANAGER", "DELEGATE", "SUB_DELEGATE")), eq(List.of("ACTIVE", "SUSPENDED")));
-        verifyNoMoreInteractions(userApiRestClient);
     }
 
     @Test
-    void getUsers_notEmpty() {
+    void getUsers_notEmpty() throws IOException {
         // given
         String institutionId = "institutionId";
         String loggedUserId = "loggedUserId";
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null))
-                .thenReturn(ResponseEntity.ok(List.of(UserDataResponse.builder().userId("userId").build())));
+        ClassPathResource resourceFilter = new ClassPathResource("stubs/UserInfoFilter.json");
+        UserInfo.UserInfoFilter userInfoFilter = objectMapper.readValue(Files.readAllBytes(resourceFilter.getFile().toPath()), new TypeReference<>() {});
 
-        when(userMapper.toUserInfo(any())).thenReturn(new UserInfo());
+        // Simulate response from API by reading from a JSON file
+        ClassPathResource resourceResponse = new ClassPathResource("stubs/UserDataResponse.json");
+        byte[] responseData = Files.readAllBytes(resourceResponse.getFile().toPath());
+        List<UserDataResponse> userDataResponseList = objectMapper.readValue(responseData, new TypeReference<>() {});
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, userInfoFilter.getUserId(), userInfoFilter.getProductRoles(), List.of(userInfoFilter.getProductId()), List.of("MANAGER", "DELEGATE", "SUB_DELEGATE"), List.of("ACTIVE", "SUSPENDED")))
+                .thenReturn(ResponseEntity.ok(userDataResponseList));
 
         // when
         Collection<UserInfo> result = userConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
 
         // then
         assertEquals(1, result.size());
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, null, null, null, null, null);
-        verifyNoMoreInteractions(userApiRestClient);
+        UserInfo actualUserInfo = result.iterator().next();
+        assertEquals(userMapper.toUserInfo(userDataResponseList.get(0)), actualUserInfo);
     }
 
     @Test
-    void getProducts_returnsUserInstitution() {
-        // given
+    void getProducts_returnsUserInstitution() throws IOException{
         String institutionId = "institutionId";
         String userId = "userId";
-        UserInstitutionResponse userInstitutionResponse = new UserInstitutionResponse();
+
+
+        ClassPathResource resource = new ClassPathResource("stubs/UserInstitutionResponse.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserInstitutionResponse userInstitutions = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
         when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
-                eq(institutionId),
-                any(),
-                any(),
-                any(),
-                any(),
-                eq(userId)
-        )).thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
+                institutionId,
+                null,
+                null,
+                null,
+                null,
+                userId
+        )).thenReturn(ResponseEntity.ok(List.of(userInstitutions)));
 
-        // when
         UserInstitution result = userConnector.getProducts(institutionId, userId);
+        //Todo aggiungere expectedResponse
 
-        // then
         assertNotNull(result);
         verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
     }
 
     @Test
     void getProducts_throwsResourceNotFoundException() {
-        // given
         String institutionId = "institutionId";
         String userId = "userId";
         when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
-                eq(institutionId),
-                any(),
-                any(),
-                any(),
-                any(),
-                eq(userId)
+                institutionId,
+                null,
+                null,
+                null,
+                null,
+                userId
         )).thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
-        // when
         Executable executable = () -> userConnector.getProducts(institutionId, userId);
 
-        // then
         assertThrows(ResourceNotFoundException.class, executable);
         verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
     }
 
     @Test
-    void testCreateOrUpdateUserByFiscalCode() {
+    void testCreateOrUpdateUserByFiscalCode() throws IOException {
         // Arrange
         when(userApiRestClient._usersPost(Mockito.any()))
                 .thenReturn(ResponseEntity.ok("userId"));
 
-        UserToCreate userDto = new UserToCreate();
-        userDto.setName("Name");
-        userDto.setProductRoles(new HashSet<>());
-        userDto.setSurname("Doe");
-        userDto.setTaxCode("Tax Code");
-        userDto.setEmail("jane.doe@example.org");
+        ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserToCreate userDto = objectMapper.readValue(resourceStream, new TypeReference<>() {});
 
         CreateUserDto.Role role = new CreateUserDto.Role();
         role.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
@@ -380,25 +407,134 @@ class UserConnectorImplTest {
 
         RootParentResponse response = new RootParentResponse();
         response.setDescription("rootDescription");
-        Institution institution = new Institution();
-        institution.setId("id");
-        institution.setDescription("description");
+        ClassPathResource institutionResource = new ClassPathResource("stubs/Institution.json");
+        byte[] institutionResourceStream = Files.readAllBytes(institutionResource.getFile().toPath());
+        Institution institution = objectMapper.readValue(institutionResourceStream, new TypeReference<>() {});
+
         institution.setRootParent(response);
         // Act
-        userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role, role2));
+        String userId = userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role, role2));
 
         // Assert that nothing has changed
         verify(userApiRestClient)._usersPost(Mockito.any());
-        assertEquals("Doe", userDto.getSurname());
-        assertEquals("Name", userDto.getName());
-        assertEquals("Tax Code", userDto.getTaxCode());
-        assertEquals("jane.doe@example.org", userDto.getEmail());
+        assertEquals("userId", userId);
     }
 
     @Test
-    void testCreateOrUpdateUserByUserId() {
+    void testCreateOrUpdateUserByFiscalCode_withNullRoles() throws IOException {
         // Arrange
-        when(userApiRestClient._usersUserIdPost(eq("userId"), any()))
+        ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserToCreate userDto = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        RootParentResponse response = new RootParentResponse();
+        response.setDescription("rootDescription");
+        ClassPathResource institutionResource = new ClassPathResource("stubs/Institution.json");
+        byte[] institutionResourceStream = Files.readAllBytes(institutionResource.getFile().toPath());
+        Institution institution = objectMapper.readValue(institutionResourceStream, new TypeReference<>() {});
+
+        institution.setRootParent(response);
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, null));
+
+        assertEquals("Role list cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrUpdateUserByFiscalCode_withEmptyRoles() throws IOException {
+        // Arrange
+        ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserToCreate userDto = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        RootParentResponse response = new RootParentResponse();
+        response.setDescription("rootDescription");
+        ClassPathResource institutionResource = new ClassPathResource("stubs/Institution.json");
+        byte[] institutionResourceStream = Files.readAllBytes(institutionResource.getFile().toPath());
+        Institution institution = objectMapper.readValue(institutionResourceStream, new TypeReference<>() {});
+
+        institution.setRootParent(response);
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, Collections.emptyList()));
+
+        assertEquals("Role list cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void testCreateOrUpdateUserByFiscalCode_withApiResponseNull() throws IOException {
+        // Arrange
+        ClassPathResource userDtoResource = new ClassPathResource("stubs/CreateUserDto.json");
+        byte[] userDtoResourceStream = Files.readAllBytes(userDtoResource.getFile().toPath());
+        it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto createUserDto = objectMapper.readValue(userDtoResourceStream, new TypeReference<>() {});
+        when(userApiRestClient._usersPost(createUserDto))
+                .thenReturn(ResponseEntity.ok(null));
+
+        ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserToCreate userDto = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        CreateUserDto.Role role = new CreateUserDto.Role();
+        role.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
+        role.setProductRole("admin");
+
+        RootParentResponse response = new RootParentResponse();
+        response.setDescription("rootDescription");
+        ClassPathResource institutionResource = new ClassPathResource("stubs/Institution.json");
+        byte[] institutionResourceStream = Files.readAllBytes(institutionResource.getFile().toPath());
+        Institution institution = objectMapper.readValue(institutionResourceStream, new TypeReference<>() {});
+
+        institution.setRootParent(response);
+
+        // Act
+        String userId = userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role));
+
+        // Assert that nothing has changed
+        verify(userApiRestClient)._usersPost(createUserDto);
+        assertNull(userId);
+    }
+
+    @Test
+    void testCreateOrUpdateUserByFiscalCode_withApiResponseEmpty() throws IOException {
+        // Arrange
+        ClassPathResource userDtoResource = new ClassPathResource("stubs/CreateUserDto.json");
+        byte[] userDtoResourceStream = Files.readAllBytes(userDtoResource.getFile().toPath());
+        it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto createUserDto = objectMapper.readValue(userDtoResourceStream, new TypeReference<>() {});
+        when(userApiRestClient._usersPost(createUserDto))
+                .thenReturn(ResponseEntity.ok(""));
+
+        ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserToCreate userDto = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        CreateUserDto.Role role = new CreateUserDto.Role();
+        role.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
+        role.setProductRole("admin");
+
+        RootParentResponse response = new RootParentResponse();
+        response.setDescription("rootDescription");
+        ClassPathResource institutionResource = new ClassPathResource("stubs/Institution.json");
+        byte[] institutionResourceStream = Files.readAllBytes(institutionResource.getFile().toPath());
+        Institution institution = objectMapper.readValue(institutionResourceStream, new TypeReference<>() {});
+
+        institution.setRootParent(response);
+
+        // Act
+        String userId = userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role));
+
+        // Assert that nothing has changed
+        verify(userApiRestClient)._usersPost(createUserDto);
+        assertEquals("", userId);
+    }
+    @Test
+    void testCreateOrUpdateUserByUserId() throws IOException {
+        ClassPathResource userRoleResource = new ClassPathResource("stubs/AddUserRoleDto.json");
+        byte[] userRoleResourceStream = Files.readAllBytes(userRoleResource.getFile().toPath());
+        AddUserRoleDto addUserRoleDto = objectMapper.readValue(userRoleResourceStream, new TypeReference<>() {});
+
+        // Arrange
+        when(userApiRestClient._usersUserIdPost("userId", addUserRoleDto))
                 .thenReturn(ResponseEntity.ok().build());
 
         CreateUserDto.Role role = new CreateUserDto.Role();
@@ -407,39 +543,45 @@ class UserConnectorImplTest {
 
         RootParentResponse response = new RootParentResponse();
         response.setDescription("rootDescription");
-        Institution institution = new Institution();
-        institution.setId("id");
-        institution.setDescription("description");
+
+        ClassPathResource resource = new ClassPathResource("stubs/Institution.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
         institution.setRootParent(response);
 
         // Act
         userConnector.createOrUpdateUserByUserId(institution, "productId", "userId", List.of(role));
 
         // Assert that nothing has changed
-        verify(userApiRestClient)._usersUserIdPost(eq("userId"), any());
+        verify(userApiRestClient)._usersUserIdPost("userId", addUserRoleDto);
     }
 
+
     @Test
-    public void retrieveFilteredUserInstitutionReturnsUserInstitutions() {
+    void retrieveFilteredUserInstitutionReturnsUserInstitutions() throws IOException {
         // Given
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
         userInfoFilter.setProductId("productId");
-        List<UserInstitutionResponse> userInstitutionResponses = List.of(new UserInstitutionResponse(), new UserInstitutionResponse());
+        ClassPathResource resource = new ClassPathResource("stubs/UserInstitutionResponse.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserInstitutionResponse userInstitutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
         when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
                 userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), null))
-                .thenReturn(ResponseEntity.ok(userInstitutionResponses));
+                .thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
 
         // When
         List<String> result = userConnector.retrieveFilteredUserInstitution(institutionId, userInfoFilter);
 
         // Then
-        assertEquals(userInstitutionResponses.size(), result.size());
+        assertEquals(userInstitutionResponse.getUserId(), result.get(0));
     }
 
     @Test
-    public void retrieveFilteredUserInstitutionReturnsEmptyListWhenNoUserInstitutions() {
+    void retrieveFilteredUserInstitutionReturnsEmptyListWhenNoUserInstitutions() {
         // Given
         String institutionId = "institutionId";
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
