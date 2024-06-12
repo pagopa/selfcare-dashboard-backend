@@ -96,7 +96,7 @@ public class ExchangeTokenServiceV2 {
     }
 
 
-    public ExchangedToken exchange(String institutionId, String productId, Optional<String> environment, String lang) {
+    public ExchangedToken exchange(String institutionId, String productId, Optional<String> environment) {
         log.trace("exchange start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchange institutionId = {}, productId = {}", institutionId, productId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -129,10 +129,9 @@ public class ExchangeTokenServiceV2 {
 
         final String urlBO = environment.map(env -> product.getBackOfficeEnvironmentConfigurations().get(env).getUrl())
                 .orElse(product.getUrlBO());
-        final String urlBOLang = Objects.nonNull(lang) ? urlBO.concat("?lang="+lang) : urlBO;
 
         log.trace("exchange end");
-        return new ExchangedToken(jwts, urlBOLang);
+        return new ExchangedToken(jwts, urlBO);
     }
 
     public ExchangedToken retrieveBillingExchangedToken(String institutionId, String lang) {

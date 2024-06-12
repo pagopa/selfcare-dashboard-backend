@@ -51,7 +51,7 @@ public class TokenV2Controller {
         log.trace("exchange start");
         log.debug("exchange institutionId = {}, productId = {}", institutionId, productId);
 
-        String token = exchangeTokenService.exchange(institutionId, productId, environment, null).getIdentityToken();
+        String token = exchangeTokenService.exchange(institutionId, productId, environment).getIdentityToken();
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
