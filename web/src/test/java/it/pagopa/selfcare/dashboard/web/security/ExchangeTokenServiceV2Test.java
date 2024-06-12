@@ -335,7 +335,6 @@ class ExchangeTokenServiceV2Test {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRole = "productRole";
-        String lang = "en";
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         UUID userId = UUID.randomUUID();

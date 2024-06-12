@@ -72,7 +72,6 @@ class TokenV2ControllerTest {
     void billingExchange() throws Exception {
         // given
         String institutionId = "inst1";
-        String lang = "en";
         Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(anyString()))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
