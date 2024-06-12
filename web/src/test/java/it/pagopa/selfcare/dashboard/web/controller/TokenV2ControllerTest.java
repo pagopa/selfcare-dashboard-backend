@@ -3,7 +3,6 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
-import it.pagopa.selfcare.dashboard.web.model.IdentityTokenResource;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,15 +15,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.net.URI;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {TokenV2Controller.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {TokenV2Controller.class, WebTestConfig.class})
@@ -47,21 +48,19 @@ class TokenV2ControllerTest {
         // given
         String institutionId = "inst1";
         String productId = "prod1";
-        Mockito.when(exchangeTokenServiceMock.exchange(anyString(), anyString(), any(), eq(null)))
+        Mockito.when(exchangeTokenServiceMock.exchange(institutionId, productId, Optional.empty(), null))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/exchange")
                 .param("institutionId", institutionId)
                 .param("productId", productId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token", is("token")))
                 .andReturn();
         // then
-        IdentityTokenResource resource = objectMapper.readValue(result.getResponse().getContentAsString(), IdentityTokenResource.class);
-        assertNotNull(resource);
-        assertNotNull(resource.getToken());
         verify(exchangeTokenServiceMock, Mockito.times(1))
                 .exchange(institutionId, productId, Optional.empty(), null);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
@@ -71,23 +70,22 @@ class TokenV2ControllerTest {
     void billingExchange() throws Exception {
         // given
         String institutionId = "inst1";
-        String lang = "en";
-        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(anyString(), anyString()))
+        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId, null))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/exchange/fatturazione")
                         .param("institutionId", institutionId)
-                        .param("lang", lang)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(status().isOk())
                 .andReturn();
         // then
         URI resource = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
         assertNotNull(resource);
+        assertEquals(resource.toString(), "urlBO");
         verify(exchangeTokenServiceMock, Mockito.times(1))
-                .retrieveBillingExchangedToken(institutionId, lang);
+                .retrieveBillingExchangedToken(institutionId, null);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 

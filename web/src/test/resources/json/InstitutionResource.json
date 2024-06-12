@@ -1,0 +1,62 @@
+{
+    "id": "123",
+    "externalId": "ext123",
+    "originId": "orig123",
+    "origin": "origin",
+    "institutionType": "SCP",
+    "name": "A description",
+    "category": "description1",
+    "fiscalCode": "tax123",
+    "mailAddress": "digital@address.com",
+    "address": "123 Street",
+    "zipCode": "12345",
+    "recipientCode": "rec123",
+    "geographicTaxonomies": [
+        {
+            "code": "code1",
+            "desc": "desc1"
+        },
+        {
+            "code": "code2",
+            "desc": "desc2"
+        }
+    ],
+    "vatNumberGroup": true,
+    "supportContact": {
+        "supportEmail": "support@address.com",
+        "supportPhone": "1234567890"
+    },
+    "vatNumber": "vat123",
+    "subunitCode": "sub123",
+    "subunitType": "type123",
+    "aooParentCode": "aoo123",
+    "parentDescription": "description",
+    "products": [
+        {
+            "productId": "prod123",
+            "userRole": "role123",
+            "productOnBoardingStatus": "ACTIVE",
+            "authorized": true,
+            "billing": {
+                "vatNumber": "vat123",
+                "recipientCode": "rec123",
+                "publicServices": true
+            }
+        },
+        {
+            "productId": "prod456",
+            "userRole": "role456",
+            "productOnBoardingStatus": "PENDING",
+            "authorized": false,
+            "billing": {
+                "vatNumber": "vat456",
+                "recipientCode": "rec456",
+                "publicServices": false
+            }
+        }
+    ],
+    "city": "City",
+    "country": "Country",
+    "county": "County",
+    "delegation": true
+}

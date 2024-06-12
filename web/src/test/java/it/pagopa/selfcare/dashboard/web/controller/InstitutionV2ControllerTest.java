@@ -11,9 +11,8 @@ import it.pagopa.selfcare.dashboard.connector.model.user.UserToCreate;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
+import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.web.model.InstitutionUserResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
@@ -31,24 +30,28 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ContextConfiguration(classes = {InstitutionV2Controller.class, InstitutionResourceMapperImpl.class, UserMapperV2Impl.class})
 @WebMvcTest(value = {InstitutionV2Controller.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class InstitutionV2ControllerTest {
 
     private static final String BASE_URL = "/v2/institutions";
+    private static final String FILE_JSON_PATH = "src/test/resources/json/";
 
     @Autowired
     protected MockMvc mvc;
@@ -58,9 +61,6 @@ class InstitutionV2ControllerTest {
 
     @MockBean
     private UserV2Service userServiceMock;
-
-    @Autowired
-    private InstitutionV2Controller institutionV2Controller;
 
     @MockBean
     private InstitutionV2Service institutionV2ServiceMock;
@@ -75,9 +75,10 @@ class InstitutionV2ControllerTest {
     void getInstitutionUser_notNullUser() throws Exception {
         //given
         final String institutionId = "institutionId";
-        final String userId = "notFound";
-        UserInfo userInfo = mockInstance(new UserInfo(), "setId");
-        userInfo.setId(randomUUID().toString());
+        final String userId = "userId";
+
+        byte[] userInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserInfo.json"));
+        UserInfo userInfo = objectMapper.readValue(userInfoStream, UserInfo.class);
 
         String loggedUserId = "loggedUserId";
         Authentication authentication = mock(Authentication.class);
@@ -86,16 +87,15 @@ class InstitutionV2ControllerTest {
         when(institutionV2ServiceMock.getInstitutionUser(any(), any(), any()))
                 .thenReturn(userInfo);
         //when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "InstitutionUserDetailsResource.json")))))
                 .andReturn();
         //then
-        InstitutionUserResource userResource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionUserResource.class);
-        assertNotNull(userResource);
         verify(institutionV2ServiceMock, times(1))
                 .getInstitutionUser(institutionId, userId, loggedUserId);
         verifyNoMoreInteractions(institutionV2ServiceMock);
@@ -112,8 +112,7 @@ class InstitutionV2ControllerTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
 
-        InstitutionBase expectedInstitution = mockInstance(new InstitutionBase());
-        expectedInstitution.setUserRole("MANAGER");
+        InstitutionBase expectedInstitution = getInstitutionBase();
         List<InstitutionBase> expectedInstitutionInfos = new ArrayList<>();
         expectedInstitutionInfos.add(expectedInstitution);
         when(userServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
@@ -123,53 +122,50 @@ class InstitutionV2ControllerTest {
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
                 .andReturn();
         // then
-        List<InstitutionResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+        List<InstitutionBaseResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
                 new TypeReference<>() {
                 });
 
         assertNotNull(resources);
-        assertFalse(resources.isEmpty());
+        assertEquals(resources.get(0).getId(), expectedInstitution.getId());
+        assertEquals(resources.get(0).getUserRole(), "ADMIN");
+        assertEquals(resources.get(0).getName(), expectedInstitution.getName());
         assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus());
-        assertNotNull(resources.get(0).getUserRole());
+        assertEquals(resources.get(0).getParentDescription(), expectedInstitution.getParentDescription());
+
         verify(userServiceMock, times(1))
                 .getInstitutions(userId);
         verifyNoMoreInteractions(userServiceMock);
     }
 
+    private InstitutionBase getInstitutionBase() {
+        InstitutionBase expectedInstitution = mockInstance(new InstitutionBase());
+        expectedInstitution.setId("123456");
+        expectedInstitution.setUserRole("MANAGER");
+        expectedInstitution.setName("name");
+        expectedInstitution.setStatus("status");
+        expectedInstitution.setParentDescription("parentDescription");
+        return expectedInstitution;
+    }
+
     @Test
-    void getInstitutionTest() throws Exception {
-        //given
-        final String institutionId = "institutionId";
-        UserInfo userInfo = mockInstance(new UserInfo(), "setId");
-        userInfo.setId(randomUUID().toString());
+    void getInstitution_institutionInfoNotNull() throws Exception {
+        String institutionId = "institutionId";
+        byte[] institutionStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "Institution.json"));
+        Institution institution = objectMapper.readValue(institutionStream, Institution.class);
 
-        Institution institution = new Institution();
-        institution.setId(institutionId);
+        when(institutionV2ServiceMock.findInstitutionById(anyString())).thenReturn(institution);
 
-        String loggedUserId = "loggedUserId";
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(loggedUserId).build());
-
-        when(institutionV2ServiceMock.findInstitutionById(any()))
-                .thenReturn(institution);
-        //when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}", institutionId)
-                        .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "InstitutionResource.json")))))
                 .andReturn();
-        //then
-        InstitutionResource userResource = objectMapper.readValue(result.getResponse().getContentAsString(), InstitutionResource.class);
-        assertNotNull(userResource);
-        verify(institutionV2ServiceMock, times(1))
-                .findInstitutionById(institutionId);
-        verifyNoMoreInteractions(institutionV2ServiceMock);
-
     }
 
     @Test
@@ -206,7 +202,6 @@ class InstitutionV2ControllerTest {
         final String institutionId = "institutionId";
         final String productId = "productId";
         final String userId = "userId";
-        UserProductRoles userProductRoles = null;
 
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
@@ -216,7 +211,7 @@ class InstitutionV2ControllerTest {
                         .put(BASE_URL + "/{institutionId}/products/{productId}/users/{userId}", institutionId, productId, userId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(userProductRoles))
+                        .content(objectMapper.writeValueAsString(null))
                         .accept(APPLICATION_JSON_VALUE))
                 .andReturn();
 
@@ -237,9 +232,11 @@ class InstitutionV2ControllerTest {
         createUserDto.setEmail("john.doe@example.com");
         createUserDto.setProductRoles(Set.of("admin"));
 
+        String id = UUID.randomUUID().toString();
+
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
-        when(userServiceMock.createUsers(eq(institutionId), eq(productId), any(UserToCreate.class))).thenReturn(UUID.randomUUID().toString());
+        when(userServiceMock.createUsers(eq(institutionId), eq(productId), any(UserToCreate.class))).thenReturn(id);
         // when
         mvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
@@ -248,6 +245,7 @@ class InstitutionV2ControllerTest {
                         .content(objectMapper.writeValueAsString(createUserDto))
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(id)))
                 .andReturn();
 
         // then
@@ -261,7 +259,6 @@ class InstitutionV2ControllerTest {
         // given
         final String institutionId = "institutionId";
         final String productId = "productId";
-        CreateUserDto createUserDto = null;
 
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
@@ -271,7 +268,7 @@ class InstitutionV2ControllerTest {
                         .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(createUserDto))
+                        .content(objectMapper.writeValueAsString(null))
                         .accept(APPLICATION_JSON_VALUE))
                 .andReturn();
 
@@ -292,7 +289,7 @@ class InstitutionV2ControllerTest {
 
         DelegationWithPagination expectedDelegationWithPagination = new DelegationWithPagination(List.of(expectedDelegation), exptectedPageInfo);
 
-        when(delegationServiceMock.getDelegationsV2(any())).thenReturn(expectedDelegationWithPagination);
+        when(delegationServiceMock.getDelegationsV2(delegationParameters)).thenReturn(expectedDelegationWithPagination);
         // When
 
         MvcResult result = mvc
@@ -326,10 +323,18 @@ class InstitutionV2ControllerTest {
         // Given
         DelegationWithInfo expectedDelegation = dummyDelegation();
         PageInfo exptectedPageInfo = new PageInfo(10, 0, 1, 1);
-        GetDelegationParameters delegationParameters = createDelegationParameters(null, "to", "prod-id", "search", Order.ASC, 0, 10);
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .from(null)
+                .to("to")
+                .productId("prod-id")
+                .search("search")
+                .order(Order.ASC.name())
+                .page(0)
+                .size(10)
+                .build();
         DelegationWithPagination expectedDelegationWithPagination = new DelegationWithPagination(List.of(expectedDelegation), exptectedPageInfo);
 
-        when(delegationServiceMock.getDelegationsV2(any())).thenReturn(expectedDelegationWithPagination);
+        when(delegationServiceMock.getDelegationsV2(delegationParameters)).thenReturn(expectedDelegationWithPagination);
         // When
 
         MvcResult result = mvc
@@ -369,31 +374,5 @@ class InstitutionV2ControllerTest {
         delegation.setInstitutionName("setInstitutionFromName");
         delegation.setBrokerName("setInstitutionFromRootName");
         return delegation;
-    }
-
-    private DelegationWithInfo createDelegation(String pattern, String from, String to) {
-        DelegationWithInfo delegation = new DelegationWithInfo();
-        delegation.setId("id_" + pattern);
-        delegation.setProductId("productId");
-        delegation.setType(DelegationType.PT);
-        delegation.setInstitutionId(to);
-        delegation.setBrokerId(from);
-        delegation.setInstitutionName("name_" + from);
-        delegation.setBrokerName("name_" + to);
-        return delegation;
-    }
-
-    private GetDelegationParameters createDelegationParameters(String from, String to, String productId,
-                                                               String search, Order order,
-                                                               Integer page, Integer size) {
-        return GetDelegationParameters.builder()
-                .from(from)
-                .to(to)
-                .productId(productId)
-                .search(search)
-                .order(order.name())
-                .page(page)
-                .size(size)
-                .build();
     }
 }

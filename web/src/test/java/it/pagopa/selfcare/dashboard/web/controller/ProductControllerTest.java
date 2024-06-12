@@ -8,7 +8,6 @@ import it.pagopa.selfcare.dashboard.core.ProductService;
 import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
-import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Test;
@@ -22,15 +21,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.Collection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.EnumMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {ProductController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -38,6 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProductControllerTest {
 
     private static final String BASE_URL = "/v1/products";
+
+    private static final String FILE_JSON_PATH = "src/test/resources/json/";
 
     @Autowired
     protected MockMvc mvc;
@@ -55,30 +57,29 @@ class ProductControllerTest {
     void getProductRoles() throws Exception {
         // given
         String productId = "prod1";
-        when(productServiceMock.getProductRoles(anyString()))
-                .thenReturn(new EnumMap<PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo>(PartyRole.class) {{
-                    put(PartyRole.MANAGER, new ProductRoleInfo());
-                    put(PartyRole.OPERATOR, new ProductRoleInfo());
+        byte[] productRoleInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "ProductRoleInfo.json"));
+        ProductRoleInfo productRoleInfo = objectMapper.readValue(productRoleInfoStream, ProductRoleInfo.class);
+
+        when(productServiceMock.getProductRoles(productId))
+                .thenReturn(new EnumMap<>(PartyRole.class) {{
+                    put(PartyRole.MANAGER, productRoleInfo);
                 }});
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{productId}/roles", productId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
+        mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{productId}/roles", productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "ProductRoleMappingsResource.json")))))
                 .andReturn();
         // then
-        Collection<ProductRoleMappingsResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(resources);
         verify(productServiceMock, times(1))
                 .getProductRoles(productId);
         verifyNoMoreInteractions(productServiceMock);
     }
 
     @Test
-    void getProductBrokers() throws Exception {
+    void getProductBrokersProdPagoPA() throws Exception {
         // given
         BrokerInfo brokerInfo = new BrokerInfo();
         brokerInfo.setCode("code");
@@ -86,7 +87,7 @@ class ProductControllerTest {
 
         String productId = "prod-pagopa";
         String institutionType = "PSP";
-        when(brokerServiceMock.findAllByInstitutionType(anyString()))
+        when(brokerServiceMock.findAllByInstitutionType(institutionType))
                 .thenReturn(List.of(
                         brokerInfo
                 ));
@@ -111,6 +112,42 @@ class ProductControllerTest {
                 .findAllByInstitutionType(institutionType);
         verifyNoMoreInteractions(brokerServiceMock);
     }
+
+    @Test
+    void getProductBrokers() throws Exception {
+        // given
+        BrokerInfo brokerInfo = new BrokerInfo();
+        brokerInfo.setCode("code");
+        brokerInfo.setDescription("description");
+
+        String productId = "prod-io";
+        String institutionType = "PSP";
+        when(brokerServiceMock.findInstitutionsByProductAndType(productId, institutionType ))
+                .thenReturn(List.of(
+                        brokerInfo
+                ));
+        // when
+        MvcResult result = mvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{productId}/brokers/{institutionType}", productId, institutionType)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        List<BrokerResource> resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertNotNull(resources);
+        assertEquals(1, resources.size());
+        assertEquals(brokerInfo.getCode(), resources.get(0).getCode());
+        assertEquals(brokerInfo.getDescription(), resources.get(0).getDescription());
+
+        verify(brokerServiceMock, times(1))
+                .findInstitutionsByProductAndType(productId, institutionType );
+        verifyNoMoreInteractions(brokerServiceMock);
+    }
+
 
     @Test
     void getProductBrokersForUnsupportedType() throws Exception {

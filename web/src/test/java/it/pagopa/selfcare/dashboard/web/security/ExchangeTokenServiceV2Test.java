@@ -55,7 +55,6 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
-import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -135,7 +134,7 @@ class ExchangeTokenServiceV2Test {
         JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(null, null, null, null);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(null, null, Optional.empty(), null);
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
@@ -161,7 +160,7 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct.setProductRole("productRole");
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        userInstitution.setProducts(Collections.emptyList());
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
@@ -172,7 +171,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null, lang);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty(), lang);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -194,7 +193,7 @@ class ExchangeTokenServiceV2Test {
         properties.setDuration("PT5S");
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        userInstitution.setProducts(Collections.emptyList());
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
@@ -205,7 +204,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null, lang);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty(), lang);
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -274,7 +273,7 @@ class ExchangeTokenServiceV2Test {
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
 
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null, lang);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty(), lang);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
@@ -318,7 +317,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null, lang);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty(), lang);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
@@ -974,7 +973,7 @@ class ExchangeTokenServiceV2Test {
         when(UserV2Service.getUserById(any(), any(), any())).thenReturn(pdvUser);
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        userInstitution.setProducts(Collections.emptyList());
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
@@ -1071,7 +1070,7 @@ class ExchangeTokenServiceV2Test {
         PKCS1("classpath:certs/PKCS1Key.pem"),
         PKCS8("classpath:certs/PKCS8key.pem");
 
-        private String resourceLocation;
+        private final String resourceLocation;
 
         PrivateKey(String resourceLocation) {
             this.resourceLocation = resourceLocation;

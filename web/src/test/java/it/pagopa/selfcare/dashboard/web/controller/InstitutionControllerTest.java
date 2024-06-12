@@ -20,11 +20,9 @@ import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
-import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.product.entity.Product;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,16 +40,21 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -59,6 +62,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class InstitutionControllerTest {
 
     private static final String BASE_URL = "/v1/institutions";
+    private static final String FILE_JSON_PATH = "src/test/resources/json/";
     private static final ProductTree PRODUCT_TREE;
     private static final Product PRODUCT;
 
@@ -75,9 +79,6 @@ class InstitutionControllerTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    @InjectMocks
-    private InstitutionController institutionController;
 
     @MockBean
     private FileStorageService storageServiceMock;
@@ -113,77 +114,34 @@ class InstitutionControllerTest {
     }
 
     @Test
-    void getInstitution_institutionInfoNotNull() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        when(institutionServiceMock.findInstitutionById(anyString()))
-                .thenAnswer(invocationOnMock -> {
-                    String id = invocationOnMock.getArgument(0, String.class);
-                    Institution institution = mockInstance(new Institution(), "setExternalId");
-                    institution.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-                    institution.setExternalId(id);
-                    return institution;
-                });
-        // when
-        mvc.perform(MockMvcRequestBuilders
-                .get(BASE_URL + "/{institutionId}", institutionId)
-                .contentType(APPLICATION_JSON_VALUE)
-                .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
-                .andReturn();
-        assertNotNull(resource);
-        verify(institutionServiceMock, times(1))
-                .findInstitutionById(institutionId);
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
     void getProductsTree_notNull() throws Exception {
         // given
-        String institutionId = "institutionId";
+        byte[] productTreeStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "ProductTree.json"));
+        ProductTree productTree = objectMapper.readValue(productTreeStream, ProductTree.class);
+
         when(institutionServiceMock.getProductsTree())
-                .thenReturn(List.of(PRODUCT_TREE));
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/products", institutionId)
+                .thenReturn(singletonList(productTree));
+
+        mvc.perform(get(BASE_URL + "/products")
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "ProductsResource.json")))))
                 .andReturn();
-        // then
-        List<ProductsResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertFalse(products.isEmpty());
-        assertEquals(1, products.get(0).getChildren().size());
-        verify(institutionServiceMock, times(1))
-                .getProductsTree();
-        verifyNoMoreInteractions(institutionServiceMock);
     }
 
     @Test
     void getProductsTree_empty() throws Exception {
-        // given
-        String institutionId = "institutionId";
         when(institutionServiceMock.getProductsTree())
                 .thenReturn(Collections.emptyList());
-        // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/products", institutionId)
+
+        mvc.perform(get(BASE_URL + "/products")
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is2xxSuccessful())
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"))
                 .andReturn();
-        // then
-        List<ProductsResource> products = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(products);
-        assertTrue(products.isEmpty());
+
         verify(institutionServiceMock, times(1))
                 .getProductsTree();
         verifyNoMoreInteractions(institutionServiceMock);
@@ -194,7 +152,7 @@ class InstitutionControllerTest {
         // given
         String institutionId = "institutionId";
         Mockito.doNothing()
-                .when(institutionServiceMock).updateInstitutionGeographicTaxonomy(anyString(), any());
+                .when(institutionServiceMock).updateInstitutionGeographicTaxonomy(eq(institutionId), any());
         GeographicTaxonomyListDto geographicTaxonomyListDto = objectMapper.readValue(
                 geographicTaxonomyDto.getInputStream().readAllBytes(),
                 GeographicTaxonomyListDto.class
@@ -223,11 +181,10 @@ class InstitutionControllerTest {
         // given
         String institutionId = "institutionId";
         List<GeographicTaxonomy> geographicTaxonomyListMock = List.of(mockInstance(new GeographicTaxonomy()));
-        when(institutionServiceMock.getGeographicTaxonomyList(Mockito.anyString()))
+        when(institutionServiceMock.getGeographicTaxonomyList(institutionId))
                 .thenReturn(geographicTaxonomyListMock);
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/geographicTaxonomy", institutionId)
+        MvcResult result = mvc.perform(get(BASE_URL + "/{institutionId}/geographicTaxonomy", institutionId)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -244,14 +201,14 @@ class InstitutionControllerTest {
                 .getGeographicTaxonomyList(institutionId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
-    
+
     @Test
     void updateInstitutionDescription_ok() throws Exception {
         //given
         String institutionId = "setId";
         UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
         Institution institutionMock = mockInstance(new Institution());
-        when(institutionServiceMock.updateInstitutionDescription(anyString(), any())).thenReturn(institutionMock);
+        when(institutionServiceMock.updateInstitutionDescription(institutionId, resource)).thenReturn(institutionMock);
 
         //when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -284,19 +241,20 @@ class InstitutionControllerTest {
     void getDelegationsUsingFrom_shouldGetData() throws Exception {
         // Given
         Delegation expectedDelegation = dummyDelegation();
+        GetDelegationParameters getDelegationParameters = dummyDelegationParametersFrom();
 
-        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(getDelegationParameters)).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
-                .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/partners?productId={productId}", expectedDelegation.getInstitutionId(), expectedDelegation.getProductId()))
+                .perform(get(BASE_URL + "/{institutionId}/partners?productId={productId}", expectedDelegation.getInstitutionId(), expectedDelegation.getProductId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
 
         List<DelegationResource> resource = objectMapper.readValue(
-                result.getResponse().getContentAsString(), new TypeReference<>() {});
+                result.getResponse().getContentAsString(), new TypeReference<>() {
+                });
         // Then
         assertThat(resource).isNotNull();
         org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
@@ -309,7 +267,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(dummyDelegationParametersFrom());
+                .getDelegations(getDelegationParameters);
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -322,12 +280,11 @@ class InstitutionControllerTest {
         Delegation expectedDelegation = dummyDelegation();
         GetDelegationParameters delegationParameters = dummyDelegationParametersTo();
 
-        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(delegationParameters)).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
-                .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
+                .perform(get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
                                 delegationParameters.getTo(), delegationParameters.getProductId(), delegationParameters.getSearch(),
                                 delegationParameters.getTaxCode(), delegationParameters.getPage(), delegationParameters.getSize()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -335,7 +292,8 @@ class InstitutionControllerTest {
                 .andReturn();
 
         List<DelegationResource> resource = objectMapper.readValue(
-                result.getResponse().getContentAsString(), new TypeReference<>() {});
+                result.getResponse().getContentAsString(), new TypeReference<>() {
+                });
         // Then
         assertThat(resource).isNotNull();
         org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
@@ -348,7 +306,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(dummyDelegationParametersTo());
+                .getDelegations(delegationParameters);
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -361,18 +319,18 @@ class InstitutionControllerTest {
                 .to("to")
                 .build();
 
-        when(delegationService.getDelegations(any())).thenReturn(List.of(expectedDelegation));
+        when(delegationService.getDelegations(delegationParameters)).thenReturn(List.of(expectedDelegation));
         // When
 
         MvcResult result = mvc
-                .perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/institutions", expectedDelegation.getBrokerId()))
+                .perform(get(BASE_URL + "/{institutionId}/institutions", expectedDelegation.getBrokerId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andReturn();
 
         List<DelegationResource> resource = objectMapper.readValue(
-                result.getResponse().getContentAsString(), new TypeReference<>() {});
+                result.getResponse().getContentAsString(), new TypeReference<>() {
+                });
         // Then
         assertThat(resource).isNotNull();
         org.assertj.core.api.Assertions.assertThat(resource).hasSize(1);
