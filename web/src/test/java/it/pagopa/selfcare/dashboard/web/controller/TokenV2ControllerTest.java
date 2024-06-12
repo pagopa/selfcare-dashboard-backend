@@ -22,7 +22,8 @@ import java.net.URI;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -47,7 +48,7 @@ class TokenV2ControllerTest {
         // given
         String institutionId = "inst1";
         String productId = "prod1";
-        Mockito.when(exchangeTokenServiceMock.exchange(anyString(), anyString(), any(), eq(null)))
+        Mockito.when(exchangeTokenServiceMock.exchange(anyString(), anyString(), any()))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
@@ -63,7 +64,7 @@ class TokenV2ControllerTest {
         assertNotNull(resource);
         assertNotNull(resource.getToken());
         verify(exchangeTokenServiceMock, Mockito.times(1))
-                .exchange(institutionId, productId, Optional.empty(), null);
+                .exchange(institutionId, productId, Optional.empty());
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 
@@ -72,13 +73,12 @@ class TokenV2ControllerTest {
         // given
         String institutionId = "inst1";
         String lang = "en";
-        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(anyString(), anyString()))
+        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(anyString()))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/exchange/fatturazione")
                         .param("institutionId", institutionId)
-                        .param("lang", lang)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
@@ -87,7 +87,7 @@ class TokenV2ControllerTest {
         URI resource = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
         assertNotNull(resource);
         verify(exchangeTokenServiceMock, Mockito.times(1))
-                .retrieveBillingExchangedToken(institutionId, lang);
+                .retrieveBillingExchangedToken(institutionId);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 

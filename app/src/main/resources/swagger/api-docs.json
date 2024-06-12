@@ -1878,15 +1878,6 @@
           "schema" : {
             "type" : "string"
           }
-        }, {
-          "name" : "lang",
-          "in" : "query",
-          "description" : "Selected language",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
         } ],
         "responses" : {
           "200" : {

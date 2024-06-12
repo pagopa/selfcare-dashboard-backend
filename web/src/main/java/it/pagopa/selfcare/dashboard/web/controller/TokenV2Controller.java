@@ -51,7 +51,7 @@ public class TokenV2Controller {
         log.trace("exchange start");
         log.debug("exchange institutionId = {}, productId = {}", institutionId, productId);
 
-        String token = exchangeTokenService.exchange(institutionId, productId, environment, null).getIdentityToken();
+        String token = exchangeTokenService.exchange(institutionId, productId, environment).getIdentityToken();
         IdentityTokenResource identityToken = new IdentityTokenResource();
         identityToken.setToken(token);
 
@@ -72,16 +72,13 @@ public class TokenV2Controller {
                             @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
                             @RequestParam(value = "environment", required = false)
                             Optional<String> environment,
-                            JwtAuthenticationToken jwtAuthenticationToken,
-                            @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.lang}")
-                            @RequestParam(value = "lang", required = false)
-                            String lang) {
+                            JwtAuthenticationToken jwtAuthenticationToken) {
 
         log.trace("billing exchange start");
         log.debug("billing exchange institutionId = {}", Encode.forJava(institutionId));
         log.info("env parameter: {}", Encode.forJava(environment.orElse("")));
 
-        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId, lang);
+        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "billing exchange result = {}", Encode.forJava(String.valueOf(location)));
         log.trace("billing exchange end");

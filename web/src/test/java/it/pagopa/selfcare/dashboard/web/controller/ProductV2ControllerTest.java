@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.net.URI;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -48,9 +49,12 @@ class ProductV2ControllerTest {
         String institutionId = "inst1";
         String lang = "en";
         final String identityToken = "identityToken";
-        final String backOfficeUrl = "back-office-url#token=";
-        when(exchangeTokenServiceMock.exchange(any(), any(), any(), anyString()))
-                .thenReturn(new ExchangedToken(identityToken, backOfficeUrl + "<IdentityToken>"));
+        final String backOfficeUrl = "back-office-url#token=<IdentityToken>?lang=<lang>";
+        final ExchangedToken exchangedToken = new ExchangedToken(identityToken, backOfficeUrl
+                .replace("<IdentityToken>", identityToken)
+                .replace("<lang>", lang));
+        when(exchangeTokenServiceMock.exchange(any(), any(), any()))
+                .thenReturn(exchangedToken);
         // when
         MvcResult result = mvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/{productId}/back-office", productId)
@@ -63,10 +67,11 @@ class ProductV2ControllerTest {
         // then
         URI response = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
         assertTrue(response.toString().contains(identityToken));
-        assertTrue(response.toString().contains(backOfficeUrl));
+        assertTrue(response.toString().contains(lang));
+        assertEquals(response.toString(), exchangedToken.getBackOfficeUrl());
 
         verify(exchangeTokenServiceMock, times(1))
-                .exchange(institutionId, productId, Optional.empty(), lang);
+                .exchange(institutionId, productId, Optional.empty());
         verifyNoMoreInteractions(exchangeTokenServiceMock);
         verifyNoInteractions(productServiceMock);
     }
