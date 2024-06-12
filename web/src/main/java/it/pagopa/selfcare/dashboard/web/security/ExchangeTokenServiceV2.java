@@ -134,7 +134,7 @@ public class ExchangeTokenServiceV2 {
         return new ExchangedToken(jwts, urlBO);
     }
 
-    public ExchangedToken retrieveBillingExchangedToken(String institutionId) {
+    public ExchangedToken retrieveBillingExchangedToken(String institutionId, String lang) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null || authentication.getCredentials() == null) {
             throw new IllegalStateException("Authentication is required");
@@ -165,8 +165,9 @@ public class ExchangeTokenServiceV2 {
         String jwts = createJwts(claims);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
         log.trace("exchange end");
+        final String billingUrlLang = Objects.nonNull(lang) ? billingUrl.concat("?lang=" + lang) : billingUrl;
 
-        return new ExchangedToken(jwts, billingUrl);
+        return new ExchangedToken(jwts, billingUrlLang);
     }
 
     private List<String> retrieveInvoiceableProductList() {
