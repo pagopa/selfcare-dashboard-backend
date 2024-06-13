@@ -1,19 +1,24 @@
 package it.pagopa.selfcare.dashboard.connector.rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.model.groups.*;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
 import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +28,6 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.rest.UserGroupConnectorImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static java.util.Collections.emptyList;
 import static java.util.UUID.randomUUID;
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -31,7 +35,7 @@ import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 
 @ExtendWith(MockitoExtension.class)
-class UserGroupConnectorImplTest {
+class UserGroupConnectorImplTest extends BaseConnectorTest {
 
     @Mock
     private UserGroupRestClient restClientMock;
@@ -45,51 +49,54 @@ class UserGroupConnectorImplTest {
     @Captor
     private ArgumentCaptor<UpdateUserGroupRequestDto> updateRequestCaptor;
 
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+    }
+
     @Test
     void createGroup_nullGroup() {
-        //given
-        CreateUserGroup userGroup = null;
-        //when
-        Executable executable = () -> groupConnector.createUserGroup(userGroup);
-        //then
+
+        Executable executable = () -> groupConnector.createUserGroup(null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A User Group is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
     }
 
     @Test
-    void createGroup() {
-        //given
-        CreateUserGroup userGroup = mockInstance(new CreateUserGroup());
-        userGroup.setMembers(List.of("string1", "string2"));
-        UserGroupResponse response = mockInstance(new UserGroupResponse());
-        when(restClientMock.createUserGroup(any()))
-                .thenReturn(response);
-        //when
-        String groupId = groupConnector.createUserGroup(userGroup);
-        //then
-        verify(restClientMock, times(1))
-                .createUserGroup(requestDtoArgumentCaptor.capture());
-        CreateUserGroupRequestDto request = requestDtoArgumentCaptor.getValue();
-        assertEquals(userGroup.getName(), request.getName());
-        assertEquals(userGroup.getDescription(), request.getDescription());
-        assertEquals(userGroup.getMembers(), request.getMembers());
-        assertEquals(userGroup.getInstitutionId(), request.getInstitutionId());
-        assertEquals(userGroup.getProductId(), request.getProductId());
-        assertEquals(UserGroupStatus.ACTIVE, request.getStatus());
-        assertEquals(response.getId(), groupId);
+    void createGroup() throws IOException {
 
-        verifyNoMoreInteractions(restClientMock);
+        ClassPathResource resource = new ClassPathResource("stubs/createUserGroup.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        CreateUserGroup userGroup = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        ClassPathResource resourceRequest = new ClassPathResource("stubs/createUserGroupRequest.json");
+        byte[] resourceStreamRequest = Files.readAllBytes(resourceRequest.getFile().toPath());
+        CreateUserGroupRequestDto userGroupRequest = objectMapper.readValue(resourceStreamRequest, new TypeReference<>() {
+        });
+
+        ClassPathResource ResponseResource = new ClassPathResource("stubs/userGroupResponse.json");
+        byte[] responseStream = Files.readAllBytes(ResponseResource.getFile().toPath());
+        UserGroupResponse response = objectMapper.readValue(responseStream, new TypeReference<>() {
+        });
+
+        when(restClientMock.createUserGroup(userGroupRequest)).thenReturn(response);
+        String groupId = groupConnector.createUserGroup(userGroup);
+
+        assertEquals(response.getId(), groupId);
+        Mockito.verify(restClientMock, times(1))
+                .createUserGroup(requestDtoArgumentCaptor.capture());
     }
 
     @Test
     void updateGroup_nullGroup() {
-        //given
+
         String groupId = "groupId";
-        UpdateUserGroup userGroup = null;
-        //when
-        Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
-        //then
+
+        Executable executable = () -> groupConnector.updateUserGroup(groupId, null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A User Group is required", e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
@@ -97,13 +104,12 @@ class UserGroupConnectorImplTest {
 
     @Test
     void updateGroup_nullId() {
-        //given
-        String groupId = null;
+
         UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
         userGroup.setMembers(List.of("string1", "string2"));
-        //when
-        Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
-        //then
+
+        Executable executable = () -> groupConnector.updateUserGroup(null, userGroup);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
         Mockito.verifyNoInteractions(restClientMock);
@@ -111,13 +117,13 @@ class UserGroupConnectorImplTest {
 
     @Test
     void updateGroup() {
-        //given
+
         String groupId = "groupId";
         UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
         userGroup.setMembers(List.of("string1", "string2"));
-        //when
+
         Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
-        //then
+
         assertDoesNotThrow(executable);
         verify(restClientMock, times(1))
                 .updateUserGroupById(any(), updateRequestCaptor.capture());
@@ -142,10 +148,8 @@ class UserGroupConnectorImplTest {
 
     @Test
     void delete_nullGroupId() {
-        //given
-        String groupId = null;
         //when
-        Executable executable = () -> groupConnector.delete(groupId);
+        Executable executable = () -> groupConnector.delete(null);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
@@ -166,10 +170,8 @@ class UserGroupConnectorImplTest {
 
     @Test
     void activate_nullGroupId() {
-        //given
-        String groupId = null;
         //when
-        Executable executable = () -> groupConnector.activate(groupId);
+        Executable executable = () -> groupConnector.activate(null);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
@@ -190,10 +192,8 @@ class UserGroupConnectorImplTest {
 
     @Test
     void suspend_nullGroupId() {
-        //given
-        String groupId = null;
         //when
-        Executable executable = () -> groupConnector.suspend(groupId);
+        Executable executable = () -> groupConnector.suspend(null);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
@@ -201,69 +201,55 @@ class UserGroupConnectorImplTest {
     }
 
     @Test
-    void getUserGroupById() {
-        //given
+    void getUserGroupById() throws IOException {
+
         String id = "id";
-        UserGroupResponse response = mockInstance(new UserGroupResponse(), "setMembers");
-        response.setMembers(List.of(randomUUID().toString(), randomUUID().toString()));
-        response.setCreatedAt(Instant.now());
-        response.setModifiedAt(Instant.now());
-        when(restClientMock.getUserGroupById(anyString()))
-                .thenReturn(response);
-        //when
+
+        ClassPathResource resource = new ClassPathResource("stubs/userGroupResponseSingle.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserGroupResponse expectedResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        ClassPathResource resourceResponse = new ClassPathResource("stubs/userGroupInfoGetUserGroupByIdSingle.json");
+        byte[] resourceStreamResponse = Files.readAllBytes(resourceResponse.getFile().toPath());
+        UserGroupInfo expectedGroupInfoResponse = objectMapper.readValue(resourceStreamResponse, new TypeReference<>() {
+        });
+
+        when(restClientMock.getUserGroupById(anyString())).thenReturn(expectedResponse);
+
         UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
-        //then
-        assertEquals(response.getId(), groupInfo.getId());
-        assertEquals(response.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response.getProductId(), groupInfo.getProductId());
-        assertEquals(response.getStatus(), groupInfo.getStatus());
-        assertEquals(response.getDescription(), groupInfo.getDescription());
-        assertEquals(response.getName(), groupInfo.getName());
-        assertEquals(response.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(toList()));
-        assertEquals(response.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(response.getModifiedBy(), groupInfo.getModifiedBy().getId());
-        verify(restClientMock, times(1))
-                .getUserGroupById(anyString());
+        assertEquals(expectedGroupInfoResponse, groupInfo);
+
+        verify(restClientMock, times(1)).getUserGroupById(anyString());
         verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
-    void getUserGroupById_nullModifiedBy() {
-        //given
+    void getUserGroupById_nullModifiedBy() throws IOException {
+
         String id = "id";
-        UserGroupResponse response = mockInstance(new UserGroupResponse(), "setMembers", "setModifiedBy");
-        response.setMembers(List.of(randomUUID().toString(), randomUUID().toString()));
-        response.setCreatedAt(Instant.now());
-        response.setModifiedAt(Instant.now());
-        when(restClientMock.getUserGroupById(anyString()))
-                .thenReturn(response);
-        //when
+
+        ClassPathResource resource = new ClassPathResource("stubs/userGroupResponseNullModifiedBy.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserGroupResponse expectedResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        ClassPathResource resourceResponse = new ClassPathResource("stubs/userGroupInfoNullModifiedBy.json");
+        byte[] resourceStreamResponse = Files.readAllBytes(resourceResponse.getFile().toPath());
+        UserGroupInfo expectedGroupInfo = objectMapper.readValue(resourceStreamResponse, new TypeReference<>() {
+        });
+
+        when(restClientMock.getUserGroupById(anyString())).thenReturn(expectedResponse);
+
         UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
-        //then
-        assertEquals(response.getId(), groupInfo.getId());
-        assertEquals(response.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response.getProductId(), groupInfo.getProductId());
-        assertEquals(response.getStatus(), groupInfo.getStatus());
-        assertEquals(response.getDescription(), groupInfo.getDescription());
-        assertEquals(response.getName(), groupInfo.getName());
-        assertEquals(response.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(toList()));
-        assertEquals(response.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response.getModifiedAt(), groupInfo.getModifiedAt());
-        assertNull(groupInfo.getModifiedBy());
-        verify(restClientMock, times(1))
-                .getUserGroupById(anyString());
-        verifyNoMoreInteractions(restClientMock);
+        assertEquals(expectedGroupInfo, groupInfo);
+        verify(restClientMock, times(1)).getUserGroupById(anyString());
     }
 
     @Test
     void getUserGroupById_nullId() {
-        //given
-        String id = null;
         //when
-        Executable executable = () -> groupConnector.getUserGroupById(id);
+        Executable executable = () -> groupConnector.getUserGroupById(null);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
@@ -287,11 +273,9 @@ class UserGroupConnectorImplTest {
 
     @Test
     void addMemberToUserGroup_nullId() {
-        //given
-        String groupId = null;
         UUID userId = randomUUID();
         //when
-        Executable executable = () -> groupConnector.addMemberToUserGroup(groupId, userId);
+        Executable executable = () -> groupConnector.addMemberToUserGroup(null, userId);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
@@ -302,9 +286,8 @@ class UserGroupConnectorImplTest {
     void addMemberToUserGroup_nullUserId() {
         //given
         String groupId = "groupId";
-        UUID userId = null;
         //when
-        Executable executable = () -> groupConnector.addMemberToUserGroup(groupId, userId);
+        Executable executable = () -> groupConnector.addMemberToUserGroup(groupId, null);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
@@ -327,11 +310,9 @@ class UserGroupConnectorImplTest {
 
     @Test
     void deleteMemberFromUserGroup_nullId() {
-        //given
-        String groupId = null;
         UUID userId = randomUUID();
         //when
-        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(groupId, userId);
+        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(null, userId);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
@@ -342,9 +323,8 @@ class UserGroupConnectorImplTest {
     void deleteMemberFromUserGroup_nullUserId() {
         //given
         String groupId = "groupId";
-        UUID userId = null;
         //when
-        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(groupId, userId);
+        Executable executable = () -> groupConnector.deleteMemberFromUserGroup(groupId, null);
         //then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
@@ -352,8 +332,8 @@ class UserGroupConnectorImplTest {
     }
 
     @Test
-    void getUserGroups() {
-        //given
+    void getUserGroups() throws IOException {
+        // Given
         Optional<String> institutionId = Optional.of("institutionId");
         Optional<String> productId = Optional.of("productId");
         Optional<UUID> userId = Optional.of(randomUUID());
@@ -362,31 +342,39 @@ class UserGroupConnectorImplTest {
         filter.setProductId(productId);
         filter.setUserId(userId);
         Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
-        UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of(randomUUID().toString(), randomUUID().toString()));
-        response1.setCreatedAt(Instant.now());
-        response1.setModifiedAt(Instant.now());
-        when(restClientMock.getUserGroups(anyString(), anyString(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
-        //when
+
+        ClassPathResource resource = new ClassPathResource("stubs/userGroupInfoGetUserGroups.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        ClassPathResource ResponseResource = new ClassPathResource("stubs/userGroupResponse.json");
+        byte[] responseStream = Files.readAllBytes(ResponseResource.getFile().toPath());
+        UserGroupResponse response = objectMapper.readValue(responseStream, new TypeReference<>() {
+        });
+
+
+        when(restClientMock.getUserGroups(filter.getInstitutionId().orElse(null),
+                filter.getProductId().orElse(null),
+                filter.getUserId().orElse(null),
+                List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED),
+                pageable))
+                .thenReturn(new PageImpl<>(List.of(response)));
+
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
-        //then
-        assertNotNull(groupInfos);
-        assertNotNull(groupInfos.getContent());
-        assertEquals(1, groupInfos.getContent().size());
-        UserGroupInfo groupInfo = groupInfos.iterator().next();
-        assertEquals(response1.getId(), groupInfo.getId());
-        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response1.getProductId(), groupInfo.getProductId());
-        assertEquals(response1.getStatus(), groupInfo.getStatus());
-        assertEquals(response1.getDescription(), groupInfo.getDescription());
-        assertEquals(response1.getName(), groupInfo.getName());
-        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(toList()));
-        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
-        verifyNoMoreInteractions(restClientMock);
+
+        assertEquals(1, groupInfos.getTotalElements());
+        assertEquals(userGroupInfo, groupInfos.getContent().get(0));
+        Mockito.verify(restClientMock, times(1))
+                .getUserGroups(filter.getInstitutionId().orElse(null),
+                        filter.getProductId().orElse(null),
+                        filter.getUserId().orElse(null),
+                        List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED),
+                        pageable);
+
+        UserGroupInfo actualUserGroupInfo = groupInfos.getContent().get(0);
+        assertEquals(userGroupInfo, actualUserGroupInfo);
+
     }
 
     @Test
@@ -405,7 +393,7 @@ class UserGroupConnectorImplTest {
     }
 
     @Test
-    void getUserGroups_notEmptyInstitutionId_notEmptyProductId() {
+    void getUserGroups_notEmptyInstitutionId_notEmptyProductId() throws IOException {
         //given
         Optional<String> institutionId = Optional.of("institutionId");
         Optional<String> productId = Optional.of("productId");
@@ -414,65 +402,51 @@ class UserGroupConnectorImplTest {
         filter.setProductId(productId);
         Pageable pageable = Pageable.unpaged();
         UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of(randomUUID().toString(), randomUUID().toString()));
-        response1.setCreatedAt(Instant.now());
-        response1.setModifiedAt(Instant.now());
+        response1.setMembers(List.of("123", "321"));
+        response1.setCreatedAt(Instant.MAX);
+        response1.setModifiedAt(Instant.MAX);
         when(restClientMock.getUserGroups(anyString(), anyString(), any(), any(), any()))
                 .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+
+        ClassPathResource resource = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
+
+        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
+
         //then
-        assertNotNull(groupInfos);
-        assertNotNull(groupInfos.getContent());
-        assertEquals(1, groupInfos.getContent().size());
-        UserGroupInfo groupInfo = groupInfos.iterator().next();
-        assertEquals(response1.getId(), groupInfo.getId());
-        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response1.getProductId(), groupInfo.getProductId());
-        assertEquals(response1.getStatus(), groupInfo.getStatus());
-        assertEquals(response1.getDescription(), groupInfo.getDescription());
-        assertEquals(response1.getName(), groupInfo.getName());
-        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(toList()));
-        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+        assertEquals(groupInfos.getContent().get(0), expectedUserGroupInfo);
         verify(restClientMock, times(1))
                 .getUserGroups(eq(institutionId.get()), eq(productId.get()), isNull(), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
         verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
-    void getUserGroups_notEmptyUserId() {
+    void getUserGroups_notEmptyUserId() throws IOException {
         //given
         Optional<UUID> userId = Optional.of(randomUUID());
         UserGroupFilter filter = new UserGroupFilter();
         filter.setUserId(userId);
         Pageable pageable = Pageable.unpaged();
         UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of(randomUUID().toString(), randomUUID().toString()));
-        response1.setCreatedAt(Instant.now());
-        response1.setModifiedAt(Instant.now());
+        response1.setMembers(List.of("123", "321"));
+        response1.setCreatedAt(Instant.MAX);
+        response1.setModifiedAt(Instant.MAX);
         when(restClientMock.getUserGroups(any(), any(), any(), anyList(), any()))
                 .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
-        assertNotNull(groupInfos);
-        assertNotNull(groupInfos.getContent());
-        assertEquals(1, groupInfos.getContent().size());
-        UserGroupInfo groupInfo = groupInfos.iterator().next();
-        assertEquals(response1.getId(), groupInfo.getId());
-        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response1.getProductId(), groupInfo.getProductId());
-        assertEquals(response1.getStatus(), groupInfo.getStatus());
-        assertEquals(response1.getDescription(), groupInfo.getDescription());
-        assertEquals(response1.getName(), groupInfo.getName());
-        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(toList()));
-        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+
+        ClassPathResource resource = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
+
+        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
+        assertEquals(groupInfos.getContent().get(0), expectedUserGroupInfo);
+
         verify(restClientMock, times(1))
                 .getUserGroups(isNull(), isNull(), eq(userId.get()), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
         verifyNoMoreInteractions(restClientMock);
@@ -492,50 +466,43 @@ class UserGroupConnectorImplTest {
         assertNotNull(groupInfos);
         assertTrue(groupInfos.isEmpty());
         verify(restClientMock, times(1))
-                .getUserGroups(isNull(), isNull(), isNull(),eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
+                .getUserGroups(isNull(), isNull(), isNull(), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
         verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
-    void groupResponse_toGroupInfo() {
+    void groupResponse_toGroupInfo() throws IOException {
         //given
         UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of(randomUUID().toString(), randomUUID().toString()));
-        response1.setCreatedAt(Instant.now());
-        response1.setModifiedAt(Instant.now());
+        response1.setMembers(List.of("123", "321"));
+        response1.setCreatedAt(Instant.MAX);
+        response1.setModifiedAt(Instant.MAX);
         //when
         UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response1);
         //then
-        assertEquals(response1.getId(), groupInfo.getId());
-        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response1.getProductId(), groupInfo.getProductId());
-        assertEquals(response1.getStatus(), groupInfo.getStatus());
-        assertEquals(response1.getDescription(), groupInfo.getDescription());
-        assertEquals(response1.getName(), groupInfo.getName());
-        assertEquals(response1.getMembers(), groupInfo.getMembers().stream().map(UserInfo::getId).collect(toList()));
-        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+        ClassPathResource resource = new ClassPathResource("stubs/groupResponse_toGroupInfo.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
+
+        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
+        assertEquals(groupInfo, expectedUserGroupInfo);
     }
 
     @Test
-    void groupResponse_toGroupInfo_nullMembers() {
+    void groupResponse_toGroupInfo_nullMembers() throws IOException {
         //given
         UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
+        response1.setCreatedAt(Instant.MAX);
+        response1.setModifiedAt(Instant.MAX);
         //when
         UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response1);
         //then
-        assertEquals(response1.getId(), groupInfo.getId());
-        assertEquals(response1.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(response1.getProductId(), groupInfo.getProductId());
-        assertEquals(response1.getStatus(), groupInfo.getStatus());
-        assertEquals(response1.getDescription(), groupInfo.getDescription());
-        assertEquals(response1.getName(), groupInfo.getName());
-        assertEquals(response1.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(response1.getCreatedBy(), groupInfo.getCreatedBy().getId());
-        assertEquals(response1.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(response1.getModifiedBy(), groupInfo.getModifiedBy().getId());
+        ClassPathResource resource = new ClassPathResource("stubs/groupResponse_toGroupInfo_nullMembers.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
+
+        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
+        assertEquals(groupInfo, expectedUserGroupInfo);
     }
 
     @Test
@@ -559,11 +526,10 @@ class UserGroupConnectorImplTest {
     @Test
     void deleteMembers_institutionId() {
         //given
-        String institutionId = null;
         String productId = "productId";
         UUID memberId = randomUUID();
         //when
-        Executable executable = () -> groupConnector.deleteMembers(memberId.toString(), institutionId, productId);
+        Executable executable = () -> groupConnector.deleteMembers(memberId.toString(), null, productId);
         //when
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         Assertions.assertEquals("Required institutionId", e.getMessage());

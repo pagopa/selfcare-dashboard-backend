@@ -67,13 +67,12 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
 
     private enum TestCase {
         FULLY_VALUED,
-        FULLY_NULL,
-        EMPTY_RESULT
+        FULLY_NULL
     }
 
-    private static final Map<UserGroupRestClientTest.TestCase, String> testCase2igroupdMap = new EnumMap<>(UserGroupRestClientTest.TestCase.class) {{
-        put(UserGroupRestClientTest.TestCase.FULLY_VALUED, "groupId1");
-        put(UserGroupRestClientTest.TestCase.FULLY_NULL, "groupId2");
+    private static final Map<TestCase, String> testCase2igroupdMap = new EnumMap<>(TestCase.class) {{
+        put(TestCase.FULLY_VALUED, "groupId1");
+        put(TestCase.FULLY_NULL, "groupId2");
     }};
     @Autowired
     private UserGroupRestClient restClient;

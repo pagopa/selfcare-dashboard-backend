@@ -8,6 +8,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +54,6 @@ public class BackOfficeAuthorizationInterceptorTest {
 
         // then
         Map<String, Collection<String>> headers = requestTemplate.headers();
-        assertEquals(Arrays.asList("1"), headers.get("Ocp-Apim-Subscription-Key"));
+        assertEquals(List.of("1"), headers.get("Ocp-Apim-Subscription-Key"));
     }
 }
