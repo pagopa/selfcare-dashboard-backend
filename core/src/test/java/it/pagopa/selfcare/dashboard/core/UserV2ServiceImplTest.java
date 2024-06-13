@@ -1,9 +1,9 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
-import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
@@ -17,6 +17,7 @@ import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.entity.ProductRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -25,213 +26,266 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-@ExtendWith({MockitoExtension.class})
-class UserV2ServiceImplTest {
-
-    @Mock
-    private UserRegistryConnector userConnectorMock;
+@ExtendWith(MockitoExtension.class)
+public class UserV2ServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
-    private UserV2ServiceImpl userService;
-
+    private UserV2ServiceImpl userV2ServiceImpl;
     @Mock
     private MsCoreConnector msCoreConnectorMock;
-
     @Mock
-    private UserApiConnector userApiConnector;
-
+    private UserGroupV2Service userGroupServiceMock;
     @Mock
-    private UserGroupV2Service userGroupService;
-
+    private UserApiConnector userApiConnectorMock;
     @Mock
-    private ProductsConnector productsConnector;
+    private ProductsConnector productsConnectorMock;
 
-    @Test
-    void getInstitutions() {
-        // given
-        String userId = "userId";
-        InstitutionBase expectedInstitutionInfo = new InstitutionBase();
-
-        when(userApiConnector.getUserInstitutions(userId)).thenReturn(List.of(expectedInstitutionInfo));
-        // when
-        Collection<InstitutionBase> institutions = userService.getInstitutions(userId);
-
-        assertNotNull(institutions);
-        assertEquals(1, institutions.size());
-        assertSame(expectedInstitutionInfo, institutions.iterator().next());
-        verifyNoMoreInteractions(msCoreConnectorMock);
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
     }
 
+    @Test
+    void getInstitutionsNullUserId() {
+
+        String userId = null;
+        Collection<InstitutionBase> result = userV2ServiceImpl.getInstitutions(userId);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getInstitutions() throws IOException {
+
+        String userId = "userId";
+        ClassPathResource resource = new ClassPathResource("expectations/InstitutionBase.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Collection<InstitutionBase> expectedInstitutions = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiConnectorMock.getUserInstitutions(userId)).thenReturn((List<InstitutionBase>) expectedInstitutions);
+        Collection<InstitutionBase> result = userV2ServiceImpl.getInstitutions(userId);
+        Assertions.assertEquals(expectedInstitutions, result);
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUserInstitutions(userId);
+    }
+
+    @Test
+    void getUserByIdNullUserId() {
+
+        String userId = null;
+        String institutionId = "institutionId";
+        List<String> fields = new ArrayList<>();
+        User result = userV2ServiceImpl.getUserById(userId, institutionId, fields);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void getUserById() throws IOException {
+
+        String userId = "userId";
+        String institutionId = "institutionId";
+        List<String> fields = new ArrayList<>();
+
+        ClassPathResource resource = new ClassPathResource("expectations/User.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        User user = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiConnectorMock.getUserById(userId, "institutionId", new ArrayList<>())).thenReturn(user);
+
+        User result = userV2ServiceImpl.getUserById(userId, institutionId, fields);
+        Assertions.assertEquals(user, result);
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUserById(userId, institutionId, fields);
+    }
+
+    @Test
+    void searchUserByFiscalCodeNullFiscalCode() {
+
+        String fiscalCode = null;
+        String institutionId = "institutionId";
+        User result = userV2ServiceImpl.searchUserByFiscalCode(fiscalCode, institutionId);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void searchUserByFiscalCodeNullReturn() {
+
+        String fiscalCode = "fiscalCode";
+        String institutionId = "institutionId";
+        when(userApiConnectorMock.searchByFiscalCode(fiscalCode, institutionId)).thenReturn(null);
+        User result = userV2ServiceImpl.searchUserByFiscalCode(fiscalCode, institutionId);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void searchUserByFiscalCode() throws IOException {
+
+        String fiscalCode = "fiscalCode";
+        String institutionId = "institutionId";
+        ClassPathResource resource = new ClassPathResource("expectations/User.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        User user = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+        when(userApiConnectorMock.searchByFiscalCode(fiscalCode, institutionId)).thenReturn(user);
+        User result = userV2ServiceImpl.searchUserByFiscalCode(fiscalCode, institutionId);
+        Assertions.assertEquals(user, result);
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).searchByFiscalCode(fiscalCode, institutionId);
+    }
+
+    @Test
+    void getUsersByInstitutionIdWithoutInstitutionId() {
+
+        String institutionId = null;
+        String productId = "productId";
+        List<String> productRoles = new ArrayList<>();
+        String loggedUserId = "loggedUserId";
+
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getUsersByInstitutionIdEmptyUserInfo() {
+
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String loggedUserId = "loggedUserId";
+        List<String> productRoles = new ArrayList<>();
+        productRoles.add("productRole");
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
+
+        when(userApiConnectorMock.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(new ArrayList<>());
+
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getUsersByInstitutionId() throws IOException {
+
+        String institutionId = "institutionId";
+        String productId = "productId";
+        List<String> productRoles = new ArrayList<>();
+        productRoles.add("productRole");
+        String loggedUserId = "loggedUserId";
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
+
+        ClassPathResource resource = new ClassPathResource("expectations/CollectionUserInfo.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Collection<UserInfo> userInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiConnectorMock.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(userInfo);
+
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Assertions.assertEquals(userInfo, result);
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUsers(institutionId, userInfoFilter, loggedUserId);
+    }
 
     @Test
     void suspend() {
-        // given
+
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
         String productRole = "admin";
 
-        // when
-        userService.suspendUserProduct(userId, institutionid, productId, productRole);
-        Mockito.verify(userApiConnector, Mockito.times(1))
+        userV2ServiceImpl.suspendUserProduct(userId, institutionid, productId, productRole);
+        verify(userApiConnectorMock, times(1))
                 .suspendUserProduct(userId, institutionid, productId, productRole);
-        Mockito.verifyNoMoreInteractions(userApiConnector);
+        Mockito.verifyNoMoreInteractions(userApiConnectorMock);
     }
 
 
     @Test
     void activate() {
-        // given
+
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
         String productRole = "admin";
 
-        // when
-        userService.activateUserProduct(userId, institutionid, productId, productRole);
-        // then
-        Mockito.verify(userApiConnector, Mockito.times(1))
+        userV2ServiceImpl.activateUserProduct(userId, institutionid, productId, productRole);
+
+        Mockito.verify(userApiConnectorMock, Mockito.times(1))
                 .activateUserProduct(userId, institutionid, productId, productRole);
-        Mockito.verifyNoMoreInteractions(userApiConnector);
+        Mockito.verifyNoMoreInteractions(userApiConnectorMock);
     }
 
     @Test
     void delete() {
-        //given
+
         String userId = "rel1";
         String institutionid = "id1";
         String productId = "prod-pagopa";
         String productRole = "admin";
 
-        //when
-        userService.deleteUserProduct(userId, institutionid, productId, productRole);
-        //then
-        Mockito.verify(userApiConnector, Mockito.times(1))
+        userV2ServiceImpl.deleteUserProduct(userId, institutionid, productId, productRole);
+
+        Mockito.verify(userApiConnectorMock, Mockito.times(1))
                 .deleteUserProduct(userId, institutionid, productId, productRole);
-        Mockito.verify(userGroupService, Mockito.times(1))
+        Mockito.verify(userGroupServiceMock, Mockito.times(1))
                 .deleteMembersByUserId(userId, institutionid, productId);
-        Mockito.verifyNoMoreInteractions(userApiConnector, userGroupService);
-    }
-
-    @Test
-    void getById(){
-        //given
-        final String userId = "userId";
-        final String institutionId = "institutionId";
-        final List<String> fields = List.of("fields");
-        User user = mockInstance(new User());
-        when(userApiConnector.getUserById(anyString(), anyString(), any())).thenReturn(user);
-        //when
-        User result = userService.getUserById(userId, institutionId, fields);
-        //then
-        assertNotNull(result);
-        assertEquals(user, result);
-        verify(userApiConnector, times(1)).getUserById(userId, institutionId, fields);
-    }
-
-    @Test
-    void searchByFiscalCode(){
-        final String fiscalCode = "fiscalCode";
-        final String institutionId = "institutionId";
-        User user = mockInstance(new User());
-        when(userApiConnector.searchByFiscalCode(anyString(), anyString())).thenReturn(user);
-        //when
-        User result = userService.searchUserByFiscalCode(fiscalCode, institutionId);
-        //then
-        assertNotNull(result);
-        assertEquals(user, result);
-        verify(userApiConnector, times(1)).searchByFiscalCode(fiscalCode, institutionId);
+        Mockito.verifyNoMoreInteractions(userApiConnectorMock, userGroupServiceMock);
     }
 
     @Test
     void updateUser() {
-        //given
+
         final String institutionId = "institutionId";
         final String userId = "userId";
         final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
         Institution institutionMock = mockInstance(new Institution());
         when(msCoreConnectorMock.getInstitution(Mockito.anyString()))
                 .thenReturn(institutionMock);
-        //when
-        Executable executable = () -> userService.updateUser(userId, institutionId, user);
-        //then
+
+        Executable executable = () -> userV2ServiceImpl.updateUser(userId, institutionId, user);
+
         assertDoesNotThrow(executable);
         verify(msCoreConnectorMock, times(1))
                 .getInstitution(institutionId);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .updateUser(userId, institutionId, user);
-        verifyNoMoreInteractions(userConnectorMock, msCoreConnectorMock);
+        verifyNoMoreInteractions(userApiConnectorMock, msCoreConnectorMock);
     }
 
     @Test
     void updateUser_nullInstitution() {
-        //given
+
         final String institutionId = "institutionId";
         final String userId = "userId";
         final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
-        //when
-        Executable executable = () -> userService.updateUser(userId, institutionId, user);
-        //then
+
+        Executable executable = () -> userV2ServiceImpl.updateUser(userId, institutionId, user);
+
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, executable);
         assertEquals("There is no institution for given institutionId", exception.getMessage());
-        verifyNoInteractions(userApiConnector);
+        verifyNoInteractions(userApiConnectorMock);
     }
 
-    @Test
-    void getUsersByInstitutionId_returnsExpectedUsers() {
-        // given
-        final String institutionId = "inst1";
-        final String productId = "prod1";
-        final String loggedUserId = "loggedUserId";
-        List<String> productRoles = List.of("productRole");
-        UserInfo expectedUser = new UserInfo();
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(productId);
-        userInfoFilter.setProductRoles(productRoles);
-
-        when(userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(List.of(expectedUser));
-        // when
-        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId,productRoles, loggedUserId);
-
-        // then
-        assertNotNull(users);
-        assertEquals(1, users.size());
-        assertSame(expectedUser, users.iterator().next());
-        verifyNoMoreInteractions(userApiConnector);
-    }
-
-    @Test
-    void getUsersByInstitutionId_emptyList() {
-        // given
-        final String institutionId = "inst1";
-        final String productId = "prod1";
-        final String loggedUserId = "loggedUserId";
-        final List<String> productRoles = List.of("productRole");
-
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(productId);
-        userInfoFilter.setProductRoles(productRoles);
-
-        when(userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(Collections.emptyList());
-        // when
-        Collection<UserInfo> users = userService.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
-
-        // then
-        assertNotNull(users);
-        assertTrue(users.isEmpty());
-        verifyNoMoreInteractions(userApiConnector);
-    }
 
     @Test
     void addUserProductRoles_ok() {
-        // given
+
         final String institutionId = "institutionId";
         final String productId = "productId";
         final String userId = "userId";
@@ -245,21 +299,19 @@ class UserV2ServiceImplTest {
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
-        when(productsConnector.getProduct(productId)).thenReturn(product);
-        doNothing().when(userApiConnector).createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        doNothing().when(userApiConnectorMock).createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
 
-        // when
-        userService.addUserProductRoles(institutionId, productId, userId, productRoles);
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles);
 
-        // then
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
-        verifyNoMoreInteractions(userApiConnector);
+        verifyNoMoreInteractions(userApiConnectorMock);
     }
 
     @Test
     void addUserProductRoles_invalidProductRole() {
-        // given
+
         final String institutionId = "institutionId";
         final String productId = "productId";
         final String userId = "userId";
@@ -273,17 +325,16 @@ class UserV2ServiceImplTest {
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
-        when(productsConnector.getProduct(productId)).thenReturn(product);
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
 
-        // when
-        Assertions.assertThrows(InvalidProductRoleException.class, () -> userService.addUserProductRoles(institutionId, productId, userId, productRoles));
+        Assertions.assertThrows(InvalidProductRoleException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles));
 
-        verifyNoInteractions(userApiConnector);
+        verifyNoInteractions(userApiConnectorMock);
     }
 
     @Test
     void addUserProductRoles_invalidOnboardingStatus() {
-        // given
+
         final String institutionId = "institutionId";
         final String productId = "productId";
         final String userId = "userId";
@@ -291,15 +342,14 @@ class UserV2ServiceImplTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(new Institution());
 
-        // when
-        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userService.addUserProductRoles(institutionId, productId, userId, productRoles));
+        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles));
 
-        verifyNoInteractions(userApiConnector);
+        verifyNoInteractions(userApiConnectorMock);
     }
 
     @Test
     void createUsersByFiscalCode() {
-        // given
+
         final String institutionId = "institutionId";
         final String productId = "productId";
         final String productRole = "operator";
@@ -316,28 +366,26 @@ class UserV2ServiceImplTest {
         onboardedProduct.setStatus(RelationshipState.ACTIVE);
         institution.setOnboarding(List.of(onboardedProduct));
 
-        when(productsConnector.getProduct(productId)).thenReturn(product);
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
 
-        when(userApiConnector.createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
+        when(userApiConnectorMock.createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
-        // when
-        String userId = userService.createUsers(institutionId, productId, userToCreate);
+        String userId = userV2ServiceImpl.createUsers(institutionId, productId, userToCreate);
 
-        // then
         assertNotNull(userId);
         ArgumentCaptor<List<CreateUserDto.Role>> captorRoles = ArgumentCaptor.forClass(List.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), captorRoles.capture());
         assertEquals(captorRoles.getValue().get(0).getProductRole(), productRole);
 
-        verifyNoMoreInteractions(userApiConnector);
+        verifyNoMoreInteractions(userApiConnectorMock);
     }
 
     @Test
     void createUsersByFiscalCodeWithOnboardingNotActive() {
-        // given
+
         final String institutionId = "institutionId";
         final String productId = "productId";
         UserToCreate userToCreate = new UserToCreate();
@@ -347,12 +395,10 @@ class UserV2ServiceImplTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(new Institution());
 
-        // when
-        assertThrows(InvalidOnboardingStatusException.class, () -> userService.createUsers(institutionId, productId, userToCreate));
+        assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate));
 
-        // then
         verify(msCoreConnectorMock, times(1)).getInstitution(institutionId);
-        verifyNoMoreInteractions(userApiConnector);
+        verifyNoMoreInteractions(userApiConnectorMock);
     }
 
     private static Product getProduct() {

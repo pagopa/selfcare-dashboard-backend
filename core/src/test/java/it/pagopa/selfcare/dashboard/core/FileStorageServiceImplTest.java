@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,6 +20,7 @@ import org.springframework.util.MimeTypeUtils;
 import java.io.InputStream;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @ContextConfiguration(classes = {FileStorageServiceImpl.class, CoreTestConfig.class})
 @TestPropertySource(properties = {
         "INSTITUTION_LOGO_ALLOWED_MIME_TYPES=image/png,image/jpeg",
@@ -37,10 +39,8 @@ class FileStorageServiceImplTest {
     void storeInstitutionLogo_nullFileName() {
         String institutionId = "institutionId";
         InputStream logo = InputStream.nullInputStream();
-        String contentType = null;
-        String fileName = null;
         // when
-        Executable executable = () -> storageService.storeInstitutionLogo(institutionId, logo, contentType, fileName);
+        Executable executable = () -> storageService.storeInstitutionLogo(institutionId, logo, null, null);
         // then
         Assertions.assertThrows(FileValidationException.class, executable);
         Mockito.verifyNoInteractions(storageConnectorMock);

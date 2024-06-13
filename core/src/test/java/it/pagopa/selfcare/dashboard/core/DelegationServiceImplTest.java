@@ -1,131 +1,105 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DelegationServiceImplTest {
-    @Mock
-    private MsCoreConnector delegationConnector;
+class DelegationServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private DelegationServiceImpl delegationServiceImpl;
+    @Mock
+    private MsCoreConnector msCoreConnector;
 
-    /**
-     * Method under test: {@link DelegationServiceImpl#createDelegation(DelegationRequest)}
-     */
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+    }
+
     @Test
-    void testCreateDelegation() {
+    void testCreateDelegation() throws IOException {
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/DelegationRequest.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        DelegationRequest delegation = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
         DelegationId delegationId = new DelegationId();
         delegationId.setId("id");
-        when(delegationConnector.createDelegation(any())).thenReturn(delegationId);
-        DelegationRequest delegation = new DelegationRequest();
-        delegation.setId("id");
+        when(msCoreConnector.createDelegation(delegation)).thenReturn(delegationId);
+
         DelegationId response = delegationServiceImpl.createDelegation(delegation);
-        verify(delegationConnector).createDelegation(any());
-        assertNotNull(delegation);
-        assertNotNull(delegation.getId());
-        assertEquals(delegation.getId(), response.getId());
+        Assertions.assertEquals(delegation.getId(), response.getId());
+        Mockito.verify(msCoreConnector, Mockito.times(1))
+                .createDelegation(delegation);
     }
 
     @Test
-    void getDelegations() {
-        //given
-        Delegation delegation = dummyDelegation();
-        List<Delegation> delegationList = new ArrayList<>();
-        delegationList.add(delegation);
-        when(delegationConnector.getDelegations(any())).thenReturn(delegationList);
+    void getDelegations() throws IOException {
 
-        //when
-        delegationList = delegationServiceImpl.getDelegations(dummyDelegationParametersTo());
+        ClassPathResource pathExpectation = new ClassPathResource("expectations/Delegation.json");
+        byte[] ExpectationStream = Files.readAllBytes(pathExpectation.getFile().toPath());
+        List<Delegation> delegations = objectMapper.readValue(ExpectationStream, new TypeReference<>() {
+        });
 
-        //then
-        assertNotNull(delegationList);
-        assertNotNull(delegationList.getClass());
-        assertEquals(1, delegationList.size());
-        verify(delegationConnector, times(1))
-                .getDelegations(dummyDelegationParametersTo());
-        verifyNoMoreInteractions(delegationConnector);
-    }
-
-    @Test
-    void getDelegationsV2() {
-        //given
-        DelegationWithInfo delegation = dummyDelegationWithInfo();
-        List<DelegationWithInfo> delegationList = new ArrayList<>();
-        delegationList.add(delegation);
-        PageInfo pageInfo = new PageInfo(1000, 0, 1, 1);
-        DelegationWithPagination delegationWithPagination= new DelegationWithPagination(delegationList, pageInfo);
-
-        when(delegationConnector.getDelegationsV2(any())).thenReturn(delegationWithPagination);
-
-        //when
-        DelegationWithPagination response = delegationServiceImpl.getDelegationsV2(dummyDelegationParametersTo());
-
-        //then
-        assertNotNull(response);
-        assertEquals(1, response.getDelegations().size());
-        assertEquals(delegation, response.getDelegations().get(0));
-        verify(delegationConnector, times(1))
-                .getDelegationsV2(dummyDelegationParametersTo());
-        verifyNoMoreInteractions(delegationConnector);
-    }
-
-    private Delegation dummyDelegation() {
-        Delegation delegation = new Delegation();
-        delegation.setInstitutionId("from");
-        delegation.setBrokerId("to");
-        delegation.setId("setId");
-        delegation.setProductId("setProductId");
-        delegation.setType(DelegationType.PT);
-        delegation.setInstitutionName("setInstitutionFromName");
-        return delegation;
-    }
-
-    private DelegationWithInfo dummyDelegationWithInfo() {
-        DelegationWithInfo delegation = new DelegationWithInfo();
-        delegation.setId("setId");
-        delegation.setInstitutionId("from");
-        delegation.setInstitutionName("setInstitutionFromName");
-        delegation.setBrokerId("to");
-        delegation.setBrokerName("setInstitutionFromRootName");
-        delegation.setBrokerTaxCode("brokerTaxCode");
-        delegation.setBrokerType("brokerType");
-        delegation.setProductId("setProductId");
-        delegation.setInstitutionRootName("setInstitutionRootName");
-        delegation.setType(DelegationType.PT);
-        delegation.setCreatedAt(OffsetDateTime.now().minusDays(2));
-        delegation.setUpdatedAt(OffsetDateTime.now());
-        delegation.setInstitutionType(InstitutionType.PT);
-        delegation.setStatus("ACTIVE");
-        delegation.setTaxCode("taxCode");
-        return delegation;
-    }
-
-    private GetDelegationParameters dummyDelegationParametersTo() {
-        return GetDelegationParameters.builder()
-                .to("to")
-                .productId("product-io")
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .productId("setProductId")
                 .taxCode("taxCode")
                 .search("name")
-                .order(Order.ASC.name())
+                .order("ASC")
                 .page(0)
                 .size(1000)
                 .build();
+
+        when(msCoreConnector.getDelegations(delegationParameters)).thenReturn(delegations);
+
+        List<Delegation> response = delegationServiceImpl.getDelegations(delegationParameters);
+
+        Assertions.assertEquals(delegations, response);
+        Mockito.verify(msCoreConnector, Mockito.times(1))
+                .getDelegations(delegationParameters);
+    }
+
+    @Test
+    void getDelegationV2() throws IOException {
+
+        ClassPathResource pathExpectation = new ClassPathResource("expectations/DelegationWithPagination.json");
+        byte[] ExpectationStream = Files.readAllBytes(pathExpectation.getFile().toPath());
+        DelegationWithPagination delegationWithPagination = objectMapper.readValue(ExpectationStream, new TypeReference<>() {
+        });
+
+        GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
+                .productId("setProductId")
+                .taxCode("taxCode")
+                .search("name")
+                .order("ASC")
+                .page(0)
+                .size(1000)
+                .build();
+
+        when(msCoreConnector.getDelegationsV2(delegationParameters)).thenReturn(delegationWithPagination);
+
+        DelegationWithPagination response = delegationServiceImpl.getDelegationsV2(delegationParameters);
+
+        Assertions.assertEquals(delegationWithPagination, response);
+        Mockito.verify(msCoreConnector, Mockito.times(1))
+                .getDelegationsV2(delegationParameters);
     }
 
 }

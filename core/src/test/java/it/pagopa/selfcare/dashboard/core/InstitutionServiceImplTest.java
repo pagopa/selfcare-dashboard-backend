@@ -1,272 +1,295 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
-import it.pagopa.selfcare.dashboard.connector.api.UserRegistryConnector;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
-import it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto;
-import it.pagopa.selfcare.dashboard.core.config.CoreTestConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.dashboard.core.InstitutionServiceImpl.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {
-        InstitutionServiceImpl.class,
-        CoreTestConfig.class
-})
-@TestPropertySource(properties = {
-        "USER_STATES_FILTER=ACTIVE,SUSPENDED"
-})
-class InstitutionServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+public class InstitutionServiceImplTest extends BaseServiceTest {
 
-    @MockBean
+    @InjectMocks
+    private InstitutionServiceImpl institutionService;
+    @Mock
     private MsCoreConnector msCoreConnectorMock;
-
-    @MockBean
-    private UserRegistryConnector userRegistryConnector;
-
-    @MockBean
+    @Mock
     private ProductsConnector productsConnectorMock;
 
-    @Autowired
-    private InstitutionServiceImpl institutionService;
-
-    @Captor
-    private ArgumentCaptor<CreateUserDto> createUserDtoCaptor;
-
-
     @BeforeEach
-    void beforeEach() {
-        SecurityContextHolder.clearContext();
+    public void setUp() {
+        super.setUp();
     }
 
     @Test
-    void getInstitutionById() {
-        // Given
+    void getInstitutionById() throws IOException {
+
         String institutionId = "institutionId";
-        Institution institution = new Institution();
+
+        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
-        // When
         Institution result = institutionService.getInstitutionById(institutionId);
+        Assertions.assertEquals(institution, result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
+    }
 
-        // Then
-        verify(msCoreConnectorMock, times(1)).getInstitution(institutionId);
-        assertEquals(institution, result);
+    @Test
+    void getInstitutionByIdEmptyInstitution() {
+
+        String institutionId = "institutionId";
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(null);
+
+        Institution result = institutionService.getInstitutionById(institutionId);
+        Assertions.assertNull(result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 
     @Test
     void updateInstitutionGeographicTaxonomy() {
-        // given
+
         String institutionId = "institutionId";
-        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
-        geographicTaxonomies.setGeographicTaxonomyList(List.of(mockInstance(new GeographicTaxonomy())));
+        GeographicTaxonomy geographicTaxonomy = new GeographicTaxonomy();
+        geographicTaxonomy.setCode("testCode1");
+        geographicTaxonomy.setDesc("testDesc1");
+
+        GeographicTaxonomyList geographicTaxonomyList = new GeographicTaxonomyList();
+        geographicTaxonomyList.setGeographicTaxonomyList(List.of(geographicTaxonomy));
+
         Mockito.doNothing()
-                .when(msCoreConnectorMock).updateInstitutionGeographicTaxonomy(anyString(), any());
-        // when
-        institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
-        // then
-        verify(msCoreConnectorMock, times(1))
-                .updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
-        verifyNoMoreInteractions(msCoreConnectorMock);
+                .when(msCoreConnectorMock).updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomyList);
+
+        institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomyList);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomyList);
     }
 
     @Test
-    void updateInstitutionGeographicTaxonomy_hasNullInstitutionId() {
-        // given
-        String institutionId = null;
+    void updateInstitutionGeographicTaxonomyWithoutInstitutionId() {
+
         GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
-        // when
-        Executable executable = () -> institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_INSTITUTION_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.updateInstitutionGeographicTaxonomy(null, geographicTaxonomies));
     }
 
     @Test
-    void updateInstitutionGeographicTaxonomy_hasNullGeographicTaxonomies() {
-        // given
+    void updateInstitutionGeographicTaxonomyWithoutGeographicTaxonomies() {
+
         String institutionId = "institutionId";
-        GeographicTaxonomyList geographicTaxonomies = null;
-        // when
-        Executable executable = () -> institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_GEOGRAPHIC_TAXONOMIES, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.updateInstitutionGeographicTaxonomy(institutionId, null));
     }
 
     @Test
     void getGeographicTaxonomyList() {
-        // given
+
         String institutionId = "institutionId";
-        Institution institutionMock = mockInstance(new Institution());
-        institutionMock.setGeographicTaxonomies(List.of(mockInstance(new GeographicTaxonomy())));
-        when(msCoreConnectorMock.getGeographicTaxonomyList(anyString()))
-                .thenReturn(institutionMock.getGeographicTaxonomies());
-        // when
+        GeographicTaxonomy geographicTaxonomy = new GeographicTaxonomy();
+        geographicTaxonomy.setCode("testCode1");
+        geographicTaxonomy.setDesc("testDesc1");
+
+        List<GeographicTaxonomy> geographicTaxonomies = List.of(geographicTaxonomy);
+
+        when(msCoreConnectorMock.getGeographicTaxonomyList(institutionId)).thenReturn(geographicTaxonomies);
+
         List<GeographicTaxonomy> result = institutionService.getGeographicTaxonomyList(institutionId);
-        // then
-        assertNotNull(result);
-        assertEquals(institutionMock.getGeographicTaxonomies().get(0).getCode(), result.get(0).getCode());
-        assertEquals(institutionMock.getGeographicTaxonomies().get(0).getDesc(), result.get(0).getDesc());
-        verify(msCoreConnectorMock, times(1))
-                .getGeographicTaxonomyList(institutionId);
-        verifyNoMoreInteractions(msCoreConnectorMock);
+        Assertions.assertEquals(geographicTaxonomies, result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getGeographicTaxonomyList(institutionId);
     }
 
     @Test
-    void getGeographicTaxonomyList_hasNullInstitutionId() {
-        // given
-        String institutionId = null;
-        // when
-        Executable executable = () -> institutionService.getGeographicTaxonomyList(institutionId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_INSTITUTION_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
+    void getGeographicTaxonomyListWithoutInstitutionId() {
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.getGeographicTaxonomyList(null));
     }
 
     @Test
-    void getProductsTree_emptyProducts() {
-        when(productsConnectorMock.getProductsTree())
-                .thenReturn(Collections.emptyList());
-        //when
-        List<ProductTree> products = institutionService.getProductsTree();
-        //then
-        Assertions.assertNotNull(products);
-        Assertions.assertTrue(products.isEmpty());
-        verify(productsConnectorMock, times(1)).getProductsTree();
-        verifyNoMoreInteractions(productsConnectorMock);
-        verifyNoInteractions(msCoreConnectorMock);
+    void getProductsTree() throws IOException {
+
+        ClassPathResource resource = new ClassPathResource("expectations/ProductTree.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        List<ProductTree> productTrees = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(productsConnectorMock.getProductsTree()).thenReturn(productTrees);
+
+        List<ProductTree> result = institutionService.getProductsTree();
+        Assertions.assertEquals(productTrees, result);
+        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductsTree();
+
     }
 
     @Test
-    void getProductsTree() {
-        ProductTree product = mock(ProductTree.class);
-        List<ProductTree> productList = List.of(product);
-        when(productsConnectorMock.getProductsTree())
-                .thenReturn(productList);
-        //when
-        List<ProductTree> products = institutionService.getProductsTree();
-        //then
-        Assertions.assertNotNull(products);
-        assertEquals(1, products.size());
-        verify(productsConnectorMock, times(1)).getProductsTree();
-        verifyNoMoreInteractions(productsConnectorMock);
-        verifyNoInteractions(msCoreConnectorMock);
-    }
+    void getProductsTreeEmptyProduct() {
 
+        when(productsConnectorMock.getProductsTree()).thenReturn(Collections.emptyList());
 
-    @Test
-    void updateInstitutionDescription() {
-        // given
-        String institutionId = "setId";
-        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        Institution institutionMock = mockInstance(new Institution());
-        when(msCoreConnectorMock.updateInstitutionDescription(anyString(), any()))
-                .thenReturn(institutionMock);
-        // when
-        Institution institution = institutionService.updateInstitutionDescription(institutionId, resource);
-        // then
-        assertEquals(institution.getId(), institutionId);
-        assertEquals(institution.getDescription(), resource.getDescription());
-        assertEquals(institution.getDigitalAddress(), resource.getDigitalAddress());
-        verify(msCoreConnectorMock, times(1))
-                .updateInstitutionDescription(institutionId, resource);
-        verifyNoMoreInteractions(msCoreConnectorMock);
+        List<ProductTree> result = institutionService.getProductsTree();
+        Assertions.assertEquals(0, result.size());
     }
 
     @Test
-    void updateInstitutionDescription_hasNullInstitutionId() {
-        // given
-        String institutionId = null;
-        UpdateInstitutionResource resource = mockInstance(new UpdateInstitutionResource());
-        // when
-        Executable executable = () -> institutionService.updateInstitutionDescription(institutionId, resource);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_INSTITUTION_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
-    }
+    void updateInstitutionDescription() throws IOException {
 
-    @Test
-    void updateInstitutionDescription_hasNullDescription() {
-        // given
         String institutionId = "institutionId";
-        UpdateInstitutionResource resource = null;
-        // when
-        Executable executable = () -> institutionService.updateInstitutionDescription(institutionId, resource);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_UPDATE_RESOURCE_MESSAGE, e.getMessage());
-        verifyNoInteractions(msCoreConnectorMock);
+        UpdateInstitutionResource updateInstitutionResource = new UpdateInstitutionResource();
+        updateInstitutionResource.setDescription("updatedDescription");
+        updateInstitutionResource.setDigitalAddress("updatedDigitalAddress");
+
+        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(msCoreConnectorMock.updateInstitutionDescription(institutionId, updateInstitutionResource)).thenReturn(institution);
+
+        Institution result = institutionService.updateInstitutionDescription(institutionId, updateInstitutionResource);
+
+        Assertions.assertEquals(institution, result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).updateInstitutionDescription(institutionId, updateInstitutionResource);
+
     }
 
     @Test
-    void findInstitutionByIdTest2() {
-        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
-        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
-                null,
-                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        Institution institution = new Institution();
-        institution.setExternalId("externalId");
-        institution.setDescription("description");
-        OnboardedProduct onboardedProduct = new OnboardedProduct();
-        onboardedProduct.setProductId("productId");
-        institution.setOnboarding(Collections.singletonList(onboardedProduct));
-        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
-        Institution institutionResponse = institutionService.findInstitutionById("institutionId");
-        Assertions.assertEquals("description", institutionResponse.getDescription());
-        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+    void updateInstitutionDescriptionWithoutInstitutionId() {
+
+        UpdateInstitutionResource updateInstitutionResource = new UpdateInstitutionResource();
+        updateInstitutionResource.setDescription("description");
+        updateInstitutionResource.setDigitalAddress("digitalAddress");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.updateInstitutionDescription(null, updateInstitutionResource));
     }
 
     @Test
-    void findInstitutionByIdTest() {
+    void updateInstitutionDescriptionWithoutUpdateInstitutionResource() {
+
+        String institutionId = "institutionId";
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.updateInstitutionDescription(institutionId, null));
+    }
+
+    @Test
+    void updateInstitutionDescriptionEmptyInstitution() {
+
+        String institutionId = "institutionId";
+        UpdateInstitutionResource updateInstitutionResource = new UpdateInstitutionResource();
+        updateInstitutionResource.setDescription("updatedDescription");
+        updateInstitutionResource.setDigitalAddress("updatedDigitalAddress");
+
+        when(msCoreConnectorMock.updateInstitutionDescription(institutionId, updateInstitutionResource)).thenReturn(new Institution());
+
+        Institution result = institutionService.updateInstitutionDescription(institutionId, updateInstitutionResource);
+        Assertions.assertEquals(new Institution(), result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).updateInstitutionDescription(institutionId, updateInstitutionResource);
+    }
+
+    @Test
+    void findInstitutionById() throws IOException {
+
+        String institutionId = "123e4567-e89b-12d3-a456-426614174000";
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(OPERATOR, "productRole", "productId");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
                 null,
-                Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
+                Collections.singletonList(new SelfCareGrantedAuthority("123e4567-e89b-12d3-a456-426614174000", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        Institution institution = new Institution();
-        institution.setExternalId("externalId");
-        institution.setDescription("description");
-        OnboardedProduct onboardedProduct = new OnboardedProduct();
-        onboardedProduct.setProductId("productId");
-        institution.setOnboarding(Collections.singletonList(onboardedProduct));
-        when(msCoreConnectorMock.getInstitution("institutionId")).thenReturn(institution);
-        Institution institutionResponse = institutionService.findInstitutionById("institutionId");
-        Assertions.assertEquals("description", institutionResponse.getDescription());
-        Assertions.assertEquals("externalId", institutionResponse.getExternalId());
+
+        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        Institution result = institutionService.findInstitutionById(institutionId);
+        Assertions.assertTrue(result.getOnboarding().get(0).isAuthorized());
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
+    }
+
+    @Test
+    void findInstitutionByIdWithLimitation() throws IOException {
+
+        String institutionId = "123e4567-e89b-12d3-a456-426614174000";
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId2");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("123e4567-e89b-12d3-a456-426614174000", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        Institution result = institutionService.findInstitutionById(institutionId);
+        Assertions.assertFalse(result.getOnboarding().get(0).isAuthorized());
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
+    }
+
+    @Test
+    void findInstitutionByIdWithoutMatch() throws IOException {
+
+        String institutionId = "institutionId";
+        ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(null,
+                null,
+                Collections.singletonList(new SelfCareGrantedAuthority("noMatchInstitutionId", Collections.singleton(productGrantedAuthority))));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        Institution result = institutionService.findInstitutionById(institutionId);
+        Assertions.assertEquals(institution, result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
+    }
+
+    @Test
+    void findInstitutionByIdWithoutInstitutionId() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.findInstitutionById(null));
+    }
+
+    @Test
+    void findInstitutionByIdEmpty() {
+
+        String institutionId = "institutionId";
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(null);
+
+        Institution result = institutionService.findInstitutionById(institutionId);
+        Assertions.assertNull(result);
+        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 }

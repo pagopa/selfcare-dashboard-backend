@@ -1,92 +1,113 @@
 package it.pagopa.selfcare.dashboard.core;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.PagoPABackOfficeConnector;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class BrokerServiceImplTest {
-
-    @Mock
-    private PagoPABackOfficeConnector backOfficeConnectorMock;
-
-    @Mock
-    private MsCoreConnector msCoreConnector;
+public class BrokerServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private BrokerServiceImpl brokerService;
+    @Mock
+    PagoPABackOfficeConnector backOfficeConnectorMock;
+    @Mock
+    MsCoreConnector msCoreConnector;
 
-    @Test
-    void getBrokersEC() {
-        // given
-        String institutionType = "EC";
-        List<BrokerInfo> brokersMocked = buildBrokerInfos();
-        Mockito.when(backOfficeConnectorMock.getBrokersEC(anyInt(), anyInt()))
-                .thenReturn(brokersMocked);
-        // when
-        List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(institutionType);
-        // then
-        Assertions.assertSame(brokersMocked, brokers);
-        Mockito.verify(backOfficeConnectorMock, Mockito.times(1))
-                .getBrokersEC(0,1000);
-        Mockito.verifyNoMoreInteractions(backOfficeConnectorMock);
-
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
     }
 
     @Test
-    void getBrokersPSP() {
-        // given
+    void getBrokersPSP() throws IOException {
+
         String institutionType = "PSP";
-        List<BrokerInfo> brokersMocked = buildBrokerInfos();
-        Mockito.when(backOfficeConnectorMock.getBrokersPSP(anyInt(), anyInt()))
-                .thenReturn(brokersMocked);
-        // when
-        List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(institutionType);
-        // then
-        Assertions.assertSame(brokersMocked, brokers);
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/BrokerInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        List<BrokerInfo> brokerInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(backOfficeConnectorMock.getBrokersPSP(0, 1000))
+                .thenReturn(brokerInfo);
+
+        List<BrokerInfo> result = brokerService.findAllByInstitutionType(institutionType);
+        Assertions.assertEquals(brokerInfo, result);
         Mockito.verify(backOfficeConnectorMock, Mockito.times(1))
-                .getBrokersPSP(0,1000);
-        Mockito.verifyNoMoreInteractions(backOfficeConnectorMock);
+                .getBrokersPSP(0, 1000);
 
     }
 
     @Test
-    void findInstitutionsByProductAndType() {
-        // given
-        final String institutionType = "EC";
-        final String productId = "productId";
-        List<BrokerInfo> brokersMocked = buildBrokerInfos();
-        Mockito.when(msCoreConnector.findInstitutionsByProductAndType(anyString(), anyString()))
-                .thenReturn(brokersMocked);
-        // when
+    void getBrokersEC() throws IOException {
+
+        String institutionType = "EC";
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/BrokerInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        List<BrokerInfo> brokerInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(backOfficeConnectorMock.getBrokersEC(0, 1000))
+                .thenReturn(brokerInfo);
+
+        List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(institutionType);
+        Assertions.assertEquals(brokerInfo, brokers);
+        Mockito.verify(backOfficeConnectorMock, Mockito.times(1))
+                .getBrokersEC(0, 1000);
+
+    }
+
+    @Test
+    void getBrokerEmptyList() {
+        List<BrokerInfo> brokers = brokerService.findAllByInstitutionType(null);
+        Assertions.assertEquals(0, brokers.size());
+        Mockito.verify(backOfficeConnectorMock, Mockito.times(1))
+                .getBrokersEC(0, 1000);
+    }
+
+    @Test
+    void getFindInstitutionsByProductAndType() throws IOException {
+        String institutionType = "EC";
+        String productId = "productId";
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/BrokerInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        List<BrokerInfo> brokerInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(msCoreConnector.findInstitutionsByProductAndType(productId, institutionType))
+                .thenReturn(brokerInfo);
+
         List<BrokerInfo> brokers = brokerService.findInstitutionsByProductAndType(productId, institutionType);
-        // then
-        Assertions.assertSame(brokersMocked, brokers);
+        Assertions.assertEquals(brokerInfo, brokers);
         Mockito.verify(msCoreConnector, Mockito.times(1))
-                .findInstitutionsByProductAndType(productId,institutionType);
-        Mockito.verifyNoMoreInteractions(msCoreConnector);
-
+                .findInstitutionsByProductAndType(productId, institutionType);
     }
 
-    private List<BrokerInfo> buildBrokerInfos() {
-        BrokerInfo brokerInfo = new BrokerInfo();
-        brokerInfo.setCode("code");
-        List<BrokerInfo> brokersMocked = new ArrayList<>();
-        brokersMocked.add(brokerInfo);
-        return brokersMocked;
-    }
+    @Test
+    void getFindInstitutionsByProductAndTypeEmptyList() {
 
+        List<BrokerInfo> brokers = brokerService.findInstitutionsByProductAndType(null, null);
+        Assertions.assertEquals(0, brokers.size());
+        Mockito.verify(msCoreConnector, Mockito.times(1))
+                .findInstitutionsByProductAndType(null, null);
+    }
 }

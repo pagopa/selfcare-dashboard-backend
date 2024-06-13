@@ -4,61 +4,52 @@ import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceImplTest {
+public class ProductServiceImplTest extends BaseServiceTest {
 
+    @InjectMocks
+    ProductServiceImpl productService;
     @Mock
     private ProductsConnector productsConnectorMock;
 
-    @InjectMocks
-    private ProductServiceImpl productService;
-
-
-    @Test
-    void getProductRoles_nullProductId() {
-        // given
-        String productId = null;
-        // when
-        Executable executable = () -> productService.getProductRoles(productId);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        Assertions.assertEquals("A Product id is required", e.getMessage());
-        Mockito.verifyNoInteractions(productsConnectorMock);
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
     }
-
 
     @Test
     void getProductRoles() {
-        // given
+
         String productId = "productId";
-        EnumMap<PartyRole, ProductRoleInfo> roleMappingsMocked = new EnumMap<>(PartyRole.class) {{
-            put(PartyRole.MANAGER, new ProductRoleInfo());
-            put(PartyRole.DELEGATE, new ProductRoleInfo());
-            put(PartyRole.SUB_DELEGATE, new ProductRoleInfo());
-            put(PartyRole.OPERATOR, new ProductRoleInfo());
-        }};
-        Mockito.when(productsConnectorMock.getProductRoleMappings(Mockito.any()))
-                .thenReturn(roleMappingsMocked);
-        // when
-        Map<it.pagopa.selfcare.onboarding.common.PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo> roleMappings = productService.getProductRoles(productId);
-        // then
-        Assertions.assertSame(roleMappingsMocked, roleMappings);
-        Mockito.verify(productsConnectorMock, Mockito.times(1))
-                .getProductRoleMappings(productId);
-        Mockito.verifyNoMoreInteractions(productsConnectorMock);
+        Map<PartyRole, ProductRoleInfo> productRoleMappingsMock = new HashMap<>();
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        productRoleMappingsMock.put(PartyRole.MANAGER, productRoleInfo);
+
+        when(productsConnectorMock.getProductRoleMappings(productId)).thenReturn(productRoleMappingsMock);
+
+        Map<PartyRole, ProductRoleInfo> result = productService.getProductRoles(productId);
+        Assertions.assertEquals(productRoleMappingsMock, result);
+        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductRoleMappings(productId);
+    }
+
+    @Test
+    void getProductRolesWithoutProductId() {
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.getProductRoles(null));
+        Mockito.verifyNoInteractions(productsConnectorMock);
     }
 
 }
