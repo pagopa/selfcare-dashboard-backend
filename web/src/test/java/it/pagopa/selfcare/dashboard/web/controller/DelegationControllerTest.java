@@ -1,127 +1,158 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationIdResource;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationRequestDto;
-import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapperImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.any;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ContextConfiguration(classes = {DelegationController.class})
 @ExtendWith(MockitoExtension.class)
-class DelegationControllerTest {
+class DelegationControllerTest extends BaseControllerTest {
 
     @InjectMocks
     private DelegationController delegationController;
 
     @Mock
     private DelegationService delegationService;
-
     @Spy
-    private DelegationMapper delegationMapper = new DelegationMapperImpl();
+    private DelegationMapperImpl delegationMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @BeforeEach
+    void setUp() {
+        super.setUp(delegationController);
+    }
 
 
-    /**
-     * Method under test: {@link DelegationController#createDelegation(DelegationRequestDto)}
-     */
     @Test
-    void testCreateDelegation() throws Exception {
+    void createDelegationWithRequiredParameter() throws Exception {
+        DelegationId delegationId = new DelegationId();
+        delegationId.setId("id");
 
-        DelegationId delegation = new DelegationId();
-        delegation.setId("id");
-        when(delegationService.createDelegation(any())).thenReturn(delegation);
+        DelegationIdResource delegationIdResource = new DelegationIdResource();
+        delegationIdResource.setId("id");
 
-        DelegationRequestDto delegationRequest = new DelegationRequestDto();
-        delegationRequest.setFrom("111111");
-        delegationRequest.setTo("2222222");
-        delegationRequest.setInstitutionFromName("Test name");
-        delegationRequest.setInstitutionToName("Test to name");
-        delegationRequest.setProductId("productId");
-        delegationRequest.setType(DelegationType.PT);
-        String content = (new ObjectMapper()).writeValueAsString(delegationRequest);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/v1/delegations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content);
-        MvcResult result =  MockMvcBuilders.standaloneSetup(delegationController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+        DelegationRequestDto delegationRequest = getDelegationRequestDto();
+
+        when(delegationService.createDelegation((delegationMapper.toDelegation(delegationRequest)))).thenReturn(delegationId);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(getDelegationRequestDto()))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(objectMapper.writeValueAsString(delegationIdResource)))
                 .andReturn();
-
-        DelegationIdResource response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-
-        assertNotNull(response);
-        assertNotNull(response.getId());
-        assertEquals(delegation.getId(), response.getId());
     }
 
-    /**
-     * Method under test: {@link DelegationController#createDelegation(DelegationRequestDto)}
-     */
     @Test
-    void testCreateDelegationWithBadRequest() throws Exception {
+    void createDelegationWithFromNull() throws Exception {
+        DelegationRequestDto delegationRequestDto = getDelegationRequestDto();
+        delegationRequestDto.setFrom(null);
 
-        DelegationRequestDto delegationRequest = new DelegationRequestDto();
-        String content = (new ObjectMapper()).writeValueAsString(delegationRequest);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/v1/delegations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content);
-        MockMvcBuilders.standaloneSetup(delegationController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(delegationRequestDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andReturn();
     }
 
-    /**
-     * Method under test: {@link DelegationController#createDelegation(DelegationRequestDto)}
-     */
     @Test
-    void testCreateDelegationBadType() throws Exception {
+    void createDelegationWithToNull() throws Exception {
+        DelegationRequestDto delegationRequestDto = getDelegationRequestDto();
+        delegationRequestDto.setTo(null);
 
-        DelegationRequestDto delegationRequest = new DelegationRequestDto();
-        delegationRequest.setFrom("111111");
-        delegationRequest.setTo("2222222");
-        delegationRequest.setInstitutionFromName("Test name");
-        delegationRequest.setProductId("productId");
-        delegationRequest.setType(DelegationType.UO);
-        String content = (new ObjectMapper()).writeValueAsString(delegationRequest);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/v1/delegations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content);
-        MockMvcBuilders.standaloneSetup(delegationController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(delegationRequestDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andReturn();
     }
 
+    @Test
+    void createDelegationWithProductIdNull() throws Exception {
+        DelegationRequestDto delegationRequestDto = getDelegationRequestDto();
+        delegationRequestDto.setProductId(null);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(delegationRequestDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    void createDelegationWithInstitutionFromNameNull() throws Exception {
+        DelegationRequestDto delegationRequestDto = getDelegationRequestDto();
+        delegationRequestDto.setInstitutionFromName(null);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(delegationRequestDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    void createDelegationWithInstitutionToNameNull() throws Exception {
+        DelegationRequestDto delegationRequestDto = getDelegationRequestDto();
+        delegationRequestDto.setInstitutionToName(null);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(delegationRequestDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test
+    void createDelegationWithWrongType() throws Exception {
+        DelegationRequestDto delegationRequestDto = getDelegationRequestDto();
+        delegationRequestDto.setType(DelegationType.UO);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/delegations")
+                        .content(objectMapper.writeValueAsString(delegationRequestDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    private DelegationRequestDto getDelegationRequestDto() throws IOException {
+
+        ClassPathResource resource = new ClassPathResource("json/delegationRequestDto.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        return objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+    }
 }

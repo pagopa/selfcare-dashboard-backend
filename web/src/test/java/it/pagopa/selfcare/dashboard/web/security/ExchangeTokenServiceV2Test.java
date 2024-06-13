@@ -32,7 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -55,10 +54,8 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
-import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
@@ -135,7 +132,7 @@ class ExchangeTokenServiceV2Test {
         JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(null, null, null);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(null, null, Optional.empty());
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
@@ -160,10 +157,10 @@ class ExchangeTokenServiceV2Test {
         onboardedProduct.setProductRole("productRole");
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        userInstitution.setProducts(Collections.emptyList());
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, "userId")).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
@@ -171,7 +168,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty());
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -192,10 +189,10 @@ class ExchangeTokenServiceV2Test {
         properties.setDuration("PT5S");
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        userInstitution.setProducts(Collections.emptyList());
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, "userId")).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", "differentProductId"));
@@ -203,7 +200,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("userId").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, null);
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty());
         // then
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A Product Granted SelfCareAuthority is required for product '" + productId + "' and institution '" + institutionId + "'", e.getMessage());
@@ -216,13 +213,14 @@ class ExchangeTokenServiceV2Test {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String credential = "password";
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
+        when(jwtServiceMock.getClaims(credential))
                 .thenReturn(null);
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
@@ -233,7 +231,7 @@ class ExchangeTokenServiceV2Test {
 
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
         Institution institutionInfo = new Institution();
-        when(institutionServiceMock.getInstitutionById(any()))
+        when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         final Pageable pageable = Pageable.ofSize(100);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
@@ -245,7 +243,7 @@ class ExchangeTokenServiceV2Test {
         for (int i = 0; i < pageable.getPageSize(); i++) {
             groupInfos.add(groupInfo);
         }
-        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+        when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
 
 
@@ -266,7 +264,7 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, null, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
 
@@ -276,7 +274,7 @@ class ExchangeTokenServiceV2Test {
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
         verify(jwtServiceMock, times(1))
-                .getClaims(any());
+                .getClaims(credential);
         verifyNoMoreInteractions(jwtServiceMock);
     }
 
@@ -306,7 +304,7 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(List.of(onboardedProduct));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, "userId")).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
@@ -335,6 +333,7 @@ class ExchangeTokenServiceV2Test {
         String institutionId = "institutionId";
         String productId = "productId";
         String productRole = "productRole";
+        String credential = "password";
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, productId));
         List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
         UUID userId = UUID.randomUUID();
@@ -352,12 +351,12 @@ class ExchangeTokenServiceV2Test {
         product.setRoleMappings(roleMappings);
         product.setIdentityTokenAudience(realm);
         product.setUrlBO("http://localhost:8080/#selfcareToken=<IdentityToken>");
-        when(productsConnectorMock.getProduct(Mockito.anyString()))
+        when(productsConnectorMock.getProduct(productId))
                 .thenReturn(product);
 
         TestSecurityContextHolder.setAuthentication(authentication);
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
+        when(jwtServiceMock.getClaims(credential))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
@@ -372,10 +371,10 @@ class ExchangeTokenServiceV2Test {
         institutionInfo.setSubunitType("subunitType");
         institutionInfo.setAooParentCode("AOO");
         institutionInfo.setOriginId("id");
-        when(institutionServiceMock.getInstitutionById(any()))
+        when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+        when(groupServiceMock.getUserGroups(institutionId, productId, userId, Pageable.ofSize(100)))
                 .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
@@ -392,12 +391,12 @@ class ExchangeTokenServiceV2Test {
         user.setId(UUID.randomUUID().toString());
         Map<String, WorkContact> workContactMap = new HashMap<>();
         WorkContact contact = new WorkContact();
-        CertifiedField<String> email =  new CertifiedField<>();
+        CertifiedField<String> email = new CertifiedField<>();
         email.setValue("email");
         contact.setEmail(email);
         workContactMap.put(institutionId, contact);
         user.setWorkContacts(workContactMap);
-        when(UserV2Service.getUserById(any(), any(), any())).thenReturn(user);
+        when(UserV2Service.getUserById(String.valueOf(userId), null, null)).thenReturn(user);
 
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
@@ -427,7 +426,7 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
@@ -463,7 +462,7 @@ class ExchangeTokenServiceV2Test {
         assertEquals(2, institution.getRoles().size());
         assertFalse(exchangedClaims.containsKey("groups"));
         verify(jwtServiceMock, times(1))
-                .getClaims(any());
+                .getClaims(credential);
         verify(institutionServiceMock, times(1))
                 .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
@@ -479,6 +478,7 @@ class ExchangeTokenServiceV2Test {
         String realm = "identityTokenAudienceFromProduct";
         String jti = "id";
         String sub = "subject";
+        String credential = "password";
         Date iat = Date.from(Instant.now().minusSeconds(1));
         Date exp = Date.from(iat.toInstant().plusSeconds(5));
         String institutionId = "institutionId";
@@ -492,7 +492,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
+        when(jwtServiceMock.getClaims(credential))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
@@ -508,7 +508,7 @@ class ExchangeTokenServiceV2Test {
         institutionInfo.setSubunitType("subunitType");
         institutionInfo.setAooParentCode("AOO");
         institutionInfo.setOriginId("id");
-        when(institutionServiceMock.getInstitutionById(any()))
+        when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         UserGroupInfo groupInfo = new UserGroupInfo();
@@ -520,7 +520,7 @@ class ExchangeTokenServiceV2Test {
         for (int i = 0; i < pageable.getPageSize(); i++) {
             groupInfos.add(groupInfo);
         }
-        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+        when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = new Product();
@@ -538,7 +538,7 @@ class ExchangeTokenServiceV2Test {
         backOfficeConfigurations.setIdentityTokenAudience("identityTokenAudienceFromProduct");
         backOfficeConfigurationsMap.put(COLLAUDO_ENV, backOfficeConfigurations);
         product.setBackOfficeEnvironmentConfigurations(backOfficeConfigurationsMap);
-        when(productsConnectorMock.getProduct(Mockito.anyString()))
+        when(productsConnectorMock.getProduct(productId))
                 .thenReturn(product);
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
@@ -554,12 +554,12 @@ class ExchangeTokenServiceV2Test {
         pdvUser.setId(UUID.randomUUID().toString());
         Map<String, WorkContact> workContactMap = new HashMap<>();
         WorkContact contact = new WorkContact();
-        CertifiedField<String> email =  new CertifiedField<>();
+        CertifiedField<String> email = new CertifiedField<>();
         email.setValue("email");
         contact.setEmail(email);
         workContactMap.put(institutionId, contact);
         pdvUser.setWorkContacts(workContactMap);
-        when(UserV2Service.getUserById(any(), any(), any())).thenReturn(pdvUser);
+        when(UserV2Service.getUserById(String.valueOf(userId), null, null)).thenReturn(pdvUser);
 
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
@@ -570,7 +570,7 @@ class ExchangeTokenServiceV2Test {
         OnboardedProduct onboardedProduct2 = new OnboardedProduct();
         onboardedProduct2.setRole(MANAGER);
         onboardedProduct2.setProductId(productId);
-        onboardedProduct2.setProductRole(productRole+"2");
+        onboardedProduct2.setProductRole(productRole + "2");
         onboardedProduct2.setStatus(RelationshipState.DELETED);
 
 
@@ -589,14 +589,15 @@ class ExchangeTokenServiceV2Test {
         institutionMock.setSubunitType("subunitType");
         institutionMock.setAooParentCode("AOO");
         institutionMock.setOriginId("id");
-        when( institutionServiceMock.getInstitutionById(any())).thenReturn(institutionMock);
+        when(institutionServiceMock.getInstitutionById(institutionId)).thenReturn(institutionMock);
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.of(COLLAUDO_ENV));
         // then
-        assertEquals(product.getBackOfficeEnvironmentConfigurations().get(COLLAUDO_ENV).getUrl(), exchangedToken.getBackOfficeUrl());
+        assertEquals(product.getBackOfficeEnvironmentConfigurations().get(COLLAUDO_ENV).getUrl(),
+                exchangedToken.getBackOfficeUrl());
         Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(loadPublicKey())
                 .parseClaimsJws(exchangedToken.getIdentityToken());
@@ -624,7 +625,7 @@ class ExchangeTokenServiceV2Test {
         assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         verify(jwtServiceMock, times(1))
-                .getClaims(any());
+                .getClaims(credential);
         verify(institutionServiceMock, times(1))
                 .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
@@ -655,13 +656,14 @@ class ExchangeTokenServiceV2Test {
         // given
         String institutionId = "institutionId";
         String productId = "productId";
+        String credential = "password";
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         ExchangeTokenProperties properties = new ExchangeTokenProperties();
         properties.setSigningKey(jwtSigningKey);
         properties.setDuration("PT5S");
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
+        when(jwtServiceMock.getClaims(credential))
                 .thenReturn(null);
         ProductsConnector productsConnector = mock(ProductsConnector.class);
         ProductTree productTree = new ProductTree();
@@ -688,10 +690,10 @@ class ExchangeTokenServiceV2Test {
         for (int i = 0; i < pageable.getPageSize(); i++) {
             groupInfos.add(groupInfo);
         }
-        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+        when(groupServiceMock.getUserGroups(institutionId, null, userId, Pageable.ofSize(100)))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
 
-        when(institutionServiceMock.getInstitutionById(any()))
+        when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
 
         OnboardedProduct onboardedProduct = new OnboardedProduct();
@@ -704,7 +706,7 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(List.of(onboardedProduct));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnector, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
 
@@ -713,7 +715,7 @@ class ExchangeTokenServiceV2Test {
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
         verify(jwtServiceMock, times(1))
-                .getClaims(any());
+                .getClaims(credential);
         verifyNoMoreInteractions(jwtServiceMock);
     }
 
@@ -743,7 +745,7 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(List.of(onboardedProduct));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, "ccbc5350-0ba7-47bc-9f61-8c65001939f9")).thenReturn(userInstitution);
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
         List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, "productRole", productId));
@@ -766,6 +768,7 @@ class ExchangeTokenServiceV2Test {
         // given
         String jti = "id";
         String sub = "subject";
+        String credential = "password";
         Date iat = Date.from(Instant.now().minusSeconds(1));
         Date exp = Date.from(iat.toInstant().plusSeconds(5));
         String institutionId = "institutionId";
@@ -791,7 +794,7 @@ class ExchangeTokenServiceV2Test {
 
         TestSecurityContextHolder.setAuthentication(authentication);
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
+        when(jwtServiceMock.getClaims(credential))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setSubject(sub)
@@ -806,10 +809,10 @@ class ExchangeTokenServiceV2Test {
         institutionInfo.setSubunitType("subunitType");
         institutionInfo.setAooParentCode("AOO");
         institutionInfo.setOriginId("id");
-        when(institutionServiceMock.getInstitutionById(any()))
+        when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+        when(groupServiceMock.getUserGroups(institutionId, null, userId, Pageable.ofSize(100)))
                 .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(3, Pageable.class), () -> 0L));
         File file = ResourceUtils.getFile(privateKey.getResourceLocation());
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
@@ -829,12 +832,12 @@ class ExchangeTokenServiceV2Test {
         user.setId(UUID.randomUUID().toString());
         Map<String, WorkContact> workContactMap = new HashMap<>();
         WorkContact contact = new WorkContact();
-        CertifiedField<String> email =  new CertifiedField<>();
+        CertifiedField<String> email = new CertifiedField<>();
         email.setValue("email");
         contact.setEmail(email);
         workContactMap.put(institutionId, contact);
         user.setWorkContacts(workContactMap);
-        when(UserV2Service.getUserById(any(), any(), any())).thenReturn(user);
+        when(UserV2Service.getUserById(String.valueOf(userId), null, null)).thenReturn(user);
         UserInstitution userInstitution = new UserInstitution();
         OnboardedProduct onboardedProduct = new OnboardedProduct();
         onboardedProduct.setRole(MANAGER);
@@ -844,7 +847,7 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(List.of(onboardedProduct));
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId, null);
@@ -876,7 +879,7 @@ class ExchangeTokenServiceV2Test {
         assertNotNull(institution.getRoles());
         assertFalse(exchangedClaims.containsKey("groups"));
         verify(jwtServiceMock, times(1))
-                .getClaims(any());
+                .getClaims(credential);
         verify(institutionServiceMock, times(1))
                 .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
@@ -889,8 +892,9 @@ class ExchangeTokenServiceV2Test {
     @EnumSource(PrivateKey.class)
     void billingExchange_ok(PrivateKey privateKey) throws Exception {
         // given
-        String lang = "lang";
+        String lang = "en";
         String jti = "id";
+        String credential = "password";
         Date iat = Date.from(Instant.now().minusSeconds(1));
         Date exp = Date.from(iat.toInstant().plusSeconds(5));
         String institutionId = "institutionId";
@@ -903,7 +907,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         JwtService jwtServiceMock = mock(JwtService.class);
-        when(jwtServiceMock.getClaims(any()))
+        when(jwtServiceMock.getClaims(credential))
                 .thenReturn(Jwts.claims()
                         .setId(jti)
                         .setIssuedAt(iat)
@@ -918,7 +922,7 @@ class ExchangeTokenServiceV2Test {
         institutionInfo.setSubunitType("subunitType");
         institutionInfo.setAooParentCode("AOO");
         institutionInfo.setOriginId("id");
-        when(institutionServiceMock.getInstitutionById(any()))
+        when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         UserGroupInfo groupInfo = new UserGroupInfo();
@@ -930,7 +934,7 @@ class ExchangeTokenServiceV2Test {
         for (int i = 0; i < pageable.getPageSize(); i++) {
             groupInfos.add(groupInfo);
         }
-        when(groupServiceMock.getUserGroups(any(), any(), any(), any()))
+        when(groupServiceMock.getUserGroups(institutionId, null, userId, pageable))
                 .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = new Product();
@@ -959,17 +963,17 @@ class ExchangeTokenServiceV2Test {
         pdvUser.setId(UUID.randomUUID().toString());
         Map<String, WorkContact> workContactMap = new HashMap<>();
         WorkContact contact = new WorkContact();
-        CertifiedField<String> email =  new CertifiedField<>();
+        CertifiedField<String> email = new CertifiedField<>();
         email.setValue("email");
         contact.setEmail(email);
         workContactMap.put(institutionId, contact);
         pdvUser.setWorkContacts(workContactMap);
-        when(UserV2Service.getUserById(any(), any(), any())).thenReturn(pdvUser);
+        when(UserV2Service.getUserById(String.valueOf(userId), null, null)).thenReturn(pdvUser);
 
         UserInstitution userInstitution = new UserInstitution();
-        userInstitution.setProducts(EMPTY_LIST);
+        userInstitution.setProducts(Collections.emptyList());
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
-        when(userApiConnector.getProducts(anyString(), anyString())).thenReturn(userInstitution);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
         final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId, lang);
@@ -1003,7 +1007,7 @@ class ExchangeTokenServiceV2Test {
         assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         verify(jwtServiceMock, times(1))
-                .getClaims(any());
+                .getClaims(credential);
         verify(institutionServiceMock, times(1))
                 .getInstitutionById(institutionId);
         verify(groupServiceMock, times(1))
@@ -1064,7 +1068,7 @@ class ExchangeTokenServiceV2Test {
         PKCS1("classpath:certs/PKCS1Key.pem"),
         PKCS8("classpath:certs/PKCS8key.pem");
 
-        private String resourceLocation;
+        private final String resourceLocation;
 
         PrivateKey(String resourceLocation) {
             this.resourceLocation = resourceLocation;
