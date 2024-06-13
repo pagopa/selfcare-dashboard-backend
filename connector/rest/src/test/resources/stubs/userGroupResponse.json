@@ -1,0 +1,13 @@
+{
+  "id": "groupId",
+  "institutionId": "institutionId",
+  "productId": "productId",
+  "name": "groupName",
+  "description": "groupDescription",
+  "status": "ACTIVE",
+  "members": ["userId1"],
+  "createdAt": "2022-01-01T00:00:00Z",
+  "createdBy": "creatorId",
+  "modifiedAt": "2022-01-01T00:00:00Z",
+  "modifiedBy": "modifierId"
+}

@@ -78,9 +78,8 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
     void getUserByInternalId_nullFieldList() {
         //given
         UUID userId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
-        final EnumSet<User.Fields> fieldList = null;
         //when
-        final Executable executable = () -> restClient.getUserByInternalId(userId, fieldList);
+        final Executable executable = () -> restClient.getUserByInternalId(userId, null);
         //then
         final FeignException.NotFound e = assertThrows(FeignException.NotFound.class, executable);
         assertTrue(e.getMessage().contains("Request was not matched"));

@@ -1,0 +1,46 @@
+{
+  "id": "setId",
+  "institutionId": "setInstitutionId",
+  "productId": "setProductId",
+  "description": "setDescription",
+  "name": "setName",
+  "status": "ACTIVE",
+  "members": [
+    {
+      "id": "123",
+      "user": null,
+      "role": null,
+      "products": null,
+      "status": null,
+      "institutionId": null,
+      "userMailUuid": null
+    },
+    {
+      "id": "321",
+      "user": null,
+      "role": null,
+      "products": null,
+      "status": null,
+      "institutionId": null,
+      "userMailUuid": null
+    }
+  ],
+  "createdAt": "+1000000000-12-31T23:59:59.999999999Z",
+  "createdBy": {
+    "id": "setCreatedBy",
+    "fiscalCode": null,
+    "name": null,
+    "familyName": null,
+    "email": null,
+    "workContacts": null
+  },
+  "modifiedAt": "+1000000000-12-31T23:59:59.999999999Z",
+  "modifiedBy": {
+    "id": "setModifiedBy",
+    "fiscalCode": null,
+    "name": null,
+    "familyName": null,
+    "email": null,
+    "workContacts": null
+  }
+}

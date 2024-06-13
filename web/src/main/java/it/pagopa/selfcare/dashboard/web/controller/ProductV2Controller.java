@@ -42,12 +42,14 @@ public class ProductV2Controller {
                                          @RequestParam(value = "environment", required = false)
                                          Optional<String> environment,
                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.lang}")
-                                         @RequestParam(value = "lang", required = false)
+                                         @RequestParam(value = "lang", required = false, defaultValue = "it")
                                          String lang) {
         log.trace("accessProductBackoffice start");
         log.debug("accessProductBackoffice institutionId = {}, productId = {}", institutionId, productId);
-        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, environment, lang);
-        final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
+        final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, environment);
+        final URI location = URI.create(exchangedToken.getBackOfficeUrl()
+                .replace("<IdentityToken>", exchangedToken.getIdentityToken())
+                .replace("<lang>", lang));
         log.trace("accessProductBackoffice end");
         return location;
 

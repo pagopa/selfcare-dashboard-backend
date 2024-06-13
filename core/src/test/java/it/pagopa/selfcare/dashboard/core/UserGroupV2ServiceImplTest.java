@@ -1,35 +1,34 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidUserGroupException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
@@ -37,25 +36,142 @@ import static it.pagopa.selfcare.dashboard.connector.model.institution.Relations
 import static it.pagopa.selfcare.dashboard.core.UserGroupV2ServiceImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
-@ContextConfiguration(classes = {UserGroupV2ServiceImpl.class})
-@ExtendWith(SpringExtension.class)
-class UserGroupV2ServiceImplTest {
-    @MockBean
-    private UserApiConnector userApiConnector;
+@ExtendWith(MockitoExtension.class)
+public class UserGroupV2ServiceImplTest extends BaseServiceTest {
 
-    @MockBean
-    private UserGroupConnector userGroupConnector;
+    @InjectMocks
+    private UserGroupV2ServiceImpl userGroupV2Service;
+    @Mock
+    private UserApiConnector userApiConnectorMock;
+    @Mock
+    private UserGroupConnector userGroupConnectorMock;
 
-    @Autowired
-    private UserGroupV2ServiceImpl userV2GroupServiceImpl;
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+    }
+
+
+    @Test
+    void getUserGroupById() throws IOException {
+
+        String groupId = "GroupId";
+        String institutionId = "InstitutionId";
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(any(), any()))
+                .thenReturn(List.of("setId", "setId", "setId", "setId"));
+        when(userGroupConnectorMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
+
+        UserGroupInfo result = userGroupV2Service.getUserGroupById(groupId, institutionId);
+
+        assertEquals(userGroupInfo, result);
+        verify(userGroupConnectorMock, times(1)).getUserGroupById(groupId);
+    }
+
+    @Test
+    void getUserGroupByIdMismatch() throws IOException {
+
+        String groupId = "GroupId";
+        String institutionId = "mismatchInstitutionId";
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userGroupConnectorMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
+
+        assertThrows(InvalidUserGroupException.class, () -> userGroupV2Service.getUserGroupById(groupId, institutionId));
+    }
+
+    @Test
+    void getUserGroupByIdNullGroupId() {
+
+        String institutionId = "InstitutionId";
+
+        assertThrows(IllegalArgumentException.class, () -> userGroupV2Service.getUserGroupById(null, institutionId));
+    }
+
+    @Test
+    void getUserGroupByIdNullInstitutionId() throws IOException {
+
+        String groupId = "GroupId";
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userGroupConnectorMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
+
+        UserGroupInfo result = userGroupV2Service.getUserGroupById(groupId, null);
+
+        assertEquals(userGroupInfo, result);
+        verify(userGroupConnectorMock, times(1)).getUserGroupById(groupId);
+    }
+
+    @Test
+    void getUserGroups() throws IOException {
+
+        String institutionId = "InstitutionId";
+        String productId = "ProductId";
+        UUID userId = UUID.randomUUID();
+        PageRequest pageable = PageRequest.of(0, 10);
+
+        UserGroupFilter userGroupFilter = new UserGroupFilter();
+        userGroupFilter.setInstitutionId(Optional.of(institutionId));
+        userGroupFilter.setProductId(Optional.of(productId));
+        userGroupFilter.setUserId(Optional.of(userId));
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        Page<UserGroupInfo> mockPage = new PageImpl<>(Collections.singletonList(userGroupInfo));
+
+        when(userGroupConnectorMock.getUserGroups(userGroupFilter, pageable)).thenReturn(mockPage);
+
+        Page<UserGroupInfo> result = userGroupV2Service.getUserGroups(institutionId, productId, userId, pageable);
+
+        assertEquals(mockPage, result);
+        verify(userGroupConnectorMock, times(1)).getUserGroups(any(), eq(pageable));
+    }
+
+    @Test
+    void getUserGroupsNullInstitutionId() {
+
+        String productId = "ProductId";
+        UUID userId = UUID.randomUUID();
+        PageRequest pageable = PageRequest.of(0, 10);
+
+        UserGroupFilter userGroupFilter = new UserGroupFilter();
+        userGroupFilter.setInstitutionId(Optional.empty());
+        userGroupFilter.setProductId(Optional.of(productId));
+        userGroupFilter.setUserId(Optional.of(userId));
+
+        UserGroupInfo mockGroupInfo1 = new UserGroupInfo();
+        UserGroupInfo mockGroupInfo2 = new UserGroupInfo();
+        Page<UserGroupInfo> mockPage = new PageImpl<>(Arrays.asList(mockGroupInfo1, mockGroupInfo2));
+
+        when(userGroupConnectorMock.getUserGroups(any(), eq(pageable))).thenReturn(mockPage);
+
+        Page<UserGroupInfo> result = userGroupV2Service.getUserGroups(null, productId, userId, pageable);
+
+        assertEquals(mockPage, result);
+        verify(userGroupConnectorMock, times(1)).getUserGroups(any(), eq(pageable));
+    }
 
     @Test
     void createGroup() {
-        //given
+
         CreateUserGroup userGroup = mockInstance(new CreateUserGroup());
         String id1 = randomUUID().toString();
         String id2 = randomUUID().toString();
@@ -73,18 +189,18 @@ class UserGroupV2ServiceImplTest {
         userInfoMock2.setId(id2);
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
-        when(userGroupConnector.createUserGroup(any()))
+        when(userGroupConnectorMock.createUserGroup(any()))
                 .thenReturn(groupIdMock);
 
-        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any()))
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(anyString(), any()))
                 .thenReturn(List.of(id1, id2, id3, id4));   //when
-        String groupId = userV2GroupServiceImpl.createUserGroup(userGroup);
-        //then
+        String groupId = userGroupV2Service.createUserGroup(userGroup);
+
         assertEquals(groupIdMock, groupId);
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .createUserGroup(any());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
@@ -92,12 +208,12 @@ class UserGroupV2ServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(userGroup.getProductId(), capturedFilter.getProductId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verifyNoMoreInteractions(userGroupConnector, userApiConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock, userApiConnectorMock);
     }
 
     @Test
     void createGroup_invalidList() {
-        //given
+
         CreateUserGroup userGroup = mockInstance(new CreateUserGroup());
         String id1 = randomUUID().toString();
         String id2 = randomUUID().toString();
@@ -115,14 +231,14 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        when(userApiConnector.retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), any()))
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), any()))
                 .thenReturn(List.of("setId", "setId", "setId", "setId"));   //when
-        Executable executable = () -> userV2GroupServiceImpl.createUserGroup(userGroup);
-        //then
+        Executable executable = () -> userGroupV2Service.createUserGroup(userGroup);
+
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .retrieveFilteredUserInstitution(eq(userGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
@@ -130,85 +246,76 @@ class UserGroupV2ServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(userGroup.getProductId(), capturedFilter.getProductId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verifyNoMoreInteractions(userApiConnector);
-        Mockito.verifyNoInteractions(userGroupConnector);
+        verifyNoMoreInteractions(userApiConnectorMock);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void delete() {
-        // given
+
         String groupId = "relationshipId";
-        // when
-        userV2GroupServiceImpl.delete(groupId);
-        // then
-        verify(userGroupConnector, times(1))
+
+        userGroupV2Service.delete(groupId);
+        verify(userGroupConnectorMock, times(1))
                 .delete(groupId);
-        verifyNoMoreInteractions(userGroupConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock);
     }
 
     @Test
     void delete_nullGroupId() {
-        //given
-        String groupId = null;
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.delete(groupId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.delete(null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void activate() {
-        // given
+
         String groupId = "relationshipId";
-        // when
-        userV2GroupServiceImpl.activate(groupId);
-        // then
-        verify(userGroupConnector, times(1))
+
+        userGroupV2Service.activate(groupId);
+        verify(userGroupConnectorMock, times(1))
                 .activate(groupId);
-        verifyNoMoreInteractions(userGroupConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock);
     }
 
     @Test
     void activate_nullGroupId() {
-        //given
-        String groupId = null;
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.activate(groupId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.activate(null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void suspend() {
-        // given
+
         String groupId = "relationshipId";
-        // when
-        userV2GroupServiceImpl.suspend(groupId);
-        // then
-        verify(userGroupConnector, times(1))
+
+        userGroupV2Service.suspend(groupId);
+        verify(userGroupConnectorMock, times(1))
                 .suspend(groupId);
-        verifyNoMoreInteractions(userGroupConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock);
     }
 
     @Test
     void suspend_nullGroupId() {
-        //given
-        String groupId = null;
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.suspend(groupId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.suspend(null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void updateUserGroup() {
-        //given
+
         String groupId = "groupId";
         UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
         String id1 = randomUUID().toString();
@@ -220,7 +327,7 @@ class UserGroupV2ServiceImplTest {
 
         UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
         foundGroup.setId(groupId);
-        when(userGroupConnector.getUserGroupById(anyString()))
+        when(userGroupConnectorMock.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
         UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
@@ -233,16 +340,16 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any()))
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(anyString(), any()))
                 .thenReturn(List.of(id1, id2, id3, id4)); //when
-        Executable executable = () -> userV2GroupServiceImpl.updateUserGroup(groupId, userGroup);
-        //then
+        Executable executable = () -> userGroupV2Service.updateUserGroup(groupId, userGroup);
+
         assertDoesNotThrow(executable);
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .getUserGroupById(anyString());
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
@@ -250,14 +357,14 @@ class UserGroupV2ServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .updateUserGroup(anyString(), any());
-        verifyNoMoreInteractions(userApiConnector, userGroupConnector);
+        verifyNoMoreInteractions(userApiConnectorMock, userGroupConnectorMock);
     }
 
     @Test
     void updateUserGroup_invalidMembersList() {
-        //given
+
         String groupId = "groupId";
         UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
         String id1 = randomUUID().toString();
@@ -269,7 +376,7 @@ class UserGroupV2ServiceImplTest {
 
         UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
         foundGroup.setId(groupId);
-        when(userGroupConnector.getUserGroupById(anyString()))
+        when(userGroupConnectorMock.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
         UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
@@ -282,15 +389,15 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        when(userApiConnector.retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), any()))
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), any()))
                 .thenReturn(List.of("setId", "setId", "setId", "setId"));   //when
-        Executable executable = () -> userV2GroupServiceImpl.updateUserGroup(groupId, userGroup);
-        //then
+        Executable executable = () -> userGroupV2Service.updateUserGroup(groupId, userGroup);
+
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("Some members in the list aren't allowed for this institution", e.getMessage());
 
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .retrieveFilteredUserInstitution(eq(foundGroup.getInstitutionId()), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
@@ -298,39 +405,35 @@ class UserGroupV2ServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .getUserGroupById(anyString());
-        verifyNoMoreInteractions(userApiConnector, userGroupConnector);
+        verifyNoMoreInteractions(userApiConnectorMock, userGroupConnectorMock);
     }
 
 
     @Test
     void testDeleteMembersByUserIdUserNotFound() {
-        // Arrange
-        when(userApiConnector.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(Collections.emptyList());
 
-        // Act
-        userV2GroupServiceImpl.deleteMembersByUserId("userId", "institutionId", "prod-io");
+        when(userApiConnectorMock.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(Collections.emptyList());
 
-        // Assert that nothing has changed
-        verify(userApiConnector).retrieveFilteredUser("userId", "institutionId", "prod-io");
+        userGroupV2Service.deleteMembersByUserId("userId", "institutionId", "prod-io");
+        verify(userApiConnectorMock).retrieveFilteredUser("userId", "institutionId", "prod-io");
     }
 
 
     @Test
     void testDeleteMembersByUserIdUserFound() {
-        // Arrange
-        when(userApiConnector.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(List.of(Mockito.mock(UserInstitution.class)));
 
-        // Act and Assert
-        userV2GroupServiceImpl.deleteMembersByUserId("userId", "institutionId", "prod-io");
-        verify(userApiConnector).retrieveFilteredUser("userId", "institutionId", "prod-io");
-        verifyNoInteractions(userGroupConnector);
+        when(userApiConnectorMock.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(List.of(Mockito.mock(UserInstitution.class)));
+
+        userGroupV2Service.deleteMembersByUserId("userId", "institutionId", "prod-io");
+        verify(userApiConnectorMock).retrieveFilteredUser("userId", "institutionId", "prod-io");
+        verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void addMemberToUserGroup() {
-        //given
+
         String groupId = "groupId";
         String institutionId = "institutionId";
         String productId = "productId";
@@ -350,28 +453,26 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
         foundGroup.setMembers(List.of(userInfoMock2, userInfoMock3, userInfoMock4));
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId);
         foundGroup.setProductId(productId);
 
-        when(userGroupConnector.getUserGroupById(anyString()))
+        when(userGroupConnectorMock.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        when(userApiConnector.retrieveFilteredUserInstitution(eq(institutionId), any()))
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(eq(institutionId), any()))
                 .thenReturn(List.of(userId.toString(), "setId", "setId", "setId"));  //when
-        Executable executable = () -> userV2GroupServiceImpl.addMemberToUserGroup(groupId, userId);
-        //then
+        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(groupId, userId);
+
         assertDoesNotThrow(executable);
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .addMemberToUserGroup(anyString(), any());
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .getUserGroupById(groupId);
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
@@ -380,12 +481,12 @@ class UserGroupV2ServiceImplTest {
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
 
-        verifyNoMoreInteractions(userGroupConnector, userApiConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock, userApiConnectorMock);
     }
 
     @Test
     void addMemberToUserGroup_invalidMember() {
-        //given
+
         String groupId = "groupId";
         String institutionId = "institutionId";
         String productId = "productId";
@@ -406,28 +507,26 @@ class UserGroupV2ServiceImplTest {
         userInfoMock3.setId(id3);
         userInfoMock4.setId(id4);
 
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
         foundGroup.setMembers(List.of(userInfoMock2, userInfoMock3, userInfoMock4));
         foundGroup.setCreatedAt(Instant.now());
         foundGroup.setModifiedAt(Instant.now());
         foundGroup.setInstitutionId(institutionId);
         foundGroup.setProductId(productId);
 
-        when(userGroupConnector.getUserGroupById(anyString()))
+        when(userGroupConnectorMock.getUserGroupById(anyString()))
                 .thenReturn(foundGroup);
 
-        when(userApiConnector.retrieveFilteredUserInstitution(eq(institutionId),  any()))
+        when(userApiConnectorMock.retrieveFilteredUserInstitution(eq(institutionId), any()))
                 .thenReturn(List.of("setId", "setId", "setId", "setId"));
 
-        Executable executable = () -> userV2GroupServiceImpl.addMemberToUserGroup(groupId, userId);
-        //then
+        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(groupId, userId);
+
         InvalidMemberListException e = assertThrows(InvalidMemberListException.class, executable);
         assertEquals("This user is not allowed for this group", e.getMessage());
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .getUserGroupById(groupId);
         ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
+        verify(userApiConnectorMock, times(1))
                 .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture());
         UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
         assertNull(capturedFilter.getUserId());
@@ -435,399 +534,88 @@ class UserGroupV2ServiceImplTest {
         assertNull(capturedFilter.getRole());
         assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
         assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verifyNoMoreInteractions(userGroupConnector, userApiConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock, userApiConnectorMock);
     }
 
     @Test
     void addMemberToUserGroup_nullId() {
-        //given
-        String groupId = null;
+
         UUID userId = randomUUID();
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.addMemberToUserGroup(groupId, userId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(null, userId);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void addMemberToUserGroup_nullUserId() {
-        //given
+
         String groupId = "groupId";
-        UUID userId = null;
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.addMemberToUserGroup(groupId, userId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(groupId, null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void deleteMemberFromUserGroup() {
-        //given
+
         String groupId = "groupId";
         UUID userId = randomUUID();
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.deleteMemberFromUserGroup(groupId, userId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.deleteMemberFromUserGroup(groupId, userId);
+
         assertDoesNotThrow(executable);
-        verify(userGroupConnector, times(1))
+        verify(userGroupConnectorMock, times(1))
                 .deleteMemberFromUserGroup(anyString(), any());
-        verifyNoMoreInteractions(userGroupConnector);
+        verifyNoMoreInteractions(userGroupConnectorMock);
     }
 
     @Test
     void deleteMemberFromUserGroup_nullId() {
-        //given
-        String groupId = null;
+
         UUID userId = randomUUID();
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.deleteMemberFromUserGroup(groupId, userId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.deleteMemberFromUserGroup(null, userId);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void deleteMemberFromUserGroup_nullUserId() {
-        //given
+
         String groupId = "groupId";
-        UUID userId = null;
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.deleteMemberFromUserGroup(groupId, userId);
-        //then
+
+        Executable executable = () -> userGroupV2Service.deleteMemberFromUserGroup(groupId, null);
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("A userId is required", e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
-    }
-
-    @Test
-    void getUserGroups() {
-        //given
-        String institutionId = "institutionId";
-        String productId = "productId";
-        UUID userId = randomUUID();
-        Pageable pageable = PageRequest.of(1, 2);
-        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
-        when(userGroupConnector.getUserGroups(any(), any()))
-                .thenAnswer(invocation -> getPage(List.of(userGroupInfo), invocation.getArgument(1, Pageable.class), () -> 1L));
-        //when
-        Page<UserGroupInfo> groupInfos = userV2GroupServiceImpl.getUserGroups(institutionId, productId, userId, pageable);
-        //then
-        assertNotNull(groupInfos);
-        assertNotNull(groupInfos.getContent());
-        assertEquals(1, groupInfos.getContent().size());
-        verify(userGroupConnector, times(1))
-                .getUserGroups(any(), any());
-        verifyNoMoreInteractions(userGroupConnector);
-    }
-
-    @Test
-    void getUserGroupById() {
-        //given
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
-        foundGroup.setId(groupId);
-        String id1 = randomUUID().toString();
-        String id2 = randomUUID().toString();
-        String id3 = randomUUID().toString();
-        String id4 = randomUUID().toString();
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
-
-        userInfoMock1.setId(id1);
-        userInfoMock2.setId(id2);
-        userInfoMock3.setId(id3);
-        userInfoMock4.setId(id4);
-
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
-        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any()))
-                .thenReturn(List.of(id1, id2, id3, id4)); foundGroup.setMembers(members);
-        foundGroup.setCreatedAt(Instant.now());
-        foundGroup.setModifiedAt(Instant.now());
-        foundGroup.setInstitutionId(institutionId);
-        User createdBy = new User();
-        createdBy.setId("createdBy");
-        foundGroup.setCreatedBy(createdBy);
-        User modifiedBy = new User();
-        modifiedBy.setId("modifiedBy");
-        foundGroup.setModifiedBy(modifiedBy);
-
-        User createdByMock = mockInstance(new User(), "setId");
-        User modifiedByMock = mockInstance(new User(), "setId");
-
-        when(userGroupConnector.getUserGroupById(anyString()))
-                .thenReturn(foundGroup);
-        when(userApiConnector.getUserById(anyString(), anyString(), any()))
-                .thenAnswer(invocation -> {
-                    User userMock = new User();
-                    userMock.setId(invocation.getArgument(0, String.class));
-                    return userMock;
-                });
-        when(userApiConnector.getUserById(eq(createdBy.getId()), anyString(), any()))
-                .thenAnswer(invocation -> {
-                    createdByMock.setId(invocation.getArgument(0, String.class));
-                    return createdByMock;
-                });
-        when(userApiConnector.getUserById(eq(modifiedBy.getId()), anyString(), any()))
-                .thenAnswer(invocation -> {
-                    modifiedByMock.setId(invocation.getArgument(0, String.class));
-                    return modifiedByMock;
-                });
-        //when
-        UserGroupInfo groupInfo = userV2GroupServiceImpl.getUserGroupById(groupId, institutionId);
-        //then
-        assertEquals(foundGroup.getId(), groupInfo.getId());
-        assertEquals(foundGroup.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(foundGroup.getProductId(), groupInfo.getProductId());
-        assertEquals(foundGroup.getStatus(), groupInfo.getStatus());
-        assertEquals(foundGroup.getDescription(), groupInfo.getDescription());
-        assertEquals(foundGroup.getName(), groupInfo.getName());
-        assertEquals(foundGroup.getMembers(), groupInfo.getMembers());
-        assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
-        assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
-        verify(userGroupConnector, times(1))
-                .getUserGroupById(anyString());
-        verify(userApiConnector, times(6))
-                .getUserById(any(), any(),anyList());
-
-        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
-                .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture());
-        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertNull(capturedFilter.getUserId());
-        assertNull(capturedFilter.getProductRoles());
-        assertNull(capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
-        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verifyNoMoreInteractions(userGroupConnector);
-    }
-
-    @Test
-    void getUserGroupById_nullModifiedBy() {
-        //given
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
-        foundGroup.setId(groupId);
-        String id1 = randomUUID().toString();
-        String id2 = randomUUID().toString();
-        String id3 = randomUUID().toString();
-        String id4 = randomUUID().toString();
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
-
-        userInfoMock1.setId(id1);
-        userInfoMock2.setId(id2);
-        userInfoMock3.setId(id3);
-        userInfoMock4.setId(id4);
-
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
-        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any()))
-                .thenReturn(List.of("setId", "setId", "setId", "setId"));
-
-        foundGroup.setMembers(members);
-        foundGroup.setCreatedAt(Instant.now());
-        foundGroup.setModifiedAt(Instant.now());
-        foundGroup.setInstitutionId(institutionId);
-        User createdBy = new User();
-        createdBy.setId("createdBy");
-        foundGroup.setCreatedBy(createdBy);
-
-        User createdByMock = mockInstance(new User(), "setId");
-
-        when(userGroupConnector.getUserGroupById(anyString()))
-                .thenReturn(foundGroup);
-        when(userApiConnector.getUserById(anyString(), any(), any()))
-                .thenAnswer(invocation -> {
-                    User userMock = new User();
-                    userMock.setId(invocation.getArgument(0, String.class));
-                    return userMock;
-                });
-        when(userApiConnector.getUserById(any(), any(), any()))
-                .thenAnswer(invocation -> {
-                    createdByMock.setId(invocation.getArgument(0, String.class));
-                    return createdByMock;
-                });
-        //when
-        UserGroupInfo groupInfo = userV2GroupServiceImpl.getUserGroupById(groupId, institutionId);
-        //then
-        assertEquals(foundGroup.getId(), groupInfo.getId());
-        assertEquals(foundGroup.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(foundGroup.getProductId(), groupInfo.getProductId());
-        assertEquals(foundGroup.getStatus(), groupInfo.getStatus());
-        assertEquals(foundGroup.getDescription(), groupInfo.getDescription());
-        assertEquals(foundGroup.getName(), groupInfo.getName());
-        assertEquals(foundGroup.getMembers(), groupInfo.getMembers());
-        assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
-        assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
-        assertNull(groupInfo.getModifiedBy());
-        verify(userGroupConnector, times(1))
-                .getUserGroupById(anyString());
-        verifyNoMoreInteractions(userGroupConnector);
-    }
-
-    @Test
-    void getUserGroupById_noRelationshipMember() {
-        //given
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId", "setCreatedBy", "setModifiedBy");
-        foundGroup.setId(groupId);
-        String id1 = randomUUID().toString();
-        String id2 = randomUUID().toString();
-        String id3 = randomUUID().toString();
-        String id4 = randomUUID().toString();
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
-
-        userInfoMock1.setId(id1);
-        userInfoMock2.setId(id2);
-        userInfoMock3.setId(id3);
-        userInfoMock4.setId(id4);
-
-        List<UserInfo> members = List.of(userInfoMock1, userInfoMock2, userInfoMock3, userInfoMock4);
-
-        when(userApiConnector.retrieveFilteredUserInstitution(anyString(), any()))
-                .thenReturn(List.of(id4));
-        when(userApiConnector.getUserById(anyString(), any(), any()))
-                .thenAnswer(invocation -> {
-                    User userMock = new User();
-                    userMock.setId(invocation.getArgument(0, String.class));
-                    return userMock;
-                });
-
-        foundGroup.setMembers(members);
-        foundGroup.setCreatedAt(Instant.now());
-        foundGroup.setModifiedAt(Instant.now());
-        foundGroup.setInstitutionId(institutionId);
-        final String createdById = randomUUID().toString();
-        final String modifiedById = randomUUID().toString();
-        User createdBy = new User();
-        createdBy.setId(createdById);
-        foundGroup.setCreatedBy(createdBy);
-        User modifiedBy = new User();
-        modifiedBy.setId(modifiedById);
-        foundGroup.setModifiedBy(modifiedBy);
-
-        User createdByMock = mockInstance(new User(), "setId");
-        createdByMock.setId(createdById);
-        User modifiedByMock = mockInstance(new User(), "setId");
-        modifiedByMock.setId(modifiedById);
-
-        when(userGroupConnector.getUserGroupById(any()))
-                .thenReturn(foundGroup);
-        when(userApiConnector.getUserById(eq(createdById), any(), any()))
-                .thenReturn(createdByMock);
-        when(userApiConnector.getUserById(eq(modifiedById), any(), any()))
-                .thenReturn(modifiedByMock);
-        //when
-        UserGroupInfo groupInfo = userV2GroupServiceImpl.getUserGroupById(groupId, institutionId);
-        //then
-        assertEquals(foundGroup.getId(), groupInfo.getId());
-        assertEquals(foundGroup.getInstitutionId(), groupInfo.getInstitutionId());
-        assertEquals(foundGroup.getProductId(), groupInfo.getProductId());
-        assertEquals(foundGroup.getStatus(), groupInfo.getStatus());
-        assertEquals(foundGroup.getDescription(), groupInfo.getDescription());
-        assertEquals(foundGroup.getName(), groupInfo.getName());
-        assertEquals(1, groupInfo.getMembers().size());
-        assertEquals(foundGroup.getCreatedAt(), groupInfo.getCreatedAt());
-        assertEquals(createdByMock.getId(), groupInfo.getCreatedBy().getId());
-        assertEquals(foundGroup.getModifiedAt(), groupInfo.getModifiedAt());
-        assertEquals(modifiedByMock.getId(), groupInfo.getModifiedBy().getId());
-        verify(userGroupConnector, times(1))
-                .getUserGroupById(groupId);
-
-        ArgumentCaptor<UserInfo.UserInfoFilter> filterCaptor = ArgumentCaptor.forClass(UserInfo.UserInfoFilter.class);
-        verify(userApiConnector, times(1))
-                .retrieveFilteredUserInstitution(eq(institutionId), filterCaptor.capture());
-        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertNull(capturedFilter.getUserId());
-        assertNull(capturedFilter.getProductRoles());
-        assertNull(capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
-        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-        verifyNoMoreInteractions(userGroupConnector);
-    }
-
-    @Test
-    void getUserGroupById_nullId() {
-        //given
-        String groupId = null;
-        String institutionId = "institutionId";
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.getUserGroupById(groupId, institutionId);
-        //then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
-        Mockito.verifyNoInteractions(userGroupConnector);
-        Mockito.verifyNoInteractions(userApiConnector);
-
-    }
-
-    @Test
-    void getUserGroupById_invalidUserGroupException() {
-        //given
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId");
-        foundGroup.setId(groupId);
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        userInfoMock1.setId("createdBy");
-        userInfoMock2.setId("modifiedBy");
-        foundGroup.setCreatedAt(Instant.now());
-        foundGroup.setModifiedAt(Instant.now());
-
-        when(userGroupConnector.getUserGroupById(anyString()))
-                .thenReturn(foundGroup);
-        //when
-        Executable executable = () -> userV2GroupServiceImpl.getUserGroupById(groupId, institutionId);
-        //then
-        InvalidUserGroupException e = assertThrows(InvalidUserGroupException.class, executable);
-        assertEquals("Could not find a UserGroup for given institutionId", e.getMessage());
-        verify(userGroupConnector, times(1))
-                .getUserGroupById(anyString());
-        verifyNoMoreInteractions(userGroupConnector);
-        Mockito.verifyNoInteractions(userApiConnector);
+        Mockito.verifyNoInteractions(userGroupConnectorMock);
     }
 
     @Test
     void testDeleteMembersByUserIdUserNotFound1() {
-        // Arrange
-        when(userApiConnector.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(Collections.emptyList());
 
-        // Act
-        userV2GroupServiceImpl.deleteMembersByUserId("userId", "institutionId", "prod-io");
+        when(userApiConnectorMock.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(Collections.emptyList());
 
-        // Assert that nothing has changed
-        verify(userApiConnector).retrieveFilteredUser("userId", "institutionId", "prod-io");
+        userGroupV2Service.deleteMembersByUserId("userId", "institutionId", "prod-io");
+        verify(userApiConnectorMock).retrieveFilteredUser("userId", "institutionId", "prod-io");
     }
 
 
     @Test
     void testDeleteMembersByUserIdUserFound2() {
-        // Arrange
-        when(userApiConnector.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(List.of(Mockito.mock(UserInstitution.class)));
 
-        // Act and Assert
-        userV2GroupServiceImpl.deleteMembersByUserId("userId", "institutionId", "prod-io");
-        verify(userApiConnector).retrieveFilteredUser("userId", "institutionId", "prod-io");
-        verifyNoInteractions(userGroupConnector);
+        when(userApiConnectorMock.retrieveFilteredUser("userId", "institutionId", "prod-io")).thenReturn(List.of(Mockito.mock(UserInstitution.class)));
+
+        userGroupV2Service.deleteMembersByUserId("userId", "institutionId", "prod-io");
+        verify(userApiConnectorMock).retrieveFilteredUser("userId", "institutionId", "prod-io");
+        verifyNoInteractions(userGroupConnectorMock);
     }
 }

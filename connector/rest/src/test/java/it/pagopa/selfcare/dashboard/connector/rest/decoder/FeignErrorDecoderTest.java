@@ -19,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FeignErrorDecoderTest {
     FeignErrorDecoder feignDecoder = new FeignErrorDecoder();
 
-    private Map<String, Collection<String>> headers = new LinkedHashMap<>();
+    private final Map<String, Collection<String>> headers = new LinkedHashMap<>();
 
     @Test
-    void testDecodeToResourceNotFound() throws Throwable {
+    void testDecodeToResourceNotFound() {
         //given
         Response response = Response.builder()
                 .status(404)
@@ -38,7 +38,7 @@ class FeignErrorDecoderTest {
     }
 
     @Test
-    void testDecodeToBadGateway() throws Throwable {
+    void testDecodeToBadGateway() {
         //given
         Response response = Response.builder()
                 .status(500)
