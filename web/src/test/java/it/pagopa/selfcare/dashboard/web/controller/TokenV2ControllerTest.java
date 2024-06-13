@@ -1,18 +1,16 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.web.security.ExchangeTokenServiceV2;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -27,31 +25,31 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = {TokenV2Controller.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {TokenV2Controller.class, WebTestConfig.class})
-class TokenV2ControllerTest {
+@ExtendWith(MockitoExtension.class)
+class TokenV2ControllerTest extends BaseControllerTest {
 
     private static final String BASE_URL = "/v2/token";
 
-    @Autowired
-    protected MockMvc mvc;
+    @InjectMocks
+    private TokenV2Controller tokenV2Controller;
 
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private ExchangeTokenServiceV2 exchangeTokenServiceMock;
 
+    @BeforeEach
+    void setUp() {
+        super.setUp(tokenV2Controller);
+    }
 
     @Test
     void exchange() throws Exception {
         // given
         String institutionId = "inst1";
         String productId = "prod1";
-        Mockito.when(exchangeTokenServiceMock.exchange(institutionId, productId, Optional.empty(), null))
+        Mockito.when(exchangeTokenServiceMock.exchange(institutionId, productId, Optional.empty()))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
-        mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                 .get(BASE_URL + "/exchange")
                 .param("institutionId", institutionId)
                 .param("productId", productId)
@@ -62,7 +60,31 @@ class TokenV2ControllerTest {
                 .andReturn();
         // then
         verify(exchangeTokenServiceMock, Mockito.times(1))
-                .exchange(institutionId, productId, Optional.empty(), null);
+                .exchange(institutionId, productId, Optional.empty());
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
+    }
+
+    @Test
+    void exchange_emptyIdentityToken() throws Exception {
+        // given
+        String institutionId = "inst1";
+        String productId = "prod1";
+        Mockito.when(exchangeTokenServiceMock.exchange(institutionId, productId, Optional.empty()))
+                .thenReturn(new ExchangedToken(null, null));
+        // when
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/exchange")
+                        .param("institutionId", institutionId)
+                        .param("productId", productId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        String content = result.getResponse().getContentAsString();
+        Assertions.assertFalse(content.isEmpty());
+        verify(exchangeTokenServiceMock, Mockito.times(1))
+                .exchange(institutionId, productId, Optional.empty());
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 
@@ -73,7 +95,7 @@ class TokenV2ControllerTest {
         Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId, null))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/exchange/fatturazione")
                         .param("institutionId", institutionId)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -89,5 +111,26 @@ class TokenV2ControllerTest {
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 
-
+    @Test
+    void billingExchange_emptyIdentityToken() throws Exception {
+        // given
+        String institutionId = "inst1";
+        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId, null))
+                .thenReturn(new ExchangedToken("", ""));
+        // when
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/exchange/fatturazione")
+                        .param("institutionId", institutionId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        URI resource = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
+        assertNotNull(resource);
+        assertEquals(resource.toString(), "");
+        verify(exchangeTokenServiceMock, Mockito.times(1))
+                .retrieveBillingExchangedToken(institutionId, null);
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
+    }
 }

@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -17,15 +16,15 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperIm
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -41,32 +40,32 @@ import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ContextConfiguration(classes = {InstitutionV2Controller.class, InstitutionResourceMapperImpl.class, UserMapperV2Impl.class})
-@WebMvcTest(value = {InstitutionV2Controller.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-class InstitutionV2ControllerTest {
+@ExtendWith(MockitoExtension.class)
+class InstitutionV2ControllerTest extends BaseControllerTest {
 
     private static final String BASE_URL = "/v2/institutions";
     private static final String FILE_JSON_PATH = "src/test/resources/json/";
 
-    @Autowired
-    protected MockMvc mvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @MockBean
+    @InjectMocks
+    private InstitutionV2Controller institutionV2Controller;
+    @Mock
     private UserV2Service userServiceMock;
-
-    @MockBean
+    @Mock
     private InstitutionV2Service institutionV2ServiceMock;
-
-    @MockBean
+    @Mock
     DelegationService delegationServiceMock;
+    @Spy
+    private UserMapperV2Impl userMapper;
+    @Spy
+    private InstitutionResourceMapperImpl institutionResourceMapper;
+    @BeforeEach
+    void setUp() {
+        super.setUp(institutionV2Controller);
+    }
 
     /**
      * Method under test: {@link InstitutionV2Controller#getInstitutionUser(String, String, Authentication)}
@@ -84,10 +83,10 @@ class InstitutionV2ControllerTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(loggedUserId).build());
 
-        when(institutionV2ServiceMock.getInstitutionUser(any(), any(), any()))
+        when(institutionV2ServiceMock.getInstitutionUser(institutionId, userId, loggedUserId))
                 .thenReturn(userInfo);
         //when
-        mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -117,7 +116,7 @@ class InstitutionV2ControllerTest {
         expectedInstitutionInfos.add(expectedInstitution);
         when(userServiceMock.getInstitutions(userId)).thenReturn(expectedInstitutionInfos);
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -157,9 +156,9 @@ class InstitutionV2ControllerTest {
         byte[] institutionStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "Institution.json"));
         Institution institution = objectMapper.readValue(institutionStream, Institution.class);
 
-        when(institutionV2ServiceMock.findInstitutionById(anyString())).thenReturn(institution);
+        when(institutionV2ServiceMock.findInstitutionById(institutionId)).thenReturn(institution);
 
-        mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}", institutionId)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
@@ -178,10 +177,9 @@ class InstitutionV2ControllerTest {
         userProductRoles.setProductRoles(Set.of("admin"));
 
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
 
         // when
-        mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .put(BASE_URL + "/{institutionId}/products/{productId}/users/{userId}", institutionId, productId, userId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -204,10 +202,9 @@ class InstitutionV2ControllerTest {
         final String userId = "userId";
 
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(userId).build());
 
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .put(BASE_URL + "/{institutionId}/products/{productId}/users/{userId}", institutionId, productId, userId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -232,13 +229,14 @@ class InstitutionV2ControllerTest {
         createUserDto.setEmail("john.doe@example.com");
         createUserDto.setProductRoles(Set.of("admin"));
 
+        UserToCreate userToCreate = userMapper.toUserToCreate(createUserDto);
+
         String id = UUID.randomUUID().toString();
 
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
-        when(userServiceMock.createUsers(eq(institutionId), eq(productId), any(UserToCreate.class))).thenReturn(id);
+        when(userServiceMock.createUsers(institutionId, productId, userToCreate)).thenReturn(id);
         // when
-        mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -250,7 +248,7 @@ class InstitutionV2ControllerTest {
 
         // then
         verify(userServiceMock, times(1))
-                .createUsers(eq(institutionId), eq(productId), any(UserToCreate.class));
+                .createUsers(institutionId, productId, userToCreate);
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -261,10 +259,8 @@ class InstitutionV2ControllerTest {
         final String productId = "productId";
 
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
-
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
                         .principal(authentication)
                         .contentType(APPLICATION_JSON_VALUE)
@@ -292,7 +288,7 @@ class InstitutionV2ControllerTest {
         when(delegationServiceMock.getDelegationsV2(delegationParameters)).thenReturn(expectedDelegationWithPagination);
         // When
 
-        MvcResult result = mvc
+        MvcResult result = mockMvc
                 .perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}/institutions", expectedDelegation.getBrokerId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -337,7 +333,7 @@ class InstitutionV2ControllerTest {
         when(delegationServiceMock.getDelegationsV2(delegationParameters)).thenReturn(expectedDelegationWithPagination);
         // When
 
-        MvcResult result = mvc
+        MvcResult result = mockMvc
                 .perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
                                 delegationParameters.getTo(), delegationParameters.getProductId(), delegationParameters.getSearch(),

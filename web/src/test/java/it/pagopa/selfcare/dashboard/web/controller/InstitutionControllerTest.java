@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
@@ -14,32 +13,30 @@ import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.FileStorageService;
 import it.pagopa.selfcare.dashboard.core.InstitutionService;
-import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
-import it.pagopa.selfcare.dashboard.web.handler.DashboardExceptionsHandler;
+import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyDto;
 import it.pagopa.selfcare.dashboard.web.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.DelegationMapperImpl;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GeographicTaxonomyMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.product.entity.Product;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.Resource;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.MimeTypeUtils;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -48,18 +45,15 @@ import java.util.List;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = {InstitutionController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {InstitutionController.class, DelegationMapperImpl.class, WebTestConfig.class, DashboardExceptionsHandler.class, InstitutionResourceMapperImpl.class})
-class InstitutionControllerTest {
+@ExtendWith(MockitoExtension.class)
+class InstitutionControllerTest extends BaseControllerTest {
 
     private static final String BASE_URL = "/v1/institutions";
     private static final String FILE_JSON_PATH = "src/test/resources/json/";
@@ -74,20 +68,23 @@ class InstitutionControllerTest {
         PRODUCT_TREE.setNode(PRODUCT);
     }
 
-    @Autowired
-    protected MockMvc mvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @MockBean
+    @InjectMocks
+    private InstitutionController institutionController;
+    @Mock
     private FileStorageService storageServiceMock;
-
-    @MockBean
+    @Mock
     private InstitutionService institutionServiceMock;
-
-    @MockBean
+    @Mock
     private DelegationService delegationService;
+    @Spy
+    private InstitutionResourceMapperImpl institutionResourceMapper;
+    @Spy
+    private DelegationMapperImpl delegationMapper;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp(institutionController);
+    }
 
     @Test
     void saveInstitutionLogo() throws Exception {
@@ -95,8 +92,8 @@ class InstitutionControllerTest {
         String institutionId = "institutionId";
         String contentType = MimeTypeUtils.IMAGE_JPEG_VALUE;
         String filename = "test.jpeg";
-        MockMultipartFile multipartFile = new MockMultipartFile("logo", filename,
-                contentType, "test institution logo".getBytes());
+        byte[] content = "test institution logo".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile("logo", filename, contentType, content);
         MockMultipartHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .multipart(BASE_URL + "/" + institutionId + "/logo")
                 .file(multipartFile);
@@ -104,12 +101,17 @@ class InstitutionControllerTest {
             request.setMethod(HttpMethod.PUT.name());
             return request;
         });
+
         // when
-        mvc.perform(requestBuilder)
+        mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
         // then
+        ArgumentCaptor<InputStream> inputStreamCaptor = ArgumentCaptor.forClass(InputStream.class);
         verify(storageServiceMock, times(1))
-                .storeInstitutionLogo(Mockito.eq(institutionId), any(), Mockito.eq(contentType), Mockito.eq(filename));
+                .storeInstitutionLogo(eq(institutionId), inputStreamCaptor.capture(), eq(contentType), eq(filename));
+        InputStream capturedInputStream = inputStreamCaptor.getValue();
+        byte[] capturedContent = capturedInputStream.readAllBytes();
+        assertArrayEquals(content, capturedContent);
         verifyNoMoreInteractions(storageServiceMock);
     }
 
@@ -122,7 +124,7 @@ class InstitutionControllerTest {
         when(institutionServiceMock.getProductsTree())
                 .thenReturn(singletonList(productTree));
 
-        mvc.perform(get(BASE_URL + "/products")
+        mockMvc.perform(get(BASE_URL + "/products")
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -135,7 +137,7 @@ class InstitutionControllerTest {
         when(institutionServiceMock.getProductsTree())
                 .thenReturn(Collections.emptyList());
 
-        mvc.perform(get(BASE_URL + "/products")
+        mockMvc.perform(get(BASE_URL + "/products")
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -148,31 +150,36 @@ class InstitutionControllerTest {
     }
 
     @Test
-    void updateInstitutionGeographicTaxonomy(@Value("classpath:stubs/geographicTaxonomyListDto.json") Resource geographicTaxonomyDto) throws Exception {
+    void updateInstitutionGeographicTaxonomy() throws Exception {
         // given
         String institutionId = "institutionId";
-        Mockito.doNothing()
-                .when(institutionServiceMock).updateInstitutionGeographicTaxonomy(eq(institutionId), any());
-        GeographicTaxonomyListDto geographicTaxonomyListDto = objectMapper.readValue(
-                geographicTaxonomyDto.getInputStream().readAllBytes(),
-                GeographicTaxonomyListDto.class
-        );
+        GeographicTaxonomyDto geographicTaxonomyDto = new GeographicTaxonomyDto();
+        geographicTaxonomyDto.setCode("code");
+        geographicTaxonomyDto.setDesc("desc");
+
+        GeographicTaxonomyListDto geographicTaxonomyListDto = new GeographicTaxonomyListDto();
+        geographicTaxonomyListDto.setGeographicTaxonomyDtoList(List.of(geographicTaxonomyDto));
+
+        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
+        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
+
+        doNothing().when(institutionServiceMock).updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
+
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .put(BASE_URL + "/" + institutionId + "/geographicTaxonomy")
-                        .content(geographicTaxonomyDto.getInputStream().readAllBytes())
+                        .content(objectMapper.writeValueAsString(geographicTaxonomyListDto))
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andReturn();
+                .andExpect(status().isOk());
+
         // then
-        assertEquals("", result.getResponse().getContentAsString());
         ArgumentCaptor<GeographicTaxonomyList> argumentCaptor = ArgumentCaptor.forClass(GeographicTaxonomyList.class);
         verify(institutionServiceMock, times(1))
-                .updateInstitutionGeographicTaxonomy(Mockito.eq(institutionId), argumentCaptor.capture());
-        GeographicTaxonomyList geographicTaxonomyList = argumentCaptor.getValue();
-        assertEquals(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().get(0).getCode(), geographicTaxonomyList.getGeographicTaxonomyList().get(0).getCode());
-        assertEquals(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().get(0).getDesc(), geographicTaxonomyList.getGeographicTaxonomyList().get(0).getDesc());
+                .updateInstitutionGeographicTaxonomy(eq(institutionId), argumentCaptor.capture());
+        GeographicTaxonomyList capturedGeographicTaxonomies = argumentCaptor.getValue();
+        assertEquals(geographicTaxonomies.getGeographicTaxonomyList().get(0).getCode(), capturedGeographicTaxonomies.getGeographicTaxonomyList().get(0).getCode());
+        assertEquals(geographicTaxonomies.getGeographicTaxonomyList().get(0).getDesc(), capturedGeographicTaxonomies.getGeographicTaxonomyList().get(0).getDesc());
         verifyNoMoreInteractions(institutionServiceMock);
     }
 
@@ -184,7 +191,7 @@ class InstitutionControllerTest {
         when(institutionServiceMock.getGeographicTaxonomyList(institutionId))
                 .thenReturn(geographicTaxonomyListMock);
         // when
-        MvcResult result = mvc.perform(get(BASE_URL + "/{institutionId}/geographicTaxonomy", institutionId)
+        MvcResult result = mockMvc.perform(get(BASE_URL + "/{institutionId}/geographicTaxonomy", institutionId)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -211,7 +218,7 @@ class InstitutionControllerTest {
         when(institutionServiceMock.updateInstitutionDescription(institutionId, resource)).thenReturn(institutionMock);
 
         //when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .put(BASE_URL + "/" + institutionId)
                         .content(objectMapper.writeValueAsString(resource))
                         .contentType(APPLICATION_JSON_VALUE)
@@ -246,7 +253,7 @@ class InstitutionControllerTest {
         when(delegationService.getDelegations(getDelegationParameters)).thenReturn(List.of(expectedDelegation));
         // When
 
-        MvcResult result = mvc
+        MvcResult result = mockMvc
                 .perform(get(BASE_URL + "/{institutionId}/partners?productId={productId}", expectedDelegation.getInstitutionId(), expectedDelegation.getProductId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
@@ -274,6 +281,7 @@ class InstitutionControllerTest {
     /**
      * Method under test: {@link InstitutionController#getDelegationsUsingTo(String, String, String, Order, Integer, Integer)}
      */
+
     @Test
     void getDelegationsUsingTo_shouldGetData() throws Exception {
         // Given
@@ -283,8 +291,9 @@ class InstitutionControllerTest {
         when(delegationService.getDelegations(delegationParameters)).thenReturn(List.of(expectedDelegation));
         // When
 
-        MvcResult result = mvc
-                .perform(get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
+        MvcResult result = mockMvc
+                .perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/institutions?productId={productId}&search={search}&taxCode={taxCode}&mode=FULL&order=ASC&page={page}&size={size}",
                                 delegationParameters.getTo(), delegationParameters.getProductId(), delegationParameters.getSearch(),
                                 delegationParameters.getTaxCode(), delegationParameters.getPage(), delegationParameters.getSize()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -306,7 +315,7 @@ class InstitutionControllerTest {
         assertThat(actual.getInstitutionId()).isEqualTo(expectedDelegation.getInstitutionId());
 
         verify(delegationService, times(1))
-                .getDelegations(delegationParameters);
+                .getDelegations(dummyDelegationParametersTo());
         verifyNoMoreInteractions(delegationService);
     }
 
@@ -322,7 +331,7 @@ class InstitutionControllerTest {
         when(delegationService.getDelegations(delegationParameters)).thenReturn(List.of(expectedDelegation));
         // When
 
-        MvcResult result = mvc
+        MvcResult result = mockMvc
                 .perform(get(BASE_URL + "/{institutionId}/institutions", expectedDelegation.getBrokerId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
@@ -347,6 +356,7 @@ class InstitutionControllerTest {
                 .getDelegations(delegationParameters);
         verifyNoMoreInteractions(delegationService);
     }
+
 
     private Delegation dummyDelegation() {
         Delegation delegation = new Delegation();

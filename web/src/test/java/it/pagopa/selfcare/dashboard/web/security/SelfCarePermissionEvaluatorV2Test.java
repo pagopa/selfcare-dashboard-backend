@@ -10,6 +10,9 @@ import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -26,17 +29,14 @@ import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {SelfCarePermissionEvaluatorV2.class})
+@ExtendWith(MockitoExtension.class)
 class SelfCarePermissionEvaluatorV2Test {
 
-    @MockBean
+    @Mock
     UserApiConnector userApiConnector;
-
-    @MockBean
+    @Mock
     UserGroupConnector userGroupConnector;
-
-    @Autowired
+    @InjectMocks
     SelfCarePermissionEvaluatorV2 permissionEvaluator;
 
     @Test
@@ -159,7 +159,7 @@ class SelfCarePermissionEvaluatorV2Test {
         String targetType = InstitutionResource.class.getSimpleName();
         String permission = "ADMIN";
         String institutionId = "institutionId";
-        when(userApiConnector.hasPermission(institutionId, permission, null)).thenReturn(false);
+        when(userApiConnector.hasPermission(targetId.toString(), permission, null)).thenReturn(false);
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("username", "password", permission);
 
         boolean hasPermission = permissionEvaluator.hasPermission(authentication, targetId, targetType, permission);

@@ -1,13 +1,14 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.connector.model.support.SupportRequest;
 import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.core.SupportService;
-import it.pagopa.selfcare.dashboard.web.model.delegation.DelegationRequestDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.SupportMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.SupportMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.support.SupportRequestDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,20 +20,17 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ContextConfiguration(classes = {SupportController.class})
 @ExtendWith(MockitoExtension.class)
-class SupportControllerTest {
+class SupportControllerTest extends BaseControllerTest {
 
     @InjectMocks
     private SupportController supportController;
@@ -43,9 +41,10 @@ class SupportControllerTest {
     @Spy
     private SupportMapper supportMapper = new SupportMapperImpl();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final SelfCareUser user;
+    private static final String FILE_JSON_PATH = "src/test/resources/json/";
+
 
     static {
         user = SelfCareUser.builder("id")
@@ -55,57 +54,54 @@ class SupportControllerTest {
                 .build();
     }
 
+    @BeforeEach
+    void setUp() {
+        super.setUp(supportController);
+    }
+
     /**
      * Method under test: {@link SupportController#sendSupportRequest(SupportRequestDto, Authentication)}
      */
     @Test
     void testSendSupportRequest() throws Exception {
-
-        final String redirectUrl = "test";
-        final SupportResponse supportResponse = SupportResponse.builder()
-                .redirectUrl(redirectUrl)
-                .build();
         Authentication authentication = Mockito.mock(Authentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
+
+        byte[] requestStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "SupportRequest.json"));
+        SupportRequest supportRequest = objectMapper.readValue(requestStream, new TypeReference<>() {});
+
+        byte[] responseStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "SupportResponse.json"));
+        SupportResponse supportResponse = objectMapper.readValue(responseStream,  new TypeReference<>() {});
+
+        byte[] apiRequestStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "SupportRequestDto.json"));
+        SupportRequestDto supportRequestDto = objectMapper.readValue(apiRequestStream,  new TypeReference<>() {});
+
         when(authentication.getPrincipal()).thenReturn(user);
-        when(supportService.sendRequest(any())).thenReturn(supportResponse);
 
-        SupportRequestDto supportRequest = new SupportRequestDto();
-        supportRequest.setEmail("test@gmail.com");
-        String content = (new ObjectMapper()).writeValueAsString(supportRequest);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/v1/support")
-                .principal(authentication)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content);
-        MvcResult result =  MockMvcBuilders.standaloneSetup(supportController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk())
+        when(supportService.sendRequest(supportRequest)).thenReturn(supportResponse);
+
+        String content = objectMapper.writeValueAsString(supportRequestDto);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/support")
+                        .principal(authentication)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(supportResponse)))
                 .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        assertNotNull(response);
-
     }
 
-    /**
-     * Method under test: {@link DelegationController#createDelegation(DelegationRequestDto)}
-     */
     @Test
     void testSendBadRequest() throws Exception {
         SupportRequestDto supportRequest = new SupportRequestDto();
         supportRequest.setEmail("pp");
-        String content = (new ObjectMapper()).writeValueAsString(supportRequest);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/v1/support")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content);
-        MockMvcBuilders.standaloneSetup(supportController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+        String content = objectMapper.writeValueAsString(supportRequest);
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/support")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isBadRequest())
                 .andReturn();
     }
 }

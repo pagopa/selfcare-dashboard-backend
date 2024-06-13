@@ -1,23 +1,21 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.core.BrokerService;
 import it.pagopa.selfcare.dashboard.core.ProductService;
-import it.pagopa.selfcare.dashboard.web.config.WebTestConfig;
 import it.pagopa.selfcare.dashboard.web.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.product.BrokerResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -33,25 +31,26 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value = {ProductController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = {ProductController.class, WebTestConfig.class, BrokerResourceMapperImpl.class})
-class ProductControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ProductControllerTest extends BaseControllerTest {
 
     private static final String BASE_URL = "/v1/products";
 
     private static final String FILE_JSON_PATH = "src/test/resources/json/";
 
-    @Autowired
-    protected MockMvc mvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
-
-    @MockBean
+    @InjectMocks
+    private ProductController productController;
+    @Mock
     private ProductService productServiceMock;
-
-    @MockBean
+    @Mock
     private BrokerService brokerServiceMock;
+    @Spy
+    private BrokerResourceMapperImpl brokerResourceMapper;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp(productController);
+    }
 
     @Test
     void getProductRoles() throws Exception {
@@ -65,7 +64,7 @@ class ProductControllerTest {
                     put(PartyRole.MANAGER, productRoleInfo);
                 }});
         // when
-        mvc.perform(MockMvcRequestBuilders
+        mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{productId}/roles", productId)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
@@ -92,7 +91,7 @@ class ProductControllerTest {
                         brokerInfo
                 ));
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{productId}/brokers/{institutionType}", productId, institutionType)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
@@ -122,12 +121,12 @@ class ProductControllerTest {
 
         String productId = "prod-io";
         String institutionType = "PSP";
-        when(brokerServiceMock.findInstitutionsByProductAndType(productId, institutionType ))
+        when(brokerServiceMock.findInstitutionsByProductAndType(productId, institutionType))
                 .thenReturn(List.of(
                         brokerInfo
                 ));
         // when
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{productId}/brokers/{institutionType}", productId, institutionType)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
@@ -144,7 +143,7 @@ class ProductControllerTest {
         assertEquals(brokerInfo.getDescription(), resources.get(0).getDescription());
 
         verify(brokerServiceMock, times(1))
-                .findInstitutionsByProductAndType(productId, institutionType );
+                .findInstitutionsByProductAndType(productId, institutionType);
         verifyNoMoreInteractions(brokerServiceMock);
     }
 
@@ -152,7 +151,7 @@ class ProductControllerTest {
     @Test
     void getProductBrokersForUnsupportedType() throws Exception {
         String productId = "prod-pagopa";
-        MvcResult result = mvc.perform(MockMvcRequestBuilders
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{productId}/brokers/{institutionType}", productId, "TEST")
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
