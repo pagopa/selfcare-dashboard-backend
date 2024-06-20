@@ -92,7 +92,7 @@ class TokenV2ControllerTest extends BaseControllerTest {
     void billingExchange() throws Exception {
         // given
         String institutionId = "inst1";
-        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId, null))
+        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId))
                 .thenReturn(new ExchangedToken("token", "urlBO"));
         // when
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -107,7 +107,7 @@ class TokenV2ControllerTest extends BaseControllerTest {
         assertNotNull(resource);
         assertEquals(resource.toString(), "urlBO");
         verify(exchangeTokenServiceMock, Mockito.times(1))
-                .retrieveBillingExchangedToken(institutionId, null);
+                .retrieveBillingExchangedToken(institutionId);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 
@@ -115,7 +115,7 @@ class TokenV2ControllerTest extends BaseControllerTest {
     void billingExchange_emptyIdentityToken() throws Exception {
         // given
         String institutionId = "inst1";
-        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId, null))
+        Mockito.when(exchangeTokenServiceMock.retrieveBillingExchangedToken(institutionId))
                 .thenReturn(new ExchangedToken("", ""));
         // when
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -130,7 +130,7 @@ class TokenV2ControllerTest extends BaseControllerTest {
         assertNotNull(resource);
         assertEquals(resource.toString(), "");
         verify(exchangeTokenServiceMock, Mockito.times(1))
-                .retrieveBillingExchangedToken(institutionId, null);
+                .retrieveBillingExchangedToken(institutionId);
         verifyNoMoreInteractions(exchangeTokenServiceMock);
     }
 }
