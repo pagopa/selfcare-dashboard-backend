@@ -644,7 +644,7 @@ class ExchangeTokenServiceV2Test {
         JwtService jwtServiceMock = mock(JwtService.class);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, null, null, null, properties, null, null, new InstitutionResourceMapperImpl());
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(null, null);
+        Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(null);
         // then
         IllegalStateException e = assertThrows(IllegalStateException.class, executable);
         assertEquals("Authentication is required", e.getMessage());
@@ -710,7 +710,7 @@ class ExchangeTokenServiceV2Test {
 
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnector, properties, null, userApiConnector, new InstitutionResourceMapperImpl());
 
-        Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId, null);
+        Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Session token claims is required", e.getMessage());
@@ -753,7 +753,7 @@ class ExchangeTokenServiceV2Test {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(SelfCareUser.builder("ccbc5350-0ba7-47bc-9f61-8c65001939f9").build(), "password", authorities);
         TestSecurityContextHolder.setAuthentication(authentication);
         // when
-        Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId, null);
+        Executable executable = () -> ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
         RuntimeException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Institution info is required", e.getMessage());
@@ -850,7 +850,7 @@ class ExchangeTokenServiceV2Test {
         when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
-        final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId, null);
+        final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
         assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
@@ -892,7 +892,6 @@ class ExchangeTokenServiceV2Test {
     @EnumSource(PrivateKey.class)
     void billingExchange_ok(PrivateKey privateKey) throws Exception {
         // given
-        String lang = "en";
         String jti = "id";
         String credential = "password";
         Date iat = Date.from(Instant.now().minusSeconds(1));
@@ -976,7 +975,7 @@ class ExchangeTokenServiceV2Test {
         when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
         ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
-        final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId, lang);
+        final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
         assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
