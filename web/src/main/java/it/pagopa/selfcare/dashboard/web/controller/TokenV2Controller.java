@@ -81,7 +81,7 @@ public class TokenV2Controller {
         log.debug("billing exchange institutionId = {}", Encode.forJava(institutionId));
         log.info("env parameter: {}", Encode.forJava(environment.orElse("")));
 
-        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId, lang);
+        final ExchangedToken exchangedToken = exchangeTokenService.retrieveBillingExchangedToken(institutionId);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl().replace("<IdentityToken>", exchangedToken.getIdentityToken()));
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "billing exchange result = {}", Encode.forJava(String.valueOf(location)));
         log.trace("billing exchange end");
