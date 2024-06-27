@@ -1,6 +1,6 @@
 locals {
-  apim_name    = format("selc-%s-apim", var.env_short)
-  apim_rg      = format("selc-%s-api-rg", var.env_short)
+  apim_name    = format("selc-%s-apim-v2", var.env_short)
+  apim_rg      = format("selc-%s-api-v2-rg", var.env_short)
   api_name     = var.is_pnpg ? format("selc-%s-pnpg-api-bff-dashboard", var.env_short) : format("selc-%s-api-bff-dashboard", var.env_short)
   display_name = var.is_pnpg ? "BFF PNPG Dashboard API" : "BFF Dashboard API"
   base_path    = var.is_pnpg ? "imprese/dashboard" : "dashboard"
@@ -17,7 +17,7 @@ resource "azurerm_api_management_api_version_set" "apim_api_bff_dashboard" {
 
 
 module "apim_api_bff_dashboard" {
-  source              = "github.com/pagopa/terraform-azurerm-v3.git//api_management_api?ref=v7.50.1"
+  source              = "github.com/pagopa/terraform-azurerm-v3.git//api_management_api?ref=v8.18.0"
   name                = local.api_name
   api_management_name = local.apim_name
   resource_group_name = local.apim_rg
