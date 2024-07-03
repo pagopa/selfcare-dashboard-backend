@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.core;
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,36 @@ class DelegationServiceImplTest extends BaseServiceTest {
 
         DelegationId response = delegationServiceImpl.createDelegation(delegation);
         Assertions.assertEquals(delegation.getId(), response.getId());
+        Mockito.verify(msCoreConnector, Mockito.times(1))
+                .createDelegation(delegation);
+    }
+
+
+    @Test
+    void testCreateDelegationPagoPa() throws IOException {
+
+        ClassPathResource pathResource = new ClassPathResource("expectations/DelegationRequestPagoPa.json");
+        byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
+        DelegationRequest delegation = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        DelegationRequest delegationTaxCode = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        ClassPathResource pathResourceInstitution = new ClassPathResource("expectations/Institution.json");
+        byte[] resourceStreamInstitution = Files.readAllBytes(pathResourceInstitution.getFile().toPath());
+        Institution institution = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
+        });
+
+        DelegationId delegationId = new DelegationId();
+        delegationId.setId("id");
+        when(msCoreConnector.getInstitutionsFromTaxCode(delegationTaxCode.getTo(), null, null, null)).thenReturn(List.of(institution));
+        when(msCoreConnector.createDelegation(delegation)).thenReturn(delegationId);
+
+        DelegationId response = delegationServiceImpl.createDelegation(delegation);
+        Assertions.assertEquals(delegation.getId(), response.getId());
+        Mockito.verify(msCoreConnector, Mockito.times(1))
+                .getInstitutionsFromTaxCode(delegationTaxCode.getTo(), null, null, null);
         Mockito.verify(msCoreConnector, Mockito.times(1))
                 .createDelegation(delegation);
     }

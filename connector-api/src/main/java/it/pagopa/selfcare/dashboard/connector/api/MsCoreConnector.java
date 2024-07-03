@@ -16,6 +16,8 @@ public interface MsCoreConnector {
 
     Institution getInstitution(String institutionId);
 
+    List<Institution> getInstitutionsFromTaxCode(String taxCode, String subunitCode, String origin, String originId);
+
     Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updatePnPGInstitutionResource);
 
     DelegationId createDelegation(DelegationRequest delegation);
