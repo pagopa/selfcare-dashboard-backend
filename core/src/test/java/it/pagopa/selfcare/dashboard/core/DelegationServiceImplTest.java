@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.core;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import org.junit.jupiter.api.Assertions;
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,6 +82,14 @@ class DelegationServiceImplTest extends BaseServiceTest {
                 .getInstitutionsFromTaxCode(delegationTaxCode.getTo(), null, null, null);
         Mockito.verify(msCoreConnector, Mockito.times(1))
                 .createDelegation(delegation);
+    }
+
+    @Test
+    void testCreateDelegationWithResourceNotFoundException() {
+        DelegationRequest delegationPagoPa = new DelegationRequest();
+        delegationPagoPa.setProductId("prod-pagopa");
+        when(msCoreConnector.getInstitutionsFromTaxCode(any(), any(), any(), any())).thenReturn(List.of());
+        assertThrows(ResourceNotFoundException.class, () -> delegationServiceImpl.createDelegation(delegationPagoPa));
     }
 
     @Test
