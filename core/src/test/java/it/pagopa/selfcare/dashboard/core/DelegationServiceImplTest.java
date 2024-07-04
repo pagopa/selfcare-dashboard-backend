@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import static it.pagopa.selfcare.onboarding.common.ProductId.PROD_PAGOPA;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -87,7 +88,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
     @Test
     void testCreateDelegationWithResourceNotFoundException() {
         DelegationRequest delegationPagoPa = new DelegationRequest();
-        delegationPagoPa.setProductId("prod-pagopa");
+        delegationPagoPa.setProductId(PROD_PAGOPA.getValue());
         when(msCoreConnector.getInstitutionsFromTaxCode(any(), any(), any(), any())).thenReturn(List.of());
         assertThrows(ResourceNotFoundException.class, () -> delegationServiceImpl.createDelegation(delegationPagoPa));
     }
