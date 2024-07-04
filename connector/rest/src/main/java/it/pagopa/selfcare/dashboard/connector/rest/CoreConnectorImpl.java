@@ -51,6 +51,8 @@ class CoreConnectorImpl implements MsCoreConnector {
     private final DelegationRestClientMapper delegationMapper;
 
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
+    static final String REQUIRED_TAX_CODE_MESSAGE = "A taxCode is required";
+    static final String NO_INSTITUTION_FOUND = "No institution found with given taxCode";
     static final String REQUIRED_PRODUCT_ID_MESSAGE = "A Product id is required";
     static final String REQUIRED_INSTITUTION_TYPE_MESSAGE = "An Institution type is required";
     static final String REQUIRED_UPDATE_RESOURCE_MESSAGE = "An Institution description is required";
@@ -78,6 +80,19 @@ class CoreConnectorImpl implements MsCoreConnector {
         log.debug("updateInstitutionDescription result = {}", institution);
         log.trace("updateInstitutionDescription end");
         return institutionMapper.toInstitution(institution);
+    }
+
+    @Override
+    @Retry(name = "retryTimeout")
+    public List<Institution> getInstitutionsFromTaxCode(String taxCode, String subunitCode, String origin, String originId) {
+        log.trace("getInstitution start");
+        log.debug("getInstitution institutionId = {}", taxCode);
+        Assert.hasText(taxCode, REQUIRED_TAX_CODE_MESSAGE);
+        InstitutionsResponse institutions = coreInstitutionApiRestClient._getInstitutionsUsingGET(taxCode, subunitCode, origin, originId).getBody();
+        log.debug("getInstitution result = {}", institutions);
+        log.trace("getInstitution end");
+        Assert.notNull(institutions, NO_INSTITUTION_FOUND);
+        return institutions.getInstitutions().stream().map(institutionMapper::toInstitution).toList();
     }
 
     @Override

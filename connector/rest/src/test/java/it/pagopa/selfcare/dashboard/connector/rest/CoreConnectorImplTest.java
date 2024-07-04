@@ -9,7 +9,10 @@ import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationId;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationWithPagination;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
-import it.pagopa.selfcare.dashboard.connector.model.institution.*;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
+import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
+import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
 import it.pagopa.selfcare.dashboard.connector.model.product.PartyProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.CoreDelegationApiRestClient;
@@ -132,6 +135,29 @@ class CoreConnectorImplTest extends BaseConnectorTest{
         assertEquals(institution, institutionMapperSpy.toInstitution(institutionMock));
         verify(coreInstitutionApiRestClient, times(1))
                 ._retrieveInstitutionByIdUsingGET(institutionId);
+    }
+
+    @Test
+    void getInstitutionsFromTaxCode() throws IOException {
+        // given
+        String institutionId = "institutionId";
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        InstitutionResponse institutionMock = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        institutionsResponse.setInstitutions(List.of(institutionMock));
+
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(institutionMock.getTaxCode(), null, null, null))
+                .thenReturn(ResponseEntity.of(Optional.of(institutionsResponse)));
+        // when
+        List<Institution> institutions = msCoreConnector.getInstitutionsFromTaxCode(institutionMock.getTaxCode(), null, null, null);
+        // then
+
+        assertEquals(institutions.get(0), institutionMapperSpy.toInstitution(institutionMock));
+        verify(coreInstitutionApiRestClient, times(1))
+                ._getInstitutionsUsingGET(institutionMock.getTaxCode(), null, null, null);
     }
 
     @Test
