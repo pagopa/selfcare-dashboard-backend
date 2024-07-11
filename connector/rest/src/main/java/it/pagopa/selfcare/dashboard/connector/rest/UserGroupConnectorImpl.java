@@ -6,41 +6,51 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.GroupMapper;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserGroupConnectorImpl implements UserGroupConnector {
 
     private final UserGroupRestClient restClient;
+    private final GroupMapper groupMapper;
 
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
 
-    static final Function<UserGroupResponse, UserGroupInfo> GROUP_RESPONSE_TO_GROUP_INFO = groupResponse -> {
+    static final Function<UserGroupResource, UserGroupInfo> GROUP_RESPONSE_TO_GROUP_INFO = groupResponse -> {
         UserGroupInfo groupInfo = new UserGroupInfo();
         groupInfo.setId(groupResponse.getId());
         groupInfo.setInstitutionId(groupResponse.getInstitutionId());
         groupInfo.setProductId(groupResponse.getProductId());
         groupInfo.setName(groupResponse.getName());
         groupInfo.setDescription(groupResponse.getDescription());
-        groupInfo.setStatus(groupResponse.getStatus());
+        if(Objects.nonNull(groupResponse.getStatus())) {
+            groupInfo.setStatus(UserGroupStatus.valueOf(groupResponse.getStatus().getValue()));
+        }
         if (groupResponse.getMembers() != null) {
             List<UserInfo> members = groupResponse.getMembers().stream().map(id -> {
                 UserInfo member = new UserInfo();
-                member.setId(id);
+                member.setId(id.toString());
                 return member;
             }).collect(Collectors.toList());
             groupInfo.setMembers(members);
@@ -60,24 +70,15 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         return groupInfo;
     };
 
-    @Autowired
-    public UserGroupConnectorImpl(UserGroupRestClient restClient) {
-        this.restClient = restClient;
-    }
-
     @Override
     public String createUserGroup(CreateUserGroup userGroup) {
         log.trace("createUserGroup start");
         log.debug("createUserGroup userGroup = {}", userGroup);
         Assert.notNull(userGroup, "A User Group is required");
-        CreateUserGroupRequestDto userGroupRequest = new CreateUserGroupRequestDto();
-        userGroupRequest.setDescription(userGroup.getDescription());
-        userGroupRequest.setMembers(userGroup.getMembers());
-        userGroupRequest.setInstitutionId(userGroup.getInstitutionId());
-        userGroupRequest.setProductId(userGroup.getProductId());
-        userGroupRequest.setName(userGroup.getName());
-        userGroupRequest.setStatus(UserGroupStatus.ACTIVE);
-        String groupId = restClient.createUserGroup(userGroupRequest).getId();
+        CreateUserGroupDto userGroupDto = groupMapper.toCreateUserGroupDto(userGroup);
+        ResponseEntity<UserGroupResource> responseEntity = restClient._createGroupUsingPOST(userGroupDto);
+        UserGroupResource userGroupResource = responseEntity.getBody();
+        String groupId = userGroupResource != null ? userGroupResource.getId() : null;
         log.debug("createUserGroup result = {}", groupId);
         log.trace("createUserGroup end");
         return groupId;
@@ -88,7 +89,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.trace("delete start");
         log.debug("delete groupId = {}", groupId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
-        restClient.deleteUserGroupById(groupId);
+        restClient._deleteGroupUsingDELETE(groupId);
         log.trace("delete end");
     }
 
@@ -99,7 +100,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         Assert.hasText(memberId, "Required memberId");
         Assert.hasText(institutionId, "Required institutionId");
         Assert.hasText(productId, "Required productId");
-        restClient.deleteMembers(UUID.fromString(memberId), institutionId, productId);
+        restClient._deleteMemberFromUserGroupsUsingDELETE(UUID.fromString(memberId), institutionId, productId);
         log.trace("delete end");
     }
 
@@ -108,7 +109,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.trace("activate start");
         log.debug("activate groupId = {}", groupId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
-        restClient.activateUserGroupById(groupId);
+        restClient._activateGroupUsingPOST(groupId);
         log.trace("activate end");
     }
 
@@ -117,7 +118,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.trace("suspend start");
         log.debug("suspend groupId = {}", groupId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
-        restClient.suspendUserGroupById(groupId);
+        restClient._suspendGroupUsingPOST(groupId);
         log.trace("suspend end");
     }
 
@@ -127,11 +128,8 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("updateUserGroup userGroup = {}", userGroup);
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userGroup, "A User Group is required");
-        UpdateUserGroupRequestDto userGroupRequest = new UpdateUserGroupRequestDto();
-        userGroupRequest.setDescription(userGroup.getDescription());
-        userGroupRequest.setMembers(userGroup.getMembers());
-        userGroupRequest.setName(userGroup.getName());
-        restClient.updateUserGroupById(id, userGroupRequest);
+        UpdateUserGroupDto updateUserGroupDto = groupMapper.toUpdateUserGroupDto(userGroup);
+        restClient._updateUserGroupUsingPUT(id, updateUserGroupDto);
         log.trace("updateUserGroup end");
     }
 
@@ -141,7 +139,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.trace("getUserGroupById start");
         log.debug("getUseGroupById id = {}", id);
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
-        UserGroupResponse response = restClient.getUserGroupById(id);
+        UserGroupResource response = restClient._getUserGroupUsingGET(id).getBody();
         UserGroupInfo groupInfo = GROUP_RESPONSE_TO_GROUP_INFO.apply(response);
         log.debug("getUseGroupById groupInfo = {}", groupInfo);
         log.trace("getUserGroupById end");
@@ -154,7 +152,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("addMemberToUserGroup id = {}, userId = {}", id, userId);
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
-        restClient.addMemberToUserGroup(id, userId);
+        restClient._addMemberToUserGroupUsingPUT(id, userId);
         log.trace("addMemberToUserGroup end");
     }
 
@@ -164,7 +162,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("deleteMemberFromUserGroup id = {}, userId = {}", id, userId);
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
-        restClient.deleteMemberFromUserGroup(id, userId);
+        restClient._deleteMemberFromUserGroupUsingDELETE(id, userId);
         log.trace("deleteMemberFromUserGroup end");
     }
 
@@ -173,15 +171,32 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     public Page<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", filter.getInstitutionId(), filter.getProductId(), filter.getUserId(), pageable);
-        final Page<UserGroupInfo> userGroups = restClient.getUserGroups(filter.getInstitutionId().orElse(null),
-                        filter.getProductId().orElse(null),
-                        filter.getUserId().orElse(null),
-                        List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED),
-                        pageable)
-                .map(GROUP_RESPONSE_TO_GROUP_INFO);
+
+        List<String> sortParams = new ArrayList<>();
+        if (pageable.getSort().isSorted()) {
+            pageable.getSort().forEach(order -> sortParams.add(order.getProperty() + "," + order.getDirection()));
+        }
+
+        final PageOfUserGroupResource userGroupResources = restClient._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null),
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sortParams,
+                filter.getProductId().orElse(null),
+                filter.getUserId().orElse(null),
+                String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())).getBody();
+
+        assert userGroupResources != null;
+        final Page<UserGroupInfo> userGroups = convertToUserGroupInfoPage(userGroupResources, pageable);
         log.debug("getUserGroups result = {}", userGroups);
         log.trace("getUserGroups end");
         return userGroups;
     }
 
+    private Page<UserGroupInfo> convertToUserGroupInfoPage(PageOfUserGroupResource userGroupResources, Pageable pageable) {
+        return new PageImpl<>(
+                userGroupResources.getContent().stream().map(GROUP_RESPONSE_TO_GROUP_INFO).collect(Collectors.toList()),
+                pageable,
+                userGroupResources.getTotalElements() == null ? 0 : userGroupResources.getTotalElements()
+        );
+    }
 }

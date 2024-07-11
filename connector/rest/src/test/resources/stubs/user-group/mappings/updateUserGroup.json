@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "PUT",
-    "urlPathPattern": "/user-groups/v1/\\w+"
+    "urlPathPattern": "/v1/user-groups/\\w+"
   },
   "response": {
     "status": "204",

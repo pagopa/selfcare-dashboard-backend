@@ -2,7 +2,7 @@
   "priority": 1,
   "request": {
     "method": "GET",
-    "urlPath": "/user-groups/v1/"
+    "urlPath": "/v1/user-groups"
   },
   "response": {
     "status": "200",

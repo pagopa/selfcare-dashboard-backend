@@ -3,9 +3,11 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
+import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.GroupMapper;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,11 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,15 +29,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.rest.UserGroupConnectorImpl.REQUIRED_GROUP_ID_MESSAGE;
-import static java.util.Collections.emptyList;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.data.support.PageableExecutionUtils.getPage;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -43,11 +48,14 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
     @InjectMocks
     private UserGroupConnectorImpl groupConnector;
 
-    @Captor
-    private ArgumentCaptor<CreateUserGroupRequestDto> requestDtoArgumentCaptor;
+    @Spy
+    private GroupMapper groupMapper;
 
     @Captor
-    private ArgumentCaptor<UpdateUserGroupRequestDto> updateRequestCaptor;
+    private ArgumentCaptor<CreateUserGroupDto> requestDtoArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<UpdateUserGroupDto> updateRequestCaptor;
 
     @BeforeEach
     public void setUp() {
@@ -67,27 +75,27 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
     @Test
     void createGroup() throws IOException {
 
-        ClassPathResource resource = new ClassPathResource("stubs/createUserGroup.json");
-        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
-        CreateUserGroup userGroup = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        ClassPathResource userGroupResource = new ClassPathResource("stubs/createUserGroup.json");
+        CreateUserGroup userGroup = objectMapper.readValue(userGroupResource.getInputStream(), new TypeReference<>() {
+        });
+        ClassPathResource requestResource = new ClassPathResource("stubs/createUserGroupRequest.json");
+        CreateUserGroupDto expectedRequest = objectMapper.readValue(requestResource.getInputStream(), new TypeReference<>() {
+        });
+        ClassPathResource responseResource = new ClassPathResource("stubs/userGroupResponse.json");
+        UserGroupResource mockedResponse = objectMapper.readValue(responseResource.getInputStream(), new TypeReference<>() {
         });
 
-        ClassPathResource resourceRequest = new ClassPathResource("stubs/createUserGroupRequest.json");
-        byte[] resourceStreamRequest = Files.readAllBytes(resourceRequest.getFile().toPath());
-        CreateUserGroupRequestDto userGroupRequest = objectMapper.readValue(resourceStreamRequest, new TypeReference<>() {
-        });
+        when(groupMapper.toCreateUserGroupDto(any(CreateUserGroup.class))).thenReturn(expectedRequest);
+        when(restClientMock._createGroupUsingPOST(any(CreateUserGroupDto.class))).thenReturn(ResponseEntity.of(Optional.of(mockedResponse)));
 
-        ClassPathResource ResponseResource = new ClassPathResource("stubs/userGroupResponse.json");
-        byte[] responseStream = Files.readAllBytes(ResponseResource.getFile().toPath());
-        UserGroupResponse response = objectMapper.readValue(responseStream, new TypeReference<>() {
-        });
-
-        when(restClientMock.createUserGroup(userGroupRequest)).thenReturn(response);
         String groupId = groupConnector.createUserGroup(userGroup);
 
-        assertEquals(response.getId(), groupId);
-        Mockito.verify(restClientMock, times(1))
-                .createUserGroup(requestDtoArgumentCaptor.capture());
+        verify(groupMapper, times(1)).toCreateUserGroupDto(refEq(userGroup));
+        verify(restClientMock, times(1))._createGroupUsingPOST(requestDtoArgumentCaptor.capture());
+        CreateUserGroupDto capturedRequest = requestDtoArgumentCaptor.getValue();
+        assertNotNull(capturedRequest);
+        assertEquals(expectedRequest, capturedRequest);
+        assertEquals(mockedResponse.getId(), groupId);
     }
 
     @Test
@@ -117,20 +125,32 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
 
     @Test
     void updateGroup() {
-
+        // Arrange
         String groupId = "groupId";
         UpdateUserGroup userGroup = mockInstance(new UpdateUserGroup());
-        userGroup.setMembers(List.of("string1", "string2"));
+        userGroup.setMembers(List.of("895b4af3-7fa7-4442-8a0d-a2b05c6c719f", "895b4af3-7fa7-4442-8a0d-a2b05c6c719c"));
 
-        Executable executable = () -> groupConnector.updateUserGroup(groupId, userGroup);
+        UpdateUserGroupDto expectedRequest = new UpdateUserGroupDto();
+        expectedRequest.setName(userGroup.getName());
+        expectedRequest.setDescription(userGroup.getDescription());
+        expectedRequest.setMembers(userGroup.getMembers().stream().map(UUID::fromString).collect(Collectors.toSet()));
 
-        assertDoesNotThrow(executable);
+        // Mock the behavior of groupMapper to return the expected DTO
+        when(groupMapper.toUpdateUserGroupDto(any(UpdateUserGroup.class))).thenReturn(expectedRequest);
+
+        // Act
+        groupConnector.updateUserGroup(groupId, userGroup);
+
+        // Assert
         verify(restClientMock, times(1))
-                .updateUserGroupById(any(), updateRequestCaptor.capture());
-        UpdateUserGroupRequestDto request = updateRequestCaptor.getValue();
-        assertEquals(userGroup.getName(), request.getName());
-        assertEquals(userGroup.getDescription(), request.getDescription());
-        assertEquals(userGroup.getMembers(), request.getMembers());
+                ._updateUserGroupUsingPUT(eq(groupId), updateRequestCaptor.capture());
+        UpdateUserGroupDto actualRequest = updateRequestCaptor.getValue();
+
+        assertNotNull(actualRequest);
+        assertEquals(expectedRequest.getName(), actualRequest.getName());
+        assertEquals(expectedRequest.getDescription(), actualRequest.getDescription());
+        assertEquals(expectedRequest.getMembers(), actualRequest.getMembers());
+
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -142,7 +162,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         groupConnector.delete(groupId);
         //then
         verify(restClientMock, times(1))
-                .deleteUserGroupById(groupId);
+                ._deleteGroupUsingDELETE(groupId);
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -164,7 +184,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         groupConnector.activate(groupId);
         //then
         verify(restClientMock, times(1))
-                .activateUserGroupById(groupId);
+                ._activateGroupUsingPOST(groupId);
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -186,7 +206,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         groupConnector.suspend(groupId);
         //then
         verify(restClientMock, times(1))
-                .suspendUserGroupById(groupId);
+                ._suspendGroupUsingPOST(groupId);
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -207,7 +227,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
 
         ClassPathResource resource = new ClassPathResource("stubs/userGroupResponseSingle.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
-        UserGroupResponse expectedResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        UserGroupResource expectedResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
         ClassPathResource resourceResponse = new ClassPathResource("stubs/userGroupInfoGetUserGroupByIdSingle.json");
@@ -215,12 +235,12 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         UserGroupInfo expectedGroupInfoResponse = objectMapper.readValue(resourceStreamResponse, new TypeReference<>() {
         });
 
-        when(restClientMock.getUserGroupById(anyString())).thenReturn(expectedResponse);
+        when(restClientMock._getUserGroupUsingGET(anyString())).thenReturn(ResponseEntity.of(Optional.of(expectedResponse)));
 
         UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
         assertEquals(expectedGroupInfoResponse, groupInfo);
 
-        verify(restClientMock, times(1)).getUserGroupById(anyString());
+        verify(restClientMock, times(1))._getUserGroupUsingGET(anyString());
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -231,7 +251,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
 
         ClassPathResource resource = new ClassPathResource("stubs/userGroupResponseNullModifiedBy.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
-        UserGroupResponse expectedResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        UserGroupResource expectedResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
         ClassPathResource resourceResponse = new ClassPathResource("stubs/userGroupInfoNullModifiedBy.json");
@@ -239,11 +259,11 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         UserGroupInfo expectedGroupInfo = objectMapper.readValue(resourceStreamResponse, new TypeReference<>() {
         });
 
-        when(restClientMock.getUserGroupById(anyString())).thenReturn(expectedResponse);
+        when(restClientMock._getUserGroupUsingGET(anyString())).thenReturn(ResponseEntity.of(Optional.of(expectedResponse)));
 
         UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
         assertEquals(expectedGroupInfo, groupInfo);
-        verify(restClientMock, times(1)).getUserGroupById(anyString());
+        verify(restClientMock, times(1))._getUserGroupUsingGET(anyString());
     }
 
     @Test
@@ -267,7 +287,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         //then
         assertDoesNotThrow(executable);
         verify(restClientMock, times(1))
-                .addMemberToUserGroup(anyString(), any());
+                ._addMemberToUserGroupUsingPUT(anyString(), any());
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -304,7 +324,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         //then
         assertDoesNotThrow(executable);
         verify(restClientMock, times(1))
-                .deleteMemberFromUserGroup(anyString(), any());
+                ._deleteMemberFromUserGroupUsingDELETE(anyString(), any());
         verifyNoMoreInteractions(restClientMock);
     }
 
@@ -336,11 +356,12 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         // Given
         Optional<String> institutionId = Optional.of("institutionId");
         Optional<String> productId = Optional.of("productId");
-        Optional<UUID> userId = Optional.of(randomUUID());
+        Optional<UUID> userId = Optional.of(UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719f"));
         UserGroupFilter filter = new UserGroupFilter();
         filter.setInstitutionId(institutionId);
         filter.setProductId(productId);
         filter.setUserId(userId);
+
         Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
 
         ClassPathResource resource = new ClassPathResource("stubs/userGroupInfoGetUserGroups.json");
@@ -350,40 +371,56 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
 
         ClassPathResource ResponseResource = new ClassPathResource("stubs/userGroupResponse.json");
         byte[] responseStream = Files.readAllBytes(ResponseResource.getFile().toPath());
-        UserGroupResponse response = objectMapper.readValue(responseStream, new TypeReference<>() {
+        UserGroupResource response = objectMapper.readValue(responseStream, new TypeReference<>() {
         });
 
+        // Extract page number and page size from pageable
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
 
-        when(restClientMock.getUserGroups(filter.getInstitutionId().orElse(null),
+        // Convert Sort to a list of strings if sorting is needed and supported
+        List<String> sortCriteria = pageable.getSort().stream()
+                .map(order -> order.getProperty() + "," + order.getDirection())
+                .collect(Collectors.toList());
+
+        PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setContent(List.of(response));
+
+        when(restClientMock._getUserGroupsUsingGET(
+                filter.getInstitutionId().orElse(null),
+                pageNumber,
+                pageSize,
+                sortCriteria,
                 filter.getProductId().orElse(null),
                 filter.getUserId().orElse(null),
-                List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED),
-                pageable))
-                .thenReturn(new PageImpl<>(List.of(response)));
+                String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
+                .thenReturn(ResponseEntity.ok(pageOfUserGroupResource));
 
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
 
         assertEquals(1, groupInfos.getTotalElements());
         assertEquals(userGroupInfo, groupInfos.getContent().get(0));
         Mockito.verify(restClientMock, times(1))
-                .getUserGroups(filter.getInstitutionId().orElse(null),
+                ._getUserGroupsUsingGET(
+                        filter.getInstitutionId().orElse(null),
+                        pageNumber,
+                        pageSize,
+                        sortCriteria,
                         filter.getProductId().orElse(null),
                         filter.getUserId().orElse(null),
-                        List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED),
-                        pageable);
+                        String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name()));
 
         UserGroupInfo actualUserGroupInfo = groupInfos.getContent().get(0);
         assertEquals(userGroupInfo, actualUserGroupInfo);
-
     }
 
     @Test
     void getUserGroups_nullResponse_emptyInstitutionId_emptyProductId_emptyUserId_unPaged() {
         //given
         UserGroupFilter filter = new UserGroupFilter();
-        Pageable pageable = Pageable.unpaged();
-        when(restClientMock.getUserGroups(any(), any(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(4, Pageable.class), () -> 0L));
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
+        when(restClientMock._getUserGroupsUsingGET(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(new PageOfUserGroupResource()));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
@@ -400,18 +437,27 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         UserGroupFilter filter = new UserGroupFilter();
         filter.setInstitutionId(institutionId);
         filter.setProductId(productId);
-        Pageable pageable = Pageable.unpaged();
-        UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of("123", "321"));
-        response1.setCreatedAt(Instant.MAX);
-        response1.setModifiedAt(Instant.MAX);
-        when(restClientMock.getUserGroups(anyString(), anyString(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
+
+        Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
+
+        UUID member = UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719f");
+        UUID member2 = UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719a");
+        UserGroupResource resource = mockInstance(new UserGroupResource());
+        resource.setMembers(List.of(member, member2));
+        resource.setCreatedAt(Instant.MAX);
+        resource.setModifiedAt(Instant.MAX);
+
+        PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setContent(List.of(resource));
+        ResponseEntity<PageOfUserGroupResource> responseEntity = ResponseEntity.ok(pageOfUserGroupResource);
+
+        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), List.of("name,ASC"), filter.getProductId().orElse(null), null, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
+                .thenReturn(responseEntity);
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
 
-        ClassPathResource resource = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
-        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        ClassPathResource resource1 = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
+        byte[] resourceStream = Files.readAllBytes(resource1.getFile().toPath());
         String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
 
         UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
@@ -419,66 +465,90 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         //then
         assertEquals(groupInfos.getContent().get(0), expectedUserGroupInfo);
         verify(restClientMock, times(1))
-                .getUserGroups(eq(institutionId.get()), eq(productId.get()), isNull(), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
-        verifyNoMoreInteractions(restClientMock);
+                ._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), List.of("name,ASC"), filter.getProductId().orElse(null), null, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name()));
     }
 
     @Test
     void getUserGroups_notEmptyUserId() throws IOException {
-        //given
-        Optional<UUID> userId = Optional.of(randomUUID());
-        UserGroupFilter filter = new UserGroupFilter();
-        filter.setUserId(userId);
-        Pageable pageable = Pageable.unpaged();
-        UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of("123", "321"));
-        response1.setCreatedAt(Instant.MAX);
-        response1.setModifiedAt(Instant.MAX);
-        when(restClientMock.getUserGroups(any(), any(), any(), anyList(), any()))
-                .thenAnswer(invocation -> getPage(List.of(response1), invocation.getArgument(4, Pageable.class), () -> 1L));
-        //when
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
-        //then
 
-        ClassPathResource resource = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
-        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        UUID userId = UUID.randomUUID();
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setInstitutionId(Optional.of("institutionId"));
+        filter.setUserId(Optional.of(userId));
+        filter.setProductId(Optional.of("productId"));
+
+        UUID member = UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719f");
+        UUID member2 = UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719a");
+        UserGroupResource resource = mockInstance(new UserGroupResource());
+        resource.setMembers(List.of(member, member2));
+        resource.setCreatedAt(Instant.MAX);
+        resource.setModifiedAt(Instant.MAX);
+
+        Pageable pageable = PageRequest.of(1, 1, Sort.by("name"));
+
+        List<String> sortCriteria = pageable.getSort().stream()
+                .map(order -> order.getProperty() + "," + order.getDirection())
+                .toList();
+
+        PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setContent(List.of(resource));
+        ResponseEntity<PageOfUserGroupResource> responseEntity = ResponseEntity.ok(pageOfUserGroupResource);
+
+        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), userId, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
+                .thenReturn(responseEntity);
+
+        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+
+        ClassPathResource resource1 = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
+        byte[] resourceStream = Files.readAllBytes(resource1.getFile().toPath());
         String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
 
         UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
         assertEquals(groupInfos.getContent().get(0), expectedUserGroupInfo);
 
         verify(restClientMock, times(1))
-                .getUserGroups(isNull(), isNull(), eq(userId.get()), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
+                ._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), userId, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name()));
         verifyNoMoreInteractions(restClientMock);
     }
 
+
     @Test
     void getUserGroups_nullGroupInfos() {
-        //given
 
         UserGroupFilter filter = new UserGroupFilter();
-        Pageable pageable = Pageable.unpaged();
-        when(restClientMock.getUserGroups(any(), any(), any(), any(), any()))
-                .thenAnswer(invocation -> getPage(emptyList(), invocation.getArgument(4, Pageable.class), () -> 0L));
-        //when
+        filter.setInstitutionId(Optional.of("institutionId"));
+        filter.setProductId(Optional.of("productId"));
+        filter.setUserId(Optional.of(UUID.fromString("f36f7205-23ed-4726-b757-0ed5537fee03")));
+
+        Pageable pageable = PageRequest.of(1, 1, Sort.by("name"));
+
+        List<String> sortCriteria = pageable.getSort().stream()
+                .map(order -> order.getProperty() + "," + order.getDirection())
+                .toList();
+
+        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), filter.getUserId().orElse(null), String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
+                .thenReturn(ResponseEntity.ok(new PageOfUserGroupResource()));
+
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
-        //then
+
         assertNotNull(groupInfos);
         assertTrue(groupInfos.isEmpty());
         verify(restClientMock, times(1))
-                .getUserGroups(isNull(), isNull(), isNull(), eq(List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED)), isNotNull());
+                ._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), filter.getUserId().orElse(null), String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name()));
         verifyNoMoreInteractions(restClientMock);
     }
 
     @Test
     void groupResponse_toGroupInfo() throws IOException {
         //given
-        UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
-        response1.setMembers(List.of("123", "321"));
-        response1.setCreatedAt(Instant.MAX);
-        response1.setModifiedAt(Instant.MAX);
+        UserGroupResource response = mockInstance(new UserGroupResource(), "setMembers");
+        UUID id = UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719f");
+        UUID id1 = UUID.fromString("b339c8b4-b749-4498-82eb-1ad2e3761079");
+        response.setMembers(List.of(id, id1));
+        response.setCreatedAt(Instant.MAX);
+        response.setModifiedAt(Instant.MAX);
         //when
-        UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response1);
+        UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response);
         //then
         ClassPathResource resource = new ClassPathResource("stubs/groupResponse_toGroupInfo.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
@@ -491,7 +561,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
     @Test
     void groupResponse_toGroupInfo_nullMembers() throws IOException {
         //given
-        UserGroupResponse response1 = mockInstance(new UserGroupResponse(), "setMembers");
+        UserGroupResource response1 = mockInstance(new UserGroupResource(), "setMembers");
         response1.setCreatedAt(Instant.MAX);
         response1.setModifiedAt(Instant.MAX);
         //when
@@ -519,7 +589,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         //when
         assertDoesNotThrow(executable);
         verify(restClientMock, times(1))
-                .deleteMembers(memberId, institutionId, productId);
+                ._deleteMemberFromUserGroupsUsingDELETE(memberId, institutionId, productId);
         verifyNoMoreInteractions(restClientMock);
     }
 
