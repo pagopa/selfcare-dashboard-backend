@@ -75,6 +75,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("createUserGroup userGroup = {}", userGroup);
         Assert.notNull(userGroup, "A User Group is required");
         CreateUserGroupDto userGroupDto = groupMapper.toCreateUserGroupDto(userGroup);
+        userGroupDto.setStatus(CreateUserGroupDto.StatusEnum.ACTIVE);
         ResponseEntity<UserGroupResource> responseEntity = restClient._createGroupUsingPOST(userGroupDto);
         UserGroupResource userGroupResource = responseEntity.getBody();
         String groupId = userGroupResource != null ? userGroupResource.getId() : null;
@@ -195,7 +196,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         return new PageImpl<>(
                 userGroupResources.getContent().stream().map(GROUP_RESPONSE_TO_GROUP_INFO).toList(),
                 pageable,
-                userGroupResources.getTotalElements()
+                userGroupResources.getTotalElements() != null ? userGroupResources.getTotalElements() : 0L
         );
     }
 }
