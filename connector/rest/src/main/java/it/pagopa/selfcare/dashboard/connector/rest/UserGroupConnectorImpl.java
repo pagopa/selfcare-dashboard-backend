@@ -196,7 +196,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         return new PageImpl<>(
                 userGroupResources.getContent().stream().map(GROUP_RESPONSE_TO_GROUP_INFO).toList(),
                 pageable,
-                userGroupResources.getTotalElements() != null ? userGroupResources.getTotalElements() : 0L
+                userGroupResources.getTotalElements()
         );
     }
 }

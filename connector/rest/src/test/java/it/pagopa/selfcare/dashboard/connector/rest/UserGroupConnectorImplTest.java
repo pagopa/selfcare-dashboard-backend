@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -384,6 +385,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
                 .toList();
 
         PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setTotalElements(1L);
         pageOfUserGroupResource.setContent(List.of(response));
 
         when(restClientMock._getUserGroupsUsingGET(
@@ -419,8 +421,10 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         //given
         UserGroupFilter filter = new UserGroupFilter();
         Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
+        PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setTotalElements(0L);
         when(restClientMock._getUserGroupsUsingGET(any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(ResponseEntity.ok(new PageOfUserGroupResource()));
+                .thenReturn(ResponseEntity.ok(pageOfUserGroupResource));
         //when
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
@@ -448,6 +452,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         resource.setModifiedAt(Instant.MAX);
 
         PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setTotalElements(1L);
         pageOfUserGroupResource.setContent(List.of(resource));
         ResponseEntity<PageOfUserGroupResource> responseEntity = ResponseEntity.ok(pageOfUserGroupResource);
 
@@ -492,6 +497,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
 
         PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
         pageOfUserGroupResource.setContent(List.of(resource));
+        pageOfUserGroupResource.setTotalElements(1L);
         ResponseEntity<PageOfUserGroupResource> responseEntity = ResponseEntity.ok(pageOfUserGroupResource);
 
         when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), userId, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
@@ -526,8 +532,11 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
                 .map(order -> order.getProperty() + "," + order.getDirection())
                 .toList();
 
+        PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
+        pageOfUserGroupResource.setTotalElements(0L);
+
         when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), filter.getUserId().orElse(null), String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
-                .thenReturn(ResponseEntity.ok(new PageOfUserGroupResource()));
+                .thenReturn(ResponseEntity.ok(pageOfUserGroupResource));
 
         Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
 
