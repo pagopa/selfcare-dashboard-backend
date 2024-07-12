@@ -6,9 +6,6 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserGroupRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
@@ -23,10 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -201,7 +194,6 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String institutionId = null;
         String productId = null;
         UUID userId = null;
-        Pageable pageable = Pageable.unpaged();
         String status = String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name());
         List<String> sortParams = new ArrayList<>();
         // when
@@ -233,7 +225,6 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         UUID userId = null;
         String status = String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name());
         List<String> sortParams = new ArrayList<>();
-        Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
         // when
         ResponseEntity<PageOfUserGroupResource> response = restClient._getUserGroupsUsingGET(institutionId,3,2 , sortParams,productId, userId, status);
         //then

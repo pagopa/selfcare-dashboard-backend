@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,7 +51,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
                 UserInfo member = new UserInfo();
                 member.setId(id.toString());
                 return member;
-            }).collect(Collectors.toList());
+            }).toList();
             groupInfo.setMembers(members);
         }
         groupInfo.setCreatedAt(groupResponse.getCreatedAt());
@@ -194,9 +193,9 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
 
     private Page<UserGroupInfo> convertToUserGroupInfoPage(PageOfUserGroupResource userGroupResources, Pageable pageable) {
         return new PageImpl<>(
-                userGroupResources.getContent().stream().map(GROUP_RESPONSE_TO_GROUP_INFO).collect(Collectors.toList()),
+                userGroupResources.getContent().stream().map(GROUP_RESPONSE_TO_GROUP_INFO).toList(),
                 pageable,
-                userGroupResources.getTotalElements() == null ? 0 : userGroupResources.getTotalElements()
+                userGroupResources.getTotalElements()
         );
     }
 }

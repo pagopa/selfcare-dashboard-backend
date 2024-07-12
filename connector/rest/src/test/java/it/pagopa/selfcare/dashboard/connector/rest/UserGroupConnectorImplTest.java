@@ -58,7 +58,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
     private ArgumentCaptor<UpdateUserGroupDto> updateRequestCaptor;
 
     @BeforeEach
-    public void setUp() {
+    public void init() {
         super.setUp();
     }
 
@@ -369,8 +369,8 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        ClassPathResource ResponseResource = new ClassPathResource("stubs/userGroupResponse.json");
-        byte[] responseStream = Files.readAllBytes(ResponseResource.getFile().toPath());
+        ClassPathResource responseResource = new ClassPathResource("stubs/userGroupResponse.json");
+        byte[] responseStream = Files.readAllBytes(responseResource.getFile().toPath());
         UserGroupResource response = objectMapper.readValue(responseStream, new TypeReference<>() {
         });
 
@@ -381,7 +381,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         // Convert Sort to a list of strings if sorting is needed and supported
         List<String> sortCriteria = pageable.getSort().stream()
                 .map(order -> order.getProperty() + "," + order.getDirection())
-                .collect(Collectors.toList());
+                .toList();
 
         PageOfUserGroupResource pageOfUserGroupResource = new PageOfUserGroupResource();
         pageOfUserGroupResource.setContent(List.of(response));
