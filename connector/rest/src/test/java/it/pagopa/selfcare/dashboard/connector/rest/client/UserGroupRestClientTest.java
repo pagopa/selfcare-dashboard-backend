@@ -6,9 +6,10 @@ import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
 import it.pagopa.selfcare.dashboard.connector.rest.config.UserGroupRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
@@ -19,18 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -80,10 +75,10 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
     @Test
     void createGroup() {
         //given
-        CreateUserGroupRequestDto request = TestUtils.mockInstance(new CreateUserGroupRequestDto());
-        request.setMembers(List.of(TestUtils.mockInstance(UUID.randomUUID().toString())));
+        CreateUserGroupDto request = TestUtils.mockInstance(new CreateUserGroupDto());
+        request.setMembers(Set.of(TestUtils.mockInstance(UUID.randomUUID())));
         //when
-        Executable executable = () -> restClient.createUserGroup(request);
+        Executable executable = () -> restClient._createGroupUsingPOST(request);
         //then
         assertDoesNotThrow(executable);
     }
@@ -93,7 +88,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //given
         String id = "id";
         //when
-        Executable executable = () -> restClient.deleteUserGroupById(id);
+        Executable executable = () -> restClient._deleteGroupUsingDELETE(id);
         //then
         assertDoesNotThrow(executable);
     }
@@ -103,7 +98,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //given
         String id = "id";
         //when
-        Executable executable = () -> restClient.activateUserGroupById(id);
+        Executable executable = () -> restClient._activateGroupUsingPOST(id);
         //then
         assertDoesNotThrow(executable);
     }
@@ -113,7 +108,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //given
         String id = "id";
         //when
-        Executable executable = () -> restClient.suspendUserGroupById(id);
+        Executable executable = () -> restClient._suspendGroupUsingPOST(id);
         //then
         assertDoesNotThrow(executable);
     }
@@ -122,10 +117,10 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
     void updateUserGroup() {
         //given
         String id = "id";
-        UpdateUserGroupRequestDto request = TestUtils.mockInstance(new UpdateUserGroupRequestDto());
-        request.setMembers(List.of(TestUtils.mockInstance(UUID.randomUUID().toString())));
+        UpdateUserGroupDto request = TestUtils.mockInstance(new UpdateUserGroupDto());
+        request.setMembers(Set.of(TestUtils.mockInstance(UUID.randomUUID())));
         //when
-        Executable executable = () -> restClient.updateUserGroupById(id, request);
+        Executable executable = () -> restClient._updateUserGroupUsingPUT(id, request);
         //then
         assertDoesNotThrow(executable);
     }
@@ -135,7 +130,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //given
         String groupId = testCase2igroupdMap.get(TestCase.FULLY_VALUED);
         //when
-        UserGroupResponse response = restClient.getUserGroupById(groupId);
+        UserGroupResource response = restClient._getUserGroupUsingGET(groupId).getBody();
         //then
         assertNotNull(response);
         assertNotNull(response.getCreatedAt());
@@ -156,7 +151,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         //given
         String groupId = testCase2igroupdMap.get(TestCase.FULLY_NULL);
         //when
-        UserGroupResponse response = restClient.getUserGroupById(groupId);
+        UserGroupResource response = restClient._getUserGroupUsingGET(groupId).getBody();
         //then
         assertNotNull(response);
         Assertions.assertNull(response.getCreatedAt());
@@ -177,7 +172,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String groupId = "groupId";
         UUID memberId = UUID.randomUUID();
         //when
-        Executable executable = () -> restClient.addMemberToUserGroup(groupId, memberId);
+        Executable executable = () -> restClient._addMemberToUserGroupUsingPUT(groupId, memberId);
         //then
         assertDoesNotThrow(executable);
     }
@@ -188,7 +183,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String groupId = "groupId";
         UUID memberId = UUID.randomUUID();
         //when
-        Executable executable = () -> restClient.deleteMemberFromUserGroup(groupId, memberId);
+        Executable executable = () -> restClient._deleteMemberFromUserGroupUsingDELETE(groupId, memberId);
         //then
         assertDoesNotThrow(executable);
     }
@@ -199,26 +194,27 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String institutionId = null;
         String productId = null;
         UUID userId = null;
-        Pageable pageable = Pageable.unpaged();
+        String status = String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name());
+        List<String> sortParams = new ArrayList<>();
         // when
-        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED), pageable);
+        ResponseEntity<PageOfUserGroupResource> response = restClient._getUserGroupsUsingGET(institutionId,3,2 , sortParams,productId, userId, status);
         //then
         assertNotNull(response);
-        assertEquals(0, response.getNumber());
-        assertEquals(20, response.getSize());
-        assertEquals(1, response.getTotalElements());
-        assertEquals(1, response.getTotalPages());
-        assertNotNull(response.getContent());
-        assertNotNull(response.getContent().get(0).getCreatedAt());
-        assertNotNull(response.getContent().get(0).getCreatedBy());
-        assertNotNull(response.getContent().get(0).getDescription());
-        assertNotNull(response.getContent().get(0).getId());
-        assertNotNull(response.getContent().get(0).getMembers());
-        assertNotNull(response.getContent().get(0).getName());
-        assertNotNull(response.getContent().get(0).getInstitutionId());
-        assertNotNull(response.getContent().get(0).getModifiedAt());
-        assertNotNull(response.getContent().get(0).getModifiedBy());
-        assertNotNull(response.getContent().get(0).getStatus());
+        assertEquals(0, Objects.requireNonNull(response.getBody()).getNumber());
+        assertEquals(20, response.getBody().getSize());
+        assertEquals(1, response.getBody().getTotalElements());
+        assertEquals(1, response.getBody().getTotalPages());
+        assertNotNull(response.getBody().getContent());
+        assertNotNull(response.getBody().getContent().get(0).getCreatedAt());
+        assertNotNull(response.getBody().getContent().get(0).getCreatedBy());
+        assertNotNull(response.getBody().getContent().get(0).getDescription());
+        assertNotNull(response.getBody().getContent().get(0).getId());
+        assertNotNull(response.getBody().getContent().get(0).getMembers());
+        assertNotNull(response.getBody().getContent().get(0).getName());
+        assertNotNull(response.getBody().getContent().get(0).getInstitutionId());
+        assertNotNull(response.getBody().getContent().get(0).getModifiedAt());
+        assertNotNull(response.getBody().getContent().get(0).getModifiedBy());
+        assertNotNull(response.getBody().getContent().get(0).getStatus());
     }
 
     @Test
@@ -227,26 +223,27 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String institutionId = null;
         String productId = null;
         UUID userId = null;
-        Pageable pageable = PageRequest.of(0, 1, Sort.by("name"));
+        String status = String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name());
+        List<String> sortParams = new ArrayList<>();
         // when
-        Page<UserGroupResponse> response = restClient.getUserGroups(institutionId, productId, userId, List.of(UserGroupStatus.ACTIVE, UserGroupStatus.SUSPENDED), pageable);
+        ResponseEntity<PageOfUserGroupResource> response = restClient._getUserGroupsUsingGET(institutionId,3,2 , sortParams,productId, userId, status);
         //then
         assertNotNull(response);
-        assertEquals(0, response.getNumber());
-        assertEquals(20, response.getSize());
-        assertEquals(1, response.getTotalElements());
-        assertEquals(1, response.getTotalPages());
-        assertNotNull(response.getContent());
-        assertNotNull(response.getContent().get(0).getCreatedAt());
-        assertNotNull(response.getContent().get(0).getCreatedBy());
-        assertNotNull(response.getContent().get(0).getDescription());
-        assertNotNull(response.getContent().get(0).getId());
-        assertNotNull(response.getContent().get(0).getMembers());
-        assertNotNull(response.getContent().get(0).getName());
-        assertNotNull(response.getContent().get(0).getInstitutionId());
-        assertNotNull(response.getContent().get(0).getModifiedAt());
-        assertNotNull(response.getContent().get(0).getModifiedBy());
-        assertNotNull(response.getContent().get(0).getStatus());
+        assertEquals(0, Objects.requireNonNull(response.getBody()).getNumber());
+        assertEquals(20, response.getBody().getSize());
+        assertEquals(1, response.getBody().getTotalElements());
+        assertEquals(1, response.getBody().getTotalPages());
+        assertNotNull(response.getBody().getContent());
+        assertNotNull(response.getBody().getContent().get(0).getCreatedAt());
+        assertNotNull(response.getBody().getContent().get(0).getCreatedBy());
+        assertNotNull(response.getBody().getContent().get(0).getDescription());
+        assertNotNull(response.getBody().getContent().get(0).getId());
+        assertNotNull(response.getBody().getContent().get(0).getMembers());
+        assertNotNull(response.getBody().getContent().get(0).getName());
+        assertNotNull(response.getBody().getContent().get(0).getInstitutionId());
+        assertNotNull(response.getBody().getContent().get(0).getModifiedAt());
+        assertNotNull(response.getBody().getContent().get(0).getModifiedBy());
+        assertNotNull(response.getBody().getContent().get(0).getStatus());
     }
 
     @Test
@@ -256,7 +253,7 @@ class UserGroupRestClientTest extends BaseFeignRestClientTest {
         String productId = "productId";
         UUID memberId = UUID.randomUUID();
         //when
-        Executable executable = () -> restClient.deleteMembers(memberId, institutionId, productId);
+        Executable executable = () -> restClient._deleteMemberFromUserGroupsUsingDELETE(memberId, institutionId, productId);
         //then
         assertDoesNotThrow(executable);
     }

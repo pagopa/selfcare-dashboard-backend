@@ -77,13 +77,6 @@
                             </configOptions>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>6.3.0</version>
-                <executions>
                     <execution>
                         <id>selfcare-ms-backoffice-backend</id>
                         <goals>
@@ -115,13 +108,6 @@
                             </configOptions>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>6.3.0</version>
-                <executions>
                     <execution>
                         <id>user-ms</id>
                         <goals>
@@ -151,6 +137,46 @@
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
                             </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>user-group-ms</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <inputSpec>${project.basedir}/docs/openapi/user-group-docs.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <library>spring-cloud</library>
+                            <modelNameSuffix />
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <generateForOpenFeign>true</generateForOpenFeign>
+                                <basePackage>${project.groupId}.group.generated.openapi.v1</basePackage>
+                                <modelPackage>${project.groupId}.group.generated.openapi.v1.dto</modelPackage>
+                                <apiPackage>${project.groupId}.group.generated.openapi.v1.api</apiPackage>
+                                <configPackage>${project.groupId}.group.generated.openapi.v1.config</configPackage>
+                                <additionalModelTypeAnnotations>@lombok.Builder; @lombok.NoArgsConstructor; @lombok.AllArgsConstructor</additionalModelTypeAnnotations>
+                                <dateLibrary>java8</dateLibrary>
+                                <delegatePattern>true</delegatePattern>
+                                <interfaceOnly>true</interfaceOnly>
+                                <annotationLibrary>none</annotationLibrary>
+                                <documentationProvider>source</documentationProvider>
+                                <openApiNullable>false</openApiNullable>
+                                <skipDefaultInterface>false</skipDefaultInterface>
+                                <useTags>true</useTags>
+                                <swaggerAnnotations>false</swaggerAnnotations>
+                                <openApiNullable>false</openApiNullable>
+                                <dateLibrary>custom</dateLibrary>
+                            </configOptions>
+                            <typeMappings>
+                                <typeMapping>DateTime=Instant</typeMapping>
+                            </typeMappings>
+                            <importMappings>
+                                <importMapping>Instant=java.time.Instant</importMapping>
+                            </importMappings>
                         </configuration>
                     </execution>
                 </executions>

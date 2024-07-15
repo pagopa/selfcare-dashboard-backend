@@ -2,7 +2,7 @@
   "priority": 2,
   "request": {
     "method": "GET",
-    "urlPath": "/user-groups/v1/",
+    "urlPath": "/v1/user-groups/",
     "queryParameters": {
       "page": {
         "equalTo": "0"

@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "urlPathPattern": "/user-groups/v1/\\w+/suspend"
+    "urlPathPattern": "/v1/user-groups/\\w+/suspend"
   },
   "response": {
     "status": "200",

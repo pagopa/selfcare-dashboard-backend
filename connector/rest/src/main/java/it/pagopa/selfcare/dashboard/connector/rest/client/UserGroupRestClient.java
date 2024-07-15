@@ -1,66 +1,9 @@
 package it.pagopa.selfcare.dashboard.connector.rest.client;
 
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupStatus;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.CreateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UpdateUserGroupRequestDto;
-import it.pagopa.selfcare.dashboard.connector.rest.model.user_group.UserGroupResponse;
+import it.pagopa.selfcare.group.generated.openapi.v1.api.UserGroupApi;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @FeignClient(name = "${rest-client.user-groups.serviceCode}", url = "${rest-client.user-groups.base-url}")
-public interface UserGroupRestClient {
+public interface UserGroupRestClient extends UserGroupApi {
 
-    @PostMapping(value = "${rest-client.user-groups.createUserGroup.path}")
-    @ResponseBody
-    UserGroupResponse createUserGroup(@RequestBody CreateUserGroupRequestDto createUserGroupRequestDto);
-
-    @DeleteMapping(value = "${rest-client.user-group.deleteUserGroup.path}")
-    @ResponseBody
-    void deleteUserGroupById(@PathVariable("id") String id);
-
-    @PostMapping(value = "${rest-client.user-group.activateUserGroup.path}")
-    @ResponseBody
-    void activateUserGroupById(@PathVariable("id") String id);
-
-    @PostMapping(value = "${rest-client.user-group.suspendUserGroup.path}")
-    @ResponseBody
-    void suspendUserGroupById(@PathVariable("id") String id);
-
-    @PutMapping(value = "${rest-client.user-group.updateUserGroup.path}")
-    @ResponseBody
-    void updateUserGroupById(@PathVariable("id") String id,
-                             @RequestBody UpdateUserGroupRequestDto updateUserGroupRequestDto);
-
-    @GetMapping(value = "${rest-client.user-group.getUserGroupById.path}")
-    @ResponseBody
-    UserGroupResponse getUserGroupById(@PathVariable("id") String id);
-
-    @PutMapping(value = "${rest-client.user-group.addMemberToUserGroup.path}")
-    @ResponseBody
-    void addMemberToUserGroup(@PathVariable("id") String id, @PathVariable("memberId") UUID userId);
-
-    @DeleteMapping(value = "${rest-client.user-group.deleteMemberFromUserGroup.path}")
-    @ResponseBody
-    void deleteMemberFromUserGroup(@PathVariable("id") String id,
-                                   @PathVariable("memberId") UUID memberId);
-
-    @DeleteMapping(value = "${rest-client.user-group.deleteMembers.path}")
-    @ResponseBody
-    void deleteMembers(@PathVariable("memberId") UUID memberId,
-                       @RequestParam(value = "institutionId", required = false) String institutionId,
-                       @RequestParam(value = "productId", required = false) String productId);
-
-
-    @GetMapping(value = "${rest-client.user-group.getUserGroups.path}")
-    @ResponseBody
-    Page<UserGroupResponse> getUserGroups(@RequestParam(value = "institutionId", required = false) String institutionId,
-                                          @RequestParam(value = "productId", required = false) String productId,
-                                          @RequestParam(value = "userId", required = false) UUID memberId,
-                                          @RequestParam(value = "status", required = false) List<UserGroupStatus> status,
-                                          Pageable pageable);
 }
