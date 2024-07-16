@@ -1,4 +1,4 @@
-package it.pagopa.selfcare.dashboard.web.exception;
+package exception;
 
 import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
 import org.junit.jupiter.api.Test;
@@ -10,8 +10,8 @@ class InvalidRequestExceptionTest {
      * Methods under test:
      *
      * <ul>
-     *   <li>{@link InvalidRequestException#InvalidRequestException(String, String)}
-     *   <li>{@link InvalidRequestException#getCode()}
+     *   <li>{@link InvalidRequestException#InvalidRequestException(String)}
+     *   <li>{@link InvalidRequestException#getMessage()}
      * </ul>
      */
     @Test
