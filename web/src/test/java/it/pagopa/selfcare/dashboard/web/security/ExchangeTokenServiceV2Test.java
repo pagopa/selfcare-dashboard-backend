@@ -43,9 +43,11 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -319,6 +321,128 @@ class ExchangeTokenServiceV2Test {
         verify(institutionServiceMock, times(1))
                 .getInstitutionById(institutionId);
         verifyNoMoreInteractions(jwtServiceMock, institutionServiceMock);
+    }
+    @ParameterizedTest
+    @EnumSource(PrivateKey.class)
+    void exchange_nullProductProperties(PrivateKey privateKey) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException {
+        // given
+        String realm = "identityTokenAudienceFromProduct";
+        String jti = "id";
+        String sub = "subject";
+        String credential = "password";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String productRole = "productRole";
+        final Pageable pageable = Pageable.ofSize(100);
+        List<ProductGrantedAuthority> roleOnProducts = List.of(new ProductGrantedAuthority(MANAGER, productRole, productId));
+        List<GrantedAuthority> authorities = List.of(new SelfCareGrantedAuthority(institutionId, roleOnProducts));
+        UUID userId = UUID.randomUUID();
+        SelfCareUser selfCareUser = SelfCareUser.builder(userId.toString()).email("test@example.com").build();
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(selfCareUser, "password", authorities);
+        TestSecurityContextHolder.setAuthentication(authentication);
+        JwtService jwtServiceMock = mock(JwtService.class);
+        when(jwtServiceMock.getClaims(credential))
+                .thenReturn(Jwts.claims()
+                        .setId(jti)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp));
+        InstitutionService institutionServiceMock = mock(InstitutionService.class);
+        UserV2Service UserV2Service = mock(UserV2Service.class);
+        Institution institutionInfo = new Institution();
+        institutionInfo.setId(institutionId);
+        institutionInfo.setDescription("description");
+        institutionInfo.setTaxCode("taxCode");
+        institutionInfo.setSubunitCode("subunitCode");
+        institutionInfo.setSubunitType("subunitType");
+        institutionInfo.setAooParentCode("AOO");
+        institutionInfo.setOriginId("id");
+        when(institutionServiceMock.getInstitutionById(institutionId))
+                .thenReturn(institutionInfo);
+        UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
+        UserGroupInfo groupInfo = new UserGroupInfo();
+        UserInfo user = new UserInfo();
+        user.setId(userId.toString());
+        groupInfo.setMembers(List.of(user));
+        groupInfo.setId("id");
+        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        for (int i = 0; i < pageable.getPageSize(); i++) {
+            groupInfos.add(groupInfo);
+        }
+        when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
+                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+        ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
+        Product product = new Product();
+        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+        ProductRole productRole1 = new ProductRole();
+        productRole1.setCode(productRole);
+        productRoleInfo.setRoles(List.of(productRole1));
+        EnumMap<PartyRole, ProductRoleInfo> roleMappings = new EnumMap<>(PartyRole.class);
+        roleMappings.put(PartyRole.OPERATOR, productRoleInfo);
+        product.setRoleMappings(roleMappings);
+        product.setIdentityTokenAudience(realm);
+        when(productsConnectorMock.getProduct(productId))
+                .thenReturn(product);
+        File file = ResourceUtils.getFile(privateKey.getResourceLocation());
+        String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
+        String kid = "kid";
+        environmentVariables.set("JWT_TOKEN_EXCHANGE_ISSUER", "https://dev.selfcare.pagopa.it");
+        String issuer = "https://dev.selfcare.pagopa.it";
+        ExchangeTokenProperties properties = new ExchangeTokenProperties();
+        properties.setSigningKey(jwtSigningKey);
+        properties.setKid(kid);
+        properties.setDuration("PT5S");
+        properties.setIssuer(issuer);
+        User pdvUser = new User();
+        pdvUser.setId(UUID.randomUUID().toString());
+        Map<String, WorkContact> workContactMap = new HashMap<>();
+        WorkContact contact = new WorkContact();
+        CertifiedField<String> email = new CertifiedField<>();
+        email.setValue("email");
+        contact.setEmail(email);
+        workContactMap.put(institutionId, contact);
+        pdvUser.setWorkContacts(workContactMap);
+        when(UserV2Service.getUserById(String.valueOf(userId), null, null)).thenReturn(pdvUser);
+
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setRole(MANAGER);
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setProductRole(productRole);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+
+        OnboardedProduct onboardedProduct2 = new OnboardedProduct();
+        onboardedProduct2.setRole(MANAGER);
+        onboardedProduct2.setProductId(productId);
+        onboardedProduct2.setProductRole(productRole + "2");
+        onboardedProduct2.setStatus(RelationshipState.DELETED);
+
+
+        OnboardedProduct onboardedProduct3 = new OnboardedProduct();
+        onboardedProduct3.setRole(MANAGER);
+        onboardedProduct3.setProductId(productId);
+        onboardedProduct3.setProductRole("admin2");
+
+        UserInstitution userInstitution = new UserInstitution();
+        userInstitution.setProducts(List.of(onboardedProduct, onboardedProduct2));
+        Institution institutionMock = new Institution();
+        institutionMock.setId(institutionId);
+        institutionMock.setDescription("description");
+        institutionMock.setTaxCode("taxCode");
+        institutionMock.setSubunitCode("subunitCode");
+        institutionMock.setSubunitType("subunitType");
+        institutionMock.setAooParentCode("AOO");
+        institutionMock.setOriginId("id");
+        when(institutionServiceMock.getInstitutionById(institutionId)).thenReturn(institutionMock);
+        UserApiConnector userApiConnector = mock(UserApiConnector.class);
+        when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
+        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, UserV2Service, userApiConnector, new InstitutionResourceMapperImpl());
+        // when
+        Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.of(COLLAUDO_ENV));
+        // then
+        RuntimeException e = assertThrows(RuntimeException.class, executable);
+        assertEquals("Invalid Request", e.getMessage());
     }
 
     @ParameterizedTest
