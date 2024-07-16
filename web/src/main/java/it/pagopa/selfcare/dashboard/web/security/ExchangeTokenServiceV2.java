@@ -11,6 +11,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct;
@@ -121,14 +122,12 @@ public class ExchangeTokenServiceV2 {
         Product product = productsConnector.getProduct(productId);
 
         environment.ifPresentOrElse(env -> {
-            if (Objects.isNull(product.getBackOfficeEnvironmentConfigurations()) ||
-                    Objects.isNull(product.getBackOfficeEnvironmentConfigurations().get(env))){
-                        throw new RuntimeException("Invalid Request");
-                    }
-            claims.setAudience(product.getBackOfficeEnvironmentConfigurations().get(env).getIdentityTokenAudience());
-        }
-
-                , () -> claims.setAudience(product.getIdentityTokenAudience()));
+            var backOfficeConfigs = product.getBackOfficeEnvironmentConfigurations();
+            var envConfig = Optional.ofNullable(backOfficeConfigs)
+                    .map(configs -> configs.get(env))
+                    .orElseThrow(() -> new InvalidRequestException("Invalid Request"));
+            claims.setAudience(envConfig.getIdentityTokenAudience());
+        }, () -> claims.setAudience(product.getIdentityTokenAudience()));
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
         String jwts = createJwts(claims);

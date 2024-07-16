@@ -9,6 +9,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
+import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
@@ -441,7 +442,7 @@ class ExchangeTokenServiceV2Test {
         // when
         Executable executable = () -> ExchangeTokenServiceV2.exchange(institutionId, productId, Optional.of(COLLAUDO_ENV));
         // then
-        RuntimeException e = assertThrows(RuntimeException.class, executable);
+        InvalidRequestException e = assertThrows(InvalidRequestException.class, executable);
         assertEquals("Invalid Request", e.getMessage());
     }
 
