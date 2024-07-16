@@ -1102,9 +1102,9 @@ class ExchangeTokenServiceV2Test {
 
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userV2Service, userApiConnector, new InstitutionResourceMapperImpl());
+        ExchangeTokenServiceV2 exchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
-        final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
+        final ExchangedToken exchangedToken = exchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
         assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
@@ -1227,9 +1227,9 @@ class ExchangeTokenServiceV2Test {
         userInstitution.setProducts(Collections.emptyList());
         UserApiConnector userApiConnector = mock(UserApiConnector.class);
         when(userApiConnector.getProducts(institutionId, String.valueOf(userId))).thenReturn(userInstitution);
-        ExchangeTokenServiceV2 ExchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userV2Service, userApiConnector, new InstitutionResourceMapperImpl());
+        ExchangeTokenServiceV2 exchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtServiceMock, institutionServiceMock, groupServiceMock, productsConnectorMock, properties, userV2Service, userApiConnector, new InstitutionResourceMapperImpl());
         // when
-        final ExchangedToken exchangedToken = ExchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
+        final ExchangedToken exchangedToken = exchangeTokenServiceV2.retrieveBillingExchangedToken(institutionId);
         // then
         assertNotNull(exchangedToken.getIdentityToken());
         Jws<Claims> claimsJws = Jwts.parser()
