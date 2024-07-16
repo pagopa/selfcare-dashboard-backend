@@ -120,7 +120,14 @@ public class ExchangeTokenServiceV2 {
 
         Product product = productsConnector.getProduct(productId);
 
-        environment.ifPresentOrElse(env -> claims.setAudience(product.getBackOfficeEnvironmentConfigurations().get(env).getIdentityTokenAudience())
+        environment.ifPresentOrElse(env -> {
+            if (Objects.isNull(product.getBackOfficeEnvironmentConfigurations()) ||
+                    Objects.isNull(product.getBackOfficeEnvironmentConfigurations().get(env))){
+                        throw new RuntimeException("Invalid Request");
+                    }
+            claims.setAudience(product.getBackOfficeEnvironmentConfigurations().get(env).getIdentityTokenAudience());
+        }
+
                 , () -> claims.setAudience(product.getIdentityTokenAudience()));
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
