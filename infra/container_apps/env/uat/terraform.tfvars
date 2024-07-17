@@ -1,9 +1,9 @@
 env_short           = "u"
-private_dns_name    = "selc-u-dashboard-backend-ca.proudglacier-20652b81.westeurope.azurecontainerapps.io"
+private_dns_name    = "selc-u-dashboard-backend-ca.mangopond-2a5d4d65.westeurope.azurecontainerapps.io"
 dns_zone_prefix     = "uat.selfcare"
 api_dns_zone_prefix = "api.uat.selfcare"
-suffix_increment    = "-001"
-cae_name            = "cae-001"
+suffix_increment    = "-002"
+cae_name            = "cae-002"
 
 tags = {
   CreatedBy   = "Terraform"
