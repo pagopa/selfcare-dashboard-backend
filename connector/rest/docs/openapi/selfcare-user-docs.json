@@ -11,6 +11,19 @@
     "url" : "http://0.0.0.0:8080",
     "description" : "Auto generated value"
   } ],
+  "tags" : [ {
+    "name" : "Events"
+  }, {
+    "name" : "Institution"
+  }, {
+    "name" : "User"
+  }, {
+    "name" : "external-v2"
+  }, {
+    "name" : "support"
+  }, {
+    "name" : "support-pnpg"
+  } ],
   "paths" : {
     "/authorize" : {
       "get" : {
@@ -61,7 +74,7 @@
     },
     "/institutions/{institutionId}/products/{productId}/createdAt" : {
       "put" : {
-        "tags" : [ "Institution Controller" ],
+        "tags" : [ "Institution" ],
         "summary" : "The API updates user's onboarded product with createdAt passed in input",
         "parameters" : [ {
           "name" : "institutionId",
@@ -116,7 +129,7 @@
     },
     "/institutions/{institutionId}/user-institutions" : {
       "get" : {
-        "tags" : [ "Institution Controller" ],
+        "tags" : [ "Institution" ],
         "summary" : "The API retrieves users with optional filters in input as query params",
         "parameters" : [ {
           "name" : "institutionId",
@@ -196,7 +209,7 @@
     },
     "/institutions/{institutionId}/users" : {
       "get" : {
-        "tags" : [ "Institution Controller" ],
+        "tags" : [ "support", "support-pnpg", "Institution" ],
         "summary" : "The API retrieves user's info including details of roles on products",
         "parameters" : [ {
           "name" : "institutionId",
@@ -234,7 +247,7 @@
     },
     "/users" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "The API retrieves paged users with optional filters in input as query params",
         "parameters" : [ {
           "name" : "institutionId",
@@ -327,7 +340,7 @@
         } ]
       },
       "post" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "The createOrUpdateByFiscalCode function is used to create a new user or update an existing one.",
         "requestBody" : {
           "content" : {
@@ -363,7 +376,7 @@
     },
     "/users/emails" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "The API retrieves Users' emails using institution id and product id",
         "parameters" : [ {
           "name" : "institutionId",
@@ -408,7 +421,7 @@
     },
     "/users/ids" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Retrieve all users given their userIds",
         "parameters" : [ {
           "name" : "userIds",
@@ -448,7 +461,7 @@
     },
     "/users/notification" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Retrieve all SC-User for DataLake filtered by optional productId",
         "parameters" : [ {
           "name" : "page",
@@ -498,7 +511,7 @@
     },
     "/users/search" : {
       "post" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Search user by fiscalCode",
         "parameters" : [ {
           "name" : "institutionId",
@@ -541,7 +554,7 @@
     },
     "/users/{id}" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User", "external-v2", "support" ],
         "summary" : "Retrieves user given userId and optional ProductId",
         "parameters" : [ {
           "name" : "id",
@@ -588,7 +601,7 @@
     },
     "/users/{id}/details" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Retrieves user's information from pdv: name, familyName, email, fiscalCode and workContacts",
         "parameters" : [ {
           "name" : "id",
@@ -635,7 +648,7 @@
     },
     "/users/{id}/institution/{institutionId}/product/{productId}/status" : {
       "put" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Service to update user product status",
         "parameters" : [ {
           "name" : "id",
@@ -690,7 +703,7 @@
     },
     "/users/{id}/status" : {
       "put" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Update user status with optional filter for institution, product, role and productRole",
         "parameters" : [ {
           "name" : "id",
@@ -751,7 +764,7 @@
     },
     "/users/{id}/user-registry" : {
       "put" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Service to update user in user-registry and send notification when user data gets updated",
         "parameters" : [ {
           "name" : "id",
@@ -797,7 +810,7 @@
     },
     "/users/{userId}" : {
       "post" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "The createOrUpdateByUserId function is used to update existing user adding userRole.",
         "parameters" : [ {
           "name" : "userId",
@@ -837,7 +850,7 @@
     },
     "/users/{userId}/institution/{institutionId}" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "The retrieveUsers function is used to retrieve a list of users from the UserInstitution collection and userRegistry.\nAt first it try to retrieve a UserInstitution document associated with a logged user (admin)\nIf this userInstitution object is not null, so user has AdminRole, it try to retriew the userInstitutions filtered by given institutionId, roles, states, products and productRoles\nand optional given personId, otherwise it do the same query using the logged user id instead of personId.\nAfter that it retrieve personal user data, foreach userId retrieved, from userRegistry and return a stream of UserDataResponse objects containing the requested user data.",
         "parameters" : [ {
           "name" : "institutionId",
@@ -924,7 +937,7 @@
     },
     "/users/{userId}/institutions" : {
       "get" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Retrieves products info and role which the user is enabled",
         "parameters" : [ {
           "name" : "userId",
@@ -962,6 +975,48 @@
           },
           "403" : {
             "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/users/{userId}/institutions/{institutionId}" : {
+      "get" : {
+        "tags" : [ "User" ],
+        "summary" : "Retrieves userInstitution data with list of actions permitted for each user's product",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserInstitutionWithActions"
+                }
+              }
+            }
           },
           "401" : {
             "description" : "Not Authorized"
@@ -974,7 +1029,7 @@
     },
     "/users/{userId}/institutions/{institutionId}/products/{productId}" : {
       "delete" : {
-        "tags" : [ "User Controller" ],
+        "tags" : [ "User" ],
         "summary" : "Delete logically the association institution and product",
         "parameters" : [ {
           "name" : "institutionId",
@@ -1123,6 +1178,44 @@
       "OnboardedProductState" : {
         "enum" : [ "ACTIVE", "PENDING", "TOBEVALIDATED", "SUSPENDED", "DELETED", "REJECTED" ],
         "type" : "string"
+      },
+      "OnboardedProductWithActions" : {
+        "type" : "object",
+        "properties" : {
+          "productId" : {
+            "type" : "string"
+          },
+          "tokenId" : {
+            "type" : "string"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/OnboardedProductState"
+          },
+          "productRole" : {
+            "type" : "string"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/PartyRole"
+          },
+          "env" : {
+            "$ref" : "#/components/schemas/Env"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "delegationId" : {
+            "type" : "string"
+          },
+          "userProductActions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
       },
       "PartyRole" : {
         "enum" : [ "MANAGER", "DELEGATE", "SUB_DELEGATE", "OPERATOR" ],
@@ -1351,6 +1444,32 @@
           },
           "status" : {
             "$ref" : "#/components/schemas/OnboardedProductState"
+          }
+        }
+      },
+      "UserInstitutionWithActions" : {
+        "type" : "object",
+        "properties" : {
+          "userId" : {
+            "type" : "string"
+          },
+          "institutionId" : {
+            "type" : "string"
+          },
+          "institutionDescription" : {
+            "type" : "string"
+          },
+          "institutionRootName" : {
+            "type" : "string"
+          },
+          "products" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OnboardedProductWithActions"
+            }
+          },
+          "userMailUuid" : {
+            "type" : "string"
           }
         }
       },

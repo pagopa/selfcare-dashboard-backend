@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
+import it.pagopa.selfcare.user.model.UserAction;
 
 import java.util.Collection;
 
@@ -27,7 +28,7 @@ public interface UserApiConnector {
 
     UserInstitution getProducts(String institutionId, String userId);
 
-    Boolean hasPermission(String institutionId, String permission, String productId);
+    Boolean hasPermission(String userId, String institutionId, String productId, UserAction action);
 
     void updateUser(String userId, String institutionId, UpdateUserRequestDto userDto);
 

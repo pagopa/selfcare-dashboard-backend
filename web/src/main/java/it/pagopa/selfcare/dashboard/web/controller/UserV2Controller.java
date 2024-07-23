@@ -44,7 +44,7 @@ public class UserV2Controller {
     @PostMapping(value = "/{userId}/suspend", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.suspendUser}", nickname = "v2SuspendRelationshipUsingPOST")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'MANAGE_PRODUCT_USER')")
     public void suspendRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("userId") String userId,
                                     @ApiParam("${swagger.dashboard.support.model.institutionId}")
@@ -62,7 +62,7 @@ public class UserV2Controller {
     @PostMapping(value = "/{userId}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.activateUser}", nickname = "v2ActivateRelationshipUsingPOST")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'MANAGE_PRODUCT_USER')")
     public void activateRelationship(@ApiParam("${swagger.dashboard.user.model.id}")
                                      @PathVariable("userId") String userId,
                                      @RequestParam(value = "institutionId") String institutionId,
@@ -79,7 +79,7 @@ public class UserV2Controller {
     @DeleteMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.deleteUser}", nickname = "v2DeleteRelationshipByIdUsingDELETE")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'MANAGE_PRODUCT_USER')")
     public void deleteRelationshipById(@ApiParam("${swagger.dashboard.user.model.id}")
                                        @PathVariable("userId") String userId,
                                        @RequestParam(value = "institutionId") String institutionId,
@@ -94,7 +94,7 @@ public class UserV2Controller {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}", nickname = "v2GetUserByIdUsingGET")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'MANAGE_PRODUCT_USER')")
     public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("id") String userId,
                                     @ApiParam("${swagger.dashboard.institutions.model.id}")
@@ -120,7 +120,7 @@ public class UserV2Controller {
                     @Content(mediaType = MediaType.APPLICATION_PROBLEM_JSON_VALUE,
                             schema = @Schema(implementation = Problem.class))
             })
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'MANAGE_PRODUCT_USER')")
     public UserResource search(@ApiParam("${swagger.dashboard.user.model.searchUserDto}")
                                @RequestBody
                                @Valid
@@ -139,7 +139,7 @@ public class UserV2Controller {
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.updateUserById}", nickname = "v2UpdateUserUsingPUT")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'MANAGE_PRODUCT_USER')")
     public void updateUser(@ApiParam("${swagger.dashboard.user.model.id}")
                            @PathVariable("id")
                            String userId,
@@ -158,7 +158,7 @@ public class UserV2Controller {
     @GetMapping(value = "/institution/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}", nickname = "v2GetUsersUsingGET")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'MANAGE_PRODUCT_USER')")
     public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
                                               @RequestParam(value = "productId", required = false) String productId,

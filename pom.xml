@@ -125,5 +125,10 @@
             <name>Selfcare Onboarding SDK</name>
             <url>https://maven.pkg.github.com/pagopa/selfcare-onboarding</url>
         </repository>
+        <repository>
+            <id>selfcare-user</id>
+            <name>Selfcare User SDK</name>
+            <url>https://maven.pkg.github.com/pagopa/selfcare-user</url>
+        </repository>
     </repositories>
 </project>

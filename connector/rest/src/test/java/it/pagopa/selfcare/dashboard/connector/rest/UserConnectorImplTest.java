@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMappe
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
+import it.pagopa.selfcare.user.model.UserAction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -253,15 +254,23 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         assertNull(result);
     }
+
     @Test
     void hasPermissionTrue() {
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+        OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
+        onboardedProductWithActions.setUserProductActions(List.of("Selc:ViewBilling"));
+        userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+
         //given
         String institutionId = "institutionId";
-        String permission = "ADMIN";
+        UserAction action = UserAction.VIEW_BILLING;
         String productId = "productId";
-        when(userPermissionRestClient._authorizeGet(PermissionTypeEnum.ADMIN, institutionId, productId)).thenReturn(new ResponseEntity<>(true, HttpStatus.OK));
+        String userId = "userId";
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId))
+                .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
-        Boolean result = userConnector.hasPermission(institutionId, permission, productId);
+        Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
         //then
         assertNotNull(result);
         assertEquals(true, result);
@@ -269,13 +278,20 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
     @Test
     void hasPermissionFalse() {
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+        OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
+        onboardedProductWithActions.setUserProductActions(List.of("Selc:UpdateUser"));
+        userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
         //given
         String institutionId = "institutionId";
-        String permission = "ADMIN";
+        UserAction action = UserAction.VIEW_BILLING;
         String productId = "productId";
-        when(userPermissionRestClient._authorizeGet(PermissionTypeEnum.ADMIN, institutionId, productId)).thenReturn(new ResponseEntity<>(false, HttpStatus.OK));
+        String userId = "userId";
+
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId))
+                .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
-        Boolean result = userConnector.hasPermission(institutionId, permission, productId);
+        Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
         //then
         assertNotNull(result);
         assertEquals(false, result);
