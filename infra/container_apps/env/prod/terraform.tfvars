@@ -2,8 +2,8 @@ env_short           = "p"
 private_dns_name    = "selc-p-dashboard-backend-ca.lemonpond-bb0b750e.westeurope.azurecontainerapps.io"
 dns_zone_prefix     = "selfcare"
 api_dns_zone_prefix = "api.selfcare"
-suffix_increment = "-002"
-cae_name         = "cae-002"
+suffix_increment    = "-002"
+cae_name            = "cae-002"
 
 tags = {
   CreatedBy   = "Terraform"
