@@ -5,7 +5,6 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.user.model.UserAction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -33,15 +32,14 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         Assert.notNull(permission, "A permission type is required");
         boolean result = false;
         String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
-        UserAction action = UserAction.valueOf(permission.toString());
         if (targetDomainObject instanceof FilterAuthorityDomain filterAuthorityDomain) {
             if (StringUtils.hasText(filterAuthorityDomain.getGroupId())) {
                 UserGroupInfo userGroupInfo = userGroupConnector.getUserGroupById(filterAuthorityDomain.getGroupId());
                 if (Objects.nonNull(userGroupInfo)) {
-                    result = userApiConnector.hasPermission(userId, userGroupInfo.getInstitutionId(), userGroupInfo.getProductId(), action);
+                    result = userApiConnector.hasPermission(userId, userGroupInfo.getInstitutionId(), userGroupInfo.getProductId(), permission.toString());
                 }
             } else {
-                result = userApiConnector.hasPermission(userId, filterAuthorityDomain.getInstitutionId(), filterAuthorityDomain.getProductId(), action);
+                result = userApiConnector.hasPermission(userId, filterAuthorityDomain.getInstitutionId(), filterAuthorityDomain.getProductId(), permission.toString());
             }
             log.debug("check Permission result = {}", result);
             log.trace("check Permission end");

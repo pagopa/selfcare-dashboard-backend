@@ -14,12 +14,6 @@
     <dependencies>
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
-            <artifactId>user-sdk-model</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>it.pagopa.selfcare</groupId>
             <artifactId>selc-commons-web</artifactId>
         </dependency>
         <dependency>

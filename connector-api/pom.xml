@@ -30,12 +30,6 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
         </dependency>
-        <dependency>
-            <groupId>it.pagopa.selfcare</groupId>
-            <artifactId>user-sdk-model</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <repositories>
@@ -43,11 +37,6 @@
             <id>selfcare-onboarding</id>
             <name>Selfcare Onboarding SDK</name>
             <url>https://maven.pkg.github.com/pagopa/selfcare-onboarding</url>
-        </repository>
-        <repository>
-            <id>selfcare-user</id>
-            <name>Selfcare User SDK</name>
-            <url>https://maven.pkg.github.com/pagopa/selfcare-user</url>
         </repository>
     </repositories>
 

@@ -15,7 +15,6 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMappe
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
-import it.pagopa.selfcare.user.model.UserAction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -264,10 +263,10 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         //given
         String institutionId = "institutionId";
-        UserAction action = UserAction.VIEW_BILLING;
+        String action = "Selc:ViewBilling";
         String productId = "productId";
         String userId = "userId";
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId))
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
@@ -284,11 +283,11 @@ class UserConnectorImplTest extends BaseConnectorTest {
         userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
         //given
         String institutionId = "institutionId";
-        UserAction action = UserAction.VIEW_BILLING;
+        String action = "Selc:ViewBilling";
         String productId = "productId";
         String userId = "userId";
 
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId))
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);

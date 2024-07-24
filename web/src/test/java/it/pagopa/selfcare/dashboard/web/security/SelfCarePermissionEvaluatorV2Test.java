@@ -4,7 +4,6 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.user.model.UserAction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,25 +34,22 @@ class SelfCarePermissionEvaluatorV2Test {
         userGroupInfo.setInstitutionId("institutionId");
         userGroupInfo.setProductId("productId");
 
-        UserAction action = UserAction.VIEW_BILLING;
-
         when(authentication.getPrincipal()).thenReturn(user);
         when(userGroupConnector.getUserGroupById("groupId")).thenReturn(userGroupInfo);
-        when(userApiConnector.hasPermission("userId", "institutionId", "productId", action)).thenReturn(true);
+        when(userApiConnector.hasPermission("userId", "institutionId", "productId", "Selc:ViewBilling")).thenReturn(true);
 
-        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", "groupId"), action));
+        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", "groupId"), "Selc:ViewBilling"));
     }
 
     @Test
     void hasPermissionReturnsFalseForInvalidUserGroupPermission() {
         Authentication authentication = mock(Authentication.class);
         SelfCareUser user = SelfCareUser.builder("userId").build();
-        UserAction action = UserAction.VIEW_BILLING;
 
         when(authentication.getPrincipal()).thenReturn(user);
-        when(userApiConnector.hasPermission("userId", "institutionId", "productId", action)).thenReturn(true);
+        when(userApiConnector.hasPermission("userId", "institutionId", "productId", "Selc:ViewBilling")).thenReturn(true);
 
-        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), action));
+        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), "Selc:ViewBilling"));
     }
 
 
@@ -61,24 +57,22 @@ class SelfCarePermissionEvaluatorV2Test {
     void hasPermissionReturnsFalseForInvalidDirectPermission() {
         Authentication authentication = mock(Authentication.class);
         SelfCareUser user = SelfCareUser.builder("userId").build();
-        UserAction action = UserAction.VIEW_BILLING;
 
         when(authentication.getPrincipal()).thenReturn(user);
-        when(userApiConnector.hasPermission("userId", "institutionId", "productId", action)).thenReturn(false);
+        when(userApiConnector.hasPermission("userId", "institutionId", "productId", "Selc:ViewBilling")).thenReturn(false);
 
-        assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), action));
+        assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), "Selc:ViewBilling"));
     }
 
     @Test
     void hasPermissionReturnsFalseWhenUserGroupNotFound() {
         Authentication authentication = mock(Authentication.class);
         SelfCareUser user = SelfCareUser.builder("userId").build();
-        UserAction action = UserAction.VIEW_BILLING;
 
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(userGroupConnector.getUserGroupById("invalidGroupId")).thenReturn(null);
 
-        assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", "invalidGroupId"), action));
+        assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", "invalidGroupId"), "Selc:ViewBilling"));
     }
 }

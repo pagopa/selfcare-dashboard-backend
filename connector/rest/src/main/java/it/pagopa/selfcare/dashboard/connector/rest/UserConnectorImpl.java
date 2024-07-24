@@ -15,7 +15,6 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMappe
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
-import it.pagopa.selfcare.user.model.UserAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,7 +83,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
     @Override
     @Retry(name = "retryTimeout")
-    public Boolean hasPermission(String userId, String institutionId, String productId, UserAction action) {
+    public Boolean hasPermission(String userId, String institutionId, String productId, String action) {
         log.trace("permissionInstitutionIdPermissionGet start");
         log.debug("permissionInstitutionIdPermissionGet userId = {}, institutionId = {}, productId = {} for action = {}", userId, institutionId, productId, action);
 
@@ -95,7 +94,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
         if(Objects.nonNull(userInstitutionWithActions) && !CollectionUtils.isEmpty(userInstitutionWithActions.getProducts())) {
             result = userInstitutionWithActions.getProducts().stream()
-                    .anyMatch(onboardedProductWithActions -> onboardedProductWithActions.getUserProductActions().contains(action.toString()));
+                    .anyMatch(onboardedProductWithActions -> onboardedProductWithActions.getUserProductActions().contains(action));
         }
 
         log.debug("permissionInstitutionIdPermissionGet result = {}", result);
