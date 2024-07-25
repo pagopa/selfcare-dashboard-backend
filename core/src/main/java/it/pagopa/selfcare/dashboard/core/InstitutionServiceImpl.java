@@ -114,12 +114,10 @@ class InstitutionServiceImpl implements InstitutionService {
                 if (LIMITED.name().equals(selcAuthority.get().getAuthority())) {
                     institution.setOnboarding(institution.getOnboarding().stream()
                             .filter(product -> userAuthProducts.containsKey(product.getProductId()))
-                            .peek(product -> product.setAuthorized(true))
                             .peek(product -> product.setUserRole(LIMITED.name()))
                             .toList());
                 } else {
                     institution.getOnboarding().forEach(product -> {
-                        product.setAuthorized(userAuthProducts.containsKey(product.getProductId()));
                         Optional.ofNullable(userAuthProducts.get(product.getProductId()))
                                 .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null));
                     });

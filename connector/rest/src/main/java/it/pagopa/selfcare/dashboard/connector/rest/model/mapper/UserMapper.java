@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -43,6 +44,8 @@ public interface UserMapper {
     @Mapping(target = "products", expression = "java(toProductInfoMap(userDashboardResponse.getProducts()))")
     UserInfo toUserInfo(UserDataResponse userDashboardResponse);
 
+
+    UserInstitutionWithActionsDto toUserInstitutionWithActionsDto(UserInstitutionWithActions userInstitutionWithActions);
 
     @Named("toUserInfoContacts")
     default Map<String, WorkContact> toUserInfoContacts(Map<String, String> workContactMap) {

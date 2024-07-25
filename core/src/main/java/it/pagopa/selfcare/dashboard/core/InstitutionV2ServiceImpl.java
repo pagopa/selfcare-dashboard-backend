@@ -1,14 +1,14 @@
 package it.pagopa.selfcare.dashboard.core;
 
-import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProductWithActions;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitutionWithActionsDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.*;
-
-import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -74,35 +75,31 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
         log.trace("findInstitutionById start");
         log.debug("findInstitutionById institutionId = {}", institutionId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-
         String userId = ((SelfCareUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
-        UserInstitution userInstitution = userApiConnector.getProducts(institutionId, userId);
-        if (Objects.isNull(userInstitution))
+        Institution institution = msCoreConnector.getInstitution(institutionId);
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = userApiConnector.getUserInstitutionWithActions(institutionId, userId, null);
+
+        if (Objects.isNull(userInstitutionWithActionsDto))
             throw new AccessDeniedException(String.format("User %s has not associations with institution %s", userId, institutionId));
 
-        Institution institution = msCoreConnector.getInstitution(institutionId);
         if (Objects.isNull(institution) || Objects.isNull(institution.getOnboarding()))
             throw new ResourceNotFoundException(String.format("Institution %s not found or onboarding is empty!", institutionId));
 
-        userInstitution.setProducts(userInstitution.getProducts().stream()
-                .filter(onboardedProduct -> RelationshipState.ACTIVE.equals(onboardedProduct.getStatus()))
-                .toList());
-
-        boolean limited = userInstitution.getProducts().stream().noneMatch(prod -> SelfCareAuthority.ADMIN.equals(prod.getRole().getSelfCareAuthority()));
-        if (limited) {
-            institution.getOnboarding().stream()
-                    .filter(product -> userInstitution.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())))
-                    .forEach(product -> {product.setAuthorized(true); product.setUserRole(LIMITED.name());});
-        } else {
-            institution.getOnboarding().forEach(product -> {
-                product.setAuthorized(userInstitution.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())));
-                userInstitution.getProducts().stream().filter(prodUser -> product.getProductId().equals(prodUser.getProductId())).findAny().ifPresentOrElse(userProd -> product.setUserRole(userProd.getRole().getSelfCareAuthority().name()), () -> product.setUserRole(null));
-            });
-        }
+        institution.getOnboarding().stream()
+                .filter(product -> userInstitutionWithActionsDto.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())))
+                .forEach(product -> {
+                    var onBoardedProductWithActions = getOnBoardedProductWithActions(product.getProductId(), userInstitutionWithActionsDto);
+                    product.setUserRole(onBoardedProductWithActions.getRole().getSelfCareAuthority().name());
+                    product.setUserProductActions(onBoardedProductWithActions.getUserProductActions());
+                });
 
         log.debug("findInstitutionById result = {}", institution);
         log.trace("findInstitutionById end");
         return institution;
+    }
+
+    private OnboardedProductWithActions getOnBoardedProductWithActions(String productId, UserInstitutionWithActionsDto userInstitutionWithActionsDto) {
+        return userInstitutionWithActionsDto.getProducts().stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);
     }
 
 }

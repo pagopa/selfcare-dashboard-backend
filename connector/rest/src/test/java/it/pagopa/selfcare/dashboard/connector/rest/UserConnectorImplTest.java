@@ -357,6 +357,27 @@ class UserConnectorImplTest extends BaseConnectorTest {
     }
 
     @Test
+    void getUserInstitutionWithActions_returnsUserInstitutionWithActions() {
+        String userId = "userId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(
+                userId,
+                institutionId,
+                productId
+        )).thenReturn(ResponseEntity.ok(userInstitutionWithActions));
+
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = userConnector.getUserInstitutionWithActions(userId, institutionId, productId);
+
+        verify(userApiRestClient)._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId);
+        assertNotNull(userInstitutionWithActionsDto);
+
+    }
+
+    @Test
     void getProducts_returnsUserInstitution() throws IOException{
         String institutionId = "institutionId";
         String userId = "userId";
