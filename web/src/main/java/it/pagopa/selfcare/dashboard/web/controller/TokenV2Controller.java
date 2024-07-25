@@ -37,7 +37,7 @@ public class TokenV2Controller {
     @GetMapping(value = "exchange", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "${swagger.dashboard.token.api.exchange}", notes = "${swagger.dashboard.token.api.exchange}", nickname = "v2Exchange")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:AccessProductBackoffice')")
     public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                           @RequestParam("institutionId")
                                           String institutionId,
@@ -65,7 +65,7 @@ public class TokenV2Controller {
     @GetMapping(value = "exchange/fatturazione", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.billingToken}")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewBilling')")
     public URI billingToken(@ApiParam("${swagger.dashboard.institutions.model.id}")
                             @RequestParam("institutionId")
                             String institutionId,

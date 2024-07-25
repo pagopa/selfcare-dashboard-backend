@@ -60,7 +60,6 @@ public class ProductController {
     @GetMapping(value = "/{productId}/brokers/{institutionType}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductBrokers}")
-    @PreAuthorize("hasPermission(#productId, 'productId', 'ANY')")
     public Collection<BrokerResource> getProductBrokers(@ApiParam("${swagger.dashboard.products.model.id}")
                                                         @PathVariable("productId")
                                                         String productId,

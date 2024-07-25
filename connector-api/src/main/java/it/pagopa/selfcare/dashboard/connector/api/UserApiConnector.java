@@ -27,7 +27,7 @@ public interface UserApiConnector {
 
     UserInstitution getProducts(String institutionId, String userId);
 
-    Boolean hasPermission(String institutionId, String permission, String productId);
+    Boolean hasPermission(String userId, String institutionId, String productId, String action);
 
     void updateUser(String userId, String institutionId, UpdateUserRequestDto userDto);
 

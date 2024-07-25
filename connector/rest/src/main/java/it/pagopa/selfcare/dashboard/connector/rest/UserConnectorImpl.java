@@ -11,7 +11,6 @@ import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserInstitutionApiRestClient;
-import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto;
@@ -35,7 +34,6 @@ public class UserConnectorImpl implements UserApiConnector {
 
     private final UserApiRestClient userApiRestClient;
     private final UserInstitutionApiRestClient userInstitutionApiRestClient;
-    private final UserPermissionRestClient userPermissionRestClient;
     private final InstitutionMapper institutionMapper;
     private final UserMapper userMapper;
 
@@ -85,12 +83,19 @@ public class UserConnectorImpl implements UserApiConnector {
 
     @Override
     @Retry(name = "retryTimeout")
-    public Boolean hasPermission(String institutionId, String permission, String productId) {
+    public Boolean hasPermission(String userId, String institutionId, String productId, String action) {
         log.trace("permissionInstitutionIdPermissionGet start");
-        log.debug("permissionInstitutionIdPermissionGet institutionId = {}, permission = {}, productId = {}", institutionId, permission, productId);
+        log.debug("permissionInstitutionIdPermissionGet userId = {}, institutionId = {}, productId = {} for action = {}", userId, institutionId, productId, action);
 
-        PermissionTypeEnum permissionTypeEnum = PermissionTypeEnum.fromValue(permission);
-        Boolean result = userPermissionRestClient._authorizeGet(permissionTypeEnum, institutionId, productId).getBody();
+        boolean result = false;
+
+        UserInstitutionWithActions userInstitutionWithActions = userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId)
+                        .getBody();
+
+        if(Objects.nonNull(userInstitutionWithActions) && !CollectionUtils.isEmpty(userInstitutionWithActions.getProducts())) {
+            result = userInstitutionWithActions.getProducts().stream()
+                    .anyMatch(onboardedProductWithActions -> onboardedProductWithActions.getUserProductActions().contains(action));
+        }
 
         log.debug("permissionInstitutionIdPermissionGet result = {}", result);
         log.trace("permissionInstitutionIdPermissionGet end");

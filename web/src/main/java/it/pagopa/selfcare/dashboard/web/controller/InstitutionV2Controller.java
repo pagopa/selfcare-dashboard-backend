@@ -57,7 +57,7 @@ public class InstitutionV2Controller {
     @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}", nickname = "v2RetrieveInstitutionUser")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ManageProductUsers')")
     public InstitutionUserDetailsResource getInstitutionUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
                                                              String institutionId,
@@ -98,7 +98,7 @@ public class InstitutionV2Controller {
     @PostMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}", nickname = "v2PostCreateInstitutionProductUser")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ManageProductUsers')")
     public UserIdResource createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                        @PathVariable("institutionId")
                                                        String institutionId,
@@ -123,7 +123,7 @@ public class InstitutionV2Controller {
     @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}", nickname = "v2AddUserProductRole")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ADMIN')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ManageProductUsers')")
     public void addUserProductRoles(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                     @PathVariable("institutionId")
                                     String institutionId,
@@ -146,7 +146,7 @@ public class InstitutionV2Controller {
     @GetMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "${swagger.dashboard.institutions.api.getInstitution}", notes = "${swagger.dashboard.institutions.api.getInstitution}", nickname = "v2GetInstitution")
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
     public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                               String institutionId) {
@@ -163,7 +163,7 @@ public class InstitutionV2Controller {
 
     @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
     @GetMapping(value = "/{institutionId}/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasPermission(#institutionId, 'InstitutionResource', 'ANY')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewDelegations')")
     public ResponseEntity<DelegationWithPagination> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
                                                                           @PathVariable("institutionId") String institutionId,
                                                                           @ApiParam("${swagger.dashboard.delegation.model.productId}")

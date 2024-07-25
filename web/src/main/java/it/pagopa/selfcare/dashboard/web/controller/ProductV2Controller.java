@@ -31,7 +31,7 @@ public class ProductV2Controller {
     @GetMapping(value = "/{productId}/back-office", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "${swagger.dashboard.product.api.retrieveProductBackoffice}", notes = "${swagger.dashboard.product.api.retrieveProductBackoffice}", nickname = "v2RetrieveProductBackofficeUsingGET")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.ProductAclDomain(#institutionId, #productId), 'ANY')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:AccessProductBackoffice')")
     public URI retrieveProductBackoffice(@ApiParam("${swagger.dashboard.products.model.id}")
                                          @PathVariable("productId")
                                          String productId,

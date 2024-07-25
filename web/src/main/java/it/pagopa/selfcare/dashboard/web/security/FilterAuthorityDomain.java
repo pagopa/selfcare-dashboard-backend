@@ -7,9 +7,10 @@ import lombok.ToString;
 @Getter
 @RequiredArgsConstructor
 @ToString
-public class ProductAclDomain {
+public class FilterAuthorityDomain {
 
     private final String institutionId;
     private final String productId;
+    private final String groupId;
 
 }
