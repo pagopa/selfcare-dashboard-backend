@@ -3889,6 +3889,9 @@
         "title" : "OnboardedProduct",
         "type" : "object",
         "properties" : {
+          "authorized" : {
+            "type" : "boolean"
+          },
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
@@ -3914,6 +3917,9 @@
         "title" : "OnboardedProductResource",
         "type" : "object",
         "properties" : {
+          "authorized" : {
+            "type" : "boolean"
+          },
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },

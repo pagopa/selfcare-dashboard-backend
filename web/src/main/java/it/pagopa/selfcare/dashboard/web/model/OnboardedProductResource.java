@@ -15,6 +15,7 @@ public class OnboardedProductResource {
     @JsonProperty("productOnBoardingStatus")
     private RelationshipState status;
 
+    private boolean authorized;
     private Billing billing;
 
     private List<String> userProductActions;

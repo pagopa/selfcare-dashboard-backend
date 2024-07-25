@@ -90,6 +90,7 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
                 .filter(product -> userInstitutionWithActionsDto.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())))
                 .forEach(product -> {
                     var onBoardedProductWithActions = getOnBoardedProductWithActions(product.getProductId(), userInstitutionWithActionsDto);
+                    product.setAuthorized(userInstitutionWithActionsDto.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())));
                     product.setUserRole(onBoardedProductWithActions.getRole().getSelfCareAuthority().name());
                     product.setUserProductActions(onBoardedProductWithActions.getUserProductActions());
                 });

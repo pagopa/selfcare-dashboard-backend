@@ -9,6 +9,7 @@ public class OnboardedProduct {
     private String productId;
     private String userRole;
     private RelationshipState status;
+    private boolean authorized;
     private Billing billing;
     private List<String> userProductActions;
 }
