@@ -86,6 +86,7 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
             throw new ResourceNotFoundException(String.format("Institution %s not found or onboarding is empty!", institutionId));
 
         institution.getOnboarding().stream()
+                .filter(onboardedProduct -> RelationshipState.ACTIVE.equals(onboardedProduct.getStatus()))
                 .filter(product -> userInstitutionWithActionsDto.getProducts().stream().anyMatch(prodUser -> product.getProductId().equals(prodUser.getProductId())))
                 .forEach(product -> {
                     var onBoardedProductWithActions = getOnBoardedProductWithActions(product.getProductId(), userInstitutionWithActionsDto);

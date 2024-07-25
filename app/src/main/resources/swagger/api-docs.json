@@ -3889,9 +3889,6 @@
         "title" : "OnboardedProduct",
         "type" : "object",
         "properties" : {
-          "authorized" : {
-            "type" : "boolean"
-          },
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
@@ -3902,6 +3899,12 @@
             "type" : "string",
             "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           },
+          "userProductActions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
           "userRole" : {
             "type" : "string"
           }
@@ -3911,9 +3914,6 @@
         "title" : "OnboardedProductResource",
         "type" : "object",
         "properties" : {
-          "authorized" : {
-            "type" : "boolean"
-          },
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
@@ -3923,6 +3923,12 @@
           "productOnBoardingStatus" : {
             "type" : "string",
             "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
+          },
+          "userProductActions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           },
           "userRole" : {
             "type" : "string"

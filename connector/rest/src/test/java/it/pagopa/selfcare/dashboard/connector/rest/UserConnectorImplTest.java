@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMappe
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
