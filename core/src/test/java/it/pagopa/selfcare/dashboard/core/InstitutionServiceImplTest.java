@@ -228,7 +228,6 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
         Institution result = institutionService.findInstitutionById(institutionId);
-        Assertions.assertTrue(result.getOnboarding().get(0).isAuthorized());
         Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 
@@ -250,7 +249,6 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
         Institution result = institutionService.findInstitutionById(institutionId);
-        Assertions.assertFalse(result.getOnboarding().get(0).isAuthorized());
         Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 

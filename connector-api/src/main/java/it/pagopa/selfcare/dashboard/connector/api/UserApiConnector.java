@@ -41,4 +41,6 @@ public interface UserApiConnector {
 
     void createOrUpdateUserByUserId(Institution institution, String productId, String userId, List<CreateUserDto.Role> role);
 
+    UserInstitutionWithActionsDto getUserInstitutionWithActions(String userId, String institutionId, String productId);
+
 }

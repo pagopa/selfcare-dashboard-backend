@@ -58,7 +58,6 @@
             "productId": "prod123",
             "userRole": "role123",
             "status": "ACTIVE",
-            "authorized": true,
             "billing": {
                 "vatNumber": "vat123",
                 "recipientCode": "rec123",
@@ -69,7 +68,6 @@
             "productId": "prod456",
             "userRole": "role456",
             "status": "PENDING",
-            "authorized": false,
             "billing": {
                 "vatNumber": "vat456",
                 "recipientCode": "rec456",

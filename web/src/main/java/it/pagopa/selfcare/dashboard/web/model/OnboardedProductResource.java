@@ -5,6 +5,8 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OnboardedProductResource {
     private String productId;
@@ -13,6 +15,7 @@ public class OnboardedProductResource {
     @JsonProperty("productOnBoardingStatus")
     private RelationshipState status;
 
-    private boolean authorized;
     private Billing billing;
+
+    private List<String> userProductActions;
 }

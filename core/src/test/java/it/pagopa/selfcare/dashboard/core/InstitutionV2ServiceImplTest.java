@@ -9,7 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitutionWithActionsDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -119,9 +119,9 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 null,
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(userApiConnectorMock.getProducts(institutionId, userId)).thenReturn(null);
+        when(userApiConnectorMock.getUserInstitutionWithActions(institutionId, userId, null)).thenReturn(null);
         assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById(institutionId));
-        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getProducts(institutionId, userId);
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUserInstitutionWithActions(institutionId, userId, null);
     }
 
     @Test
@@ -139,9 +139,9 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserInstitution userInstitution = new UserInstitution();
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = new UserInstitutionWithActionsDto();
 
-        when(userApiConnectorMock.getProducts(institutionId, userId)).thenReturn(userInstitution);
+        when(userApiConnectorMock.getUserInstitutionWithActions(institutionId, userId, null)).thenReturn(userInstitutionWithActionsDto);
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(null);
         assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.findInstitutionById(institutionId));
     }
@@ -161,10 +161,10 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserInstitution userInstitution = new UserInstitution();
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = new UserInstitutionWithActionsDto();
         Institution institution = new Institution();
 
-        when(userApiConnectorMock.getProducts(institutionId, userId)).thenReturn(userInstitution);
+        when(userApiConnectorMock.getUserInstitutionWithActions(institutionId, userId, null)).thenReturn(userInstitutionWithActionsDto);
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.findInstitutionById(institutionId));
     }
@@ -184,9 +184,9 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        ClassPathResource userInstitutionResource = new ClassPathResource("expectations/UserInstitution.json");
+        ClassPathResource userInstitutionResource = new ClassPathResource("expectations/UserInstitutionWithActions.json");
         byte[] userInstitutionStream = Files.readAllBytes(userInstitutionResource.getFile().toPath());
-        UserInstitution userInstitution = objectMapper.readValue(userInstitutionStream, new TypeReference<>() {
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = objectMapper.readValue(userInstitutionStream, new TypeReference<>() {
         });
 
         ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
@@ -194,13 +194,13 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userApiConnectorMock.getProducts(institutionId, userId)).thenReturn(userInstitution);
+        when(userApiConnectorMock.getUserInstitutionWithActions(institutionId, userId, null)).thenReturn(userInstitutionWithActionsDto);
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
         Institution result = institutionV2Service.findInstitutionById(institutionId);
-        Assertions.assertTrue(result.getOnboarding().get(0).isAuthorized());
-        Assertions.assertFalse(result.getOnboarding().get(1).isAuthorized());
-        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getProducts(institutionId, userId);
+        Assertions.assertNotNull(result.getOnboarding().get(0).getUserProductActions());
+        Assertions.assertEquals(2, result.getOnboarding().get(0).getUserProductActions().size());
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUserInstitutionWithActions(institutionId, userId, null);
     }
 
     @Test
@@ -218,9 +218,9 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        ClassPathResource userInstitutionResource = new ClassPathResource("expectations/UserInstitutionOperator.json");
+        ClassPathResource userInstitutionResource = new ClassPathResource("expectations/UserInstitutionWithActionsOperator.json");
         byte[] userInstitutionStream = Files.readAllBytes(userInstitutionResource.getFile().toPath());
-        UserInstitution userInstitution = objectMapper.readValue(userInstitutionStream, new TypeReference<>() {
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = objectMapper.readValue(userInstitutionStream, new TypeReference<>() {
         });
 
         ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
@@ -228,11 +228,11 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Institution institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userApiConnectorMock.getProducts(institutionId, userId)).thenReturn(userInstitution);
+        when(userApiConnectorMock.getUserInstitutionWithActions(institutionId, userId, null)).thenReturn(userInstitutionWithActionsDto);
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
         Institution result = institutionV2Service.findInstitutionById(institutionId);
-        Assertions.assertFalse(result.getOnboarding().get(1).isAuthorized());
-        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getProducts(institutionId, userId);
+        Assertions.assertEquals("LIMITED", result.getOnboarding().get(0).getUserRole());
+        Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUserInstitutionWithActions(institutionId, userId, null);
     }
 }

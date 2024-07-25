@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMappe
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -354,6 +355,27 @@ class UserConnectorImplTest extends BaseConnectorTest {
         assertEquals(1, result.size());
         UserInfo actualUserInfo = result.iterator().next();
         assertEquals(userMapper.toUserInfo(userDataResponseList.get(0)), actualUserInfo);
+    }
+
+    @Test
+    void getUserInstitutionWithActions_returnsUserInstitutionWithActions() {
+        String userId = "userId";
+        String institutionId = "institutionId";
+        String productId = "productId";
+
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(
+                userId,
+                institutionId,
+                productId
+        )).thenReturn(ResponseEntity.ok(userInstitutionWithActions));
+
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = userConnector.getUserInstitutionWithActions(userId, institutionId, productId);
+
+        verify(userApiRestClient)._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId);
+        assertNotNull(userInstitutionWithActionsDto);
+
     }
 
     @Test
