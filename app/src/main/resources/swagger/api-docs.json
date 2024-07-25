@@ -3902,6 +3902,12 @@
             "type" : "string",
             "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           },
+          "userProductActions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
           "userRole" : {
             "type" : "string"
           }
@@ -3923,6 +3929,12 @@
           "productOnBoardingStatus" : {
             "type" : "string",
             "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
+          },
+          "userProductActions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           },
           "userRole" : {
             "type" : "string"

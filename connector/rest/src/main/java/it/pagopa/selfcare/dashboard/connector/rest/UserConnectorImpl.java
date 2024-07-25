@@ -60,6 +60,15 @@ public class UserConnectorImpl implements UserApiConnector {
 
     @Override
     @Retry(name = "retryTimeout")
+    public UserInstitutionWithActionsDto getUserInstitutionWithActions(String userId, String institutionId, String productId) {
+        log.trace("getUserInstitutionWithActions start");
+        UserInstitutionWithActions userInstitutionWithActions = userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId)
+                .getBody();
+        return userMapper.toUserInstitutionWithActionsDto(userInstitutionWithActions);
+    }
+
+    @Override
+    @Retry(name = "retryTimeout")
     public UserInstitution getProducts(String institutionId, String userId) {
         log.trace("getProducts start");
         List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
