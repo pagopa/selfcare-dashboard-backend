@@ -94,7 +94,7 @@ public interface UserMapper {
                     productInfo.setId(onboardedProduct.getProductId());
                     roleInfo.setRole(onboardedProduct.getProductRole());
                     roleInfo.setStatus(onboardedProduct.getStatus().name());
-                    roleInfo.setSelcRole(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProduct.getRole().name()).getSelfCareAuthority());
+                    roleInfo.setSelcRole(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProduct.getRole()).getSelfCareAuthority());
                     if (productInfo.getRoleInfos() == null)
                         productInfo.setRoleInfos(new ArrayList<>());
                     productInfo.getRoleInfos().add(roleInfo);
@@ -114,7 +114,7 @@ public interface UserMapper {
 
     @Mapping(target = "status", expression = "java(it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.valueOf(onboardedProductResponse.getStatus().name()))")
     @Mapping(target = "env", expression = "java(it.pagopa.selfcare.commons.base.utils.Env.valueOf(onboardedProductResponse.getEnv().name()))")
-    @Mapping(target = "role", expression = "java(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProductResponse.getRole().name()))")
+    @Mapping(target = "role", expression = "java(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProductResponse.getRole()))")
     OnboardedProduct toOnboardedProducts(OnboardedProductResponse onboardedProductResponse);
 
 }

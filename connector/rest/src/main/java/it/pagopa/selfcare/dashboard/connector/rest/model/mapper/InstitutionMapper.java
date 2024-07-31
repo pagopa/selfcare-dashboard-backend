@@ -25,7 +25,7 @@ public interface InstitutionMapper {
     @Mapping(target = "id", source = "institutionId")
     @Mapping(target = "name", source = "institutionName")
     @Mapping(target = "parentDescription", source = "institutionRootName")
-    @Mapping(target = "userRole", expression = "java(institutionProducts.getRole().name())")
+    @Mapping(target = "userRole", expression = "java(institutionProducts.getRole())")
     @Mapping(target = "status", expression = "java(institutionProducts.getStatus().name())")
     InstitutionBase toInstitutionBase(UserInstitutionRoleResponse institutionProducts);
 
