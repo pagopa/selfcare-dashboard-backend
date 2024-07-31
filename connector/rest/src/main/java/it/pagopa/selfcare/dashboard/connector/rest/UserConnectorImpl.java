@@ -194,6 +194,22 @@ public class UserConnectorImpl implements UserApiConnector {
     }
 
     @Override
+    public UserInfo getUserByUserIdInstitutionIdAndProductAndStates(String userId, String institutionId, String productId, List<String> states) {
+        log.trace("getUserByUserIdInstitutionIdAndProduct start");
+        List<UserDataResponse> institutionResponses = userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, userId, userId, null, List.of(productId), null, states)
+                .getBody();
+
+        if (CollectionUtils.isEmpty(institutionResponses) || institutionResponses.size() != 1){
+            throw new ResourceNotFoundException(String.format("InstitutionId %s and userId %s not found", institutionId, userId));
+        }
+
+        log.debug("getProducts result = {}", institutionResponses);
+        log.trace("getProducts end");
+        return userMapper.toUserInfo(institutionResponses.get(0));
+
+    }
+
+    @Override
     public List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
 
         return Optional.ofNullable(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId,

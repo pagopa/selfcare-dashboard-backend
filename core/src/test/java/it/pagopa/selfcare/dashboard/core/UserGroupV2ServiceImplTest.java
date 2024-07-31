@@ -59,20 +59,32 @@ public class UserGroupV2ServiceImplTest extends BaseServiceTest {
 
         String groupId = "GroupId";
         String institutionId = "InstitutionId";
+        String userId = "123e4567-e89b-12d3-a456-426614174000";
 
         ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
         byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
         UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userApiConnectorMock.retrieveFilteredUserInstitution(any(), any()))
-                .thenReturn(List.of("setId", "setId", "setId", "setId"));
+        ClassPathResource pathResourceUserInfo = new ClassPathResource("expectations/UserInfo.json");
+        byte[] resourceStreamUserInfo = Files.readAllBytes(pathResourceUserInfo.getFile().toPath());
+
+        UserInfo userInfo = objectMapper.readValue(resourceStreamUserInfo, new TypeReference<>() {
+        });
+
+
         when(userGroupConnectorMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
+        when(userApiConnectorMock.getUserByUserIdInstitutionIdAndProductAndStates(userId, institutionId,
+                userGroupInfo.getProductId(), List.of(ACTIVE.name(), SUSPENDED.name())))
+                .thenReturn(userInfo);
 
         UserGroupInfo result = userGroupV2Service.getUserGroupById(groupId, institutionId);
 
         assertEquals(userGroupInfo, result);
         verify(userGroupConnectorMock, times(1)).getUserGroupById(groupId);
+        verify(userApiConnectorMock, times(1)).getUserByUserIdInstitutionIdAndProductAndStates(userId, institutionId,
+                userGroupInfo.getProductId(), List.of(ACTIVE.name(), SUSPENDED.name()));
+
     }
 
     @Test

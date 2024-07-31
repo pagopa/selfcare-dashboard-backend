@@ -31,7 +31,7 @@ public class UserMapper {
             resource.setRoleInfos(model.getRoleInfos()
                     .stream()
                     .map(UserMapper::toRoleInfoResource)
-                    .collect(Collectors.toList())
+                    .toList()
             );
         }
         return resource;
@@ -110,7 +110,7 @@ public class UserMapper {
             if (model.getProducts() != null) {
                 resource.setProducts(model.getProducts().values().stream()
                         .map(UserMapper::toUserProductInfoResource)
-                        .collect(Collectors.toList()));
+                        .toList());
             }
         }
         return resource;
@@ -128,7 +128,7 @@ public class UserMapper {
                 resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
                 resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
                 Optional.ofNullable(model.getUser().getWorkContacts())
-                        .map(map -> map.get(model.getInstitutionId()))
+                        .map(map -> map.get(model.getUserMailUuid() != null ? model.getUserMailUuid() : model.getInstitutionId()))
                         .map(WorkContact::getEmail)
                         .map(CertifiedFieldMapper::toValue)
                         .ifPresent(resource::setEmail);
@@ -136,7 +136,7 @@ public class UserMapper {
             if (model.getProducts() != null) {
                 resource.setProduct(model.getProducts().values().stream()
                         .map(UserMapper::toUserProductInfoResource)
-                        .collect(Collectors.toList())
+                        .toList()
                         .get(0));
             }
         }

@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.support.PageableExecutionUtils.getPage;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserGroupV2ControllerTest extends BaseControllerTest {
@@ -299,6 +299,31 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         String inst = "institutionId";
 
         byte[] userGroupInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupInfo.json"));
+        UserGroupInfo userGroupInfo = objectMapper.readValue(userGroupInfoStream, UserGroupInfo.class);
+
+        when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/" + groupId)
+                        .queryParam("institutionId", inst)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupResource.json")))));
+
+        // then
+        verify(groupServiceMock, times(1)).getUserGroupById(groupId, inst);
+        verifyNoMoreInteractions(groupServiceMock);
+    }
+
+    @Test
+    void getUserGroupWithoutMailUuid() throws Exception {
+        // given
+        String groupId = "groupId";
+        String inst = "institutionId";
+
+        byte[] userGroupInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupInfoWithoutMailUuid.json"));
         UserGroupInfo userGroupInfo = objectMapper.readValue(userGroupInfoStream, UserGroupInfo.class);
 
         when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
