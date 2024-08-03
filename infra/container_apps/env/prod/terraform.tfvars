@@ -130,6 +130,10 @@ app_settings = [
   {
     name  = "PRODUCT_STORAGE_CONTAINER"
     value = "selc-p-product"
+  },
+  {
+    name  = "ONBOARDING_URL"
+    value = "https://selc-p-onboarding-ms-ca"
   }
 ]
 

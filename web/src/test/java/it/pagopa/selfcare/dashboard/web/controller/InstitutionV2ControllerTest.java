@@ -31,10 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.hamcrest.Matchers.is;
@@ -359,6 +356,52 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
                 .getDelegationsV2(delegationParameters);
         verifyNoMoreInteractions(delegationServiceMock);
     }
+
+    /**
+     * Method under test: {@link InstitutionV2Controller#getInstitutionOnboardingPending(String, String)}
+     */
+    @Test
+    void getInstitutionOnboarding204() throws Exception {
+        //given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+
+        doReturn(Boolean.FALSE).when(institutionV2ServiceMock).verifyIfExistsPendingOnboarding(institutionId, productId);
+        //when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/onboardings/{productId}/pending", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isNoContent())
+                .andReturn();
+        //then
+        verify(institutionV2ServiceMock, times(1))
+                .verifyIfExistsPendingOnboarding(institutionId, productId);
+        verifyNoMoreInteractions(institutionV2ServiceMock);
+
+    }
+
+    @Test
+    void getInstitutionOnboarding200() throws Exception {
+        //given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+
+        doReturn(Boolean.TRUE).when(institutionV2ServiceMock).verifyIfExistsPendingOnboarding(institutionId, productId);
+        //when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/onboardings/{productId}/pending", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        //then
+        verify(institutionV2ServiceMock, times(1))
+                .verifyIfExistsPendingOnboarding(institutionId, productId);
+        verifyNoMoreInteractions(institutionV2ServiceMock);
+
+    }
+
 
     private DelegationWithInfo dummyDelegation() {
         DelegationWithInfo delegation = new DelegationWithInfo();
