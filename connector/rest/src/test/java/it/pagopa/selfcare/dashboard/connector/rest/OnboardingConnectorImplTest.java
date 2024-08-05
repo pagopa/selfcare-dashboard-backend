@@ -16,12 +16,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-public class OnboardingConnectorImplTest  extends BaseConnectorTest {
+class OnboardingConnectorImplTest  extends BaseConnectorTest {
 
     @Mock
     private OnboardingRestClient onboardingRestClient;
@@ -66,7 +65,7 @@ public class OnboardingConnectorImplTest  extends BaseConnectorTest {
         OnboardingGetResponse onboardingGetResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse))).when(onboardingRestClient)._v1OnboardingGet(null, institutionId, null, null, productId, 1, status, null, null);;
+        doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse))).when(onboardingRestClient)._v1OnboardingGet(null, institutionId, null, null, productId, 1, status, null, null);
 
         Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(institutionId, productId, status);
 

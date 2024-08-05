@@ -127,7 +127,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         assertNotNull(resources);
         assertEquals(resources.get(0).getId(), expectedInstitution.getId());
-        assertEquals(resources.get(0).getUserRole(), "ADMIN");
+        assertEquals("ADMIN", resources.get(0).getUserRole());
         assertEquals(resources.get(0).getName(), expectedInstitution.getName());
         assertEquals(resources.get(0).getStatus(), expectedInstitution.getStatus());
         assertEquals(resources.get(0).getParentDescription(), expectedInstitution.getParentDescription());

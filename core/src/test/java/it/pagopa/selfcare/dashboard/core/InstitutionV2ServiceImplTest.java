@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
-public class InstitutionV2ServiceImplTest extends BaseServiceTest {
+class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private InstitutionV2ServiceImpl institutionV2Service;
@@ -48,7 +48,7 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
     private OnboardingConnector onboardingConnectorMock;
 
     @BeforeEach
-    public void setUp() {
+    public void init() {
         super.setUp();
     }
 
