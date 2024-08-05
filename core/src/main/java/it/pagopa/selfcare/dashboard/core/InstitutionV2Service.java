@@ -9,4 +9,6 @@ public interface InstitutionV2Service {
 
 
     Institution findInstitutionById(String institutionId);
+
+    Boolean verifyIfExistsPendingOnboarding(String institutionId, String productId);
 }

@@ -126,6 +126,10 @@ app_settings = [
   {
     name  = "B4F_DASHBOARD_SECURITY_CONNECTOR"
     value = "v2"
+  },
+  {
+    name  = "ONBOARDING_URL"
+    value = "https://selc-d-onboarding-ms-ca"
   }
 ]
 

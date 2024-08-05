@@ -192,4 +192,29 @@ public class InstitutionV2Controller {
         return result;
 
     }
+
+    @GetMapping(value = "/{institutionId}/onboardings/{productId}/pending", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionOnboardingPending}", nickname = "getInstitutionOnboardingPending")
+    public ResponseEntity<Void> getInstitutionOnboardingPending(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                          @PathVariable("institutionId")
+                                                          String institutionId,
+                                                                             @PathVariable("productId")
+                                                             @ApiParam("${swagger.dashboard.products.model.id}")
+                                                             String productId) {
+
+        log.trace("getInstitutionOnboardingPending start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionOnboardingPending institutionId = {}, productId = {}", institutionId, productId);
+        Boolean result = institutionV2Service.verifyIfExistsPendingOnboarding(institutionId, productId);
+        if (Boolean.FALSE.equals(result)) {
+            log.debug("Pending onboarding not found for institutionId = {} and productId = {}", institutionId, productId);
+            log.trace("getInstitutionOnboardingPending end");
+            return ResponseEntity.noContent().build();
+        }
+        else {
+            log.debug("Pending onboarding found for institutionId = {} and productId = {}", institutionId, productId);
+            log.trace("getInstitutionOnboardingPending end");
+            return ResponseEntity.ok().build();
+        }
+    }
 }
