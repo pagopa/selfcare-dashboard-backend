@@ -6,41 +6,11 @@
   "name": "setName",
   "status": "ACTIVE",
   "members": [
-    {
-      "id": "895b4af3-7fa7-4442-8a0d-a2b05c6c719f",
-      "user": null,
-      "role": null,
-      "products": null,
-      "status": null,
-      "institutionId": null,
-      "userMailUuid": null
-    },
-    {
-      "id": "895b4af3-7fa7-4442-8a0d-a2b05c6c719a",
-      "user": null,
-      "role": null,
-      "products": null,
-      "status": null,
-      "institutionId": null,
-      "userMailUuid": null
-    }
+    "895b4af3-7fa7-4442-8a0d-a2b05c6c719f",
+    "895b4af3-7fa7-4442-8a0d-a2b05c6c719a"
   ],
   "createdAt": "+1000000000-12-31T23:59:59.999999999Z",
-  "createdBy": {
-    "id": "setCreatedBy",
-    "fiscalCode": null,
-    "name": null,
-    "familyName": null,
-    "email": null,
-    "workContacts": null
-  },
+  "createdBy": "setCreatedBy",
   "modifiedAt": "+1000000000-12-31T23:59:59.999999999Z",
-  "modifiedBy": {
-    "id": "setModifiedBy",
-    "fiscalCode": null,
-    "name": null,
-    "familyName": null,
-    "email": null,
-    "workContacts": null
-  }
+  "modifiedBy": "setModifiedBy"
 }

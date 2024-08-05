@@ -1,9 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.api;
 
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -28,6 +25,6 @@ public interface UserGroupConnector {
 
     void deleteMemberFromUserGroup(String id, UUID userId);
 
-    Page<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable);
+    Page<UserGroup> getUserGroups(UserGroupFilter filter, Pageable pageable);
 
 }

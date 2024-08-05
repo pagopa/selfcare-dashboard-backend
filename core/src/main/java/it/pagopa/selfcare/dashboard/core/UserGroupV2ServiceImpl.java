@@ -3,10 +3,7 @@ package it.pagopa.selfcare.dashboard.core;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
@@ -24,15 +21,14 @@ import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
-import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.familyName;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.name;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class UserGroupV2ServiceImpl implements UserGroupV2Service{
 
-
-    private static final EnumSet<User.Fields> MEMBER_FIELD_LIST = EnumSet.of(name, familyName, workContacts);
     private static final EnumSet<User.Fields> FIELD_LIST = EnumSet.of(name, familyName);
 
     private final UserGroupConnector groupConnector;
@@ -180,14 +176,14 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
     }
 
     @Override
-    public Page<UserGroupInfo> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable) {
+    public Page<UserGroup> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
         UserGroupFilter userGroupFilter = new UserGroupFilter();
         userGroupFilter.setInstitutionId(Optional.ofNullable(institutionId));
         userGroupFilter.setUserId(Optional.ofNullable(userId));
         userGroupFilter.setProductId(Optional.ofNullable(productId));
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
         log.debug("getUserGroups result = {}", groupInfos);
         log.trace("getUserGroups end");
 

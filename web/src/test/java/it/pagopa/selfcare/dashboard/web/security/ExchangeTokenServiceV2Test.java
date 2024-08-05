@@ -10,7 +10,7 @@ import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.product.ProductTree;
@@ -20,6 +20,7 @@ import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.web.model.ExchangedToken;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapperV2Impl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.BackOfficeConfigurations;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -69,6 +71,9 @@ class ExchangeTokenServiceV2Test {
     private EnvironmentVariables environmentVariables;
 
     private static final String COLLAUDO_ENV = "Collaudo";
+
+    @Spy
+    private GroupMapperV2Impl groupMapperV2;
 
 
     @BeforeEach
@@ -238,16 +243,16 @@ class ExchangeTokenServiceV2Test {
                 .thenReturn(institutionInfo);
         final Pageable pageable = Pageable.ofSize(100);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        UserGroupInfo groupInfo = new UserGroupInfo();
+        UserGroup groupInfo = new UserGroup();
         UserInfo user = new UserInfo();
         user.setId(userId.toString());
-        groupInfo.setMembers(List.of(user));
-        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        groupInfo.setMembers(List.of("userId"));
+        final List<UserGroup> userGroups = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
-            groupInfos.add(groupInfo);
+            userGroups.add(groupInfo);
         }
         when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
-                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+                .thenAnswer(invocation -> getPage(userGroups, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
 
 
         OnboardedProduct onboardedProduct = new OnboardedProduct();
@@ -363,17 +368,15 @@ class ExchangeTokenServiceV2Test {
         when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        UserGroupInfo groupInfo = new UserGroupInfo();
-        UserInfo user = new UserInfo();
-        user.setId(userId.toString());
-        groupInfo.setMembers(List.of(user));
-        groupInfo.setId("id");
-        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        UserGroup userGroup = new UserGroup();
+        userGroup.setMembers(List.of("userId"));
+        userGroup.setId("id");
+        final List<UserGroup> userGroups = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
-            groupInfos.add(groupInfo);
+            userGroups.add(userGroup);
         }
         when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
-                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+                .thenAnswer(invocation -> getPage(userGroups, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = new Product();
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
@@ -486,17 +489,15 @@ class ExchangeTokenServiceV2Test {
         when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        UserGroupInfo groupInfo = new UserGroupInfo();
-        UserInfo user = new UserInfo();
-        user.setId(userId.toString());
-        groupInfo.setMembers(List.of(user));
-        groupInfo.setId("id");
-        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        UserGroup userGroup = new UserGroup();
+        userGroup.setMembers(List.of("userId"));
+        userGroup.setId("id");
+        final List<UserGroup> userGroups = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
-            groupInfos.add(groupInfo);
+            userGroups.add(userGroup);
         }
         when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
-                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+                .thenAnswer(invocation -> getPage(userGroups, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = new Product();
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
@@ -765,17 +766,15 @@ class ExchangeTokenServiceV2Test {
         when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        UserGroupInfo groupInfo = new UserGroupInfo();
-        UserInfo user = new UserInfo();
-        user.setId(userId.toString());
-        groupInfo.setMembers(List.of(user));
-        groupInfo.setId("id");
-        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        UserGroup userGroup = new UserGroup();
+        userGroup.setMembers(List.of("userId"));
+        userGroup.setId("id");
+        final List<UserGroup> userGroups = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
-            groupInfos.add(groupInfo);
+            userGroups.add(userGroup);
         }
         when(groupServiceMock.getUserGroups(institutionId, productId, userId, pageable))
-                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+                .thenAnswer(invocation -> getPage(userGroups, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = new Product();
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
@@ -876,7 +875,7 @@ class ExchangeTokenServiceV2Test {
         assertEquals(1, institution.getRoles().size());
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
-        assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
+        assertTrue(groups.stream().allMatch(groupId -> groupId.equals(userGroup.getId())));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         verify(jwtServiceMock, times(1))
                 .getClaims(credential);
@@ -935,17 +934,15 @@ class ExchangeTokenServiceV2Test {
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
         InstitutionService institutionServiceMock = mock(InstitutionService.class);
 
-        UserGroupInfo groupInfo = new UserGroupInfo();
-        UserInfo user = new UserInfo();
-        user.setId(userId.toString());
-        groupInfo.setMembers(List.of(user));
+        UserGroup userGroup = new UserGroup();
+        userGroup.setMembers(List.of("userId"));
         final Pageable pageable = Pageable.ofSize(100);
-        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        final List<UserGroup> userGroups = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
-            groupInfos.add(groupInfo);
+            userGroups.add(userGroup);
         }
         when(groupServiceMock.getUserGroups(institutionId, null, userId, Pageable.ofSize(100)))
-                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+                .thenAnswer(invocation -> getPage(userGroups, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
 
         when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
@@ -1178,17 +1175,15 @@ class ExchangeTokenServiceV2Test {
         when(institutionServiceMock.getInstitutionById(institutionId))
                 .thenReturn(institutionInfo);
         UserGroupV2Service groupServiceMock = mock(UserGroupV2Service.class);
-        UserGroupInfo groupInfo = new UserGroupInfo();
-        UserInfo user = new UserInfo();
-        user.setId(userId.toString());
-        groupInfo.setMembers(List.of(user));
-        groupInfo.setId("id");
-        final List<UserGroupInfo> groupInfos = new ArrayList<>(pageable.getPageSize());
+        UserGroup userGroup = new UserGroup();
+        userGroup.setMembers(List.of("userId"));
+        userGroup.setId("id");
+        final List<UserGroup> userGroups = new ArrayList<>(pageable.getPageSize());
         for (int i = 0; i < pageable.getPageSize(); i++) {
-            groupInfos.add(groupInfo);
+            userGroups.add(userGroup);
         }
         when(groupServiceMock.getUserGroups(institutionId, null, userId, pageable))
-                .thenAnswer(invocation -> getPage(groupInfos, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
+                .thenAnswer(invocation -> getPage(userGroups, invocation.getArgument(3, Pageable.class), () -> pageable.getPageSize() + 1));
         ProductsConnector productsConnectorMock = mock(ProductsConnector.class);
         Product product = new Product();
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
@@ -1257,7 +1252,7 @@ class ExchangeTokenServiceV2Test {
         checkNotNullFields(institution, "parentDescription", "rootParent");
         List<String> groups = institution.getGroups();
         assertEquals(pageable.getPageSize(), groups.size());
-        assertTrue(groups.stream().allMatch(groupId -> groupId.equals(groupInfo.getId())));
+        assertTrue(groups.stream().allMatch(groupId -> groupId.equals(userGroup.getId())));
         assertEquals(institutionInfo.getTaxCode(), institution.getTaxCode());
         verify(jwtServiceMock, times(1))
                 .getClaims(credential);

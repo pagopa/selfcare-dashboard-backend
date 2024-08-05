@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.commons.web.model.Page;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapperV2Impl;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupIdResource;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -49,6 +52,9 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
 
     @Mock
     private UserGroupV2Service groupServiceMock;
+
+    @Spy
+    private GroupMapperV2Impl groupMapperV2;
 
     @BeforeEach
     void setUp() {
@@ -426,11 +432,11 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         String productId = "prod-io";
         UUID userId = UUID.randomUUID();
         // given
-        byte[] userGroupInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupInfo.json"));
-        UserGroupInfo userGroupInfo = objectMapper.readValue(userGroupInfoStream, new TypeReference<>() {});
+        byte[] userGroupStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroup.json"));
+        UserGroup userGroup = objectMapper.readValue(userGroupStream, new TypeReference<>() {});
 
         when(groupServiceMock.getUserGroups(eq(instId), eq(productId), eq(userId), any(Pageable.class)))
-                .thenAnswer(invocation -> getPage(List.of(userGroupInfo), invocation.getArgument(3, Pageable.class), () -> 1L));
+                .thenAnswer(invocation -> getPage(List.of(userGroup), invocation.getArgument(3, Pageable.class), () -> 1L));
 
         Pageable pageable = mock(Pageable.class);
         Page<UserGroupPlainResource> pages = userGroupV2Controller.getUserGroups(instId, productId, userId, pageable);

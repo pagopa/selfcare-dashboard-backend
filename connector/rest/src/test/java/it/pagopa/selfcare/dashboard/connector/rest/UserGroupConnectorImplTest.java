@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -237,6 +236,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         });
 
         when(restClientMock._getUserGroupUsingGET(anyString())).thenReturn(ResponseEntity.of(Optional.of(expectedResponse)));
+        when(groupMapper.toUserGroupInfo(expectedResponse)).thenReturn(expectedGroupInfoResponse);
 
         UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
         assertEquals(expectedGroupInfoResponse, groupInfo);
@@ -261,6 +261,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         });
 
         when(restClientMock._getUserGroupUsingGET(anyString())).thenReturn(ResponseEntity.of(Optional.of(expectedResponse)));
+        when(groupMapper.toUserGroupInfo(expectedResponse)).thenReturn(expectedGroupInfo);
 
         UserGroupInfo groupInfo = groupConnector.getUserGroupById(id);
         assertEquals(expectedGroupInfo, groupInfo);
@@ -367,7 +368,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
 
         ClassPathResource resource = new ClassPathResource("stubs/userGroupInfoGetUserGroups.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
-        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        UserGroup userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
         ClassPathResource responseResource = new ClassPathResource("stubs/userGroupResponse.json");
@@ -398,7 +399,9 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
                 String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
                 .thenReturn(ResponseEntity.ok(pageOfUserGroupResource));
 
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        when(groupMapper.toUserGroup(response)).thenReturn(userGroupInfo);
+
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(filter, pageable);
 
         assertEquals(1, groupInfos.getTotalElements());
         assertEquals(userGroupInfo, groupInfos.getContent().get(0));
@@ -412,7 +415,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
                         filter.getUserId().orElse(null),
                         String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name()));
 
-        UserGroupInfo actualUserGroupInfo = groupInfos.getContent().get(0);
+        UserGroup actualUserGroupInfo = groupInfos.getContent().get(0);
         assertEquals(userGroupInfo, actualUserGroupInfo);
     }
 
@@ -426,7 +429,7 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         when(restClientMock._getUserGroupsUsingGET(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(pageOfUserGroupResource));
         //when
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(filter, pageable);
         //then
         assertNotNull(groupInfos);
         assertTrue(groupInfos.isEmpty());
@@ -456,16 +459,20 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         pageOfUserGroupResource.setContent(List.of(resource));
         ResponseEntity<PageOfUserGroupResource> responseEntity = ResponseEntity.ok(pageOfUserGroupResource);
 
-        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), List.of("name,ASC"), filter.getProductId().orElse(null), null, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
-                .thenReturn(responseEntity);
-        //when
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
-
         ClassPathResource resource1 = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
         byte[] resourceStream = Files.readAllBytes(resource1.getFile().toPath());
         String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
 
-        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
+        UserGroup expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroup.class);
+
+        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), List.of("name,ASC"), filter.getProductId().orElse(null), null, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
+                .thenReturn(responseEntity);
+
+        when(groupMapper.toUserGroup(resource)).thenReturn(expectedUserGroupInfo);
+
+        //when
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(filter, pageable);
+
 
         //then
         assertEquals(groupInfos.getContent().get(0), expectedUserGroupInfo);
@@ -500,16 +507,19 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         pageOfUserGroupResource.setTotalElements(1L);
         ResponseEntity<PageOfUserGroupResource> responseEntity = ResponseEntity.ok(pageOfUserGroupResource);
 
-        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), userId, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
-                .thenReturn(responseEntity);
-
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
-
         ClassPathResource resource1 = new ClassPathResource("stubs/getUserGroups_notEmptyInstitutionId_notEmptyProductId_notEmptyUserId.json");
         byte[] resourceStream = Files.readAllBytes(resource1.getFile().toPath());
         String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
 
-        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
+        UserGroup expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroup.class);
+
+        when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), userId, String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
+                .thenReturn(responseEntity);
+
+        when(groupMapper.toUserGroup(resource)).thenReturn(expectedUserGroupInfo);
+
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(filter, pageable);
+
         assertEquals(groupInfos.getContent().get(0), expectedUserGroupInfo);
 
         verify(restClientMock, times(1))
@@ -538,50 +548,13 @@ class UserGroupConnectorImplTest extends BaseConnectorTest {
         when(restClientMock._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), filter.getUserId().orElse(null), String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())))
                 .thenReturn(ResponseEntity.ok(pageOfUserGroupResource));
 
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(filter, pageable);
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(filter, pageable);
 
         assertNotNull(groupInfos);
         assertTrue(groupInfos.isEmpty());
         verify(restClientMock, times(1))
                 ._getUserGroupsUsingGET(filter.getInstitutionId().orElse(null), pageable.getPageNumber(), pageable.getPageSize(), sortCriteria, filter.getProductId().orElse(null), filter.getUserId().orElse(null), String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name()));
         verifyNoMoreInteractions(restClientMock);
-    }
-
-    @Test
-    void groupResponse_toGroupInfo() throws IOException {
-        //given
-        UserGroupResource response = mockInstance(new UserGroupResource(), "setMembers");
-        UUID id = UUID.fromString("895b4af3-7fa7-4442-8a0d-a2b05c6c719f");
-        UUID id1 = UUID.fromString("b339c8b4-b749-4498-82eb-1ad2e3761079");
-        response.setMembers(List.of(id, id1));
-        response.setCreatedAt(Instant.MAX);
-        response.setModifiedAt(Instant.MAX);
-        //when
-        UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response);
-        //then
-        ClassPathResource resource = new ClassPathResource("stubs/groupResponse_toGroupInfo.json");
-        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
-        String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
-
-        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
-        assertEquals(groupInfo, expectedUserGroupInfo);
-    }
-
-    @Test
-    void groupResponse_toGroupInfo_nullMembers() throws IOException {
-        //given
-        UserGroupResource response1 = mockInstance(new UserGroupResource(), "setMembers");
-        response1.setCreatedAt(Instant.MAX);
-        response1.setModifiedAt(Instant.MAX);
-        //when
-        UserGroupInfo groupInfo = UserGroupConnectorImpl.GROUP_RESPONSE_TO_GROUP_INFO.apply(response1);
-        //then
-        ClassPathResource resource = new ClassPathResource("stubs/groupResponse_toGroupInfo_nullMembers.json");
-        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
-        String expectedUserGroupInfoJson = new String(resourceStream, StandardCharsets.UTF_8);
-
-        UserGroupInfo expectedUserGroupInfo = objectMapper.readValue(expectedUserGroupInfoJson, UserGroupInfo.class);
-        assertEquals(groupInfo, expectedUserGroupInfo);
     }
 
     @Test
