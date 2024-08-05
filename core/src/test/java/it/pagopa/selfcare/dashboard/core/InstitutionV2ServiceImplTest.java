@@ -5,6 +5,7 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.api.OnboardingConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -29,12 +30,13 @@ import java.util.Collections;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.PENDING;
+import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.TOBEVALIDATED;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
-public class InstitutionV2ServiceImplTest extends BaseServiceTest {
+class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private InstitutionV2ServiceImpl institutionV2Service;
@@ -42,9 +44,11 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
     private UserApiConnector userApiConnectorMock;
     @Mock
     private MsCoreConnector msCoreConnectorMock;
+    @Mock
+    private OnboardingConnector onboardingConnectorMock;
 
     @BeforeEach
-    public void setUp() {
+    public void init() {
         super.setUp();
     }
 
@@ -234,5 +238,58 @@ public class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Institution result = institutionV2Service.findInstitutionById(institutionId);
         Assertions.assertEquals("LIMITED", result.getOnboarding().get(0).getUserRole());
         Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUserInstitutionWithActions(institutionId, userId, null);
+    }
+
+    @Test
+    void getPendingOnboarding_pendingFound() {
+        // Given
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", PENDING.name()))
+                .thenReturn(Boolean.TRUE);
+
+        // When
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", "test-product");
+
+        // Then
+        assertTrue(actualResponse);
+        Mockito.verify(onboardingConnectorMock, Mockito.times(1))
+                .getOnboardingWithFilter("test-institution", "test-product", PENDING.name());
+    }
+
+    @Test
+    void getPendingOnboarding_pendingNotFound_tobeValidatedFound() {
+        // Given
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", PENDING.name()))
+                .thenReturn(Boolean.FALSE);
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name()))
+                .thenReturn(Boolean.TRUE);
+
+        // When
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", "test-product");
+
+        // Then
+        assertTrue(actualResponse);
+        Mockito.verify(onboardingConnectorMock, Mockito.times(1))
+                .getOnboardingWithFilter("test-institution", "test-product", PENDING.name());
+        Mockito.verify(onboardingConnectorMock, Mockito.times(1))
+                .getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name());
+    }
+
+    @Test
+    void getPendingOnboarding_neitherFound() {
+        // Given
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", PENDING.name()))
+                .thenReturn(Boolean.FALSE);
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name()))
+                .thenReturn(Boolean.FALSE);
+
+        // When
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", "test-product");
+
+        // Then
+        assertFalse(actualResponse);
+        Mockito.verify(onboardingConnectorMock, Mockito.times(1))
+                .getOnboardingWithFilter("test-institution", "test-product", PENDING.name());
+        Mockito.verify(onboardingConnectorMock, Mockito.times(1))
+                .getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name());
     }
 }

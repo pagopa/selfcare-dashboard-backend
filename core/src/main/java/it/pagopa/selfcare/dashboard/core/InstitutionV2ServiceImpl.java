@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
+import it.pagopa.selfcare.dashboard.connector.api.OnboardingConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
@@ -22,6 +23,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.PENDING;
+import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.TOBEVALIDATED;
+
 @Slf4j
 @Service
 class InstitutionV2ServiceImpl implements InstitutionV2Service {
@@ -33,14 +37,17 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
     private final List<RelationshipState> allowedStates;
     private final UserApiConnector userApiConnector;
     private final MsCoreConnector msCoreConnector;
+    private final OnboardingConnector onboardingConnector;
 
     @Autowired
     public InstitutionV2ServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
                                     UserApiConnector userApiConnector,
-                                  MsCoreConnector msCoreConnector) {
+                                    MsCoreConnector msCoreConnector,
+                                    OnboardingConnector onboardingConnector) {
         this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
         this.userApiConnector = userApiConnector;
         this.msCoreConnector = msCoreConnector;
+        this.onboardingConnector = onboardingConnector;
     }
 
     @Override
@@ -104,4 +111,12 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
         return userInstitutionWithActionsDto.getProducts().stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);
     }
 
+    @Override
+    public Boolean verifyIfExistsPendingOnboarding(String institutionId, String productId) {
+        Boolean response = onboardingConnector.getOnboardingWithFilter(institutionId, productId, PENDING.name());
+        if (Boolean.FALSE.equals(response)) {
+            response = onboardingConnector.getOnboardingWithFilter(institutionId, productId, TOBEVALIDATED.name());
+        }
+        return response;
+    }
 }
