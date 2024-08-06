@@ -12,7 +12,7 @@ import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.connector.api.ProductsConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
@@ -242,7 +242,7 @@ public class ExchangeTokenServiceV2 {
     }
 
     private void retrieveAndSetGroups(Institution institution, String institutionId, String productId, String userId) {
-        Page<UserGroupInfo> groupInfos = groupService.getUserGroups(institutionId, productId, UUID.fromString(userId),
+        Page<UserGroup> groupInfos = groupService.getUserGroups(institutionId, productId, UUID.fromString(userId),
                 Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
         if (groupInfos.hasNext()) {
             log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s and product %s. The Identity Token will contain only the first 100 records",
@@ -252,7 +252,7 @@ public class ExchangeTokenServiceV2 {
         }
         if (!groupInfos.isEmpty()) {
             institution.setGroups(groupInfos.stream()
-                    .map(UserGroupInfo::getId)
+                    .map(UserGroup::getId)
                     .toList());
         }
     }

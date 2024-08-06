@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.commons.web.model.Page;
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapperV2Impl;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.UserGroupIdResource;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -30,13 +33,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.data.support.PageableExecutionUtils.getPage;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class UserGroupV2ControllerTest extends BaseControllerTest {
@@ -49,6 +52,9 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
 
     @Mock
     private UserGroupV2Service groupServiceMock;
+
+    @Spy
+    private GroupMapperV2Impl groupMapperV2;
 
     @BeforeEach
     void setUp() {
@@ -318,6 +324,31 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void getUserGroupWithoutMailUuid() throws Exception {
+        // given
+        String groupId = "groupId";
+        String inst = "institutionId";
+
+        byte[] userGroupInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupInfoWithoutMailUuid.json"));
+        UserGroupInfo userGroupInfo = objectMapper.readValue(userGroupInfoStream, UserGroupInfo.class);
+
+        when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/" + groupId)
+                        .queryParam("institutionId", inst)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupResource.json")))));
+
+        // then
+        verify(groupServiceMock, times(1)).getUserGroupById(groupId, inst);
+        verifyNoMoreInteractions(groupServiceMock);
+    }
+
+    @Test
     void addMemberToUserGroup() throws Exception {
         // given
         String groupId = "groupId";
@@ -401,11 +432,11 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         String productId = "prod-io";
         UUID userId = UUID.randomUUID();
         // given
-        byte[] userGroupInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroupInfo.json"));
-        UserGroupInfo userGroupInfo = objectMapper.readValue(userGroupInfoStream, new TypeReference<>() {});
+        byte[] userGroupStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroup.json"));
+        UserGroup userGroup = objectMapper.readValue(userGroupStream, new TypeReference<>() {});
 
         when(groupServiceMock.getUserGroups(eq(instId), eq(productId), eq(userId), any(Pageable.class)))
-                .thenAnswer(invocation -> getPage(List.of(userGroupInfo), invocation.getArgument(3, Pageable.class), () -> 1L));
+                .thenAnswer(invocation -> getPage(List.of(userGroup), invocation.getArgument(3, Pageable.class), () -> 1L));
 
         Pageable pageable = mock(Pageable.class);
         Page<UserGroupPlainResource> pages = userGroupV2Controller.getUserGroups(instId, productId, userId, pageable);

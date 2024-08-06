@@ -3,8 +3,6 @@ package it.pagopa.selfcare.dashboard.connector.rest;
 import io.github.resilience4j.retry.annotation.Retry;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
 import it.pagopa.selfcare.dashboard.connector.model.groups.*;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.rest.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.GroupMapper;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
@@ -22,9 +20,7 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -35,39 +31,6 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
     private final GroupMapper groupMapper;
 
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
-
-    static final Function<UserGroupResource, UserGroupInfo> GROUP_RESPONSE_TO_GROUP_INFO = groupResponse -> {
-        UserGroupInfo groupInfo = new UserGroupInfo();
-        groupInfo.setId(groupResponse.getId());
-        groupInfo.setInstitutionId(groupResponse.getInstitutionId());
-        groupInfo.setProductId(groupResponse.getProductId());
-        groupInfo.setName(groupResponse.getName());
-        groupInfo.setDescription(groupResponse.getDescription());
-        if(Objects.nonNull(groupResponse.getStatus())) {
-            groupInfo.setStatus(UserGroupStatus.valueOf(groupResponse.getStatus().getValue()));
-        }
-        if (groupResponse.getMembers() != null) {
-            List<UserInfo> members = groupResponse.getMembers().stream().map(id -> {
-                UserInfo member = new UserInfo();
-                member.setId(id.toString());
-                return member;
-            }).toList();
-            groupInfo.setMembers(members);
-        }
-        groupInfo.setCreatedAt(groupResponse.getCreatedAt());
-        groupInfo.setModifiedAt(groupResponse.getModifiedAt());
-        User createdBy = new User();
-        createdBy.setId(groupResponse.getCreatedBy());
-        groupInfo.setCreatedBy(createdBy);
-
-        if (groupResponse.getModifiedBy() != null) {
-            User userInfo = new User();
-            userInfo.setId(groupResponse.getModifiedBy());
-            groupInfo.setModifiedBy(userInfo);
-        }
-
-        return groupInfo;
-    };
 
     @Override
     public String createUserGroup(CreateUserGroup userGroup) {
@@ -140,7 +103,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
         log.debug("getUseGroupById id = {}", id);
         Assert.hasText(id, REQUIRED_GROUP_ID_MESSAGE);
         UserGroupResource response = restClient._getUserGroupUsingGET(id).getBody();
-        UserGroupInfo groupInfo = GROUP_RESPONSE_TO_GROUP_INFO.apply(response);
+        UserGroupInfo groupInfo = groupMapper.toUserGroupInfo(response);
         log.debug("getUseGroupById groupInfo = {}", groupInfo);
         log.trace("getUserGroupById end");
         return groupInfo;
@@ -168,7 +131,7 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
 
     @Override
     @Retry(name = "retryTimeout")
-    public Page<UserGroupInfo> getUserGroups(UserGroupFilter filter, Pageable pageable) {
+    public Page<UserGroup> getUserGroups(UserGroupFilter filter, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", filter.getInstitutionId(), filter.getProductId(), filter.getUserId(), pageable);
 
@@ -186,15 +149,15 @@ public class UserGroupConnectorImpl implements UserGroupConnector {
                 String.join(",", UserGroupStatus.ACTIVE.name(), UserGroupStatus.SUSPENDED.name())).getBody();
 
         assert userGroupResources != null;
-        final Page<UserGroupInfo> userGroups = convertToUserGroupInfoPage(userGroupResources, pageable);
+        final Page<UserGroup> userGroups = convertToUserGroupInfoPage(userGroupResources, pageable);
         log.debug("getUserGroups result = {}", userGroups);
         log.trace("getUserGroups end");
         return userGroups;
     }
 
-    private Page<UserGroupInfo> convertToUserGroupInfoPage(PageOfUserGroupResource userGroupResources, Pageable pageable) {
+    private Page<UserGroup> convertToUserGroupInfoPage(PageOfUserGroupResource userGroupResources, Pageable pageable) {
         return new PageImpl<>(
-                userGroupResources.getContent().stream().map(GROUP_RESPONSE_TO_GROUP_INFO).toList(),
+                userGroupResources.getContent().stream().map(groupMapper::toUserGroup).toList(),
                 pageable,
                 userGroupResources.getTotalElements()
         );

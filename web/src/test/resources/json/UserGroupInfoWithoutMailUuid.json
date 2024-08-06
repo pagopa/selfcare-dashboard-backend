@@ -24,7 +24,7 @@
           "value": "user_email"
         },
         "workContacts": {
-          "user_mail_uuid": {
+          "institutionId": {
             "email": {
               "certification": "SPID",
               "value": "user_contact_email"
@@ -48,8 +48,7 @@
         }
       },
       "status": "active",
-      "institutionId": "institution_id",
-      "userMailUuid": "user_mail_uuid"
+      "institutionId": "institutionId"
     }
   ],
   "createdAt": "2024-05-08T12:00:00Z",

@@ -3,10 +3,7 @@ package it.pagopa.selfcare.dashboard.core;
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidMemberListException;
@@ -59,20 +56,32 @@ public class UserGroupV2ServiceImplTest extends BaseServiceTest {
 
         String groupId = "GroupId";
         String institutionId = "InstitutionId";
+        String userId = "123e4567-e89b-12d3-a456-426614174000";
 
         ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
         byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
         UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userApiConnectorMock.retrieveFilteredUserInstitution(any(), any()))
-                .thenReturn(List.of("setId", "setId", "setId", "setId"));
+        ClassPathResource pathResourceUserInfo = new ClassPathResource("expectations/UserInfo.json");
+        byte[] resourceStreamUserInfo = Files.readAllBytes(pathResourceUserInfo.getFile().toPath());
+
+        UserInfo userInfo = objectMapper.readValue(resourceStreamUserInfo, new TypeReference<>() {
+        });
+
+
         when(userGroupConnectorMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
+        when(userApiConnectorMock.getUserByUserIdInstitutionIdAndProductAndStates(userId, institutionId,
+                userGroupInfo.getProductId(), List.of(ACTIVE.name(), SUSPENDED.name())))
+                .thenReturn(userInfo);
 
         UserGroupInfo result = userGroupV2Service.getUserGroupById(groupId, institutionId);
 
         assertEquals(userGroupInfo, result);
         verify(userGroupConnectorMock, times(1)).getUserGroupById(groupId);
+        verify(userApiConnectorMock, times(1)).getUserByUserIdInstitutionIdAndProductAndStates(userId, institutionId,
+                userGroupInfo.getProductId(), List.of(ACTIVE.name(), SUSPENDED.name()));
+
     }
 
     @Test
@@ -130,16 +139,16 @@ public class UserGroupV2ServiceImplTest extends BaseServiceTest {
         userGroupFilter.setProductId(Optional.of(productId));
         userGroupFilter.setUserId(Optional.of(userId));
 
-        ClassPathResource pathResource = new ClassPathResource("expectations/UserGroupInfo.json");
+        ClassPathResource pathResource = new ClassPathResource("expectations/UserGroup.json");
         byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
-        UserGroupInfo userGroupInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        UserGroup userGroup = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        Page<UserGroupInfo> mockPage = new PageImpl<>(Collections.singletonList(userGroupInfo));
+        Page<UserGroup> mockPage = new PageImpl<>(Collections.singletonList(userGroup));
 
         when(userGroupConnectorMock.getUserGroups(userGroupFilter, pageable)).thenReturn(mockPage);
 
-        Page<UserGroupInfo> result = userGroupV2Service.getUserGroups(institutionId, productId, userId, pageable);
+        Page<UserGroup> result = userGroupV2Service.getUserGroups(institutionId, productId, userId, pageable);
 
         assertEquals(mockPage, result);
         verify(userGroupConnectorMock, times(1)).getUserGroups(any(), eq(pageable));
@@ -157,13 +166,13 @@ public class UserGroupV2ServiceImplTest extends BaseServiceTest {
         userGroupFilter.setProductId(Optional.of(productId));
         userGroupFilter.setUserId(Optional.of(userId));
 
-        UserGroupInfo mockGroupInfo1 = new UserGroupInfo();
-        UserGroupInfo mockGroupInfo2 = new UserGroupInfo();
-        Page<UserGroupInfo> mockPage = new PageImpl<>(Arrays.asList(mockGroupInfo1, mockGroupInfo2));
+        UserGroup mockGroup1 = new UserGroup();
+        UserGroup mockGroup2 = new UserGroup();
+        Page<UserGroup> mockPage = new PageImpl<>(Arrays.asList(mockGroup1, mockGroup2));
 
         when(userGroupConnectorMock.getUserGroups(any(), eq(pageable))).thenReturn(mockPage);
 
-        Page<UserGroupInfo> result = userGroupV2Service.getUserGroups(null, productId, userId, pageable);
+        Page<UserGroup> result = userGroupV2Service.getUserGroups(null, productId, userId, pageable);
 
         assertEquals(mockPage, result);
         verify(userGroupConnectorMock, times(1)).getUserGroups(any(), eq(pageable));

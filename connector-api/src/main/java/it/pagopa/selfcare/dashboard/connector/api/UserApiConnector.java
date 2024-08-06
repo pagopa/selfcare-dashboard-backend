@@ -3,12 +3,8 @@ package it.pagopa.selfcare.dashboard.connector.api;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
-import it.pagopa.selfcare.dashboard.connector.model.user.User;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
 
 import java.util.Collection;
-
 import java.util.List;
 
 public interface UserApiConnector {
@@ -32,6 +28,8 @@ public interface UserApiConnector {
     void updateUser(String userId, String institutionId, UpdateUserRequestDto userDto);
 
     Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId);
+
+    UserInfo getUserByUserIdInstitutionIdAndProductAndStates(String userId, String institutionId, String productId, List<String> states);
 
     List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter);
 

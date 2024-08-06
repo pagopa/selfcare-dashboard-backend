@@ -7,6 +7,7 @@ import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import it.pagopa.selfcare.dashboard.core.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapper;
+import it.pagopa.selfcare.dashboard.web.model.mapper.GroupMapperV2;
 import it.pagopa.selfcare.dashboard.web.model.user_groups.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.UUID;
 public class UserGroupV2Controller {
 
     private final UserGroupV2Service groupService;
+    private final GroupMapperV2 groupMapperV2;
 
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -146,7 +148,7 @@ public class UserGroupV2Controller {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, pageable = {}", institutionId, productId, pageable);
         Page<UserGroupPlainResource> groups = PageMapper.map(groupService.getUserGroups(institutionId, productId, memberId, pageable)
-                .map(GroupMapper::toPlainGroupResource));
+                .map(groupMapperV2::toPlainUserGroupResource));
         log.debug("getUserGroups result = {}", groups);
         log.trace("getUserGroups end");
         return groups;

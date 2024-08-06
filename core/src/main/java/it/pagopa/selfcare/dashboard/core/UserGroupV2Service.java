@@ -2,11 +2,11 @@ package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
+import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface UserGroupV2Service {
@@ -28,5 +28,5 @@ public interface UserGroupV2Service {
 
     UserGroupInfo getUserGroupById(String groupId, String institutionId);
 
-    Page<UserGroupInfo> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable);
+    Page<UserGroup> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable);
 }

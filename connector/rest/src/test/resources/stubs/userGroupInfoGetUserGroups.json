@@ -6,16 +6,10 @@
   "name": "groupName",
   "status": "ACTIVE",
   "members": [
-    {
-      "id": "895b4af3-7fa7-4442-8a0d-a2b05c6c719f"
-    }
+    "895b4af3-7fa7-4442-8a0d-a2b05c6c719f"
   ],
   "createdAt": "2022-01-01T00:00:00Z",
-  "createdBy": {
-    "id": "creatorId"
-  },
+  "createdBy": "creatorId",
   "modifiedAt": "2022-01-01T00:00:00Z",
-  "modifiedBy": {
-    "id": "modifierId"
-  }
+  "modifiedBy": "modifierId"
 }

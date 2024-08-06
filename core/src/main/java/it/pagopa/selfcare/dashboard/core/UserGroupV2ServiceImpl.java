@@ -1,13 +1,9 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.api.UserApiConnector;
 import it.pagopa.selfcare.dashboard.connector.api.UserGroupConnector;
-import it.pagopa.selfcare.dashboard.connector.model.groups.CreateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UpdateUserGroup;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupFilter;
-import it.pagopa.selfcare.dashboard.connector.model.groups.UserGroupInfo;
+import it.pagopa.selfcare.dashboard.connector.model.groups.*;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInstitution;
@@ -17,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -27,15 +21,14 @@ import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.ACTIVE;
 import static it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState.SUSPENDED;
-import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.familyName;
+import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.name;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class UserGroupV2ServiceImpl implements UserGroupV2Service{
 
-
-    private static final EnumSet<User.Fields> MEMBER_FIELD_LIST = EnumSet.of(name, familyName, workContacts);
     private static final EnumSet<User.Fields> FIELD_LIST = EnumSet.of(name, familyName);
 
     private final UserGroupConnector groupConnector;
@@ -155,35 +148,22 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
         log.debug("getUserGroupById groupId = {}", groupId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         UserGroupInfo userGroupInfo = groupConnector.getUserGroupById(groupId);
+
         Optional.ofNullable(institutionId).ifPresent(value -> {
             if (!value.equalsIgnoreCase(userGroupInfo.getInstitutionId())) {
                 throw new InvalidUserGroupException("Could not find a UserGroup for given institutionId");
             }
         });
-        Comparator<UserInfo> userInfoComparator = Comparator.comparing(UserInfo::getId);
-        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
-        userInfoFilter.setProductId(userGroupInfo.getProductId());
-        userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
-        List<UserInfo> userInfos = retrieveIds(userGroupInfo.getInstitutionId(), userInfoFilter).stream()
-                .map(id -> {
-                    UserInfo userInfo = new UserInfo();
-                    userInfo.setId(id);
-                    return userInfo;
-                }).toList();
-        userGroupInfo.setMembers(userGroupInfo.getMembers().stream()
-                .map(userInfo -> {
-                    int index = Collections.binarySearch(userInfos, userInfo, userInfoComparator);
-                    if (index < 0) {
-                        log.error(String.format("Member with uuid %s has no relationship with institution id '%s' and product id '%s'",
-                                userInfo.getId(),
-                                userGroupInfo.getInstitutionId(),
-                                userGroupInfo.getProductId()));
-                        return null;
-                    }
-                    userInfos.get(index).setUser(userApiConnector.getUserById(userInfo.getId(), institutionId, MEMBER_FIELD_LIST.stream().map(Enum::name).toList()));
-                    return userInfos.get(index);
-                }).filter(Objects::nonNull)
-                .toList());
+
+        List<UserInfo> members = new ArrayList<>();
+
+        userGroupInfo.getMembers().forEach(user -> {
+            UserInfo member = userApiConnector.getUserByUserIdInstitutionIdAndProductAndStates(user.getId(), institutionId, userGroupInfo.getProductId(), List.of(ACTIVE.name(), SUSPENDED.name()));
+            members.add(member);
+        });
+
+        userGroupInfo.setMembers(members);
+
         User createdBy = userApiConnector.getUserById(userGroupInfo.getCreatedBy().getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
         userGroupInfo.setCreatedBy(createdBy);
         if (userGroupInfo.getModifiedBy() != null) {
@@ -196,14 +176,14 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service{
     }
 
     @Override
-    public Page<UserGroupInfo> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable) {
+    public Page<UserGroup> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable) {
         log.trace("getUserGroups start");
         log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
         UserGroupFilter userGroupFilter = new UserGroupFilter();
         userGroupFilter.setInstitutionId(Optional.ofNullable(institutionId));
         userGroupFilter.setUserId(Optional.ofNullable(userId));
         userGroupFilter.setProductId(Optional.ofNullable(productId));
-        Page<UserGroupInfo> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
+        Page<UserGroup> groupInfos = groupConnector.getUserGroups(userGroupFilter, pageable);
         log.debug("getUserGroups result = {}", groupInfos);
         log.trace("getUserGroups end");
 

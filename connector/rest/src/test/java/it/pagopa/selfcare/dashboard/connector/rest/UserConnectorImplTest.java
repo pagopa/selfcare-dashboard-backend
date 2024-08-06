@@ -14,8 +14,8 @@ import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClie
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActions;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -633,6 +633,82 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         // Then
         assertEquals(0, result.size());
+    }
+
+    @Test
+    void getUserByUserIdInstitutionIdAndProductAndStates() throws IOException{
+
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+        String productId = "productId";
+        List<String> statusFilter = List.of(ACTIVE.name(), SUSPENDED.name());
+
+
+        // Simulate response from API by reading from a JSON file
+        ClassPathResource resourceResponse = new ClassPathResource("stubs/UserDataResponse.json");
+        byte[] responseData = Files.readAllBytes(resourceResponse.getFile().toPath());
+        List<UserDataResponse> userDataResponseList = objectMapper.readValue(responseData, new TypeReference<>() {});
+
+        UserInfo expectedUserInfo = userMapper.toUserInfo(userDataResponseList.get(0));
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(
+                institutionId,
+                userId,
+                userId,
+                null,
+                List.of(productId),
+                null,
+                statusFilter))
+                .thenReturn(ResponseEntity.ok(userDataResponseList));
+
+        // when
+        UserInfo result = userConnector.getUserByUserIdInstitutionIdAndProductAndStates(userId, institutionId, productId, statusFilter);
+
+        // then
+        assertNotNull(result);
+        assertEquals(expectedUserInfo, result);
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(
+                institutionId,
+                userId,
+                userId,
+                null,
+                List.of(productId),
+                null,
+                statusFilter);
+    }
+
+    @Test
+    void getUserByUserIdInstitutionIdAndProductAndStates_throwsResourceNotFoundException() {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+        String productId = "productId";
+        List<String> statusFilter = List.of(ACTIVE.name(), SUSPENDED.name());
+
+        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(
+                institutionId,
+                userId,
+                userId,
+                null,
+                List.of(productId),
+                null,
+                statusFilter))
+                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
+
+        // when
+        Executable executable = () -> userConnector.getUserByUserIdInstitutionIdAndProductAndStates(userId, institutionId, productId, statusFilter);
+
+        // then
+        assertThrows(ResourceNotFoundException.class, executable);
+        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(
+                institutionId,
+                userId,
+                userId,
+                null,
+                List.of(productId),
+                null,
+                statusFilter);
     }
 
 }

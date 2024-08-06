@@ -219,7 +219,7 @@ class GroupMapperTest {
         productInfo.setRoleInfos(roleInfos);
         productInfoMap.put(productInfo.getId(), productInfo);
         userInfoModel.setProducts(productInfoMap);
-        userInfoModel.getUser().setWorkContacts(Map.of(userInfoModel.getInstitutionId(), mockInstance(new WorkContact())));
+        userInfoModel.getUser().setWorkContacts(Map.of(userInfoModel.getUserMailUuid(), mockInstance(new WorkContact())));
         model.setMembers(List.of(userInfoModel));
         User createdBy = mockInstance(new User(), "setId");
         createdBy.setId(randomUUID().toString());
@@ -236,7 +236,7 @@ class GroupMapperTest {
         assertEquals(model.getMembers().get(0).getId(), resource.getMembers().get(0).getId().toString());
         assertEquals(model.getMembers().get(0).getUser().getName().getValue(), resource.getMembers().get(0).getName());
         assertEquals(model.getMembers().get(0).getUser().getFamilyName().getValue(), resource.getMembers().get(0).getSurname());
-        assertEquals(model.getMembers().get(0).getUser().getWorkContacts().get(model.getInstitutionId()).getEmail().getValue(), resource.getMembers().get(0).getEmail());
+        assertEquals(model.getMembers().get(0).getUser().getWorkContacts().get(model.getMembers().get(0).getUserMailUuid()).getEmail().getValue(), resource.getMembers().get(0).getEmail());
         assertEquals(model.getMembers().get(0).getRole(), resource.getMembers().get(0).getRole());
         assertEquals(model.getMembers().get(0).getStatus(), resource.getMembers().get(0).getStatus());
     }
