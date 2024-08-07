@@ -133,7 +133,7 @@ app_settings = [
   },
   {
     name  = "ONBOARDING_URL"
-    value = "https://selc-p-onboarding-ms-ca"
+    value = "http://selc-p-onboarding-ms-ca"
   }
 ]
 

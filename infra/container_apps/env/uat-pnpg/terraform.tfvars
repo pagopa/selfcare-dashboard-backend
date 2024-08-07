@@ -122,7 +122,7 @@ app_settings = [
   },
   {
     name  = "ONBOARDING_URL"
-    value = "https://selc-u-pnpg-onboarding-ms-ca"
+    value = "http://selc-u-pnpg-onboarding-ms-ca"
   }
 ]
 
