@@ -19,8 +19,8 @@ public class OnboardingConnectorImpl implements OnboardingConnector {
     private final OnboardingRestClient onboardingRestClient;
 
     @Override
-    public Boolean getOnboardingWithFilter(String institutionId, String productId, String status) {
-        ResponseEntity<OnboardingGetResponse> response = onboardingRestClient._v1OnboardingGet(null, institutionId, null, null, productId, 1, status, null, null);
+    public Boolean getOnboardingWithFilter(String taxCode, String subunitCode, String productId, String status) {
+        ResponseEntity<OnboardingGetResponse> response = onboardingRestClient._v1OnboardingGet(null, null, null, null, productId, 1, status, subunitCode, taxCode, null);
         return checkOnboardingPresence(response);
     }
 

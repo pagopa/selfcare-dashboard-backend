@@ -193,26 +193,25 @@ public class InstitutionV2Controller {
 
     }
 
-    @GetMapping(value = "/{institutionId}/onboardings/{productId}/pending", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/onboardings/{productId}/pending", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionOnboardingPending}", nickname = "getInstitutionOnboardingPending")
     public ResponseEntity<Void> getInstitutionOnboardingPending(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                          @PathVariable("institutionId")
-                                                          String institutionId,
-                                                                             @PathVariable("productId")
-                                                             @ApiParam("${swagger.dashboard.products.model.id}")
-                                                             String productId) {
+                                                                @RequestParam(name = "taxCode") String taxCode,
+                                                                @RequestParam(name = "subunitCode", required = false) String subunitCode,
+                                                                @PathVariable("productId")
+                                                                @ApiParam("${swagger.dashboard.products.model.id}")
+                                                                String productId) {
 
         log.trace("getInstitutionOnboardingPending start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionOnboardingPending institutionId = {}, productId = {}", institutionId, productId);
-        Boolean result = institutionV2Service.verifyIfExistsPendingOnboarding(institutionId, productId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionOnboardingPending productId = {}", productId);
+        Boolean result = institutionV2Service.verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
         if (Boolean.FALSE.equals(result)) {
-            log.debug("Pending onboarding not found for institutionId = {} and productId = {}", institutionId, productId);
+            log.debug("Pending onboarding not found for and productId = {}", productId);
             log.trace("getInstitutionOnboardingPending end");
             return ResponseEntity.noContent().build();
-        }
-        else {
-            log.debug("Pending onboarding found for institutionId = {} and productId = {}", institutionId, productId);
+        } else {
+            log.debug("Pending onboarding found for and productId = {}", productId);
             log.trace("getInstitutionOnboardingPending end");
             return ResponseEntity.ok().build();
         }

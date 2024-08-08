@@ -243,53 +243,53 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     @Test
     void getPendingOnboarding_pendingFound() {
         // Given
-        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", PENDING.name()))
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution",null, "test-product", PENDING.name()))
                 .thenReturn(Boolean.TRUE);
 
         // When
-        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", "test-product");
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution",null,  "test-product");
 
         // Then
         assertTrue(actualResponse);
         Mockito.verify(onboardingConnectorMock, Mockito.times(1))
-                .getOnboardingWithFilter("test-institution", "test-product", PENDING.name());
+                .getOnboardingWithFilter("test-institution",null,  "test-product", PENDING.name());
     }
 
     @Test
     void getPendingOnboarding_pendingNotFound_tobeValidatedFound() {
         // Given
-        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", PENDING.name()))
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution",null,  "test-product", PENDING.name()))
                 .thenReturn(Boolean.FALSE);
-        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name()))
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution",null, "test-product", TOBEVALIDATED.name()))
                 .thenReturn(Boolean.TRUE);
 
         // When
-        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", "test-product");
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution",null,  "test-product");
 
         // Then
         assertTrue(actualResponse);
         Mockito.verify(onboardingConnectorMock, Mockito.times(1))
-                .getOnboardingWithFilter("test-institution", "test-product", PENDING.name());
+                .getOnboardingWithFilter("test-institution",null,  "test-product", PENDING.name());
         Mockito.verify(onboardingConnectorMock, Mockito.times(1))
-                .getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name());
+                .getOnboardingWithFilter("test-institution",null,  "test-product", TOBEVALIDATED.name());
     }
 
     @Test
     void getPendingOnboarding_neitherFound() {
         // Given
-        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", PENDING.name()))
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution",null,  "test-product", PENDING.name()))
                 .thenReturn(Boolean.FALSE);
-        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name()))
+        when(onboardingConnectorMock.getOnboardingWithFilter("test-institution",null,  "test-product", TOBEVALIDATED.name()))
                 .thenReturn(Boolean.FALSE);
 
         // When
-        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", "test-product");
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution",null,  "test-product");
 
         // Then
         assertFalse(actualResponse);
         Mockito.verify(onboardingConnectorMock, Mockito.times(1))
-                .getOnboardingWithFilter("test-institution", "test-product", PENDING.name());
+                .getOnboardingWithFilter("test-institution",null,  "test-product", PENDING.name());
         Mockito.verify(onboardingConnectorMock, Mockito.times(1))
-                .getOnboardingWithFilter("test-institution", "test-product", TOBEVALIDATED.name());
+                .getOnboardingWithFilter("test-institution",null,  "test-product", TOBEVALIDATED.name());
     }
 }
