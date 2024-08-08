@@ -358,25 +358,26 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     }
 
     /**
-     * Method under test: {@link InstitutionV2Controller#getInstitutionOnboardingPending(String, String)}
+     * Method under test: {@link InstitutionV2Controller#getInstitutionOnboardingPending(String,String, String)}
      */
     @Test
     void getInstitutionOnboarding204() throws Exception {
         //given
-        final String institutionId = "institutionId";
+        final String taxCode = "taxCode";
         final String productId = "productId";
 
-        doReturn(Boolean.FALSE).when(institutionV2ServiceMock).verifyIfExistsPendingOnboarding(institutionId, productId);
+        doReturn(Boolean.FALSE).when(institutionV2ServiceMock).verifyIfExistsPendingOnboarding(taxCode, null, productId);
         //when
         mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/onboardings/{productId}/pending", institutionId, productId)
+                        .get(BASE_URL + "/onboardings/{productId}/pending",  productId)
+                        .queryParam("taxCode", taxCode)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isNoContent())
                 .andReturn();
         //then
         verify(institutionV2ServiceMock, times(1))
-                .verifyIfExistsPendingOnboarding(institutionId, productId);
+                .verifyIfExistsPendingOnboarding(taxCode, null, productId);
         verifyNoMoreInteractions(institutionV2ServiceMock);
 
     }
@@ -384,20 +385,23 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     @Test
     void getInstitutionOnboarding200() throws Exception {
         //given
-        final String institutionId = "institutionId";
+        final String taxCode = "taxCode";
+        final String subunitCode = "subunitCode";
         final String productId = "productId";
 
-        doReturn(Boolean.TRUE).when(institutionV2ServiceMock).verifyIfExistsPendingOnboarding(institutionId, productId);
+        doReturn(Boolean.TRUE).when(institutionV2ServiceMock).verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
         //when
         mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{institutionId}/onboardings/{productId}/pending", institutionId, productId)
+                        .get(BASE_URL + "/onboardings/{productId}/pending", productId)
+                        .queryParam("taxCode", taxCode)
+                        .queryParam("subunitCode", subunitCode)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andReturn();
         //then
         verify(institutionV2ServiceMock, times(1))
-                .verifyIfExistsPendingOnboarding(institutionId, productId);
+                .verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
         verifyNoMoreInteractions(institutionV2ServiceMock);
 
     }

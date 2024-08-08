@@ -35,7 +35,7 @@ class OnboardingConnectorImplTest  extends BaseConnectorTest {
 
     @Test
     void getOnboardingWithFilterOk() throws IOException {
-        String institutionId = "institutionId";
+        String taxCode = "taxCode";
         String productId = "productId";
         String status = "status";
 
@@ -47,15 +47,16 @@ class OnboardingConnectorImplTest  extends BaseConnectorTest {
 
         doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)))
                 .when(onboardingRestClient)
-                ._v1OnboardingGet(null, institutionId, null, null, productId, 1, status, null, null);
+                ._v1OnboardingGet(null, null, null, null, productId, 1, status, null, taxCode, null);
 
-        Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(institutionId, productId, status);
+        Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(taxCode, null, productId, status);
         Assertions.assertTrue(onboardingGetInfo);
     }
 
     @Test
     void getOnboardingWithFilterEmpty() throws IOException {
-        String institutionId = "institutionId";
+        String taxCode = "taxCode";
+        String subunitCode = "subunitCode";
         String productId = "productId";
         String status = "status";
 
@@ -65,9 +66,9 @@ class OnboardingConnectorImplTest  extends BaseConnectorTest {
         OnboardingGetResponse onboardingGetResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse))).when(onboardingRestClient)._v1OnboardingGet(null, institutionId, null, null, productId, 1, status, null, null);
+        doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse))).when(onboardingRestClient)._v1OnboardingGet(null, null, null, null, productId, 1, status, subunitCode,  taxCode, null);
 
-        Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(institutionId, productId, status);
+        Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(taxCode, subunitCode, productId, status);
 
         assertFalse(onboardingGetInfo);
     }

@@ -112,10 +112,10 @@ class InstitutionV2ServiceImpl implements InstitutionV2Service {
     }
 
     @Override
-    public Boolean verifyIfExistsPendingOnboarding(String institutionId, String productId) {
-        Boolean response = onboardingConnector.getOnboardingWithFilter(institutionId, productId, PENDING.name());
+    public Boolean verifyIfExistsPendingOnboarding(String taxCode, String subunitCode, String productId) {
+        Boolean response = onboardingConnector.getOnboardingWithFilter(taxCode, subunitCode,  productId, PENDING.name());
         if (Boolean.FALSE.equals(response)) {
-            response = onboardingConnector.getOnboardingWithFilter(institutionId, productId, TOBEVALIDATED.name());
+            response = onboardingConnector.getOnboardingWithFilter(taxCode, subunitCode, productId, TOBEVALIDATED.name());
         }
         return response;
     }
