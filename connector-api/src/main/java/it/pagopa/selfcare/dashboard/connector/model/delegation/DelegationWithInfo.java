@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.model.delegation;
 
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
@@ -19,7 +19,7 @@ public class DelegationWithInfo {
     private DelegationType type;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private InstitutionType institutionType;
+    private String institutionType;
     private String status;
     private String taxCode;
 }

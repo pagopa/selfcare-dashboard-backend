@@ -3,7 +3,8 @@ package it.pagopa.selfcare.dashboard.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.dashboard.connector.exception.BadGatewayException;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import it.pagopa.selfcare.dashboard.connector.model.backoffice.BrokerInfo;
 
 import it.pagopa.selfcare.dashboard.core.BrokerService;
@@ -65,15 +66,14 @@ public class ProductController {
                                                         String productId,
                                                         @ApiParam("${swagger.dashboard.products.model.institutionType}")
                                                         @PathVariable("institutionType")
-                                                        InstitutionType institutionType) {
+                                                        String institutionType) {
         log.trace("getProductBrokers start");
         log.debug("productId = {}, institutionType = {}", productId, institutionType);
-        List<BrokerInfo> brokers;
-        if(PAGO_PA_PRODUCT_ID.equals(productId)) {
-            brokers = brokerService.findAllByInstitutionType(institutionType.name());
-        } else {
-            brokers = brokerService.findInstitutionsByProductAndType(productId, institutionType.name());
-        }
+
+        List<BrokerInfo> brokers = PAGO_PA_PRODUCT_ID.equals(productId)
+            ?  brokerService.findAllByInstitutionType(InstitutionType.valueOf(institutionType).name())
+            : brokerService.findInstitutionsByProductAndType(productId, institutionType);
+
         Collection<BrokerResource>  result = brokerResourceMapper.toResourceList(brokers);
         log.debug("getProductBrokers result = {}", result);
         log.trace("getProductBrokers end");

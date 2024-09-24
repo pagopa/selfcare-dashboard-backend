@@ -147,19 +147,4 @@ class ProductControllerTest extends BaseControllerTest {
         verifyNoMoreInteractions(brokerServiceMock);
     }
 
-
-    @Test
-    void getProductBrokersForUnsupportedType() throws Exception {
-        String productId = "prod-pagopa";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{productId}/brokers/{institutionType}", productId, "TEST")
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        // then
-        assertEquals(400, result.getResponse().getStatus());
-        Mockito.verifyNoInteractions(brokerServiceMock);
-    }
-
 }
