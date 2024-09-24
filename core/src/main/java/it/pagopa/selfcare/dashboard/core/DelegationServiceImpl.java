@@ -49,7 +49,7 @@ class DelegationServiceImpl implements DelegationService {
     private void setToInstitutionId(DelegationRequest delegation) {
         List<Institution> institutions = msCoreConnector.getInstitutionsFromTaxCode(delegation.getTo(), null, null, null);
         Institution partner = institutions.stream()
-                .filter(institution -> institution.getInstitutionType() == InstitutionType.PT)
+                .filter(institution -> InstitutionType.PT.name().equals(institution.getInstitutionType()))
                 .findFirst()
                 .orElse(institutions.stream().findFirst()
                         .orElseThrow(() -> new ResourceNotFoundException(
