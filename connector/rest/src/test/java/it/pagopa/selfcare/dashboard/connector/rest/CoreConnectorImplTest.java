@@ -35,7 +35,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import javax.validation.ValidationException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ import java.util.function.Function;
 
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
 import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
-import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE;
 import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -140,7 +138,6 @@ class CoreConnectorImplTest extends BaseConnectorTest{
     @Test
     void getInstitutionsFromTaxCode() throws IOException {
         // given
-        String institutionId = "institutionId";
         ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         InstitutionResponse institutionMock = objectMapper.readValue(resourceStream, new TypeReference<>() {
@@ -526,54 +523,5 @@ class CoreConnectorImplTest extends BaseConnectorTest{
         assertNull(filter.getUserId());
         assertNull(filter.getRole());
         assertNull(filter.getAllowedStates());
-    }
-
-    @Test
-    void getGeographicTaxonomyList_nullInstitutionId() {
-        // when
-        Executable executable = () -> msCoreConnector.getGeographicTaxonomyList(null);
-        // then
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("An Institution id is required", e.getMessage());
-        verifyNoInteractions(coreInstitutionApiRestClient);
-    }
-
-
-    @Test
-    void getGeographicTaxonomyList_noGeographicTaxonomies() {
-        // given
-        String institutionId = "institutionId";
-        InstitutionResponse institutionMock = mockInstance(new InstitutionResponse());
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId))
-                .thenReturn(ResponseEntity.ok(institutionMock));
-        // when
-        Executable executable = () -> msCoreConnector.getGeographicTaxonomyList(institutionId);
-        // then
-        ValidationException e = assertThrows(ValidationException.class, executable);
-        assertEquals(String.format("The institution %s does not have geographic taxonomies.", institutionId), e.getMessage());
-        verify(coreInstitutionApiRestClient, times(1))
-                ._retrieveInstitutionByIdUsingGET(institutionId);
-        verifyNoMoreInteractions(coreInstitutionApiRestClient);
-    }
-
-
-    @Test
-    void getGeographicTaxonomyList() {
-        // given
-        String institutionId = "institutionId";
-        InstitutionResponse institutionMock = new InstitutionResponse();
-        AttributesResponse attribute = new AttributesResponse();
-        institutionMock.setGeographicTaxonomies(List.of(new GeoTaxonomies()));
-        institutionMock.setAttributes(List.of(attribute));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId))
-                .thenReturn(ResponseEntity.ok(institutionMock));
-        // when
-        List<GeographicTaxonomy> geographicTaxonomies = msCoreConnector.getGeographicTaxonomyList(institutionId);
-        // then
-        assertSame(institutionMock.getGeographicTaxonomies().size(), geographicTaxonomies.size());
-        assertNotNull(geographicTaxonomies);
-        verify(coreInstitutionApiRestClient, times(1))
-                ._retrieveInstitutionByIdUsingGET(institutionId);
-        verifyNoMoreInteractions(coreInstitutionApiRestClient);
     }
 }

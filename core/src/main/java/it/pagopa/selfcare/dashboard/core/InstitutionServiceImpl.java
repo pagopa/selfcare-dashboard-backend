@@ -62,17 +62,6 @@ class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
-        log.trace("getGeographicTaxonomyList start");
-        log.debug("getGeographicTaxonomyList externalInstitutionId = {}", institutionId);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        List<GeographicTaxonomy> result = msCoreConnector.getGeographicTaxonomyList(institutionId);
-        log.debug("getGeographicTaxonomyList result = {}", result);
-        log.trace("getGeographicTaxonomyList end");
-        return result;
-    }
-
-    @Override
     public List<ProductTree> getProductsTree(){
         log.trace("getProductsTree start");
         List<ProductTree> productTrees = productsConnector.getProductsTree();

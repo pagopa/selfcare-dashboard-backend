@@ -191,26 +191,6 @@ class CoreConnectorImpl implements MsCoreConnector {
 
     @Override
     @Retry(name = "retryTimeout")
-    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
-        log.trace("getGeographicTaxonomyList start");
-        log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        InstitutionResponse institution = coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody();
-        List<GeographicTaxonomy> result = Collections.emptyList();
-        if (institution != null && !CollectionUtils.isEmpty(institution.getGeographicTaxonomies())) {
-            result = institutionMapper.toGeographicTaxonomy(institution.getGeographicTaxonomies());
-        }
-        if (CollectionUtils.isEmpty(result)) {
-            throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionId));
-        }
-
-        log.debug("getGeographicTaxonomyList result = {}", result);
-        log.trace("getGeographicTaxonomyList end");
-        return result;
-    }
-
-    @Override
-    @Retry(name = "retryTimeout")
     public List<PartyProduct> getInstitutionProducts(String institutionId) {
         log.trace("getInstitutionProducts start");
         log.debug("getInstitutionProducts institutionId = {}", institutionId);

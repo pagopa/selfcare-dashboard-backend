@@ -108,29 +108,6 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
     }
 
     @Test
-    void getGeographicTaxonomyList() {
-
-        String institutionId = "institutionId";
-        GeographicTaxonomy geographicTaxonomy = new GeographicTaxonomy();
-        geographicTaxonomy.setCode("testCode1");
-        geographicTaxonomy.setDesc("testDesc1");
-
-        List<GeographicTaxonomy> geographicTaxonomies = List.of(geographicTaxonomy);
-
-        when(msCoreConnectorMock.getGeographicTaxonomyList(institutionId)).thenReturn(geographicTaxonomies);
-
-        List<GeographicTaxonomy> result = institutionService.getGeographicTaxonomyList(institutionId);
-        Assertions.assertEquals(geographicTaxonomies, result);
-        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getGeographicTaxonomyList(institutionId);
-    }
-
-    @Test
-    void getGeographicTaxonomyListWithoutInstitutionId() {
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.getGeographicTaxonomyList(null));
-    }
-
-    @Test
     void getProductsTree() throws IOException {
 
         ClassPathResource resource = new ClassPathResource("expectations/ProductTree.json");
@@ -227,7 +204,7 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
-        Institution result = institutionService.findInstitutionById(institutionId);
+        institutionService.findInstitutionById(institutionId);
         Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 
@@ -248,7 +225,7 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
-        Institution result = institutionService.findInstitutionById(institutionId);
+        institutionService.findInstitutionById(institutionId);
         Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 
