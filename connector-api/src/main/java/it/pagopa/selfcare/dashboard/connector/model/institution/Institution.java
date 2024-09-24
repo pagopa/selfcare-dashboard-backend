@@ -19,7 +19,7 @@ public class Institution {
     private String zipCode;
     private String taxCode;
     private String origin;
-    private InstitutionType institutionType;
+    private String institutionType;
     private List<Attribute> attributes;
     private List<GeographicTaxonomy> geographicTaxonomies;
     private String category;
