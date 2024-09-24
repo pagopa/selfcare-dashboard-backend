@@ -41,7 +41,7 @@ public class UserGroupV2Controller {
     public UserGroupIdResource createUserGroup(@RequestBody @Valid CreateUserGroupDto group) {
         log.trace("createGroup start");
         log.debug("createGroup group = {}", group);
-        CreateUserGroup userGroup = GroupMapper.fromDto(group);
+        CreateUserGroup userGroup = groupMapperV2.fromDto(group);
         String groupId = groupService.createUserGroup(userGroup);
         UserGroupIdResource result = GroupMapper.toIdResource(groupId);
         log.debug("createGroup result = {}", result);
@@ -98,7 +98,7 @@ public class UserGroupV2Controller {
                                 @RequestBody @Valid UpdateUserGroupDto groupDto) {
         log.trace("updateUserGroup start");
         log.debug("updateUserGroup id = {}, groupDto = {}", id, groupDto);
-        groupService.updateUserGroup(id, GroupMapper.fromDto(groupDto));
+        groupService.updateUserGroup(id, groupMapperV2.fromDto(groupDto));
         log.debug("updateUserGroup result = {}", id);
         log.trace("updateUserGroup end");
     }
