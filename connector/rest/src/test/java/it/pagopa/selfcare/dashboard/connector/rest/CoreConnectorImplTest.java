@@ -314,7 +314,7 @@ class CoreConnectorImplTest extends BaseConnectorTest{
         verifyNoMoreInteractions(coreDelegationApiRestClient);
     }
     @Test
-    void getDelegationUsingFrom_shouldGetEmptyData() throws IOException {
+    void getDelegationUsingFrom_shouldGetEmptyData() {
         // given
         GetDelegationParameters parameters = GetDelegationParameters.builder()
                 .productId("setProductId")

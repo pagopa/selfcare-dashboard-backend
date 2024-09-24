@@ -97,7 +97,13 @@ public class InstitutionController {
         return result;
     }
 
-    @Deprecated
+    /**
+     *
+     * @param institutionId
+     * @param geographicTaxonomyListDto
+     * @deprecated
+     */
+    @Deprecated(forRemoval = true)
     @PutMapping(value = "/{institutionId}/geographicTaxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")

@@ -32,7 +32,7 @@ import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class InstitutionServiceImplTest extends BaseServiceTest {
+class InstitutionServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private InstitutionServiceImpl institutionService;
@@ -41,6 +41,7 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
     @Mock
     private ProductsConnector productsConnectorMock;
 
+    @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
