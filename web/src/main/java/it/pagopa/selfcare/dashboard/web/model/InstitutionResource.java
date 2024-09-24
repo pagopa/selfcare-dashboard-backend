@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.web.model;
 
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class InstitutionResource {
     private String origin;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}")
-    private InstitutionType institutionType;
+    private String institutionType;
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}")
     private String name;

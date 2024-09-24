@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
