@@ -1455,8 +1455,7 @@
           "required" : true,
           "style" : "simple",
           "schema" : {
-            "type" : "string",
-            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -3565,8 +3564,7 @@
             "type" : "string"
           },
           "institutionType" : {
-            "type" : "string",
-            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
+            "type" : "string"
           },
           "productId" : {
             "type" : "string"
@@ -3724,8 +3722,7 @@
             "type" : "string"
           },
           "institutionType" : {
-            "type" : "string",
-            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
+            "type" : "string"
           },
           "onboarding" : {
             "type" : "array",
@@ -3842,8 +3839,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "description" : "Institution's type",
-            "enum" : [ "AS", "CON", "GSP", "PA", "PG", "PSP", "PT", "REC", "SA", "SCP" ]
+            "description" : "Institution's type"
           },
           "mailAddress" : {
             "type" : "string",
