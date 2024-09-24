@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.web.config;
 
 import com.fasterxml.classmate.TypeResolver;
 import it.pagopa.selfcare.commons.web.model.Problem;
+import it.pagopa.selfcare.commons.web.security.JwtAuthenticationToken;
 import it.pagopa.selfcare.commons.web.swagger.BaseSwaggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -74,6 +75,7 @@ class SwaggerConfig {
                 .directModelSubstitute(LocalTime.class, String.class)
                 .ignoredParameterTypes(Pageable.class)
                 .ignoredParameterTypes(Authentication.class)
+                .ignoredParameterTypes(JwtAuthenticationToken.class)
                 .forCodeGeneration(true)
                 .useDefaultResponseMessages(false)
                 .globalResponses(HttpMethod.GET, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE, NOT_FOUND_RESPONSE))

@@ -1774,38 +1774,6 @@
         "description" : "Service to create a 'Billing Token' based on a Self Care session token",
         "operationId" : "billingTokenUsingGET",
         "parameters" : [ {
-          "name" : "authenticated",
-          "in" : "query",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "boolean"
-          }
-        }, {
-          "name" : "authorities[0].authority",
-          "in" : "query",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "credentials",
-          "in" : "query",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "details",
-          "in" : "query",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "object"
-          }
-        }, {
           "name" : "institutionId",
           "in" : "query",
           "description" : "Institution's unique internal identifier",
@@ -1813,22 +1781,6 @@
           "style" : "form",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "name",
-          "in" : "query",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "principal",
-          "in" : "query",
-          "required" : false,
-          "style" : "form",
-          "schema" : {
-            "type" : "object"
           }
         }, {
           "name" : "environment",
