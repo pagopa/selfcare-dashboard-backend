@@ -131,7 +131,7 @@ public class InstitutionController {
                                                     @Valid
                                                     GeographicTaxonomyListDto geographicTaxonomyListDto) {
         log.trace("updateInstitutionGeographicTaxonomy start");
-        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomyListDto);
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", Encode.forJava(institutionId), Encode.forJava(geographicTaxonomyListDto.toString()));
         GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
         geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
         institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
