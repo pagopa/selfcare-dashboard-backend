@@ -325,6 +325,71 @@
         } ]
       }
     },
+    "/v1/institutions/{institutionId}/geographic-taxonomy" : {
+      "put" : {
+        "tags" : [ "institutions" ],
+        "summary" : "updateInstitutionGeographicTaxonomy",
+        "description" : "Service to update the geographic taxonomy of an onboarded institution",
+        "operationId" : "updateInstitutionGeographicTaxonomyUsingPUT",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/GeographicTaxonomyListDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/v1/institutions/{institutionId}/geographicTaxonomy" : {
       "get" : {
         "tags" : [ "institutions" ],
@@ -402,9 +467,9 @@
       },
       "put" : {
         "tags" : [ "institutions" ],
-        "summary" : "updateInstitutionGeographicTaxonomy",
+        "summary" : "updateInstitutionGeographicTaxonomyDeprecated",
         "description" : "Service to update the geographic taxonomy of an onboarded institution",
-        "operationId" : "updateInstitutionGeographicTaxonomyUsingPUT",
+        "operationId" : "updateInstitutionGeographicTaxonomyDeprecatedUsingPUT",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
@@ -459,6 +524,7 @@
             }
           }
         },
+        "deprecated" : true,
         "security" : [ {
           "bearerAuth" : [ "global" ]
         } ]
