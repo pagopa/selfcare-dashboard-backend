@@ -103,6 +103,9 @@ public class UserConnectorImpl implements UserApiConnector {
 
         if(Objects.nonNull(userInstitutionWithActions) && !CollectionUtils.isEmpty(userInstitutionWithActions.getProducts())) {
             result = userInstitutionWithActions.getProducts().stream()
+                    .filter(onboardedProductWithActions -> !StringUtils.hasText(productId)
+                            || onboardedProductWithActions.getProductId().equalsIgnoreCase(productId))
+                    .filter(onboardedProductWithActions -> !CollectionUtils.isEmpty(onboardedProductWithActions.getUserProductActions()))
                     .anyMatch(onboardedProductWithActions -> onboardedProductWithActions.getUserProductActions().contains(action));
         }
 

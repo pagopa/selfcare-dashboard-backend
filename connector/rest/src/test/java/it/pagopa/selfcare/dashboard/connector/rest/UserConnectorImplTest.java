@@ -256,11 +256,12 @@ class UserConnectorImplTest extends BaseConnectorTest {
     }
 
     @Test
-    void hasPermissionTrue() {
+    void hasPermissionTrueWithProduct() {
         UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
         OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
         onboardedProductWithActions.setUserProductActions(List.of("Selc:ViewBilling"));
         userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+        onboardedProductWithActions.setProductId("productId");
 
         //given
         String institutionId = "institutionId";
@@ -277,11 +278,99 @@ class UserConnectorImplTest extends BaseConnectorTest {
     }
 
     @Test
+    void hasPermissionTrueWithDifferentProduct() {
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+        OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
+        onboardedProductWithActions.setUserProductActions(List.of("Selc:ViewBilling"));
+        userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+        onboardedProductWithActions.setProductId("productId2");
+
+        //given
+        String institutionId = "institutionId";
+        String action = "Selc:ViewBilling";
+        String productId = "productId";
+        String userId = "userId";
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+                .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
+        //then
+        assertNotNull(result);
+        assertEquals(false, result);
+    }
+
+    @Test
+    void hasPermissionTrueWithoutProduct() {
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+        OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
+        onboardedProductWithActions.setUserProductActions(List.of("Selc:ViewBilling"));
+        onboardedProductWithActions.setProductId("productId");
+        userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+
+        //given
+        String institutionId = "institutionId";
+        String action = "Selc:ViewBilling";
+        String userId = "userId";
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, null))
+                .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(userId, institutionId, null, action);
+        //then
+        assertNotNull(result);
+        assertEquals(true, result);
+    }
+
+    @Test
     void hasPermissionFalse() {
         UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
         OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
         onboardedProductWithActions.setUserProductActions(List.of("Selc:UpdateUser"));
+        onboardedProductWithActions.setProductId("productId");
         userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+        //given
+        String institutionId = "institutionId";
+        String action = "Selc:ViewBilling";
+        String productId = "productId";
+        String userId = "userId";
+
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+                .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
+        //then
+        assertNotNull(result);
+        assertEquals(false, result);
+    }
+
+    @Test
+    void hasPermissionWithNullActionFalse() {
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+        OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
+        onboardedProductWithActions.setProductId("productId");
+        userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+        //given
+        String institutionId = "institutionId";
+        String action = "Selc:ViewBilling";
+        String productId = "productId";
+        String userId = "userId";
+
+        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+                .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
+        //when
+        Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
+        //then
+        assertNotNull(result);
+        assertEquals(false, result);
+    }
+
+    @Test
+    void hasPermissionWithEmptyActionFalse() {
+        UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
+        OnboardedProductWithActions onboardedProductWithActions = new OnboardedProductWithActions();
+        onboardedProductWithActions.setUserProductActions(Collections.emptyList());
+        onboardedProductWithActions.setProductId("productId");
+        userInstitutionWithActions.setProducts(List.of(onboardedProductWithActions));
+
         //given
         String institutionId = "institutionId";
         String action = "Selc:ViewBilling";
