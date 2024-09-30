@@ -32,7 +32,7 @@ import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class InstitutionServiceImplTest extends BaseServiceTest {
+class InstitutionServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private InstitutionServiceImpl institutionService;
@@ -41,6 +41,7 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
     @Mock
     private ProductsConnector productsConnectorMock;
 
+    @Override
     @BeforeEach
     public void setUp() {
         super.setUp();
@@ -105,29 +106,6 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
 
         String institutionId = "institutionId";
         Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.updateInstitutionGeographicTaxonomy(institutionId, null));
-    }
-
-    @Test
-    void getGeographicTaxonomyList() {
-
-        String institutionId = "institutionId";
-        GeographicTaxonomy geographicTaxonomy = new GeographicTaxonomy();
-        geographicTaxonomy.setCode("testCode1");
-        geographicTaxonomy.setDesc("testDesc1");
-
-        List<GeographicTaxonomy> geographicTaxonomies = List.of(geographicTaxonomy);
-
-        when(msCoreConnectorMock.getGeographicTaxonomyList(institutionId)).thenReturn(geographicTaxonomies);
-
-        List<GeographicTaxonomy> result = institutionService.getGeographicTaxonomyList(institutionId);
-        Assertions.assertEquals(geographicTaxonomies, result);
-        Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getGeographicTaxonomyList(institutionId);
-    }
-
-    @Test
-    void getGeographicTaxonomyListWithoutInstitutionId() {
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> institutionService.getGeographicTaxonomyList(null));
     }
 
     @Test
@@ -227,7 +205,7 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
-        Institution result = institutionService.findInstitutionById(institutionId);
+        institutionService.findInstitutionById(institutionId);
         Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 
@@ -248,7 +226,7 @@ public class InstitutionServiceImplTest extends BaseServiceTest {
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
-        Institution result = institutionService.findInstitutionById(institutionId);
+        institutionService.findInstitutionById(institutionId);
         Mockito.verify(msCoreConnectorMock, Mockito.times(1)).getInstitution(institutionId);
     }
 

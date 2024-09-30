@@ -2,12 +2,14 @@ package it.pagopa.selfcare.dashboard.web.config;
 
 import com.fasterxml.classmate.TypeResolver;
 import it.pagopa.selfcare.commons.web.model.Problem;
+import it.pagopa.selfcare.commons.web.security.JwtAuthenticationToken;
 import it.pagopa.selfcare.commons.web.swagger.BaseSwaggerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.Authentication;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.AuthorizationScope;
@@ -72,6 +74,8 @@ class SwaggerConfig {
                         new Tag("onboarding", environment.getProperty("swagger.dashboard.onboarding.api.description")))
                 .directModelSubstitute(LocalTime.class, String.class)
                 .ignoredParameterTypes(Pageable.class)
+                .ignoredParameterTypes(Authentication.class)
+                .ignoredParameterTypes(JwtAuthenticationToken.class)
                 .forCodeGeneration(true)
                 .useDefaultResponseMessages(false)
                 .globalResponses(HttpMethod.GET, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE, NOT_FOUND_RESPONSE))

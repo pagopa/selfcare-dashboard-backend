@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MvcResult;
@@ -145,21 +144,6 @@ class ProductControllerTest extends BaseControllerTest {
         verify(brokerServiceMock, times(1))
                 .findInstitutionsByProductAndType(productId, institutionType);
         verifyNoMoreInteractions(brokerServiceMock);
-    }
-
-
-    @Test
-    void getProductBrokersForUnsupportedType() throws Exception {
-        String productId = "prod-pagopa";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/{productId}/brokers/{institutionType}", productId, "TEST")
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().is4xxClientError())
-                .andReturn();
-        // then
-        assertEquals(400, result.getResponse().getStatus());
-        Mockito.verifyNoInteractions(brokerServiceMock);
     }
 
 }

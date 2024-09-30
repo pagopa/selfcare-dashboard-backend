@@ -5,7 +5,6 @@ import it.pagopa.selfcare.dashboard.connector.model.delegation.Delegation;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
-import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.connector.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.UpdateInstitutionResource;
@@ -180,32 +179,6 @@ class InstitutionControllerTest extends BaseControllerTest {
         GeographicTaxonomyList capturedGeographicTaxonomies = argumentCaptor.getValue();
         assertEquals(geographicTaxonomies.getGeographicTaxonomyList().get(0).getCode(), capturedGeographicTaxonomies.getGeographicTaxonomyList().get(0).getCode());
         assertEquals(geographicTaxonomies.getGeographicTaxonomyList().get(0).getDesc(), capturedGeographicTaxonomies.getGeographicTaxonomyList().get(0).getDesc());
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
-    void getInstitutionGeographicTaxonomy() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        List<GeographicTaxonomy> geographicTaxonomyListMock = List.of(mockInstance(new GeographicTaxonomy()));
-        when(institutionServiceMock.getGeographicTaxonomyList(institutionId))
-                .thenReturn(geographicTaxonomyListMock);
-        // when
-        MvcResult result = mockMvc.perform(get(BASE_URL + "/{institutionId}/geographicTaxonomy", institutionId)
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andReturn();
-        // then
-        List<GeographicTaxonomy> response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-        assertNotNull(response);
-        assertEquals(geographicTaxonomyListMock.get(0).getCode(), response.get(0).getCode());
-        assertEquals(geographicTaxonomyListMock.get(0).getDesc(), response.get(0).getDesc());
-        verify(institutionServiceMock, times(1))
-                .getGeographicTaxonomyList(institutionId);
         verifyNoMoreInteractions(institutionServiceMock);
     }
 

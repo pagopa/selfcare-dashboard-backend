@@ -23,6 +23,7 @@ import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.ProductsMapper;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -96,7 +97,35 @@ public class InstitutionController {
         return result;
     }
 
+    /**
+     *
+     * @param institutionId
+     * @param geographicTaxonomyListDto
+     * @deprecated
+     */
+    @Deprecated(forRemoval = true)
     @PutMapping(value = "/{institutionId}/geographicTaxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
+    public void updateInstitutionGeographicTaxonomyDeprecated(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                    @PathVariable("institutionId")
+                                                    String institutionId,
+                                                    @ApiParam("${swagger.dashboard.institutions.model.geographicTaxonomy}")
+                                                    @RequestBody
+                                                    @Valid
+                                                    GeographicTaxonomyListDto geographicTaxonomyListDto) {
+        log.trace("updateInstitutionGeographicTaxonomy start");
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", Encode.forJava(institutionId), Encode.forJava(geographicTaxonomyListDto.toString()));
+        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
+        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
+        institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
+        log.trace("updateInstitutionsGeographicTaxonomy end");
+    }
+
+
+
+    @PutMapping(value = "/{institutionId}/geographic-taxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
@@ -108,28 +137,11 @@ public class InstitutionController {
                                                     @Valid
                                                     GeographicTaxonomyListDto geographicTaxonomyListDto) {
         log.trace("updateInstitutionGeographicTaxonomy start");
-        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", institutionId, geographicTaxonomyListDto);
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", Encode.forJava(institutionId), Encode.forJava(geographicTaxonomyListDto.toString()));
         GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
         geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
         institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
         log.trace("updateInstitutionsGeographicTaxonomy end");
-    }
-
-    @GetMapping(value = "/{institutionId}/geographicTaxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionGeographicTaxonomy}")
-    public List<GeographicTaxonomyResource> getInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                                             @PathVariable("institutionId")
-                                                                             String institutionId) {
-        log.trace("getInstitutionGeographicTaxonomy start");
-        log.debug("getInstitutionGeographicTaxonomy institutionId = {}", institutionId);
-        List<GeographicTaxonomyResource> geographicTaxonomies = institutionService.getGeographicTaxonomyList(institutionId)
-                .stream()
-                .map(GeographicTaxonomyMapper::toResource)
-                .toList();
-        log.debug("getInstitutionGeographicTaxonomy result = {}", geographicTaxonomies);
-        log.trace("getInstitutionGeographicTaxonomy end");
-        return geographicTaxonomies;
     }
 
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)

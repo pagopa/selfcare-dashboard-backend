@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.core;
 
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import it.pagopa.selfcare.dashboard.connector.api.MsCoreConnector;
 import it.pagopa.selfcare.dashboard.connector.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
@@ -49,7 +49,7 @@ class DelegationServiceImpl implements DelegationService {
     private void setToInstitutionId(DelegationRequest delegation) {
         List<Institution> institutions = msCoreConnector.getInstitutionsFromTaxCode(delegation.getTo(), null, null, null);
         Institution partner = institutions.stream()
-                .filter(institution -> institution.getInstitutionType() == InstitutionType.PT)
+                .filter(institution -> InstitutionType.PT.name().equals(institution.getInstitutionType()))
                 .findFirst()
                 .orElse(institutions.stream().findFirst()
                         .orElseThrow(() -> new ResourceNotFoundException(

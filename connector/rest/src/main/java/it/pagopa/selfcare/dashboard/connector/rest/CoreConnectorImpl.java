@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -180,33 +181,13 @@ class CoreConnectorImpl implements MsCoreConnector {
     @Override
     public void updateInstitutionGeographicTaxonomy(String institutionId, GeographicTaxonomyList geographicTaxonomies) {
         log.trace("updateInstitutionGeographicTaxonomy start");
-        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geograpihc taxonomies = {}", institutionId, geographicTaxonomies);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
         Assert.notNull(geographicTaxonomies, REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE);
+        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geograpihc taxonomies = {}", Encode.forJava(institutionId), Encode.forJava(geographicTaxonomies.toString()));
         InstitutionPut geographicTaxonomiesRequest = new InstitutionPut();
         geographicTaxonomiesRequest.setGeographicTaxonomyCodes(geographicTaxonomies.getGeographicTaxonomyList().stream().map(GeographicTaxonomy::getCode).toList());
         coreInstitutionApiRestClient._updateInstitutionUsingPUT(institutionId, geographicTaxonomiesRequest);
         log.trace("updateInstitutionGeographicTaxonomy end");
-    }
-
-    @Override
-    @Retry(name = "retryTimeout")
-    public List<GeographicTaxonomy> getGeographicTaxonomyList(String institutionId) {
-        log.trace("getGeographicTaxonomyList start");
-        log.debug("getGeographicTaxonomyList institutionId = {}", institutionId);
-        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-        InstitutionResponse institution = coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody();
-        List<GeographicTaxonomy> result = Collections.emptyList();
-        if (institution != null && !CollectionUtils.isEmpty(institution.getGeographicTaxonomies())) {
-            result = institutionMapper.toGeographicTaxonomy(institution.getGeographicTaxonomies());
-        }
-        if (CollectionUtils.isEmpty(result)) {
-            throw new ValidationException(String.format("The institution %s does not have geographic taxonomies.", institutionId));
-        }
-
-        log.debug("getGeographicTaxonomyList result = {}", result);
-        log.trace("getGeographicTaxonomyList end");
-        return result;
     }
 
     @Override

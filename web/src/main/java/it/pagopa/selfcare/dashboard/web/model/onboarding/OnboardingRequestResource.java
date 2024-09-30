@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.web.model.onboarding;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.connector.model.institution;
 
-import it.pagopa.selfcare.commons.base.utils.InstitutionType;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,7 +19,7 @@ public class Institution {
     private String zipCode;
     private String taxCode;
     private String origin;
-    private InstitutionType institutionType;
+    private String institutionType;
     private List<Attribute> attributes;
     private List<GeographicTaxonomy> geographicTaxonomies;
     private String category;
