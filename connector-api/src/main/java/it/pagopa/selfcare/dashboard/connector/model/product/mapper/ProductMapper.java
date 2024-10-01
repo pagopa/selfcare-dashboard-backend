@@ -43,16 +43,4 @@ public class ProductMapper {
                 .map(ProductRole::getLabel);
     }
 
-    public static Optional<PartyRole> getPartyRole(String productRoleCode, Map<PartyRole, ProductRoleInfo> roleMappings) {
-        return getPartyRole(productRoleCode, roleMappings, EnumSet.allOf(PartyRole.class));
-    }
-
-    public static Optional<it.pagopa.selfcare.onboarding.common.PartyRole> getPartyRole(String productRoleCode, Map<PartyRole, ProductRoleInfo> roleMappings, EnumSet<PartyRole> partyRoleWhiteList) {
-        return roleMappings.entrySet().stream()
-                .filter(entry -> partyRoleWhiteList.contains(entry.getKey()))
-                .filter(entry -> entry.getValue().getRoles().stream().anyMatch(productRole -> productRole.getCode().equals(productRoleCode)))
-                .map(Map.Entry::getKey)
-                .findAny();
-    }
-
 }

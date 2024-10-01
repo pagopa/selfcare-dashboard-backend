@@ -1,5 +1,6 @@
 {
   "multiroleAllowed": true,
+  "phasesAdditionAllowed": ["onboarding","dashboard"],
   "roles": [
     {
       "code": "code1",
