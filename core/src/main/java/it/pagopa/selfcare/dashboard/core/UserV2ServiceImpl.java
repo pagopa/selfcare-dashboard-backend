@@ -13,8 +13,10 @@ import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
+import it.pagopa.selfcare.product.utils.ProductUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,6 @@ public class UserV2ServiceImpl implements UserV2Service {
     private final ProductsConnector productsConnector;
 
     private final List<RelationshipState> allowedStates;
-    private static final EnumSet<PartyRole> PARTY_ROLE_WHITE_LIST = EnumSet.of(PartyRole.SUB_DELEGATE, PartyRole.OPERATOR);
 
     public UserV2ServiceImpl(
             MsCoreConnector msCoreConnector,
@@ -174,13 +175,16 @@ public class UserV2ServiceImpl implements UserV2Service {
     private List<CreateUserDto.Role> retrieveRole(String productId, Set<String> productRoles) {
         Product product = productsConnector.getProduct(productId);
         return productRoles.stream().map(productRole -> {
-            Map<PartyRole, ProductRoleInfo> roleMappings = product.getRoleMappings();
+
             CreateUserDto.Role role = new CreateUserDto.Role();
             role.setProductRole(productRole);
-            role.setLabel(ProductMapper.getLabel(productRole, roleMappings).orElse(null));
-            Optional<PartyRole> partyRole = ProductMapper.getPartyRole(productRole, roleMappings, PARTY_ROLE_WHITE_LIST);
-            role.setPartyRole(partyRole.orElseThrow(() ->
-                    new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole))));
+            role.setLabel(ProductMapper.getLabel(productRole, product.getRoleMappings()).orElse(null));
+
+            List<PartyRole> partyRoles = ProductUtils.validRolesByProductRole(product, PHASE_ADDITION_ALLOWED.DASHBOARD, productRole);
+            if(Objects.isNull(partyRoles) || partyRoles.isEmpty()){
+                throw new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole));
+            }
+            role.setPartyRole(partyRoles.get(0));
             return role;
         }).toList();
     }

@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.entity.ProductRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
@@ -404,12 +405,24 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
     private static Product getProduct() {
         Product product = new Product();
         Map<PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
-        ProductRoleInfo productRoleInfo = new ProductRoleInfo();
+
+        ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
+        productRoleInfoOperator.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD.value));
         ProductRole productRole = new ProductRole();
         productRole.setCode("operator");
         productRole.setLabel("operator");
-        productRoleInfo.setRoles(List.of(productRole));
-        map.put(PartyRole.OPERATOR, productRoleInfo);
+        productRoleInfoOperator.setRoles(List.of(productRole));
+        map.put(PartyRole.OPERATOR, productRoleInfoOperator);
+
+        ProductRoleInfo productRoleInfoDelegate= new ProductRoleInfo();
+        productRoleInfoDelegate.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        ProductRole productRole2 = new ProductRole();
+        productRole2.setCode("delegate");
+        productRole2.setLabel("delegate");
+        productRoleInfoDelegate.setRoles(List.of(productRole2));
+        map.put(PartyRole.DELEGATE, productRoleInfoDelegate);
+
+
         product.setRoleMappings(map);
         return product;
     }
