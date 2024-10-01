@@ -3993,6 +3993,13 @@
             "type" : "string",
             "description" : "Party role, available values: MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA"
           },
+          "phasesAdditionAllowed" : {
+            "type" : "array",
+            "description" : "List of phases where addition of the role is allowed",
+            "items" : {
+              "type" : "string"
+            }
+          },
           "productRoles" : {
             "type" : "array",
             "description" : "Available product roles",

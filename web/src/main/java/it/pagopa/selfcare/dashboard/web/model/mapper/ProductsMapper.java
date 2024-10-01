@@ -7,13 +7,12 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResourc
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.SubProductResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
-import it.pagopa.selfcare.product.entity.BackOfficeConfigurations;
-import it.pagopa.selfcare.product.entity.Product;
-import it.pagopa.selfcare.product.entity.ProductRole;
-import it.pagopa.selfcare.product.entity.ProductRoleInfo;
+import it.pagopa.selfcare.product.entity.*;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ProductsMapper {
 
@@ -102,6 +101,8 @@ public class ProductsMapper {
             resource.setPartyRole(entry.getKey().name());
             resource.setSelcRole(entry.getKey() != PartyRole.OPERATOR ? SelfCareAuthority.ADMIN : SelfCareAuthority.LIMITED);
             resource.setMultiroleAllowed(entry.getValue().isMultiroleAllowed());
+            resource.setPhasesAdditionAllowed(entry.getValue().getPhasesAdditionAllowed());
+
             if (entry.getValue().getRoles() != null) {
                 resource.setProductRoles(entry.getValue().getRoles().stream()
                         .map(ProductsMapper::toProductRoleResource)

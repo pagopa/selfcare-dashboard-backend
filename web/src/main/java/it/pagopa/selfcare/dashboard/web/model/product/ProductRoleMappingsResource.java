@@ -19,6 +19,9 @@ public class ProductRoleMappingsResource {
     @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.multiroleAllowed}")
     private boolean multiroleAllowed;
 
+    @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.phasesAdditionAllowed}")
+    private List<String> phasesAdditionAllowed;
+
     @ApiModelProperty(value = "${swagger.dashboard.product-role-mappings.model.productRoles}")
     private List<ProductRoleResource> productRoles;
 
