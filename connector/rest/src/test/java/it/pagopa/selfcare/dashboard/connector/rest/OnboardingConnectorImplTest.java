@@ -47,7 +47,7 @@ class OnboardingConnectorImplTest  extends BaseConnectorTest {
 
         doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)))
                 .when(onboardingRestClient)
-                ._v1OnboardingGet(null, null, null, null, productId, 1, status, null, taxCode, null);
+                ._getOnboardingWithFilter(null, null, null, null, productId, 1, status, null, taxCode, null);
 
         Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(taxCode, null, productId, status);
         Assertions.assertTrue(onboardingGetInfo);
@@ -66,7 +66,7 @@ class OnboardingConnectorImplTest  extends BaseConnectorTest {
         OnboardingGetResponse onboardingGetResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse))).when(onboardingRestClient)._v1OnboardingGet(null, null, null, null, productId, 1, status, subunitCode,  taxCode, null);
+        doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse))).when(onboardingRestClient)._getOnboardingWithFilter(null, null, null, null, productId, 1, status, subunitCode,  taxCode, null);
 
         Boolean onboardingGetInfo = onboardingConnector.getOnboardingWithFilter(taxCode, subunitCode, productId, status);
 
