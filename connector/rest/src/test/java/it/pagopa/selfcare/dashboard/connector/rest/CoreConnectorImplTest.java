@@ -83,8 +83,8 @@ class CoreConnectorImplTest extends BaseConnectorTest{
 
     private static final Function<it.pagopa.selfcare.commons.base.security.PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> switch (partyRole) {
         case MANAGER, DELEGATE, SUB_DELEGATE -> ADMIN;
-        case OPERATOR -> LIMITED;
-        default -> ADMIN_EA;
+        case ADMIN_EA -> ADMIN_EA;
+        default -> LIMITED;
     };
 
 
