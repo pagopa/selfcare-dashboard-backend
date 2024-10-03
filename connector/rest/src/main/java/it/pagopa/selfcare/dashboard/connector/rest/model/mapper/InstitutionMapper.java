@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 
-import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Billing;
 import it.pagopa.selfcare.dashboard.connector.model.institution.*;
@@ -29,7 +28,7 @@ public interface InstitutionMapper {
     @Mapping(target = "status", expression = "java(institutionProducts.getStatus().name())")
     InstitutionBase toInstitutionBase(UserInstitutionRoleResponse institutionProducts);
 
-    @Mapping(target = "institutionType", expression = "java(toInstitutionType(institutionResponse.getInstitutionType()))")
+    @Mapping(target = "institutionType", source = "institutionResponse.institutionType")
     @Mapping(target = "description" , source = "institutionUpdate.description")
     @Mapping(target = "taxCode" , source = "institutionUpdate.taxCode")
     @Mapping(target = "digitalAddress" , source = "institutionUpdate.digitalAddress")
@@ -59,11 +58,6 @@ public interface InstitutionMapper {
 
     @Mapping(target = "onBoardingStatus", expression = "java(toOnboardedProductState(institutionProduct.getState()))")
     PartyProduct toPartyProduct(InstitutionProduct institutionProduct);
-
-    @Named("toInstitutionType")
-    default InstitutionType toInstitutionType(InstitutionResponse.InstitutionTypeEnum institutionTypeEnum) {
-        return InstitutionType.valueOf(institutionTypeEnum.name());
-    }
 
     @Named("toOnboardedProductState")
     default ProductOnBoardingStatus toOnboardedProductState(InstitutionProduct.StateEnum stateEnum) {

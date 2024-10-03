@@ -43,8 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.ADMIN;
-import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.LIMITED;
+import static it.pagopa.selfcare.commons.base.security.SelfCareAuthority.*;
 import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.REQUIRED_GEOGRAPHIC_TAXONOMIES_MESSAGE;
 import static it.pagopa.selfcare.dashboard.connector.rest.CoreConnectorImpl.REQUIRED_INSTITUTION_ID_MESSAGE;
 import static org.junit.jupiter.api.Assertions.*;
@@ -84,6 +83,7 @@ class CoreConnectorImplTest extends BaseConnectorTest{
 
     private static final Function<it.pagopa.selfcare.commons.base.security.PartyRole, SelfCareAuthority> PARTY_2_SELC_ROLE = partyRole -> switch (partyRole) {
         case MANAGER, DELEGATE, SUB_DELEGATE -> ADMIN;
+        case ADMIN_EA -> ADMIN_EA;
         default -> LIMITED;
     };
 

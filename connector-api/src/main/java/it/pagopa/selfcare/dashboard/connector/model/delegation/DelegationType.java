@@ -4,5 +4,6 @@ public enum DelegationType {
 
     PT,
     AOO,
-    UO;
+    UO,
+    EA;
 }
