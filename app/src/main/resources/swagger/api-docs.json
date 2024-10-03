@@ -3278,7 +3278,7 @@
           "type" : {
             "type" : "string",
             "description" : "Delegation type",
-            "enum" : [ "AOO", "PT", "UO" ]
+            "enum" : [ "AOO", "EA", "PT", "UO" ]
           }
         }
       },
@@ -3309,7 +3309,7 @@
           },
           "type" : {
             "type" : "string",
-            "enum" : [ "AOO", "PT", "UO" ]
+            "enum" : [ "AOO", "EA", "PT", "UO" ]
           }
         }
       },
@@ -3359,7 +3359,7 @@
           },
           "type" : {
             "type" : "string",
-            "enum" : [ "AOO", "PT", "UO" ]
+            "enum" : [ "AOO", "EA", "PT", "UO" ]
           },
           "updatedAt" : {
             "type" : "string",
@@ -3720,7 +3720,7 @@
           "role" : {
             "type" : "string",
             "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+            "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
             "type" : "string",
@@ -3972,7 +3972,7 @@
           "selcRole" : {
             "type" : "string",
             "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+            "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
             "type" : "string",
@@ -4010,7 +4010,7 @@
           "selcRole" : {
             "type" : "string",
             "description" : "Self Care role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+            "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           }
         }
       },
@@ -4056,7 +4056,7 @@
           "role" : {
             "type" : "string",
             "description" : "User's role",
-            "enum" : [ "ADMIN", "LIMITED" ]
+            "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
             "type" : "string",
