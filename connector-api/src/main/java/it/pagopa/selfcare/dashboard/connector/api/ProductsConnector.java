@@ -12,7 +12,7 @@ public interface ProductsConnector {
 
     List<Product> getProducts();
 
-    Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId);
+    Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId, String institutionType);
 
     Product getProduct(String productId);
 

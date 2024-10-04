@@ -35,11 +35,11 @@ public class ProductConnectorImpl implements ProductsConnector {
     }
 
     @Override
-    public Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId) {
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct productId = {}", productId);
+    public Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId, String institutionType) {
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct productId = {}, institutionType = {}", productId, institutionType);
         Assert.hasText(productId, "A productId is required");
         Product product = productService.getProduct(productId);
-        Map<PartyRole, ProductRoleInfo> result = product != null ? product.getRoleMappings() : null;
+        Map<PartyRole, ProductRoleInfo> result = product != null ? product.getRoleMappings(institutionType) : null;
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct result = {}", result);
         return result;
     }

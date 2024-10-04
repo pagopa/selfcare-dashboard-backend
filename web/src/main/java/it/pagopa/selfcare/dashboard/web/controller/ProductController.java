@@ -47,11 +47,12 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.product.api.getProductRoles}")
     public Collection<ProductRoleMappingsResource> getProductRoles(@ApiParam("${swagger.dashboard.products.model.id}")
-                                                                   @PathVariable("productId")
-                                                                   String productId) {
+                                                                   @PathVariable("productId") String productId,
+                                                                  @ApiParam("${swagger.dashboard.institutions.model.institutionType}")
+                                                                  @RequestParam(name = "institutionType", required = false) String institutionType) {
         log.trace("getProductRoles start");
         log.debug("productId = {}", productId);
-        Collection<ProductRoleMappingsResource> result = ProductsMapper.toProductRoleMappingsResource(productService.getProductRoles(productId));
+        Collection<ProductRoleMappingsResource> result = ProductsMapper.toProductRoleMappingsResource(productService.getProductRoles(productId, institutionType));
         log.debug("getProductRoles result = {}", result);
         log.trace("getProductRoles end");
 

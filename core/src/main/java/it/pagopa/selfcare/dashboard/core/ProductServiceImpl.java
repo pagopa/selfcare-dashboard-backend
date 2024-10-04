@@ -24,9 +24,9 @@ class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public Map<PartyRole, ProductRoleInfo> getProductRoles(String productId) {
+    public Map<PartyRole, ProductRoleInfo> getProductRoles(String productId, String institutionType) {
         log.trace("getProductRoles start");
-        log.debug("getProductRoles productId = {}", productId);
+        log.debug("getProductRoles productId = {}, institutionType = {}", productId, institutionType);
         Assert.hasText(productId, "A Product id is required");
 
         Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
