@@ -31,7 +31,18 @@
   "id": "setId",
   "imported": true,
   "institutionType": "AS",
-  "onboarding": [],
+  "onboarding": [
+    {
+      "productId": "setProductId",
+      "isAggregator": true,
+      "createdAt": "2024-06-11T10:09:30.154695400+02:00",
+      "billing": {
+        "publicServices": false,
+        "recipientCode": "setRecipientCode",
+        "vatNumber": "setVatNumber"
+      }
+    }
+  ],
   "origin": "setOrigin",
   "originId": "setOriginId",
   "paymentServiceProvider": {
