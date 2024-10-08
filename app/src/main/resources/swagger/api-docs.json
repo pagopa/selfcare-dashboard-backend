@@ -3766,6 +3766,9 @@
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
+          "isAggregator" : {
+            "type" : "boolean"
+          },
           "productId" : {
             "type" : "string"
           },
@@ -3793,6 +3796,9 @@
           },
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
+          },
+          "isAggregator" : {
+            "type" : "boolean"
           },
           "productId" : {
             "type" : "string"

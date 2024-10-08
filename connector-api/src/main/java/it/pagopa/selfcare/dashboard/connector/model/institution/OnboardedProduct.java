@@ -12,4 +12,5 @@ public class OnboardedProduct {
     private boolean authorized;
     private Billing billing;
     private List<String> userProductActions;
+    private Boolean isAggregator;
 }
