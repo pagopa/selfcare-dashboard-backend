@@ -9,6 +9,7 @@ import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import it.pagopa.selfcare.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -36,7 +37,7 @@ public class ProductConnectorImpl implements ProductsConnector {
 
     @Override
     public Map<PartyRole, ProductRoleInfo> getProductRoleMappings(String productId, String institutionType) {
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct productId = {}, institutionType = {}", productId, institutionType);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct productId = {}, institutionType = {}", Encode.forJava(productId), Encode.forJava(institutionType));
         Assert.hasText(productId, "A productId is required");
         Product product = productService.getProduct(productId);
         Map<PartyRole, ProductRoleInfo> result = product != null ? product.getRoleMappings(institutionType) : null;
