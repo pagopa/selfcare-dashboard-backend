@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface ProductService {
 
-    Map<PartyRole, ProductRoleInfo> getProductRoles(String productId);
+    Map<PartyRole, ProductRoleInfo> getProductRoles(String productId, String institutionType);
 
 }

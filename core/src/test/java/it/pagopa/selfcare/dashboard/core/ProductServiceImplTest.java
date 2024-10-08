@@ -34,21 +34,22 @@ public class ProductServiceImplTest extends BaseServiceTest {
     void getProductRoles() {
 
         String productId = "productId";
+        String institutionType = "type";
         Map<PartyRole, ProductRoleInfo> productRoleMappingsMock = new HashMap<>();
         ProductRoleInfo productRoleInfo = new ProductRoleInfo();
         productRoleMappingsMock.put(PartyRole.MANAGER, productRoleInfo);
 
-        when(productsConnectorMock.getProductRoleMappings(productId)).thenReturn(productRoleMappingsMock);
+        when(productsConnectorMock.getProductRoleMappings(productId, institutionType)).thenReturn(productRoleMappingsMock);
 
-        Map<PartyRole, ProductRoleInfo> result = productService.getProductRoles(productId);
+        Map<PartyRole, ProductRoleInfo> result = productService.getProductRoles(productId, institutionType);
         Assertions.assertEquals(productRoleMappingsMock, result);
-        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductRoleMappings(productId);
+        Mockito.verify(productsConnectorMock, Mockito.times(1)).getProductRoleMappings(productId, institutionType);
     }
 
     @Test
     void getProductRolesWithoutProductId() {
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.getProductRoles(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productService.getProductRoles(null, null));
         Mockito.verifyNoInteractions(productsConnectorMock);
     }
 

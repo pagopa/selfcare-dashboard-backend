@@ -55,16 +55,18 @@ class ProductControllerTest extends BaseControllerTest {
     void getProductRoles() throws Exception {
         // given
         String productId = "prod1";
+        String institutionType = "type";
         byte[] productRoleInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "ProductRoleInfo.json"));
         ProductRoleInfo productRoleInfo = objectMapper.readValue(productRoleInfoStream, ProductRoleInfo.class);
 
-        when(productServiceMock.getProductRoles(productId))
+        when(productServiceMock.getProductRoles(productId, institutionType))
                 .thenReturn(new EnumMap<>(PartyRole.class) {{
                     put(PartyRole.MANAGER, productRoleInfo);
                 }});
         // when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{productId}/roles", productId)
+                        .queryParam("institutionType", institutionType)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -72,7 +74,7 @@ class ProductControllerTest extends BaseControllerTest {
                 .andReturn();
         // then
         verify(productServiceMock, times(1))
-                .getProductRoles(productId);
+                .getProductRoles(productId, institutionType);
         verifyNoMoreInteractions(productServiceMock);
     }
 
