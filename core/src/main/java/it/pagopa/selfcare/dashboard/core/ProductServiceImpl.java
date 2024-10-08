@@ -29,7 +29,7 @@ class ProductServiceImpl implements ProductService {
         log.debug("getProductRoles productId = {}, institutionType = {}", productId, institutionType);
         Assert.hasText(productId, "A Product id is required");
 
-        Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId);
+        Map<PartyRole, ProductRoleInfo> productRoleMappings = productsConnector.getProductRoleMappings(productId, institutionType);
         log.debug("getProductRoles result = {}", productRoleMappings);
         log.trace("getProductRoles end");
         return productRoleMappings;

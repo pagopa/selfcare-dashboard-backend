@@ -178,9 +178,11 @@ public class UserV2ServiceImpl implements UserV2Service {
 
             CreateUserDto.Role role = new CreateUserDto.Role();
             role.setProductRole(productRole);
-            role.setLabel(ProductMapper.getLabel(productRole, product.getRoleMappings()).orElse(null));
 
-            List<PartyRole> partyRoles = ProductUtils.validRolesByProductRole(product, PHASE_ADDITION_ALLOWED.DASHBOARD, productRole);
+            //TODO https://pagopa.atlassian.net/browse/SELC-5706 for institutionType=null
+            role.setLabel(ProductMapper.getLabel(productRole, product.getRoleMappings(null)).orElse(null));
+
+            List<PartyRole> partyRoles = ProductUtils.validRolesByProductRole(product, PHASE_ADDITION_ALLOWED.DASHBOARD, productRole, null);
             if(Objects.isNull(partyRoles) || partyRoles.isEmpty()){
                 throw new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole));
             }

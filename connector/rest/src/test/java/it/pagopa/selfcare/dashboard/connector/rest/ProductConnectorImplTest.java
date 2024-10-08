@@ -103,7 +103,7 @@ class ProductConnectorImplTest extends BaseConnectorTest {
     @Test
     void getProductRoleMappingsWithoutProductId() {
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> productConnectorImpl.getProductRoleMappings(null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> productConnectorImpl.getProductRoleMappings(null, null));
         verify(productServiceMock, never()).getProduct(null);
     }
 
@@ -111,8 +111,9 @@ class ProductConnectorImplTest extends BaseConnectorTest {
     void getProductRoleMappingsWithEmptyProduct() {
 
         String productId = "123";
+        String institutionType = "type";
         when(productServiceMock.getProduct(productId)).thenReturn(null);
-        Map<PartyRole, ProductRoleInfo> result = productConnectorImpl.getProductRoleMappings(productId);
+        Map<PartyRole, ProductRoleInfo> result = productConnectorImpl.getProductRoleMappings(productId, institutionType);
         assertNull(result);
         Mockito.verify(productServiceMock, times(1)).getProduct(productId);
     }
@@ -121,6 +122,7 @@ class ProductConnectorImplTest extends BaseConnectorTest {
     void testGetProductRoleMappings() throws IOException {
 
         String productId = "123";
+        String institutionType = "type";
 
         ClassPathResource resource = new ClassPathResource("stubs/Product.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
@@ -128,8 +130,8 @@ class ProductConnectorImplTest extends BaseConnectorTest {
         });
 
         when(productServiceMock.getProduct(productId)).thenReturn(product);
-        Map<PartyRole, ProductRoleInfo> result = productConnectorImpl.getProductRoleMappings(productId);
-        Assertions.assertEquals(product.getRoleMappings(), result);
+        Map<PartyRole, ProductRoleInfo> result = productConnectorImpl.getProductRoleMappings(productId, institutionType);
+        Assertions.assertEquals(product.getRoleMappings(institutionType), result);
         Mockito.verify(productServiceMock, times(1)).getProduct(productId);
     }
 
