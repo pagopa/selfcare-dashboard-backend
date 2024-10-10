@@ -6,6 +6,7 @@
     "institutionType": "SCP",
     "name": "A description",
     "category": "description1",
+    "categoryCode": "code1",
     "fiscalCode": "tax123",
     "mailAddress": "digital@address.com",
     "address": "123 Street",

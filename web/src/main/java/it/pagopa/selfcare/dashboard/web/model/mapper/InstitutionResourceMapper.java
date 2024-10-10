@@ -43,6 +43,7 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "products", source = "onboarding")
     @Mapping(target = "parentDescription", source = "rootParent.description")
     @Mapping(target = "category", expression = "java(retrieveCategory(model.getAttributes()))")
+    @Mapping(target = "categoryCode", expression = "java(retrieveCategoryCode(model.getAttributes()))")
     InstitutionResource toResource(Institution model);
 
     UpdateInstitutionResource toUpdateResource(UpdateInstitutionDto dto);
@@ -51,6 +52,14 @@ public interface InstitutionResourceMapper {
     default String retrieveCategory(List<Attribute> attributes){
         if(!CollectionUtils.isEmpty(attributes)){
             return attributes.get(0).getDescription();
+        }
+        return null;
+    }
+
+    @Named("retrieveCategoryCode")
+    default String retrieveCategoryCode(List<Attribute> attributes){
+        if(!CollectionUtils.isEmpty(attributes)){
+            return attributes.get(0).getCode();
         }
         return null;
     }
