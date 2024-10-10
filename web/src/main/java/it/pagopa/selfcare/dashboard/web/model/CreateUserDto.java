@@ -27,6 +27,9 @@ public class CreateUserDto {
     @Email
     private String email;
 
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
+    String role;
+
     @ApiModelProperty(value = "${swagger.dashboard.user.model.productRoles}", required = true)
     @JsonProperty(required = true)
     @NotEmpty

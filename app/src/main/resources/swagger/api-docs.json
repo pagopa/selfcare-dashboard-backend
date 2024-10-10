@@ -3192,6 +3192,10 @@
               "type" : "string"
             }
           },
+          "role" : {
+            "type" : "string",
+            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
+          },
           "surname" : {
             "type" : "string",
             "description" : "User's surname"
@@ -3728,7 +3732,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role",
+            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -3986,7 +3990,7 @@
           },
           "selcRole" : {
             "type" : "string",
-            "description" : "User's role",
+            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -4070,7 +4074,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role",
+            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -4495,6 +4499,10 @@
             "items" : {
               "type" : "string"
             }
+          },
+          "role" : {
+            "type" : "string",
+            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
           }
         }
       },

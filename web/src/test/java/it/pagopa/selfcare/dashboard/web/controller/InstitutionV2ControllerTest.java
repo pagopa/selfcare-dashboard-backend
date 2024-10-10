@@ -165,7 +165,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void addUserProductRoles_happyPath() throws Exception {
+    void addUserProductRolesWithoutPartyRole_happyPath() throws Exception {
         // given
         final String institutionId = "institutionId";
         final String productId = "productId";
@@ -187,7 +187,36 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         // then
         verify(userServiceMock, times(1))
-                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles());
+                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles(), userProductRoles.getRole());
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
+
+    @Test
+    void addUserProductRolesWithPartyRole_happyPath() throws Exception {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        UserProductRoles userProductRoles = new UserProductRoles();
+        userProductRoles.setProductRoles(Set.of("admin"));
+        userProductRoles.setRole("MANAGER");
+
+        Authentication authentication = mock(Authentication.class);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/{institutionId}/products/{productId}/users/{userId}", institutionId, productId, userId)
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userProductRoles))
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        // then
+        verify(userServiceMock, times(1))
+                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles(), userProductRoles.getRole());
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -215,6 +244,41 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void createInstitutionProductUserWithoutRole_happyPath() throws Exception {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        CreateUserDto createUserDto = new CreateUserDto();
+        createUserDto.setName("John");
+        createUserDto.setSurname("Doe");
+        createUserDto.setTaxCode("ABC123");
+        createUserDto.setEmail("john.doe@example.com");
+        createUserDto.setProductRoles(Set.of("admin"));
+
+        UserToCreate userToCreate = userMapper.toUserToCreate(createUserDto);
+
+        String id = UUID.randomUUID().toString();
+
+        Authentication authentication = mock(Authentication.class);
+        when(userServiceMock.createUsers(institutionId, productId, userToCreate)).thenReturn(id);
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post(BASE_URL + "/{institutionId}/products/{productId}/users", institutionId, productId)
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(createUserDto))
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(id)))
+                .andReturn();
+
+        // then
+        verify(userServiceMock, times(1))
+                .createUsers(institutionId, productId, userToCreate);
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
+    @Test
     void createInstitutionProductUser_happyPath() throws Exception {
         // given
         final String institutionId = "institutionId";
@@ -225,6 +289,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         createUserDto.setTaxCode("ABC123");
         createUserDto.setEmail("john.doe@example.com");
         createUserDto.setProductRoles(Set.of("admin"));
+        createUserDto.setRole("MANAGER");
 
         UserToCreate userToCreate = userMapper.toUserToCreate(createUserDto);
 

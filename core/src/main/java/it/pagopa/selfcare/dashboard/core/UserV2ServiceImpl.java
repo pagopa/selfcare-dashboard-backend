@@ -139,19 +139,20 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
-        List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles());
+        List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles(), userDto.getRole());
         String userId = userApiConnector.createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
     }
 
     @Override
-    public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles) {
+    public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role) {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
-        List<CreateUserDto.Role> role = retrieveRole(productId, productRoles);
-        userApiConnector.createOrUpdateUserByUserId(institution, productId, userId, role);
+        PartyRole partyRole = Optional.ofNullable(role).map(PartyRole::valueOf).orElse(null);
+        List<CreateUserDto.Role> roleDto = retrieveRole(productId, productRoles, partyRole);
+        userApiConnector.createOrUpdateUserByUserId(institution, productId, userId, roleDto);
         log.trace("createOrUpdateUserByUserId end");
     }
 
@@ -172,21 +173,25 @@ public class UserV2ServiceImpl implements UserV2Service {
      * as Role to be assigned to a user in add Users ProductRoles operation).
      * If the party role is not valid, it throws an InvalidProductRoleException.
      */
-    private List<CreateUserDto.Role> retrieveRole(String productId, Set<String> productRoles) {
+    private List<CreateUserDto.Role> retrieveRole(String productId, Set<String> productRoles, PartyRole partyRole) {
         Product product = productsConnector.getProduct(productId);
         return productRoles.stream().map(productRole -> {
 
             CreateUserDto.Role role = new CreateUserDto.Role();
             role.setProductRole(productRole);
 
-            //TODO https://pagopa.atlassian.net/browse/SELC-5706 for institutionType=null
             role.setLabel(ProductMapper.getLabel(productRole, product.getRoleMappings(null)).orElse(null));
 
-            List<PartyRole> partyRoles = ProductUtils.validRolesByProductRole(product, PHASE_ADDITION_ALLOWED.DASHBOARD, productRole, null);
-            if(Objects.isNull(partyRoles) || partyRoles.isEmpty()){
-                throw new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole));
+            //TODO: https://pagopa.atlassian.net/browse/SELC-5757
+            if(Objects.isNull(partyRole)){
+                List<PartyRole> partyRoles = ProductUtils.validRolesByProductRole(product, PHASE_ADDITION_ALLOWED.DASHBOARD, productRole, null);
+                if(Objects.isNull(partyRoles) || partyRoles.isEmpty()){
+                    throw new InvalidProductRoleException(String.format("Product role '%s' is not valid", productRole));
+                }
+                role.setPartyRole(partyRoles.get(0));
+            } else{
+                role.setPartyRole(partyRole);
             }
-            role.setPartyRole(partyRoles.get(0));
             return role;
         }).toList();
     }
