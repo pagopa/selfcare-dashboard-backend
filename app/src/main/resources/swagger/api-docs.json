@@ -3594,7 +3594,11 @@
           },
           "category" : {
             "type" : "string",
-            "description" : "Institution's category"
+            "description" : "Institution's category description"
+          },
+          "categoryCode" : {
+            "type" : "string",
+            "description" : "Institution's category code"
           },
           "city" : {
             "type" : "string",
