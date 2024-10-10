@@ -180,10 +180,9 @@ public class UserV2ServiceImpl implements UserV2Service {
             CreateUserDto.Role role = new CreateUserDto.Role();
             role.setProductRole(productRole);
 
-            //TODO https://pagopa.atlassian.net/browse/SELC-5706 for institutionType=null
             role.setLabel(ProductMapper.getLabel(productRole, product.getRoleMappings(null)).orElse(null));
 
-            //TODO: RIMUOVERE IF QUANDO LATO FE CI SARÁ L'INVIO DEL PARTYROLE
+            //TODO: https://pagopa.atlassian.net/browse/SELC-5757
             if(Objects.isNull(partyRole)){
                 List<PartyRole> partyRoles = ProductUtils.validRolesByProductRole(product, PHASE_ADDITION_ALLOWED.DASHBOARD, productRole, null);
                 if(Objects.isNull(partyRoles) || partyRoles.isEmpty()){
