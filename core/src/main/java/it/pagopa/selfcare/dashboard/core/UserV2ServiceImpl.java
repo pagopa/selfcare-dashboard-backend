@@ -150,7 +150,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
-        PartyRole partyRole = Objects.nonNull(role) ? PartyRole.valueOf(role) : null;
+        PartyRole partyRole = Optional.ofNullable(role).map(PartyRole::valueOf).orElse(null);
         List<CreateUserDto.Role> roleDto = retrieveRole(productId, productRoles, partyRole);
         userApiConnector.createOrUpdateUserByUserId(institution, productId, userId, roleDto);
         log.trace("createOrUpdateUserByUserId end");
