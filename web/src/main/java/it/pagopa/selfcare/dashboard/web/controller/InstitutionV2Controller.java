@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
+import com.azure.core.annotation.QueryParam;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -105,7 +106,6 @@ public class InstitutionV2Controller {
                                                        @ApiParam("${swagger.dashboard.products.model.id}")
                                                        @PathVariable("productId")
                                                        String productId,
-                                                       @ApiParam("${swagger.dashboard.user.model.role}")
                                                        @RequestBody
                                                        @Valid
                                                        CreateUserDto user) {
@@ -139,7 +139,7 @@ public class InstitutionV2Controller {
                                     UserProductRoles userProductRoles) {
         log.trace("addUserProductRoles start");
         log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
-        userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles());
+        userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles(), userProductRoles.getRole());
         log.trace("addUserProductRoles end");
     }
 

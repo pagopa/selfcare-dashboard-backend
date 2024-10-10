@@ -291,6 +291,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         final String productId = "productId";
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
+        String role = "MANAGER";
         Product product = getProduct();
 
         Institution institution = new Institution();
@@ -299,24 +300,32 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         onboardedProduct.setStatus(RelationshipState.ACTIVE);
         institution.setOnboarding(List.of(onboardedProduct));
 
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(PartyRole.MANAGER);
+
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
-        doNothing().when(userApiConnectorMock).createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
 
-        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles);
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        doNothing().when(userApiConnectorMock).createOrUpdateUserByUserId(institution, productId, userId, List.of(roleDto));
+
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role);
 
         verify(userApiConnectorMock, times(1))
-                .createOrUpdateUserByUserId(eq(institution), eq(productId), eq(userId), anyList());
+                .createOrUpdateUserByUserId(institution, productId, userId, List.of(roleDto));
         verifyNoMoreInteractions(userApiConnectorMock);
     }
 
     @Test
-    void addUserProductRoles_invalidProductRole() {
+    void addUserProductRoles_ok_withoutPartyRole() {
 
         final String institutionId = "institutionId";
         final String productId = "productId";
         final String userId = "userId";
-        Set<String> productRoles = new HashSet<>(List.of("role1"));
+        Set<String> productRoles = new HashSet<>(List.of("operator"));
         Product product = getProduct();
 
         Institution institution = new Institution();
@@ -325,13 +334,22 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         onboardedProduct.setStatus(RelationshipState.ACTIVE);
         institution.setOnboarding(List.of(onboardedProduct));
 
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(PartyRole.OPERATOR);
+
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        doNothing().when(userApiConnectorMock).createOrUpdateUserByUserId(institution, productId, userId, List.of(roleDto));
 
-        Assertions.assertThrows(InvalidProductRoleException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles));
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, null);
 
-        verifyNoInteractions(userApiConnectorMock);
+        verify(userApiConnectorMock, times(1))
+                .createOrUpdateUserByUserId(institution, productId, userId, List.of(roleDto));
+        verifyNoMoreInteractions(userApiConnectorMock);
     }
+
 
     @Test
     void addUserProductRoles_invalidOnboardingStatus() {
@@ -340,10 +358,11 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         final String productId = "productId";
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
+        String role = "MANAGER";
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(new Institution());
 
-        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles));
+        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role));
 
         verifyNoInteractions(userApiConnectorMock);
     }
@@ -367,9 +386,16 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         onboardedProduct.setStatus(RelationshipState.ACTIVE);
         institution.setOnboarding(List.of(onboardedProduct));
 
+
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(PartyRole.OPERATOR);
+
+
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
 
-        when(userApiConnectorMock.createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), anyList())).thenReturn("userId");
+        when(userApiConnectorMock.createOrUpdateUserByFiscalCode(institution, productId, userToCreate, List.of(roleDto))).thenReturn("userId");
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
 
@@ -380,9 +406,52 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         verify(userApiConnectorMock, times(1))
                 .createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), captorRoles.capture());
         assertEquals(captorRoles.getValue().get(0).getProductRole(), productRole);
-
+        assertEquals(captorRoles.getValue().get(0).getPartyRole(), roleDto.getPartyRole());
         verifyNoMoreInteractions(userApiConnectorMock);
     }
+
+    @Test
+    void createUsersByFiscalCodeWithPartyROle() {
+
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String productRole = "operator";
+        UserToCreate userToCreate = new UserToCreate();
+        HashSet<String> productRoles = new HashSet<>();
+        productRoles.add(productRole);
+        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(PartyRole.MANAGER);
+
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+
+        when(userApiConnectorMock.createOrUpdateUserByFiscalCode(institution, productId, userToCreate, List.of(roleDto))).thenReturn("userId");
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        String userId = userV2ServiceImpl.createUsers(institutionId, productId, userToCreate);
+
+        assertNotNull(userId);
+        ArgumentCaptor<List<CreateUserDto.Role>> captorRoles = ArgumentCaptor.forClass(List.class);
+        verify(userApiConnectorMock, times(1))
+                .createOrUpdateUserByFiscalCode(eq(institution), eq(productId), eq(userToCreate), captorRoles.capture());
+        assertEquals(captorRoles.getValue().get(0).getProductRole(), productRole);
+        assertEquals(captorRoles.getValue().get(0).getPartyRole(), roleDto.getPartyRole());
+        verifyNoMoreInteractions(userApiConnectorMock);
+    }
+
 
     @Test
     void createUsersByFiscalCodeWithOnboardingNotActive() {

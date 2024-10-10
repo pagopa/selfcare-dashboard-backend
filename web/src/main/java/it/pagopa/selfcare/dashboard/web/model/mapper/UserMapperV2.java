@@ -1,13 +1,18 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
+import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import javax.validation.ValidationException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -53,5 +58,18 @@ public interface UserMapperV2 {
         return Map.of();
     }
 
+    @Mapping(target = "role", expression = "java(retrievePartyRole(user.getRole()))")
     UserToCreate toUserToCreate(it.pagopa.selfcare.dashboard.web.model.CreateUserDto user);
+
+    @Named("retrievePartyRole")
+    default PartyRole retrievePartyRole(String role) {
+        try {
+            if (StringUtils.isNotBlank(role)) {
+                return PartyRole.valueOf(role);
+            }
+            return null;
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Invalid role: " + role + ". Allowed values are: " + Arrays.toString(PartyRole.values()));
+        }
+    }
 }

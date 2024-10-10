@@ -27,5 +27,5 @@ public interface UserV2Service {
 
     String createUsers(String institutionId, String productId, UserToCreate userToCreate);
 
-    void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles);
+    void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role);
 }
