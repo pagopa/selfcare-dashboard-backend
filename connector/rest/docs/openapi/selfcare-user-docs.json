@@ -489,7 +489,11 @@
           "200" : {
             "description" : "User created or updated!",
             "content" : {
-              "application/json" : { }
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
             }
           },
           "201" : {
