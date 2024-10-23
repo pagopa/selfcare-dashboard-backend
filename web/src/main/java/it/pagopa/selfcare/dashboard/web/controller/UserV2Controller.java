@@ -158,7 +158,7 @@ public class UserV2Controller {
     @GetMapping(value = "/institution/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUsers}", nickname = "v2GetUsersUsingGET")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ManageProductUsers')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListProductUsers')")
     public List<ProductUserResource> getUsers(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
                                               @RequestParam(value = "productId", required = false) String productId,
