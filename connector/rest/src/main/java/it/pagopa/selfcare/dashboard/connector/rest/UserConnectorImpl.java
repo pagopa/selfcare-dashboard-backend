@@ -43,7 +43,7 @@ public class UserConnectorImpl implements UserApiConnector {
     @Retry(name = "retryTimeout")
     public List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
-        UserInfoResponse userInfoResponse = userApiRestClient._usersUserIdInstitutionsGet(userId, null,
+        UserInfoResponse userInfoResponse = userApiRestClient._getUserProductsInfo(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
 
         if(Objects.isNull(userInfoResponse) ||
@@ -62,7 +62,7 @@ public class UserConnectorImpl implements UserApiConnector {
     @Retry(name = "retryTimeout")
     public UserInstitutionWithActionsDto getUserInstitutionWithActions(String userId, String institutionId, String productId) {
         log.trace("getUserInstitutionWithActions start");
-        UserInstitutionWithActions userInstitutionWithActions = userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId)
+        UserInstitutionWithActions userInstitutionWithActions = userApiRestClient._getUserInstitutionWithPermission(userId, institutionId, productId)
                 .getBody();
         return userMapper.toUserInstitutionWithActionsDto(userInstitutionWithActions);
     }
@@ -71,7 +71,7 @@ public class UserConnectorImpl implements UserApiConnector {
     @Retry(name = "retryTimeout")
     public UserInstitution getProducts(String institutionId, String userId) {
         log.trace("getProducts start");
-        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._retrieveUserInstitutions(
                 institutionId,
                 null,
                 null,
@@ -98,7 +98,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
         boolean result = false;
 
-        UserInstitutionWithActions userInstitutionWithActions = userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId)
+        UserInstitutionWithActions userInstitutionWithActions = userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, productId)
                         .getBody();
 
         if(Objects.nonNull(userInstitutionWithActions) && !CollectionUtils.isEmpty(userInstitutionWithActions.getProducts())) {
@@ -120,7 +120,7 @@ public class UserConnectorImpl implements UserApiConnector {
         log.trace("getUserById start");
         log.debug("getUserById id = {}", userId);
         String fieldsString = !CollectionUtils.isEmpty(fields) ? String.join(",", fields) : null;
-        User user = userMapper.toUser(userApiRestClient._usersIdDetailsGet(userId, fieldsString, institutionId).getBody());
+        User user = userMapper.toUser(userApiRestClient._getUserDetailsById(userId, fieldsString, institutionId).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
         return user;
@@ -131,7 +131,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public User searchByFiscalCode(String fiscalCode, String institutionId) {
         log.trace("searchByFiscalCode start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
-        User user = userMapper.toUser(userApiRestClient._usersSearchPost(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build()).getBody());
+        User user = userMapper.toUser(userApiRestClient._searchUserByFiscalCode(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build()).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");
         return user;
@@ -141,7 +141,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void suspendUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("suspend start");
         log.debug("suspend userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
+        userApiRestClient._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
         log.trace("suspend end");
     }
 
@@ -149,7 +149,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void activateUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("activate start");
         log.debug("activate userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
+        userApiRestClient._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
         log.trace("activate end");
     }
 
@@ -157,7 +157,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void deleteUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("delete start");
         log.debug("delete userId = {}, institutionId = {}", userId, institutionId);
-        userApiRestClient._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
+        userApiRestClient._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
         log.trace("delete end");
     }
 
@@ -165,7 +165,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public void updateUser(String userId, String institutionId, UpdateUserRequestDto userDto) {
         log.trace("updateUser start");
         log.debug("updateUser userId = {}, institutionId = {}, userDto = {}", userId, institutionId, userDto);
-        userApiRestClient._usersIdUserRegistryPut(userId, institutionId, userMapper.toUpdateUserRequest(userDto));
+        userApiRestClient._updateUserRegistryAndSendNotification(userId, institutionId, userMapper.toUpdateUserRequest(userDto));
         log.trace("updateUser end");
     }
 
@@ -182,7 +182,7 @@ public class UserConnectorImpl implements UserApiConnector {
                 .map(Enum::name)
                 .toList();
 
-        return Optional.ofNullable(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId,
+        return Optional.ofNullable(userApiRestClient._retrieveUsers(institutionId,
                                 loggedUserId,
                                 userInfoFilter.getUserId(),
                                 userInfoFilter.getProductRoles(),
@@ -199,7 +199,7 @@ public class UserConnectorImpl implements UserApiConnector {
     @Override
     public UserInfo getUserByUserIdInstitutionIdAndProductAndStates(String userId, String institutionId, String productId, List<String> states) {
         log.trace("getUserByUserIdInstitutionIdAndProduct start");
-        List<UserDataResponse> institutionResponses = userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, userId, userId, null, List.of(productId), null, states)
+        List<UserDataResponse> institutionResponses = userApiRestClient._retrieveUsers(institutionId, userId, userId, null, List.of(productId), null, states)
                 .getBody();
 
         if (CollectionUtils.isEmpty(institutionResponses) || institutionResponses.size() != 1){
@@ -215,7 +215,7 @@ public class UserConnectorImpl implements UserApiConnector {
     @Override
     public List<String> retrieveFilteredUserInstitution(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
 
-        return Optional.ofNullable(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId,
+        return Optional.ofNullable(userInstitutionApiRestClient._retrieveUserInstitutions(institutionId,
                                 null,
                                 List.of(userInfoFilter.getProductId()),
                                 null,
@@ -233,7 +233,7 @@ public class UserConnectorImpl implements UserApiConnector {
     public List<UserInstitution> retrieveFilteredUser(String userId, String institutionId, String productId) {
         log.trace("retrieveFilteredUser start");
         log.debug("retrieveFilteredUser userId = {}, institutionId = {}, productId = {}", userId, institutionId, productId);
-        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(productId), null, getValidUserStates(), userId).getBody();
+        List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._retrieveUserInstitutions(institutionId, null, List.of(productId), null, getValidUserStates(), userId).getBody();
         if(!CollectionUtils.isEmpty(institutionResponses)) {
             log.info("retrieveFilteredUser institutionResponses size = {}", institutionResponses.size());
             return institutionResponses.stream()
@@ -259,7 +259,7 @@ public class UserConnectorImpl implements UserApiConnector {
         }
 
         CreateUserDto createUserDto = buildCreateUserDto(institution, productId, userDto, roles);
-        String userId = userApiRestClient._usersPost(createUserDto).getBody();
+        String userId = userApiRestClient._createOrUpdateByFiscalCode(createUserDto).getBody();
 
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
@@ -290,7 +290,7 @@ public class UserConnectorImpl implements UserApiConnector {
     private Product1 buildProduct(String productId, List<it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role> roles) {
         return Product1.builder()
                 .productRoles(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
-                .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(roles.get(0).getPartyRole().name()))
+                .role(roles.get(0).getPartyRole().name())
                 .productId(productId)
                 .build();
     }
@@ -304,7 +304,7 @@ public class UserConnectorImpl implements UserApiConnector {
                 .institutionDescription(institution.getDescription())
                 .product(Product.builder()
                         .productRoles(roles.stream().map(it.pagopa.selfcare.dashboard.connector.model.user.CreateUserDto.Role::getProductRole).toList())
-                        .role(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.valueOf(roles.get(0).getPartyRole().name()))
+                        .role(roles.get(0).getPartyRole().name())
                         .productId(productId)
                         .build());
 
@@ -314,7 +314,7 @@ public class UserConnectorImpl implements UserApiConnector {
 
         AddUserRoleDto addUserRoleDto = addUserRoleDtoBuilder.build();
 
-        userApiRestClient._usersUserIdPost(userId, addUserRoleDto);
+        userApiRestClient._createOrUpdateByUserId(userId, addUserRoleDto);
         log.trace("createOrUpdateUserByUserId end");
     }
 

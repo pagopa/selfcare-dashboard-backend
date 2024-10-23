@@ -14,6 +14,7 @@ import it.pagopa.selfcare.dashboard.connector.rest.client.UserPermissionRestClie
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.connector.rest.model.mapper.UserMapperImpl;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActions;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.junit.jupiter.api.Assertions;
@@ -70,7 +71,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
     @Test
     void getUserProductsNotFound() {
         String userId = "userId";
-        when(userApiRestClient._usersUserIdInstitutionsGet(userId, null,
+        when(userApiRestClient._getUserProductsInfo(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserInstitutions(userId));
     }
@@ -82,13 +83,13 @@ class UserConnectorImplTest extends BaseConnectorTest {
         ClassPathResource resource = new ClassPathResource("stubs/UserInfoResponse.json");
         String expectedResource = StringUtils.deleteWhitespace(new String(Files.readAllBytes(resource.getFile().toPath())));
         UserInfoResponse userInfoResponse = objectMapper.readValue(expectedResource, new TypeReference<>() {});
-        when(userApiRestClient._usersUserIdInstitutionsGet(userId, null,
+        when(userApiRestClient._getUserProductsInfo(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())))
                 .thenReturn(ResponseEntity.ok(userInfoResponse));
         List<InstitutionBase> result = userConnector.getUserInstitutions(userId);
         assertNotNull(result);
         assertEquals(result.get(0), institutionMapper.toInstitutionBase(userInfoResponse.getInstitutions().get(0)));
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionsGet(userId, null,
+        verify(userApiRestClient, times(1))._getUserProductsInfo(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()));
     }
 
@@ -104,7 +105,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         userConnector.suspendUserProduct(userId, institutionId, productId, productRole);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
+                ._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -121,7 +122,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         userConnector.activateUserProduct(userId, institutionId, productId, productRole);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
+                ._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -138,7 +139,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         userConnector.deleteUserProduct(userId, institutionId, productId, productRole);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdInstitutionInstitutionIdProductProductIdStatusPut(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
+                ._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -157,13 +158,13 @@ class UserConnectorImplTest extends BaseConnectorTest {
         User user = objectMapper.readValue(Files.readAllBytes(resourceResponse.getFile().toPath()), new TypeReference<>() {
         });
 
-        when(userApiRestClient._usersIdDetailsGet(userId, field, institutionId)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userApiRestClient._getUserDetailsById(userId, field, institutionId)).thenReturn(ResponseEntity.ok(userDetailResponse));
         when(userMapper.toUser(userDetailResponse)).thenReturn(user);
 
         User result = userConnector.getUserById(userId, institutionId, fields);
         assertEquals(user,result);
         assertNotNull(result);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, field, institutionId);
+        verify(userApiRestClient, times(1))._getUserDetailsById(userId, field, institutionId);
     }
     @Test
     void getUserByIdEmptyUser() throws IOException{
@@ -175,12 +176,12 @@ class UserConnectorImplTest extends BaseConnectorTest {
         UserDetailResponse userDetailResponse = objectMapper.readValue(Files.readAllBytes(resource.getFile().toPath()), new TypeReference<>() {
         });
 
-        when(userApiRestClient._usersIdDetailsGet(userId, null, institutionId)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userApiRestClient._getUserDetailsById(userId, null, institutionId)).thenReturn(ResponseEntity.ok(userDetailResponse));
         when(userMapper.toUser(userDetailResponse)).thenReturn(null);
 
         User result = userConnector.getUserById(userId, institutionId, fields);
         assertNull(result);
-        verify(userApiRestClient, times(1))._usersIdDetailsGet(userId, null, institutionId);
+        verify(userApiRestClient, times(1))._getUserDetailsById(userId, null, institutionId);
     }
     @Test
     void verifyUserExist_UserExists() throws IOException {
@@ -190,12 +191,12 @@ class UserConnectorImplTest extends BaseConnectorTest {
         ClassPathResource resource = new ClassPathResource("stubs/UserInstitutionResponse2.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         UserInstitutionResponse userInstitutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(productId), null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name(), SUSPENDED.name()), userId)).thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(institutionId, null, List.of(productId), null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name(), SUSPENDED.name()), userId)).thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
 
         List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
         assertEquals(institutionMapper.toInstitution(userInstitutionResponse), response.get(0));
 
-        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
+        verify(userInstitutionApiRestClient, times(1))._retrieveUserInstitutions(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
     }
 
     @Test
@@ -206,13 +207,13 @@ class UserConnectorImplTest extends BaseConnectorTest {
         ClassPathResource resource = new ClassPathResource("stubs/UserInstitutionResponse2.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         UserInstitutionResponse userInstitutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(productId), null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name(), SUSPENDED.name()), userId))
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(institutionId, null, List.of(productId), null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name(), SUSPENDED.name()), userId))
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         List<UserInstitution> response = userConnector.retrieveFilteredUser(userId, institutionId, productId);
         assertEquals(0, response.size());
 
-        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
+        verify(userInstitutionApiRestClient, times(1))._retrieveUserInstitutions(eq(institutionId), eq(null), eq(List.of(productId)), eq(null), anyList(), eq(userId));
     }
 
     @Test
@@ -229,7 +230,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         User user = objectMapper.readValue(Files.readAllBytes(resourceResponse.getFile().toPath()), new TypeReference<>() {
         });
 
-        when(userApiRestClient._usersSearchPost(institutionId,searchUserDto)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userApiRestClient._searchUserByFiscalCode(institutionId,searchUserDto)).thenReturn(ResponseEntity.ok(userDetailResponse));
         when(userMapper.toUser(userDetailResponse)).thenReturn(user);
 
         User result = userConnector.searchByFiscalCode(fiscalCode, institutionId);
@@ -247,7 +248,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         });
 
 
-        when(userApiRestClient._usersSearchPost(institutionId,searchUserDto)).thenReturn(ResponseEntity.ok(userDetailResponse));
+        when(userApiRestClient._searchUserByFiscalCode(institutionId,searchUserDto)).thenReturn(ResponseEntity.ok(userDetailResponse));
         when(userMapper.toUser(userDetailResponse)).thenReturn(null);
 
         User result = userConnector.searchByFiscalCode(null, institutionId);
@@ -268,7 +269,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String action = "Selc:ViewBilling";
         String productId = "productId";
         String userId = "userId";
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
@@ -290,7 +291,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String action = "Selc:ViewBilling";
         String productId = "productId";
         String userId = "userId";
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
@@ -311,7 +312,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String institutionId = "institutionId";
         String action = "Selc:ViewBilling";
         String userId = "userId";
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, null))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, null, action);
@@ -333,7 +334,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String productId = "productId";
         String userId = "userId";
 
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
@@ -354,7 +355,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String productId = "productId";
         String userId = "userId";
 
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
@@ -377,7 +378,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String productId = "productId";
         String userId = "userId";
 
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(institutionId, userId, productId))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, productId))
                 .thenReturn(new ResponseEntity<>(userInstitutionWithActions, HttpStatus.OK));
         //when
         Boolean result = userConnector.hasPermission(userId, institutionId, productId, action);
@@ -396,7 +397,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         userConnector.updateUser(userId, institutionId, user);
         // then
         verify(userApiRestClient, times(1))
-                ._usersIdUserRegistryPut(userId, institutionId, new UpdateUserRequest());
+                ._updateUserRegistryAndSendNotification(userId, institutionId, new UpdateUserRequest());
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -410,7 +411,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         UserInfo.UserInfoFilter userInfoFilter = objectMapper.readValue(Files.readAllBytes(resourceFilter.getFile().toPath()), new TypeReference<>() {
         });
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, userInfoFilter.getUserId(), userInfoFilter.getProductRoles(), List.of(userInfoFilter.getProductId()), List.of("MANAGER", "DELEGATE", "SUB_DELEGATE"), List.of("ACTIVE", "SUSPENDED")))
+        when(userApiRestClient._retrieveUsers(institutionId, loggedUserId, userInfoFilter.getUserId(), userInfoFilter.getProductRoles(), List.of(userInfoFilter.getProductId()), List.of("MANAGER", "DELEGATE", "SUB_DELEGATE"), List.of("ACTIVE", "SUSPENDED")))
                 .thenReturn(ResponseEntity.ok(Collections.emptyList()));
 
         // when
@@ -434,7 +435,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         byte[] responseData = Files.readAllBytes(resourceResponse.getFile().toPath());
         List<UserDataResponse> userDataResponseList = objectMapper.readValue(responseData, new TypeReference<>() {});
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(institutionId, loggedUserId, userInfoFilter.getUserId(), userInfoFilter.getProductRoles(), List.of(userInfoFilter.getProductId()), List.of("MANAGER", "DELEGATE", "SUB_DELEGATE"), List.of("ACTIVE", "SUSPENDED")))
+        when(userApiRestClient._retrieveUsers(institutionId, loggedUserId, userInfoFilter.getUserId(), userInfoFilter.getProductRoles(), List.of(userInfoFilter.getProductId()), List.of("MANAGER", "DELEGATE", "SUB_DELEGATE"), List.of("ACTIVE", "SUSPENDED")))
                 .thenReturn(ResponseEntity.ok(userDataResponseList));
 
         // when
@@ -454,7 +455,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         UserInstitutionWithActions userInstitutionWithActions = new UserInstitutionWithActions();
 
-        when(userApiRestClient._usersUserIdInstitutionsInstitutionIdGet(
+        when(userApiRestClient._getUserInstitutionWithPermission(
                 userId,
                 institutionId,
                 productId
@@ -462,7 +463,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         UserInstitutionWithActionsDto userInstitutionWithActionsDto = userConnector.getUserInstitutionWithActions(userId, institutionId, productId);
 
-        verify(userApiRestClient)._usersUserIdInstitutionsInstitutionIdGet(userId, institutionId, productId);
+        verify(userApiRestClient)._getUserInstitutionWithPermission(userId, institutionId, productId);
         assertNotNull(userInstitutionWithActionsDto);
 
     }
@@ -478,7 +479,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         UserInstitutionResponse userInstitutions = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(
                 institutionId,
                 null,
                 null,
@@ -491,14 +492,14 @@ class UserConnectorImplTest extends BaseConnectorTest {
         //Todo aggiungere expectedResponse
 
         assertNotNull(result);
-        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
+        verify(userInstitutionApiRestClient, times(1))._retrieveUserInstitutions(institutionId, null, null, null, null, userId);
     }
 
     @Test
     void getProducts_throwsResourceNotFoundException() {
         String institutionId = "institutionId";
         String userId = "userId";
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(
                 institutionId,
                 null,
                 null,
@@ -510,13 +511,13 @@ class UserConnectorImplTest extends BaseConnectorTest {
         Executable executable = () -> userConnector.getProducts(institutionId, userId);
 
         assertThrows(ResourceNotFoundException.class, executable);
-        verify(userInstitutionApiRestClient, times(1))._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, null, null, null, userId);
+        verify(userInstitutionApiRestClient, times(1))._retrieveUserInstitutions(institutionId, null, null, null, null, userId);
     }
 
     @Test
     void testCreateOrUpdateUserByFiscalCode() throws IOException {
         // Arrange
-        when(userApiRestClient._usersPost(Mockito.any()))
+        when(userApiRestClient._createOrUpdateByFiscalCode(Mockito.any()))
                 .thenReturn(ResponseEntity.ok("userId"));
 
         ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
@@ -524,7 +525,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         UserToCreate userDto = objectMapper.readValue(resourceStream, new TypeReference<>() {});
 
         CreateUserDto.Role role = new CreateUserDto.Role();
-        role.setPartyRole(it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER);
+        role.setPartyRole(PartyRole.MANAGER);
         role.setProductRole("admin");
 
         CreateUserDto.Role role2 = new CreateUserDto.Role();
@@ -542,7 +543,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String userId = userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role, role2));
 
         // Assert that nothing has changed
-        verify(userApiRestClient)._usersPost(Mockito.any());
+        verify(userApiRestClient)._createOrUpdateByFiscalCode(Mockito.any());
         assertEquals("userId", userId);
     }
 
@@ -594,7 +595,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         ClassPathResource userDtoResource = new ClassPathResource("stubs/CreateUserDto.json");
         byte[] userDtoResourceStream = Files.readAllBytes(userDtoResource.getFile().toPath());
         it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto createUserDto = objectMapper.readValue(userDtoResourceStream, new TypeReference<>() {});
-        when(userApiRestClient._usersPost(createUserDto))
+        when(userApiRestClient._createOrUpdateByFiscalCode(createUserDto))
                 .thenReturn(ResponseEntity.ok(null));
 
         ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
@@ -617,7 +618,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String userId = userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role));
 
         // Assert that nothing has changed
-        verify(userApiRestClient)._usersPost(createUserDto);
+        verify(userApiRestClient)._createOrUpdateByFiscalCode(createUserDto);
         assertNull(userId);
     }
 
@@ -627,7 +628,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         ClassPathResource userDtoResource = new ClassPathResource("stubs/CreateUserDto.json");
         byte[] userDtoResourceStream = Files.readAllBytes(userDtoResource.getFile().toPath());
         it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto createUserDto = objectMapper.readValue(userDtoResourceStream, new TypeReference<>() {});
-        when(userApiRestClient._usersPost(createUserDto))
+        when(userApiRestClient._createOrUpdateByFiscalCode(createUserDto))
                 .thenReturn(ResponseEntity.ok(""));
 
         ClassPathResource resource = new ClassPathResource("stubs/UserToCreate.json");
@@ -650,7 +651,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String userId = userConnector.createOrUpdateUserByFiscalCode(institution, "productId", userDto, List.of(role));
 
         // Assert that nothing has changed
-        verify(userApiRestClient)._usersPost(createUserDto);
+        verify(userApiRestClient)._createOrUpdateByFiscalCode(createUserDto);
         assertEquals("", userId);
     }
     @Test
@@ -660,7 +661,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         AddUserRoleDto addUserRoleDto = objectMapper.readValue(userRoleResourceStream, new TypeReference<>() {});
 
         // Arrange
-        when(userApiRestClient._usersUserIdPost("userId", addUserRoleDto))
+        when(userApiRestClient._createOrUpdateByUserId("userId", addUserRoleDto))
                 .thenReturn(ResponseEntity.ok().build());
 
         CreateUserDto.Role role = new CreateUserDto.Role();
@@ -680,7 +681,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         userConnector.createOrUpdateUserByUserId(institution, "productId", "userId", List.of(role));
 
         // Assert that nothing has changed
-        verify(userApiRestClient)._usersUserIdPost("userId", addUserRoleDto);
+        verify(userApiRestClient)._createOrUpdateByUserId("userId", addUserRoleDto);
     }
 
 
@@ -695,7 +696,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         UserInstitutionResponse userInstitutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
 
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(institutionId, null, List.of(userInfoFilter.getProductId()), null,
                 userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), null))
                 .thenReturn(ResponseEntity.ok(List.of(userInstitutionResponse)));
 
@@ -713,7 +714,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId("productId");
         userInfoFilter.setAllowedStates(List.of(ACTIVE, SUSPENDED));
-        when(userInstitutionApiRestClient._institutionsInstitutionIdUserInstitutionsGet(institutionId, null, List.of(userInfoFilter.getProductId()), null,
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(institutionId, null, List.of(userInfoFilter.getProductId()), null,
                 userInfoFilter.getAllowedStates().stream().map(Enum::name).toList(), null))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
@@ -741,7 +742,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         UserInfo expectedUserInfo = userMapper.toUserInfo(userDataResponseList.get(0));
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(
+        when(userApiRestClient._retrieveUsers(
                 institutionId,
                 userId,
                 userId,
@@ -757,7 +758,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         // then
         assertNotNull(result);
         assertEquals(expectedUserInfo, result);
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(
+        verify(userApiRestClient, times(1))._retrieveUsers(
                 institutionId,
                 userId,
                 userId,
@@ -775,7 +776,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String productId = "productId";
         List<String> statusFilter = List.of(ACTIVE.name(), SUSPENDED.name());
 
-        when(userApiRestClient._usersUserIdInstitutionInstitutionIdGet(
+        when(userApiRestClient._retrieveUsers(
                 institutionId,
                 userId,
                 userId,
@@ -790,7 +791,7 @@ class UserConnectorImplTest extends BaseConnectorTest {
 
         // then
         assertThrows(ResourceNotFoundException.class, executable);
-        verify(userApiRestClient, times(1))._usersUserIdInstitutionInstitutionIdGet(
+        verify(userApiRestClient, times(1))._retrieveUsers(
                 institutionId,
                 userId,
                 userId,
