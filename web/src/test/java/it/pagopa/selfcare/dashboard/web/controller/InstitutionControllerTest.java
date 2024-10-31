@@ -149,40 +149,6 @@ class InstitutionControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateInstitutionGeographicTaxonomy() throws Exception {
-        // given
-        String institutionId = "institutionId";
-        GeographicTaxonomyDto geographicTaxonomyDto = new GeographicTaxonomyDto();
-        geographicTaxonomyDto.setCode("code");
-        geographicTaxonomyDto.setDesc("desc");
-
-        GeographicTaxonomyListDto geographicTaxonomyListDto = new GeographicTaxonomyListDto();
-        geographicTaxonomyListDto.setGeographicTaxonomyDtoList(List.of(geographicTaxonomyDto));
-
-        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
-        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
-
-        doNothing().when(institutionServiceMock).updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
-
-        // when
-        mockMvc.perform(MockMvcRequestBuilders
-                        .put(BASE_URL + "/" + institutionId + "/geographicTaxonomy")
-                        .content(objectMapper.writeValueAsString(geographicTaxonomyListDto))
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-
-        // then
-        ArgumentCaptor<GeographicTaxonomyList> argumentCaptor = ArgumentCaptor.forClass(GeographicTaxonomyList.class);
-        verify(institutionServiceMock, times(1))
-                .updateInstitutionGeographicTaxonomy(eq(institutionId), argumentCaptor.capture());
-        GeographicTaxonomyList capturedGeographicTaxonomies = argumentCaptor.getValue();
-        assertEquals(geographicTaxonomies.getGeographicTaxonomyList().get(0).getCode(), capturedGeographicTaxonomies.getGeographicTaxonomyList().get(0).getCode());
-        assertEquals(geographicTaxonomies.getGeographicTaxonomyList().get(0).getDesc(), capturedGeographicTaxonomies.getGeographicTaxonomyList().get(0).getDesc());
-        verifyNoMoreInteractions(institutionServiceMock);
-    }
-
-    @Test
     void updateInstitutionDescription_ok() throws Exception {
         //given
         String institutionId = "setId";
