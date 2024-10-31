@@ -97,34 +97,6 @@ public class InstitutionController {
         return result;
     }
 
-    /**
-     *
-     * @param institutionId
-     * @param geographicTaxonomyListDto
-     * @deprecated
-     */
-    @Deprecated(forRemoval = true)
-    @PutMapping(value = "/{institutionId}/geographicTaxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
-    public void updateInstitutionGeographicTaxonomyDeprecated(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                    @PathVariable("institutionId")
-                                                    String institutionId,
-                                                    @ApiParam("${swagger.dashboard.institutions.model.geographicTaxonomy}")
-                                                    @RequestBody
-                                                    @Valid
-                                                    GeographicTaxonomyListDto geographicTaxonomyListDto) {
-        log.trace("updateInstitutionGeographicTaxonomy start");
-        log.debug("updateInstitutionGeographicTaxonomy institutionId = {}, geographic taxonomies = {}", Encode.forJava(institutionId), Encode.forJava(geographicTaxonomyListDto.toString()));
-        GeographicTaxonomyList geographicTaxonomies = new GeographicTaxonomyList();
-        geographicTaxonomies.setGeographicTaxonomyList(geographicTaxonomyListDto.getGeographicTaxonomyDtoList().stream().map(GeographicTaxonomyMapper::fromDto).toList());
-        institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomies);
-        log.trace("updateInstitutionsGeographicTaxonomy end");
-    }
-
-
-
     @PutMapping(value = "/{institutionId}/geographic-taxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
