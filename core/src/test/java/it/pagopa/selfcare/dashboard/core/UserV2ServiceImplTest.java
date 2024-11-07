@@ -11,7 +11,6 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
-import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
 import it.pagopa.selfcare.product.entity.Product;
@@ -34,12 +33,11 @@ import java.nio.file.Files;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER;
+import static it.pagopa.selfcare.onboarding.common.PartyRole.OPERATOR;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 public class UserV2ServiceImplTest extends BaseServiceTest {
@@ -337,13 +335,13 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(PartyRole.OPERATOR);
+        roleDto.setPartyRole(OPERATOR);
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
         doNothing().when(userApiConnectorMock).createOrUpdateUserByUserId(institution, productId, userId, List.of(roleDto));
 
-        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, null);
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, OPERATOR.name());
 
         verify(userApiConnectorMock, times(1))
                 .createOrUpdateUserByUserId(institution, productId, userId, List.of(roleDto));
@@ -376,6 +374,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         UserToCreate userToCreate = new UserToCreate();
         HashSet<String> productRoles = new HashSet<>();
         productRoles.add(productRole);
+        userToCreate.setRole(PartyRole.MANAGER);
         userToCreate.setProductRoles(productRoles);
 
         Product product = getProduct();
@@ -390,7 +389,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(PartyRole.OPERATOR);
+        roleDto.setPartyRole(MANAGER);
 
 
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
@@ -481,7 +480,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         productRole.setCode("operator");
         productRole.setLabel("operator");
         productRoleInfoOperator.setRoles(List.of(productRole));
-        map.put(PartyRole.OPERATOR, productRoleInfoOperator);
+        map.put(OPERATOR, productRoleInfoOperator);
 
         ProductRoleInfo productRoleInfoDelegate= new ProductRoleInfo();
         productRoleInfoDelegate.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD.value));
