@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.connector.model.delegation;
 
-import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 
 import java.time.OffsetDateTime;

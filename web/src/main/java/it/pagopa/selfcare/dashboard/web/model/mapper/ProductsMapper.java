@@ -7,14 +7,20 @@ import it.pagopa.selfcare.dashboard.web.model.product.ProductRoleMappingsResourc
 import it.pagopa.selfcare.dashboard.web.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.web.model.product.SubProductResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
-import it.pagopa.selfcare.product.entity.*;
+import it.pagopa.selfcare.product.entity.BackOfficeConfigurations;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ProductsMapper {
+
+    static final Map<PartyRole, SelfCareAuthority> ROLE_MAP = Map.of(
+            PartyRole.OPERATOR, SelfCareAuthority.LIMITED,
+            PartyRole.ADMIN_EA, SelfCareAuthority.ADMIN_EA
+    );
 
     public static ProductsResource toResource(ProductTree model) {
         ProductsResource resource = null;
@@ -99,7 +105,7 @@ public class ProductsMapper {
         if (entry != null) {
             resource = new ProductRoleMappingsResource();
             resource.setPartyRole(entry.getKey().name());
-            resource.setSelcRole(entry.getKey() != PartyRole.OPERATOR ? SelfCareAuthority.ADMIN : SelfCareAuthority.LIMITED);
+            resource.setSelcRole(toSelcRole(entry.getKey()));
             resource.setMultiroleAllowed(entry.getValue().isMultiroleAllowed());
             resource.setPhasesAdditionAllowed(entry.getValue().getPhasesAdditionAllowed());
 
@@ -122,6 +128,10 @@ public class ProductsMapper {
             resource.setDescription(productRole.getDescription());
         }
         return resource;
+    }
+
+    static SelfCareAuthority toSelcRole(PartyRole partyRole) {
+        return ROLE_MAP.getOrDefault(partyRole, SelfCareAuthority.ADMIN);
     }
 
 }
