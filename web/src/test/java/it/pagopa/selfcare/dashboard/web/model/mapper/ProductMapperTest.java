@@ -108,7 +108,7 @@ class ProductMapperTest {
     @Test
     void toProductRoleMappingsResource_fromEntry_nullRoles() {
         // given
-        Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.DELEGATE, mockInstance(new ProductRoleInfo()));
+        Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.OPERATOR, mockInstance(new ProductRoleInfo()));
         // when
         ProductRoleMappingsResource output = ProductsMapper.toProductRoleMappingsResource(input);
         // then
@@ -118,7 +118,7 @@ class ProductMapperTest {
 
 
     @Test
-    void toProductRoleMappingsResource_fromEntry_notNull() {
+    void toProductRoleMappingsResource_fromEntry_notNull_ADMIN() {
         // given
         ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo(), "setRoles");
         productRoleInfo.setRoles(List.of(mockInstance(new ProductRole())));
@@ -131,6 +131,23 @@ class ProductMapperTest {
         assertEquals(productRoleInfo.getRoles().size(), output.getProductRoles().size());
         assertEquals(input.getKey().name(), output.getPartyRole());
         assertEquals(SelfCareAuthority.ADMIN, output.getSelcRole());
+        assertEquals(input.getValue().isMultiroleAllowed(), output.isMultiroleAllowed());
+    }
+
+    @Test
+    void toProductRoleMappingsResource_fromEntry_notNull_ADMIN_EA() {
+        // given
+        ProductRoleInfo productRoleInfo = mockInstance(new ProductRoleInfo(), "setRoles");
+        productRoleInfo.setRoles(List.of(mockInstance(new ProductRole())));
+        Map.Entry<PartyRole, ProductRoleInfo> input = Map.entry(PartyRole.ADMIN_EA, productRoleInfo);
+        // when
+        ProductRoleMappingsResource output = ProductsMapper.toProductRoleMappingsResource(input);
+        // then
+        assertNotNull(output);
+        assertNotNull(output.getProductRoles());
+        assertEquals(productRoleInfo.getRoles().size(), output.getProductRoles().size());
+        assertEquals(input.getKey().name(), output.getPartyRole());
+        assertEquals(SelfCareAuthority.ADMIN_EA, output.getSelcRole());
         assertEquals(input.getValue().isMultiroleAllowed(), output.isMultiroleAllowed());
     }
 
