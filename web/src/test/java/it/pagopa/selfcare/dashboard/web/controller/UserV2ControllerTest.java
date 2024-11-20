@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -223,13 +224,14 @@ class UserV2ControllerTest extends BaseControllerTest {
         UserInfo userInfo = objectMapper.readValue(userInfoStream, UserInfo.class);
         List<UserInfo> userInfos = List.of(userInfo);
 
-        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, null, "userId")).thenReturn(userInfos);
+        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, null, List.of(PartyRole.MANAGER.name()), "userId")).thenReturn(userInfos);
 
         // when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/institution/" + institutionId)
                         .principal(authentication)
                         .queryParam("productId", productId)
+                        .queryParam("roles", PartyRole.MANAGER.name())
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -237,7 +239,7 @@ class UserV2ControllerTest extends BaseControllerTest {
 
         // then
         verify(userServiceMock, times(1))
-                .getUsersByInstitutionId(institutionId, productId, null, "userId");
+                .getUsersByInstitutionId(institutionId, productId, null, List.of(PartyRole.MANAGER.name()), "userId");
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -397,7 +399,7 @@ class UserV2ControllerTest extends BaseControllerTest {
         when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
 
         // when
-        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, null, "userId"))
+        when(userServiceMock.getUsersByInstitutionId(institutionId, productId, null, null, "userId"))
                 .thenReturn(List.of(new UserInfo()));
 
         // when
@@ -412,7 +414,7 @@ class UserV2ControllerTest extends BaseControllerTest {
 
         // then
         verify(userServiceMock, times(1))
-                .getUsersByInstitutionId(institutionId, productId, null, "userId");
+                .getUsersByInstitutionId(institutionId, productId, null, null, "userId");
         verifyNoMoreInteractions(userServiceMock);
     }
 

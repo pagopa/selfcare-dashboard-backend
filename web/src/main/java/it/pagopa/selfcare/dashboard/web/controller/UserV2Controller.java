@@ -163,13 +163,14 @@ public class UserV2Controller {
                                               @PathVariable("institutionId") String institutionId,
                                               @RequestParam(value = "productId", required = false) String productId,
                                               @RequestParam(value = "productRoles", required = false) List<String> productRoles,
+                                              @RequestParam(value = "roles", required = false) List<String> roles,
                                               Authentication authentication) {
         log.trace("getUsers start");
         log.debug("getUsers for institution: {} and product: {}", institutionId, productId);
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
 
         List<ProductUserResource> response = new ArrayList<>();
-        Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Collection<UserInfo> userInfos = userService.getUsersByInstitutionId(institutionId, productId, productRoles, roles, loggedUserId);
         userInfos.forEach(userInfo -> response.addAll(UserMapper.toProductUsers(userInfo)));
         log.debug("getUsers result = {}", response);
         log.trace("getUsers end");
