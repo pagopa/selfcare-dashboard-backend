@@ -3,7 +3,6 @@ package it.pagopa.selfcare.dashboard.connector.rest.model.mapper;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -92,6 +91,7 @@ public interface UserMapper {
                 onboardedProducts.forEach(onboardedProduct -> {
                     RoleInfo roleInfo = new RoleInfo();
                     productInfo.setId(onboardedProduct.getProductId());
+                    productInfo.setCreatedAt(onboardedProduct.getCreatedAt());
                     roleInfo.setRole(onboardedProduct.getProductRole());
                     roleInfo.setStatus(onboardedProduct.getStatus().name());
                     roleInfo.setSelcRole(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProduct.getRole()).getSelfCareAuthority());
