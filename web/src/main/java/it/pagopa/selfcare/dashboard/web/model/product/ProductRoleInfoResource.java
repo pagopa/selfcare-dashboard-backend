@@ -13,7 +13,7 @@ public class ProductRoleInfoResource {
     private String role;
     @ApiModelProperty(value = "${swagger.dashboard.user.model.status}")
     private String status;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.selcRole}")
     private SelfCareAuthority selcRole;
 
 }

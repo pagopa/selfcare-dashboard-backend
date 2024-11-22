@@ -37,7 +37,7 @@ public class ProductUserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.email}")
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.selcRole}")
     private SelfCareAuthority role;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.product}")

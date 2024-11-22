@@ -3938,7 +3938,7 @@
           },
           "selcRole" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
+            "description" : "User's Selfcare role, available value: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -4031,7 +4031,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
+            "description" : "User's Selfcare role, available value: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
