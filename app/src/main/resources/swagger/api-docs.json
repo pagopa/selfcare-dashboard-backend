@@ -2466,6 +2466,16 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "roles",
+          "in" : "query",
+          "description" : "roles",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -3928,7 +3938,7 @@
           },
           "selcRole" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
+            "description" : "User's Selfcare role, available value: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -3993,9 +4003,18 @@
         "title" : "ProductUserResource",
         "type" : "object",
         "properties" : {
+          "createdAt" : {
+            "type" : "string",
+            "description" : "User's creation date associated with a product",
+            "format" : "date-time"
+          },
           "email" : {
             "type" : "string",
             "description" : "User's personal email"
+          },
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
           },
           "id" : {
             "type" : "string",
@@ -4012,7 +4031,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
+            "description" : "User's Selfcare role, available value: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {

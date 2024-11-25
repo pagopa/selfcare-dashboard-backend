@@ -177,10 +177,11 @@ public class UserConnectorImpl implements UserApiConnector {
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
 
-        List<String> roles = Arrays.stream(PartyRole.values())
-                .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
-                .map(Enum::name)
-                .toList();
+        List<String> roles = Optional.ofNullable(userInfoFilter.getRoles()).orElse(
+                Arrays.stream(PartyRole.values())
+                        .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
+                        .map(Enum::name)
+                        .toList());
 
         return Optional.ofNullable(userApiRestClient._retrieveUsers(institutionId,
                                 loggedUserId,

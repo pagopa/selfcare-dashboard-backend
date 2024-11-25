@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiModelProperty;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -30,10 +31,13 @@ public class ProductUserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
     private String surname;
 
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
+    private String fiscalCode;
+
     @ApiModelProperty(value = "${swagger.dashboard.user.model.email}")
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.selcRole}")
     private SelfCareAuthority role;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.product}")
@@ -41,6 +45,9 @@ public class ProductUserResource {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.status}")
     private String status;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.createdAt}")
+    private LocalDateTime createdAt;
 
 
 }

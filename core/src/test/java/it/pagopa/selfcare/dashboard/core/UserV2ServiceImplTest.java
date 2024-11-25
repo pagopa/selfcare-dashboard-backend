@@ -152,7 +152,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         List<String> productRoles = new ArrayList<>();
         String loggedUserId = "loggedUserId";
 
-        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, null, loggedUserId);
         Assertions.assertTrue(result.isEmpty());
     }
 
@@ -171,7 +171,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
 
         when(userApiConnectorMock.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(new ArrayList<>());
 
-        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, null, loggedUserId);
         Assertions.assertTrue(result.isEmpty());
     }
 
@@ -195,7 +195,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
 
         when(userApiConnectorMock.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(userInfo);
 
-        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, loggedUserId);
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, null, loggedUserId);
         Assertions.assertEquals(userInfo, result);
         Mockito.verify(userApiConnectorMock, Mockito.times(1)).getUsers(institutionId, userInfoFilter, loggedUserId);
     }

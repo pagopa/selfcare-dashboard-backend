@@ -117,13 +117,14 @@ public class UserV2ServiceImpl implements UserV2Service {
     }
 
     @Override
-    public Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, List<String> productRoles, String loggedUserId) {
+    public Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, List<String> productRoles, List<String> roles, String loggedUserId) {
         log.trace("getUsersByInstitutionId start");
         log.debug("getUsersByInstitutionId institutionId = {}", institutionId);
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
         userInfoFilter.setProductRoles(productRoles);
         userInfoFilter.setAllowedStates(allowedStates);
+        userInfoFilter.setRoles(roles);
         Collection<UserInfo> result = userApiConnector.getUsers(institutionId, userInfoFilter, loggedUserId);
         log.info("getUsersByInstitutionId result size = {}", result.size());
         log.trace("getUsersByInstitutionId end");

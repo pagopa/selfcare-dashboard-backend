@@ -5,7 +5,8 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipStat
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(of = "id")
@@ -24,6 +25,7 @@ public class UserInfo {
         private SelfCareAuthority role;
         private String productId;
         private List<String> productRoles;
+        private List<String> roles;
         private String userId;
         private List<RelationshipState> allowedStates;
     }

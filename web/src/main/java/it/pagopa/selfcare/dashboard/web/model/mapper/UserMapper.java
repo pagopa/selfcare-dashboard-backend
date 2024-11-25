@@ -154,6 +154,7 @@ public class UserMapper {
                 if (model.getUser() != null) {
                     resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
                     resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
+                    resource.setFiscalCode(model.getUser().getFiscalCode());
                     Optional.ofNullable(model.getUser().getWorkContacts())
                             .map(map -> map.get(model.getUserMailUuid()))
                             .map(WorkContact::getEmail)
@@ -161,6 +162,7 @@ public class UserMapper {
                             .ifPresent(resource::setEmail);
                 }
                 resource.setProduct(UserMapper.toUserProductInfoResource(productInfo));
+                resource.setCreatedAt(productInfo.getCreatedAt());
                 response.add(resource);
             });
         }
