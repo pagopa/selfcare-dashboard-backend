@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 
 @Data
 public class UpdateUserDto {
@@ -17,4 +18,8 @@ public class UpdateUserDto {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalEmail}")
     @Email
     private String email;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalPhone}")
+    @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "Il numero di telefono non è valido")
+    private String mobilePhone;
 }

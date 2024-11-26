@@ -4278,6 +4278,11 @@
             "format" : "email",
             "example" : "email@example.com"
           },
+          "mobilePhone" : {
+            "pattern" : "^\\+?[0-9]{9,15}$",
+            "type" : "string",
+            "description" : "User's institutional phone number"
+          },
           "name" : {
             "type" : "string",
             "description" : "User's name"
