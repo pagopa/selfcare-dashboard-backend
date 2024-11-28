@@ -27,6 +27,7 @@ public interface UserMapper {
     @Mapping(target = "name",  expression = "java(toCertifiedField(response.getName()))")
     @Mapping(target = "familyName",  expression = "java(toCertifiedField(response.getFamilyName()))")
     @Mapping(target = "email",  expression = "java(toCertifiedField(response.getEmail()))")
+    @Mapping(target = "mobilePhone",  expression = "java(toCertifiedField(response.getMobilePhone()))")
     @Mapping(target = "workContacts", expression = "java(toCertifiedWorkContact(response.getWorkContacts()))")
     User toUser(UserDetailResponse response);
 
@@ -38,6 +39,7 @@ public interface UserMapper {
     @Mapping(target = "user.name", expression = "java(toCertifiedField(userResponse.getName()))")
     @Mapping(target = "user.familyName", expression = "java(toCertifiedField(userResponse.getSurname()))")
     @Mapping(target = "user.email", expression = "java(toCertifiedField(userResponse.getEmail()))")
+    @Mapping(target = "user.mobilePhone", expression = "java(toCertifiedField(userResponse.getMobilePhone()))")
     @Mapping(target = "user.workContacts", expression = "java(toUserInfoContacts(userResponse.getWorkContacts()))")
     @Mapping(target = "role", expression = "java(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(userDashboardResponse.getRole()).getSelfCareAuthority())")
     @Mapping(target = "products", expression = "java(toProductInfoMap(userDashboardResponse.getProducts()))")

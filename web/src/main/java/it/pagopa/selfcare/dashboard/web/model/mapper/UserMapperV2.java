@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.web.model.mapper;
 
-import it.pagopa.selfcare.dashboard.connector.exception.InvalidRequestException;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.user.CertifiedFieldResource;
@@ -22,6 +21,7 @@ public interface UserMapperV2 {
     @Mapping(target = "name", expression = "java(toCertifiedFieldResource(model.getName()))")
     @Mapping(target = "familyName", expression = "java(toCertifiedFieldResource(model.getFamilyName()))")
     @Mapping(target = "email", expression = "java(toCertifiedFieldResource(model.getEmail()))")
+    @Mapping(target = "mobilePhone", expression = "java(toCertifiedFieldResource(model.getMobilePhone()))")
     UserResource toUserResource(User model);
 
     UpdateUserRequestDto fromUpdateUser(UpdateUserDto userDto);

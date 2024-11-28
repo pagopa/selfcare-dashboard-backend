@@ -22,10 +22,11 @@
     ],
     "userResponse": {
       "id": "id",
-      "taxCode": "name",
-      "name": "email",
-      "surname": "ACTIVE",
-      "email": "2020-01-01T00:00:00Z",
+      "taxCode": "taxCode",
+      "name": "name",
+      "surname": "surname",
+      "email": "email",
+      "mobilePhone": "phone",
       "workContacts": null
     }
   }

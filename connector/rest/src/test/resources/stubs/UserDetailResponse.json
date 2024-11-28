@@ -10,6 +10,9 @@
   "email": {
     "value": "john.doe@example.com"
   },
+  "mobilePhone": {
+    "value": "0000000000"
+  },
   "workContacts": {
     "institution1": {
       "email": {

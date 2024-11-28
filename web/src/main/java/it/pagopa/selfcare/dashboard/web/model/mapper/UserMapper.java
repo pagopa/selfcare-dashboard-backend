@@ -106,6 +106,7 @@ public class UserMapper {
                 resource.setName(CertifiedFieldMapper.toValue(model.getUser().getName()));
                 resource.setSurname(CertifiedFieldMapper.toValue(model.getUser().getFamilyName()));
                 resource.setEmail(CertifiedFieldMapper.toValue(model.getUser().getEmail()));
+                resource.setMobilePhone(CertifiedFieldMapper.toValue(model.getUser().getMobilePhone()));
             }
             if (model.getProducts() != null) {
                 resource.setProducts(model.getProducts().values().stream()
