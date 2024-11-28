@@ -13,7 +13,6 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,7 +45,7 @@ class UpdateUserDtoTest {
                     Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
                     return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
                 })
-                .collect(Collectors.toList());
+                .toList();
         assertTrue(filteredViolations.isEmpty());
     }
 
@@ -56,6 +55,7 @@ class UpdateUserDtoTest {
         // given
         UpdateUserDto model = TestUtils.mockInstance(new UpdateUserDto());
         model.setEmail("email@example.com");
+        model.setMobilePhone("1234567890");
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(model);
         // then
@@ -69,6 +69,7 @@ class UpdateUserDtoTest {
         HashMap<String, Class<? extends Annotation>> toCheckMap = new HashMap<>();
         toCheckMap.put("email", Email.class);
         UpdateUserDto model = TestUtils.mockInstance(new UpdateUserDto());
+        model.setMobilePhone("1234567890");
         // when
         Set<ConstraintViolation<Object>> violations = validator.validate(model);
         // then
@@ -77,7 +78,7 @@ class UpdateUserDtoTest {
                     Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
                     return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
                 })
-                .collect(Collectors.toList());
+                .toList();
         assertTrue(filteredViolations.isEmpty());
     }
 
