@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.core.UserV2Service;
 import it.pagopa.selfcare.dashboard.web.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
+import it.pagopa.selfcare.dashboard.web.model.user.GetUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,8 +137,8 @@ class UserV2ControllerTest extends BaseControllerTest {
         byte[] userStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "User.json"));
         User user = objectMapper.readValue(userStream, new TypeReference<>() {
         });
-        byte[] userInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserResource.json"));
-        UserResource userResource = objectMapper.readValue(userInfoStream, new TypeReference<>() {
+        byte[] userInfoStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "GetUserResource.json"));
+        GetUserResource userResource = objectMapper.readValue(userInfoStream, new TypeReference<>() {
         });
         when(userServiceMock.getUserById(userId, institutionId, fields)).thenReturn(user);
 

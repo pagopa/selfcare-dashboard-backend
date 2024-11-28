@@ -2660,7 +2660,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/UserResource"
+                  "$ref" : "#/components/schemas/GetUserResource"
                 }
               }
             }
@@ -3391,6 +3391,33 @@
           "desc" : {
             "type" : "string",
             "description" : "Institution's geographic taxonomy extended name"
+          }
+        }
+      },
+      "GetUserResource" : {
+        "title" : "GetUserResource",
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "description" : "User's institutional email",
+            "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
+          },
+          "familyName" : {
+            "description" : "User's surname",
+            "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
+          },
+          "fiscalCode" : {
+            "type" : "string",
+            "description" : "User's fiscal code"
+          },
+          "id" : {
+            "type" : "string",
+            "description" : "User's unique identifier",
+            "format" : "uuid"
+          },
+          "name" : {
+            "description" : "User's name",
+            "$ref" : "#/components/schemas/CertifiedFieldResourceOfstring"
           }
         }
       },

@@ -1,0 +1,16 @@
+{
+  "id": "c8b70220-dbe2-4e33-925e-92b96f8b65e6",
+  "name": {
+    "certified": true,
+    "value": "name"
+  },
+  "familyName": {
+    "certified": true,
+    "value": "familyName"
+  },
+  "email": {
+    "certified": true,
+    "value": "email@example.com"
+  },
+  "fiscalCode": "fiscalCode"
+}

@@ -17,6 +17,7 @@ import it.pagopa.selfcare.dashboard.web.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.web.model.product.ProductUserResource;
+import it.pagopa.selfcare.dashboard.web.model.user.GetUserResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +96,7 @@ public class UserV2Controller {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user.api.getUserByInternalId}", nickname = "v2GetUserByIdUsingGET")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ManageProductUsers')")
-    public UserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
+    public GetUserResource getUserById(@ApiParam("${swagger.dashboard.user.model.id}")
                                     @PathVariable("id") String userId,
                                     @ApiParam("${swagger.dashboard.institutions.model.id}")
                                     @RequestParam(value = "institutionId")
@@ -108,7 +109,7 @@ public class UserV2Controller {
         User user = userService.getUserById(userId, institutionId, fields);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
-        return userMapperV2.toUserResource(user);
+        return userMapperV2.toGetUserResource(user);
     }
 
     @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
