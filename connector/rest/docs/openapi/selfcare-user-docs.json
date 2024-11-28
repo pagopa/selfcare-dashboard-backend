@@ -1636,6 +1636,7 @@
             "type" : "string"
           },
           "mobilePhone" : {
+            "pattern" : "^\\+?[0-9]{9,15}$",
             "type" : "string"
           }
         }
@@ -1717,6 +1718,9 @@
             "$ref" : "#/components/schemas/CertifiableFieldResponseString"
           },
           "email" : {
+            "$ref" : "#/components/schemas/CertifiableFieldResponseString"
+          },
+          "mobilePhone" : {
             "$ref" : "#/components/schemas/CertifiableFieldResponseString"
           },
           "workContacts" : {
