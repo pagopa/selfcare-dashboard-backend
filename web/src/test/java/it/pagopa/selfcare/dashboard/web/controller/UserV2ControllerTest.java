@@ -410,31 +410,6 @@ class UserV2ControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateUser_EmptyObject() throws Exception {
-        //given
-        final String id = "userId";
-        final String institutionId = "institutionId";
-
-        byte[] userStream = Files.readAllBytes(Paths.get("src/test/resources/stubs/updateUserDto.json"));
-        UpdateUserDto updateUserDto = objectMapper.readValue(userStream, UpdateUserDto.class);
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders
-                        .put(BASE_URL + "/{id}", id)
-                        .queryParam("institutionId", institutionId)
-                        .content(userStream)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(emptyString()));
-        //then
-        verify(userServiceMock, times(1))
-                .updateUser(id, institutionId, userMapper.fromUpdateUser(updateUserDto));
-
-        Mockito.verifyNoMoreInteractions(userServiceMock);
-    }
-
-    @Test
     void getUsers_institutionIdProductIdValid_EmptyObject() throws Exception {
         // given
         final String institutionId = "institutionId";

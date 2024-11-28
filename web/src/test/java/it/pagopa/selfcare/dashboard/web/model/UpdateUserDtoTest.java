@@ -13,7 +13,6 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,7 +45,7 @@ class UpdateUserDtoTest {
                     Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
                     return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
                 })
-                .collect(Collectors.toList());
+                .toList();
         assertTrue(filteredViolations.isEmpty());
     }
 
@@ -79,7 +78,7 @@ class UpdateUserDtoTest {
                     Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
                     return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
                 })
-                .collect(Collectors.toList());
+                .toList();
         assertTrue(filteredViolations.isEmpty());
     }
 
