@@ -3138,7 +3138,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
           },
           "surname" : {
             "type" : "string",
@@ -3684,7 +3684,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -3942,7 +3942,7 @@
           },
           "selcRole" : {
             "type" : "string",
-            "description" : "User's Selfcare role, available value: [ADMIN, ADMIN_EA, LIMITED]",
+            "description" : "User's Selfcare role, available values: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -4035,7 +4035,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's Selfcare role, available value: [ADMIN, ADMIN_EA, LIMITED]",
+            "description" : "User's Selfcare role, available values: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -4283,7 +4283,7 @@
             "example" : "email@example.com"
           },
           "mobilePhone" : {
-            "pattern" : "^\\+?[0-9]{9,15}$",
+            "pattern" : "^\\+?[0-9]{7,15}$",
             "type" : "string",
             "description" : "User's institutional phone number"
           },
@@ -4468,7 +4468,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available value: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
           }
         }
       },
