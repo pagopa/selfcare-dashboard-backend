@@ -15,6 +15,10 @@
       "certification": "NONE",
       "value": "string"
     },
+    "mobilePhone": {
+      "certification": "NONE",
+      "value": "string"
+    },
     "workContacts": {
       "string": {
         "email": {

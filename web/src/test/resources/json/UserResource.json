@@ -12,6 +12,10 @@
     "certified": true,
     "value": "email@example.com"
   },
+  "mobilePhone": {
+    "certified": true,
+    "value": "0000000000"
+  },
   "fiscalCode": "fiscalCode",
   "workContacts": {
     "contact1": {

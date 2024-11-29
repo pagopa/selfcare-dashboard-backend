@@ -15,6 +15,7 @@ public class User {
     private CertifiedField<String> name;
     private CertifiedField<String> familyName;
     private CertifiedField<String> email;
+    private CertifiedField<String> mobilePhone;
     private Map<String, WorkContact> workContacts;
 
 

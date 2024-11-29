@@ -3,6 +3,7 @@
   "name": "string",
   "surname": "string",
   "email": "string",
+  "mobilePhone": "string",
   "role": "ADMIN",
   "status": "string",
   "products": [

@@ -13,6 +13,10 @@
     "certification": "SPID",
     "value": "email@example.com"
   },
+  "mobilePhone": {
+    "certification": "SPID",
+    "value": "0000000000"
+  },
   "workContacts": {
     "contact1": {
       "email": {
