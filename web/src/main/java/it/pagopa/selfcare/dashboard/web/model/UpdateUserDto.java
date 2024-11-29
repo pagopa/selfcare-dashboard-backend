@@ -20,6 +20,6 @@ public class UpdateUserDto {
     private String email;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalPhone}")
-    @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "Il numero di telefono non è valido")
+    @Pattern(regexp = "^\\+?[0-9]{7,15}$", message = "Il numero di telefono non è valido")
     private String mobilePhone;
 }
