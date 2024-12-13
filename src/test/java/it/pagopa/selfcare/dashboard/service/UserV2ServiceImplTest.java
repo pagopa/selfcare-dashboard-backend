@@ -1,0 +1,512 @@
+package it.pagopa.selfcare.dashboard.service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
+import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
+import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.exception.InvalidOnboardingStatusException;
+import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.model.institution.OnboardedProduct;
+import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.model.user.*;
+import it.pagopa.selfcare.dashboard.model.user.CreateUserDto;
+import it.pagopa.selfcare.dashboard.model.user.User;
+import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
+import it.pagopa.selfcare.dashboard.service.UserV2ServiceImpl;
+import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
+import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
+import it.pagopa.selfcare.product.entity.ProductRoleInfo;
+import it.pagopa.selfcare.product.service.ProductService;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
+
+import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.*;
+import static it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER;
+import static it.pagopa.selfcare.onboarding.common.PartyRole.OPERATOR;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class UserV2ServiceImplTest extends BaseServiceTest {
+
+    @InjectMocks
+    private UserV2ServiceImpl userV2ServiceImpl;
+    @Mock
+    private UserGroupV2Service userGroupServiceMock;
+    @Mock
+    private UserApiRestClient userApiRestClient;
+    @Mock
+    private CoreInstitutionApiRestClient coreInstitutionApiRestClient;
+    @Mock
+    private ProductService productService;
+    @Spy
+    private InstitutionMapper institutionMapper;
+    @Spy
+    private UserMapper userMapper;
+
+    @BeforeEach
+    public void setUp() {
+        super.setUp();
+    }
+
+    @Test
+    void getInstitutionsNullUserId() {
+
+        String userId = null;
+        Collection<InstitutionBase> result = userV2ServiceImpl.getInstitutions(userId);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getInstitutions() throws IOException {
+
+        String userId = "userId";
+        ClassPathResource resource = new ClassPathResource("expectations/InstitutionBase.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Collection<InstitutionBase> expectedInstitutions = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiRestClient._getUserProductsInfo(userId, null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenReturn(ResponseEntity.ok(new UserInfoResponse()));
+        Collection<InstitutionBase> result = userV2ServiceImpl.getInstitutions(userId);
+        Assertions.assertEquals(expectedInstitutions, result);
+        Mockito.verify(userApiRestClient, Mockito.times(1))._getUserProductsInfo(userId, null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()));
+    }
+
+    @Test
+    void getUserByIdNullUserId() {
+
+        String userId = null;
+        String institutionId = "institutionId";
+        List<String> fields = new ArrayList<>();
+        User result = userV2ServiceImpl.getUserById(userId, institutionId, fields);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void getUserById() throws IOException {
+
+        String userId = "userId";
+        String institutionId = "institutionId";
+        List<String> fields = new ArrayList<>();
+
+        ClassPathResource resource = new ClassPathResource("expectations/User.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        User user = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiRestClient._getUserDetailsById(userId, "field", "institutionId")).thenReturn(ResponseEntity.ok(new UserDetailResponse()));
+
+        User result = userV2ServiceImpl.getUserById(userId, institutionId, fields);
+        Assertions.assertEquals(user, result);
+        Mockito.verify(userApiRestClient, Mockito.times(1))._getUserDetailsById(userId, "field", "institutionId");
+    }
+
+    @Test
+    void searchUserByFiscalCodeNullFiscalCode() {
+
+        String fiscalCode = null;
+        String institutionId = "institutionId";
+        User result = userV2ServiceImpl.searchUserByFiscalCode(fiscalCode, institutionId);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void searchUserByFiscalCodeNullReturn() {
+
+        String fiscalCode = "fiscalCode";
+        String institutionId = "institutionId";
+        when(userApiRestClient._searchUserByFiscalCode(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build())).thenReturn(null);
+        User result = userV2ServiceImpl.searchUserByFiscalCode(fiscalCode, institutionId);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void searchUserByFiscalCode() throws IOException {
+
+        String fiscalCode = "fiscalCode";
+        String institutionId = "institutionId";
+        ClassPathResource resource = new ClassPathResource("expectations/User.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        User user = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+        when(userApiRestClient._searchUserByFiscalCode(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build())).thenReturn(ResponseEntity.ok(new UserDetailResponse()));
+        User result = userV2ServiceImpl.searchUserByFiscalCode(fiscalCode, institutionId);
+        Assertions.assertEquals(user, result);
+        Mockito.verify(userApiRestClient, Mockito.times(1))._searchUserByFiscalCode(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build());
+    }
+
+    @Test
+    void getUsersByInstitutionIdWithoutInstitutionId() {
+        String productId = "productId";
+        List<String> productRoles = new ArrayList<>();
+        String loggedUserId = "loggedUserId";
+
+        Executable executable = () -> userV2ServiceImpl.getUsersByInstitutionId("", productId, productRoles, null, loggedUserId);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+    }
+
+    @Test
+    void getUsersByInstitutionIdEmptyUserInfo() {
+
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String loggedUserId = "loggedUserId";
+        List<String> productRoles = new ArrayList<>();
+        productRoles.add("productRole");
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
+
+        when(userApiRestClient._retrieveUsers(institutionId, loggedUserId, null, productRoles, List.of(productId), null, null)).thenReturn(ResponseEntity.ok(new ArrayList<>()));
+
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, null, loggedUserId);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getUsersByInstitutionId() throws IOException {
+
+        String institutionId = "institutionId";
+        String productId = "productId";
+        List<String> productRoles = new ArrayList<>();
+        productRoles.add("productRole");
+        String loggedUserId = "loggedUserId";
+
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setProductRoles(productRoles);
+
+        ClassPathResource resource = new ClassPathResource("expectations/CollectionUserInfo.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        Collection<UserInfo> userInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
+        });
+
+        when(userApiRestClient._retrieveUsers(institutionId, loggedUserId, null, productRoles, List.of(productId), null, null)).thenReturn(ResponseEntity.ok(new ArrayList<>()));
+
+        Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, null, loggedUserId);
+        Assertions.assertEquals(userInfo, result);
+        Mockito.verify(userApiRestClient, Mockito.times(1))._retrieveUsers(institutionId, loggedUserId, null, productRoles, List.of(productId), null, null);
+    }
+
+    @Test
+    void suspend() {
+
+        String userId = "rel1";
+        String institutionid = "id1";
+        String productId = "prod-pagopa";
+        String productRole = "admin";
+
+        userV2ServiceImpl.suspendUserProduct(userId, institutionid, productId, productRole);
+        verify(userApiRestClient, times(1))
+                ._updateUserProductStatus(userId, institutionid, productId, OnboardedProductState.SUSPENDED, productRole);
+        Mockito.verifyNoMoreInteractions(userApiRestClient);
+    }
+
+
+    @Test
+    void activate() {
+
+        String userId = "rel1";
+        String institutionid = "id1";
+        String productId = "prod-pagopa";
+        String productRole = "admin";
+
+        userV2ServiceImpl.activateUserProduct(userId, institutionid, productId, productRole);
+
+        Mockito.verify(userApiRestClient, Mockito.times(1))
+                ._updateUserProductStatus(userId, institutionid, productId, OnboardedProductState.ACTIVE, productRole);
+        Mockito.verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void delete() {
+
+        String userId = "rel1";
+        String institutionid = "id1";
+        String productId = "prod-pagopa";
+        String productRole = "admin";
+
+        userV2ServiceImpl.deleteUserProduct(userId, institutionid, productId, productRole);
+
+        Mockito.verify(userApiRestClient, Mockito.times(1))
+                ._updateUserProductStatus(userId, institutionid, productId, OnboardedProductState.DELETED, productRole);
+        Mockito.verify(userGroupServiceMock, Mockito.times(1))
+                .deleteMembersByUserId(userId, institutionid, productId);
+        Mockito.verifyNoMoreInteractions(userApiRestClient, userGroupServiceMock);
+    }
+
+    @Test
+    void updateUser() {
+        final String institutionId = "institutionId";
+        final String userId = "userId";
+        final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
+        Institution institutionMock = mockInstance(new Institution());
+
+        InstitutionResponse institution = new InstitutionResponse();
+        institutionMock.setId(institutionId);
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+
+        Executable executable = () -> userV2ServiceImpl.updateUser(userId, institutionId, user);
+
+        assertDoesNotThrow(executable);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(userApiRestClient, times(1))._updateUserRegistryAndSendNotification(eq(userId), eq(institutionId), any(UpdateUserRequest.class));
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void updateUser_nullInstitution() {
+        final String institutionId = "institutionId";
+        final String userId = "userId";
+        final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
+
+        Executable executable = () -> userV2ServiceImpl.updateUser(userId, institutionId, user);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, executable);
+        assertEquals("There is no institution for given institutionId", exception.getMessage());
+        verifyNoInteractions(userApiRestClient);
+    }
+
+    @Test
+    void addUserProductRoles_ok() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        Set<String> productRoles = new HashSet<>(List.of("operator"));
+        String role = "MANAGER";
+        Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(PartyRole.MANAGER);
+
+        AddUserRoleDto addRoleDto = new AddUserRoleDto();
+        addRoleDto.setProduct(it.pagopa.selfcare.user.generated.openapi.v1.dto.Product.builder().productId(productId).build());
+        addRoleDto.setInstitutionId(institutionId);
+
+        InstitutionResponse institutionMock = new InstitutionResponse();
+        institutionMock.setId(institutionId);
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(productService.getProduct(productId)).thenReturn(product);
+        doNothing().when(userApiRestClient)._createOrUpdateByUserId(userId, addRoleDto);
+
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role);
+
+        verify(userApiRestClient, times(1))._createOrUpdateByUserId(userId, addRoleDto);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void addUserProductRoles_ok_withoutPartyRole() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        Set<String> productRoles = new HashSet<>(List.of("operator"));
+        Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        AddUserRoleDto addRoleDto = new AddUserRoleDto();
+        addRoleDto.setProduct(it.pagopa.selfcare.user.generated.openapi.v1.dto.Product.builder().productId(productId).build());
+        addRoleDto.setInstitutionId(institutionId);
+
+        InstitutionResponse institutionMock = new InstitutionResponse();
+        institutionMock.setId(institutionId);
+
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(OPERATOR);
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(productService.getProduct(productId)).thenReturn(product);
+        doNothing().when(userApiRestClient)._createOrUpdateByUserId(userId, addRoleDto);
+
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, OPERATOR.name());
+
+        verify(userApiRestClient, times(1))._createOrUpdateByUserId(userId, addRoleDto);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void addUserProductRoles_invalidOnboardingStatus() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        Set<String> productRoles = new HashSet<>(List.of("operator"));
+        String role = "MANAGER";
+
+        InstitutionResponse institution = new InstitutionResponse();
+        institution.setId(institutionId);
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+
+        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role));
+
+        verifyNoInteractions(userApiRestClient);
+    }
+
+    @Test
+    void createUsersByFiscalCode() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String productRole = "operator";
+        UserToCreate userToCreate = new UserToCreate();
+        HashSet<String> productRoles = new HashSet<>();
+        productRoles.add(productRole);
+        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        InstitutionResponse institutionMock = new InstitutionResponse();
+        institution.setId(institutionId);
+
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(MANAGER);
+
+        when(productService.getProduct(productId)).thenReturn(product);
+        when(userApiRestClient._createOrUpdateByFiscalCode(any())).thenReturn(ResponseEntity.ok("userId"));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+
+        String userId = userV2ServiceImpl.createUsers(institutionId, productId, userToCreate);
+
+        assertNotNull(userId);
+
+        it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto role = new it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto();
+        role.setInstitutionId(institutionId);
+
+        verify(userApiRestClient, times(1))._createOrUpdateByFiscalCode(role);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithPartyRole() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String productRole = "operator";
+        UserToCreate userToCreate = new UserToCreate();
+        HashSet<String> productRoles = new HashSet<>();
+        productRoles.add(productRole);
+        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        Product product = getProduct();
+
+        Institution institution = new Institution();
+        OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        CreateUserDto.Role roleDto = new CreateUserDto.Role();
+        roleDto.setProductRole("operator");
+        roleDto.setLabel("operator");
+        roleDto.setPartyRole(PartyRole.MANAGER);
+
+        InstitutionResponse institutionMock = new InstitutionResponse();
+        institutionMock.setId(institutionId);
+
+        when(productService.getProduct(productId)).thenReturn(product);
+        when(userApiRestClient._createOrUpdateByFiscalCode(any())).thenReturn(ResponseEntity.ok("userId"));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+
+        String userId = userV2ServiceImpl.createUsers(institutionId, productId, userToCreate);
+
+        assertNotNull(userId);
+
+        it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto role = new it.pagopa.selfcare.user.generated.openapi.v1.dto.CreateUserDto();
+        role.setInstitutionId(institutionId);
+
+        verify(userApiRestClient, times(1))._createOrUpdateByFiscalCode(role);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithOnboardingNotActive() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        UserToCreate userToCreate = new UserToCreate();
+        HashSet<String> productRoles = new HashSet<>();
+        productRoles.add("operator");
+        userToCreate.setProductRoles(productRoles);
+
+        InstitutionResponse institutionMock = new InstitutionResponse();
+        institutionMock.setId(institutionId);
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+
+        assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate));
+
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    private static Product getProduct() {
+        Product product = new Product();
+        Map<PartyRole, ProductRoleInfo> map = new EnumMap<>(PartyRole.class);
+
+        ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
+        productRoleInfoOperator.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        ProductRole productRole = new ProductRole();
+        productRole.setCode("operator");
+        productRole.setLabel("operator");
+        productRoleInfoOperator.setRoles(List.of(productRole));
+        map.put(OPERATOR, productRoleInfoOperator);
+
+        ProductRoleInfo productRoleInfoDelegate = new ProductRoleInfo();
+        productRoleInfoDelegate.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        ProductRole productRole2 = new ProductRole();
+        productRole2.setCode("delegate");
+        productRole2.setLabel("delegate");
+        productRoleInfoDelegate.setRoles(List.of(productRole2));
+        map.put(PartyRole.DELEGATE, productRoleInfoDelegate);
+
+        product.setRoleMappings(map);
+        return product;
+    }
+}
