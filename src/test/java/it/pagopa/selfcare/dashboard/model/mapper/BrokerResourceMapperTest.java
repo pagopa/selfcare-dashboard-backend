@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.model.mapper;
 
 import it.pagopa.selfcare.dashboard.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.BrokerResource;
 import org.junit.jupiter.api.Test;
 

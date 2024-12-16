@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.model;
 
 import it.pagopa.selfcare.commons.utils.TestUtils;
-import it.pagopa.selfcare.dashboard.model.InstitutionResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -62,7 +61,7 @@ class InstitutionResourceTest {
                     Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
                     return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
                 })
-                .collect(Collectors.toList());
+                .toList();
         assertTrue(filteredViolations.isEmpty());
     }
 

@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.exception;
 
-import it.pagopa.selfcare.dashboard.exception.InvalidRequestException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

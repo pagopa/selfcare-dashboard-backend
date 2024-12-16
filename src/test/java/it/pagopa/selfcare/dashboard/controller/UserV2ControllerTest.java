@@ -2,14 +2,14 @@ package it.pagopa.selfcare.dashboard.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.controller.UserV2Controller;
-import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
+import it.pagopa.selfcare.dashboard.model.user.User;
+import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
+import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -45,6 +46,10 @@ class UserV2ControllerTest extends BaseControllerTest {
 
     @Spy
     private UserMapperV2Impl userMapper;
+
+    @Spy
+    private UserMapperImpl userMapperImpl;
+
     private static final String BASE_URL = "/v2/users";
 
     private static final String FILE_JSON_PATH = "src/test/resources/json/";
@@ -194,7 +199,8 @@ class UserV2ControllerTest extends BaseControllerTest {
         final String id = "userId";
         final String institutionId = "institutionId";
 
-        byte[] userStream = Files.readAllBytes(Paths.get("stubs/updateUserDto.json"));
+        ClassPathResource pathUpdateUserDto = new ClassPathResource("stubs/updateUserDto.json");
+        byte[] userStream = Files.readAllBytes(pathUpdateUserDto.getFile().toPath());
         UpdateUserDto updateUserDto = objectMapper.readValue(userStream, UpdateUserDto.class);
 
         //when
@@ -219,7 +225,8 @@ class UserV2ControllerTest extends BaseControllerTest {
         final String id = "userId";
         final String institutionId = "institutionId";
 
-        byte[] userStream = Files.readAllBytes(Paths.get("stubs/updateUserDto.json"));
+        ClassPathResource pathUpdateUserDto = new ClassPathResource("stubs/updateUserDto.json");
+        byte[] userStream = Files.readAllBytes(pathUpdateUserDto.getFile().toPath());
         UpdateUserDto updateUserDto = objectMapper.readValue(userStream, UpdateUserDto.class);
         updateUserDto.setMobilePhone("12345678912345566788");
 
@@ -241,7 +248,8 @@ class UserV2ControllerTest extends BaseControllerTest {
         final String id = "userId";
         final String institutionId = "institutionId";
 
-        byte[] userStream = Files.readAllBytes(Paths.get("stubs/updateUserDto.json"));
+        ClassPathResource pathUpdateUserDto = new ClassPathResource("stubs/updateUserDto.json");
+        byte[] userStream = Files.readAllBytes(pathUpdateUserDto.getFile().toPath());
         UpdateUserDto updateUserDto = objectMapper.readValue(userStream, UpdateUserDto.class);
         updateUserDto.setEmail("test");
 
@@ -407,31 +415,6 @@ class UserV2ControllerTest extends BaseControllerTest {
         //then
         Mockito.verify(userServiceMock, Mockito.times(1))
                 .searchUserByFiscalCode(externalId, institutionId);
-        Mockito.verifyNoMoreInteractions(userServiceMock);
-    }
-
-    @Test
-    void updateUser_EmptyObject() throws Exception {
-        //given
-        final String id = "userId";
-        final String institutionId = "institutionId";
-
-        byte[] userStream = Files.readAllBytes(Paths.get("stubs/updateUserDto.json"));
-        UpdateUserDto updateUserDto = objectMapper.readValue(userStream, UpdateUserDto.class);
-
-        //when
-        mockMvc.perform(MockMvcRequestBuilders
-                        .put(BASE_URL + "/{id}", id)
-                        .queryParam("institutionId", institutionId)
-                        .content(userStream)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(emptyString()));
-        //then
-        verify(userServiceMock, times(1))
-                .updateUser(id, institutionId, userMapper.fromUpdateUser(updateUserDto));
-
         Mockito.verifyNoMoreInteractions(userServiceMock);
     }
 

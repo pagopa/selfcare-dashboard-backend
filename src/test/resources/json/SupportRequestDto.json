@@ -1,6 +1,6 @@
 {
   "email": "user@example.com",
-  "productId": "prod-io",
+  "productId": "productId",
   "userId": "user-12345",
-  "institutionId": "inst-67890"
+  "institutionId": "institutionId"
 }

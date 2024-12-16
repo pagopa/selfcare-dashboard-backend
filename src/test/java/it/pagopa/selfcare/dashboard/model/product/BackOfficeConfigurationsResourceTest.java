@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.model.product;
 
-import it.pagopa.selfcare.dashboard.model.product.BackOfficeConfigurationsResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +44,7 @@ class BackOfficeConfigurationsResourceTest {
                     Class<? extends Annotation> annotationToCheck = toCheckMap.get(violation.getPropertyPath().toString());
                     return !violation.getConstraintDescriptor().getAnnotation().annotationType().equals(annotationToCheck);
                 })
-                .collect(Collectors.toList());
+                .toList();
         assertTrue(filteredViolations.isEmpty());
     }
 

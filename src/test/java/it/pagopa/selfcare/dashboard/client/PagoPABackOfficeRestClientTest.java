@@ -5,8 +5,6 @@ import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Brokers;
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPsp;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
-import it.pagopa.selfcare.dashboard.client.MsBackOfficeChannelApiClient;
-import it.pagopa.selfcare.dashboard.client.MsBackOfficeStationApiClient;
 import it.pagopa.selfcare.dashboard.config.PagoPABackOfficeRestClientTestConfig;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Order;

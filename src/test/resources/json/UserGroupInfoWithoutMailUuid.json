@@ -51,7 +51,6 @@
       "institutionId": "institutionId"
     }
   ],
-  "createdAt": "2024-05-08T12:00:00Z",
   "createdBy": {
     "id": "f8bce6fc-848c-4a03-8ef3-01ac36a38299",
     "fiscalCode": "creator_fiscal_code",
@@ -76,7 +75,6 @@
       }
     }
   },
-  "modifiedAt": "2024-05-08T13:00:00Z",
   "modifiedBy": {
     "id": "3f62c13b-9d33-4768-9a43-0e10a0bea2a9",
     "fiscalCode": "modifier_fiscal_code",

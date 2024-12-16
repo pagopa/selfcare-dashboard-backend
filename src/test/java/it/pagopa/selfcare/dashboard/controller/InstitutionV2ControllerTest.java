@@ -3,20 +3,20 @@ package it.pagopa.selfcare.dashboard.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.controller.InstitutionV2Controller;
+import it.pagopa.selfcare.dashboard.model.CreateUserDto;
+import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.model.user.UserToCreate;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
-import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
-import it.pagopa.selfcare.dashboard.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
-import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
-import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.hamcrest.Matchers.is;
@@ -60,6 +63,9 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     DelegationService delegationServiceMock;
     @Spy
     private UserMapperV2Impl userMapper;
+
+    @Spy
+    private UserMapperImpl userMapperImpl;
     @Spy
     private InstitutionResourceMapperImpl institutionResourceMapper;
 
@@ -87,6 +93,9 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         when(institutionV2ServiceMock.getInstitutionUser(institutionId, userId, loggedUserId))
                 .thenReturn(userInfo);
+
+        ClassPathResource pathResourceInstitution = new ClassPathResource("json/InstitutionUserDetailsResource.json");
+        byte[] resourceStreamInstitution = Files.readAllBytes(pathResourceInstitution.getFile().toPath());
         //when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/{institutionId}/users/{userId}", institutionId, userId)
@@ -94,7 +103,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(new String(Files.readAllBytes(Paths.get("json/InstitutionUserDetailsResource.json")))))
+                .andExpect(content().json(new String(resourceStreamInstitution)))
                 .andReturn();
         //then
         verify(institutionV2ServiceMock, times(1))

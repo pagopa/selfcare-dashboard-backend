@@ -1,8 +1,7 @@
 package it.pagopa.selfcare.dashboard.model.mapper;
 
-import it.pagopa.selfcare.dashboard.model.institution.SupportContact;
 import it.pagopa.selfcare.dashboard.model.SupportContactResource;
-import it.pagopa.selfcare.dashboard.model.mapper.SupportContactMapper;
+import it.pagopa.selfcare.dashboard.model.institution.SupportContact;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

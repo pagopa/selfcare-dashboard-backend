@@ -1,9 +1,8 @@
 package it.pagopa.selfcare.dashboard.model.mapper;
 
-import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyDto;
 import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyResource;
-import it.pagopa.selfcare.dashboard.model.mapper.GeographicTaxonomyMapper;
+import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomy;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

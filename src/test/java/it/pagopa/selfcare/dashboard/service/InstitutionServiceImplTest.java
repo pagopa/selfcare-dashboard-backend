@@ -10,10 +10,9 @@ import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.UpdateInstitutionResource;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
-import it.pagopa.selfcare.dashboard.service.InstitutionServiceImpl;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.service.ProductService;
 import org.junit.jupiter.api.Assertions;
@@ -25,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -47,7 +47,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
     @Mock
     private ProductService productService;
     @Spy
-    private InstitutionMapper institutionMapper;
+    private InstitutionMapperImpl institutionMapper;
     @Spy
     private ProductMapper productMapper;
 
@@ -62,7 +62,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
 
         String institutionId = "institutionId";
 
-        ClassPathResource resource = new ClassPathResource("json/InstitutionResponse.json");
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
         byte[] resourceStream;
         try {
             resourceStream = Files.readAllBytes(resource.getFile().toPath());
@@ -72,7 +72,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody()).thenReturn(institutionResponse);
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
         Institution institution = institutionMapper.toInstitution(institutionResponse);
 
         Institution result = institutionService.getInstitutionById(institutionId);
@@ -86,7 +86,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
 
         String institutionId = "institutionId";
 
-        doReturn(null).when(coreInstitutionApiRestClient)._retrieveInstitutionByIdUsingGET(institutionId).getBody();
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok().build());
 
         Institution result = institutionService.getInstitutionById(institutionId);
         Assertions.assertNull(result);
@@ -106,8 +106,6 @@ class InstitutionServiceImplTest extends BaseServiceTest {
 
         InstitutionPut geographicTaxonomiesRequest = new InstitutionPut();
         geographicTaxonomiesRequest.setGeographicTaxonomyCodes(geographicTaxonomyList.getGeographicTaxonomyList().stream().map(GeographicTaxonomy::getCode).toList());
-
-        doNothing().when(coreInstitutionApiRestClient)._updateInstitutionUsingPUT(institutionId, geographicTaxonomiesRequest);
 
         institutionService.updateInstitutionGeographicTaxonomy(institutionId, geographicTaxonomyList);
         verify(coreInstitutionApiRestClient, times(1))._updateInstitutionUsingPUT(institutionId, geographicTaxonomiesRequest);
@@ -175,7 +173,8 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        doReturn(institutionResponse).when(coreInstitutionApiRestClient)._updateInstitutionUsingPUT(institutionId, institutionMapper.toInstitutionPut(updateInstitutionResource)).getBody();
+        when(coreInstitutionApiRestClient._updateInstitutionUsingPUT(institutionId, institutionMapper.toInstitutionPut(updateInstitutionResource)))
+                .thenReturn(ResponseEntity.ok(institutionResponse));
 
         Institution result = institutionService.updateInstitutionDescription(institutionId, updateInstitutionResource);
 
@@ -209,7 +208,8 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         updateInstitutionResource.setDescription("updatedDescription");
         updateInstitutionResource.setDigitalAddress("updatedDigitalAddress");
 
-        doReturn(new InstitutionResponse()).when(coreInstitutionApiRestClient)._updateInstitutionUsingPUT(institutionId, institutionMapper.toInstitutionPut(updateInstitutionResource)).getBody();
+        when(coreInstitutionApiRestClient._updateInstitutionUsingPUT(institutionId, institutionMapper.toInstitutionPut(updateInstitutionResource)))
+                .thenReturn(ResponseEntity.ok(new InstitutionResponse()));
 
         Institution result = institutionService.updateInstitutionDescription(institutionId, updateInstitutionResource);
         Assertions.assertEquals(new Institution(), result);
@@ -236,7 +236,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        doReturn(institutionResponse).when(coreInstitutionApiRestClient)._retrieveInstitutionByIdUsingGET(institutionId).getBody();
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
 
         institutionService.findInstitutionById(institutionId);
         verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
@@ -262,7 +262,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        doReturn(institutionResponse).when(coreInstitutionApiRestClient)._retrieveInstitutionByIdUsingGET(institutionId).getBody();
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
 
         institutionService.findInstitutionById(institutionId);
         verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
@@ -288,7 +288,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        doReturn(institutionResponse).when(coreInstitutionApiRestClient)._retrieveInstitutionByIdUsingGET(institutionId).getBody();
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
 
         Institution result = institutionService.findInstitutionById(institutionId);
         Assertions.assertEquals(institutionMapper.toInstitution(institutionResponse), result);
@@ -305,7 +305,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
 
         String institutionId = "institutionId";
 
-        doReturn(null).when(coreInstitutionApiRestClient)._retrieveInstitutionByIdUsingGET(institutionId).getBody();
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok().build());
 
         Institution result = institutionService.findInstitutionById(institutionId);
         Assertions.assertNull(result);

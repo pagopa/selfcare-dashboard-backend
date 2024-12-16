@@ -1,21 +1,20 @@
 package it.pagopa.selfcare.dashboard.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import it.pagopa.selfcare.dashboard.controller.InstitutionController;
-import it.pagopa.selfcare.dashboard.model.delegation.Delegation;
-import it.pagopa.selfcare.dashboard.model.delegation.DelegationType;
-import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
-import it.pagopa.selfcare.dashboard.model.delegation.Order;
+import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyDto;
+import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyListDto;
+import it.pagopa.selfcare.dashboard.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.UpdateInstitutionResource;
+import it.pagopa.selfcare.dashboard.model.mapper.DelegationMapperImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.FileStorageService;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
-import it.pagopa.selfcare.dashboard.model.delegation.DelegationResource;
-import it.pagopa.selfcare.dashboard.model.mapper.DelegationMapperImpl;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.product.entity.Product;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +24,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -291,6 +292,49 @@ class InstitutionControllerTest extends BaseControllerTest {
         verify(delegationService, times(1))
                 .getDelegations(delegationParameters);
         verifyNoMoreInteractions(delegationService);
+    }
+
+    @Test
+    void testGetInstitution() throws Exception {
+        String institutionId = "123";
+        Institution institution = new Institution();
+        InstitutionResource institutionResource = new InstitutionResource();
+        institutionResource.setId(institutionId);
+
+        when(institutionServiceMock.findInstitutionById(institutionId)).thenReturn(institution);
+
+        ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{institutionId}", institutionId)
+                .accept(MediaType.APPLICATION_JSON_VALUE));
+
+        MvcResult mvcResult = resultActions
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andReturn();
+
+        InstitutionResource resource = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+                });
+
+        Assertions.assertEquals(resource.getId(), institution.getId());
+
+    }
+
+    @Test
+    void testUpdateInstitutionGeographicTaxonomy() throws Exception {
+        String institutionId = "123";
+        GeographicTaxonomyListDto geographicTaxonomyListDto = new GeographicTaxonomyListDto();
+        GeographicTaxonomyDto geo = new GeographicTaxonomyDto();
+        geo.setCode("123");
+        geo.setDesc("desc");
+        geographicTaxonomyListDto.setGeographicTaxonomyDtoList(List.of(geo));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put(BASE_URL + "/" + institutionId + "/geographic-taxonomy")
+                        .content(objectMapper.writeValueAsString(geographicTaxonomyListDto))
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
 

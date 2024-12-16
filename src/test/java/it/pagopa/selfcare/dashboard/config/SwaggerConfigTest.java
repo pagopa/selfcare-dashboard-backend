@@ -1,11 +1,9 @@
 package it.pagopa.selfcare.dashboard.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.pagopa.selfcare.dashboard.config.SwaggerConfig;
-import it.pagopa.selfcare.dashboard.config.WebConfig;
-import it.pagopa.selfcare.dashboard.service.*;
 import it.pagopa.selfcare.dashboard.model.mapper.*;
 import it.pagopa.selfcare.dashboard.security.ExchangeTokenServiceV2;
+import it.pagopa.selfcare.dashboard.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 })
 @EnableOpenApi
 @EnableWebMvc
-@ComponentScan(basePackages = "it.pagopa.selfcare.dashboard.web.controller")
+@ComponentScan(basePackages = "it.pagopa.selfcare.dashboard.controller")
 @TestPropertySource(locations = "classpath:config/application.yml")
 class SwaggerConfigTest {
 
@@ -74,6 +72,12 @@ class SwaggerConfigTest {
 
     @MockBean
     private UserMapperV2 userMapperImpl;
+
+    @MockBean
+    private UserMapper userMapper;
+
+    @MockBean
+    private GroupMapper groupMapper;
 
     @MockBean
     private GroupMapperV2 groupMapperImpl;

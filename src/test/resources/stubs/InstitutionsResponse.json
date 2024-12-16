@@ -1,4 +1,4 @@
-{
+{"institutions": [{
   "address": "setAddress",
   "aooParentCode": "setAooParentCode",
   "attributes": [
@@ -33,9 +33,8 @@
   "institutionType": "AS",
   "onboarding": [
     {
-      "productId": "productId",
+      "productId": "setProductId",
       "isAggregator": true,
-      "status": "ACTIVE",
       "createdAt": "2024-06-11T10:09:30.154695400+02:00",
       "billing": {
         "publicServices": false,
@@ -66,4 +65,4 @@
   "taxCode": "setTaxCode",
   "updatedAt": "2024-06-11T10:09:30.153694300+02:00",
   "zipCode": "setZipCode"
-}
+}]}

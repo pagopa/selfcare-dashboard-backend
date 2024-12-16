@@ -1,13 +1,11 @@
 package it.pagopa.selfcare.dashboard.interceptor;
 
 import feign.RequestTemplate;
-import it.pagopa.selfcare.dashboard.interceptor.BackOfficeAuthorizationInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

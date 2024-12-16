@@ -1,9 +1,8 @@
 package it.pagopa.selfcare.dashboard.controller;
 
-import it.pagopa.selfcare.dashboard.controller.ProductV2Controller;
-import it.pagopa.selfcare.dashboard.service.ProductService;
 import it.pagopa.selfcare.dashboard.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.security.ExchangeTokenServiceV2;
+import it.pagopa.selfcare.dashboard.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

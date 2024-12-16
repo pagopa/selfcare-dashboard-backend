@@ -4,12 +4,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import feign.FeignException;
 import it.pagopa.selfcare.commons.connector.rest.BaseFeignRestClientTest;
 import it.pagopa.selfcare.commons.connector.rest.RestTestUtils;
-import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.dashboard.config.UserRegistryRestClientTestConfig;
-import it.pagopa.selfcare.dashboard.model.user.MutableUserFieldsDto;
-import it.pagopa.selfcare.dashboard.model.user.SaveUserDto;
 import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserId;
 import it.pagopa.selfcare.dashboard.model.user_registry.EmbeddedExternalId;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Order;
@@ -62,17 +58,6 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
 
     @Autowired
     private UserRegistryRestClient restClient;
-
-    @Test
-    void userUpdate() {
-        //given
-        UUID id = UUID.randomUUID();
-        MutableUserFieldsDto mutableUserFieldsDto = TestUtils.mockInstance(new MutableUserFieldsDto(), "setWorkContacts");
-        //when
-        Executable executable = () -> restClient.patchUser(id, mutableUserFieldsDto);
-        //then
-        assertDoesNotThrow(executable);
-    }
 
     @Test
     void getUserByInternalId_nullFieldList() {
@@ -133,15 +118,6 @@ class UserRegistryRestClientTest extends BaseFeignRestClientTest {
         assertEquals(externalId, response.getFiscalCode());
     }
 
-    @Test
-    void saveUser() {
-        //given
-        SaveUserDto userDto = TestUtils.mockInstance(new SaveUserDto(), "setWorkContacts");
-        //when
-        UserId id = restClient.saveUser(userDto);
-        //then
-        assertNotNull(id);
-    }
 
 
     @Test

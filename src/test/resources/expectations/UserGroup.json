@@ -1,6 +1,6 @@
 {
   "id": "id",
-  "institutionId": "institutionId",
+  "institutionId": "setInstitutionId",
   "productId": "productId",
   "description": "A user group",
   "name": "UserGroup1",

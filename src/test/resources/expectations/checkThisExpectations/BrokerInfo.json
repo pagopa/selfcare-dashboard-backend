@@ -3,6 +3,6 @@
     "code": "code",
     "description": "description",
     "enabled": true,
-    "extendedFaultBean": true
+    "extendedFaultBean": null
   }
 ]

@@ -3,11 +3,10 @@ package it.pagopa.selfcare.dashboard.model.mapper;
 import it.pagopa.selfcare.dashboard.model.institution.DataProtectionOfficer;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionInfo;
 import it.pagopa.selfcare.dashboard.model.institution.PaymentServiceProvider;
-import it.pagopa.selfcare.dashboard.model.mapper.OnboardingRequestMapper;
-import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.WorkContact;
 import it.pagopa.selfcare.dashboard.model.onboarding.OnboardingRequestInfo;
 import it.pagopa.selfcare.dashboard.model.onboarding.OnboardingRequestResource;
+import it.pagopa.selfcare.dashboard.model.user.User;
+import it.pagopa.selfcare.dashboard.model.user.WorkContact;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

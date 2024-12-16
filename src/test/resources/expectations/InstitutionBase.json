@@ -3,7 +3,7 @@
     "id": "institutionBaseId",
     "name": "institutionBaseName",
     "userRole": "userRole",
-    "status": "status",
+    "status": "ACTIVE",
     "parentDescription": "parentDescription"
   }
 ]

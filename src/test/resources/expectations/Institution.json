@@ -12,16 +12,10 @@
   "city": "city",
   "county": "county",
   "country": "country",
-  "billing": {
-    "vatNumber": "vatNumber",
-    "recipientCode": "recipientCode",
-    "publicServices": true
-  },
   "onboarding": [
     {
       "productId": "productId",
       "status": "ACTIVE",
-      "userRole": "MANAGER",
       "billing": {
         "vatNumber": "vatNumber",
         "recipientCode": "recipientCode",
@@ -31,7 +25,6 @@
     {
       "productId": "productId2",
       "status": "ACTIVE",
-      "userRole": "OPERATOR",
       "billing": {
         "vatNumber": "vatNumber",
         "recipientCode": "recipientCode",

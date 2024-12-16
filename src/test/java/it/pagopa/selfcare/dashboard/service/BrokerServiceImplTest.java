@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokerPsp;
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.Brokers;
 import it.pagopa.selfcare.backoffice.generated.openapi.v1.dto.BrokersPsp;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.BrokerResponse;
@@ -8,8 +9,7 @@ import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.MsBackOfficeChannelApiClient;
 import it.pagopa.selfcare.dashboard.client.MsBackOfficeStationApiClient;
 import it.pagopa.selfcare.dashboard.model.backoffice.BrokerInfo;
-import it.pagopa.selfcare.dashboard.model.mapper.BrokerMapper;
-import it.pagopa.selfcare.dashboard.service.BrokerServiceImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.BrokerMapperImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BrokerServiceImplTest extends BaseServiceTest {
+class BrokerServiceImplTest extends BaseServiceTest {
 
     @InjectMocks
     private BrokerServiceImpl brokerService;
@@ -42,7 +42,7 @@ public class BrokerServiceImplTest extends BaseServiceTest {
     @Mock
     private CoreInstitutionApiRestClient coreInstitutionApiRestClient;
     @Spy
-    private BrokerMapper brokerMapper;
+    private BrokerMapperImpl brokerMapper;
 
     @BeforeEach
     public void setUp() {
@@ -57,8 +57,15 @@ public class BrokerServiceImplTest extends BaseServiceTest {
         List<BrokerInfo> brokerInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(backofficeChannelApiClient._getBrokersPsp(0, null, 1000, null, null, null, "ASC").getBody())
-                .thenReturn((BrokersPsp) brokerInfo);
+        byte[] resourceBrokerPsp = Files.readAllBytes(Paths.get("src/test/resources/stubs/BrokerPsp.json"));
+        List<BrokerPsp> brokerPspInfo = objectMapper.readValue(resourceBrokerPsp, new TypeReference<>() {
+        });
+
+        BrokersPsp brokersPsp = new BrokersPsp();
+        brokersPsp.setBrokersPsp(brokerPspInfo);
+
+        when(backofficeChannelApiClient._getBrokersPsp(0, null, 1000, null, null, null, "ASC"))
+                .thenReturn(ResponseEntity.ok(brokersPsp));
 
         List<BrokerInfo> result = brokerService.findAllByInstitutionType(institutionType);
         Assertions.assertEquals(brokerInfo, result);
@@ -80,7 +87,9 @@ public class BrokerServiceImplTest extends BaseServiceTest {
         .thenReturn(brokersResponseEntity);
 
         List<BrokerInfo> result = brokerService.findAllByInstitutionType(institutionType);
-        Assertions.assertEquals(brokers, result.get(0));
+        Assertions.assertEquals(brokers.getBrokers().get(0).getBrokerCode(), result.get(0).getCode());
+        Assertions.assertEquals(brokers.getBrokers().get(0).getDescription(), result.get(0).getDescription());
+        Assertions.assertEquals(brokers.getBrokers().get(0).getEnabled(), result.get(0).getEnabled());
         Mockito.verify(backofficeStationApiClient, Mockito.times(1))
                 ._getBrokers(0, null, 1000, null, null, null, "ASC");
     }
@@ -103,9 +112,9 @@ public class BrokerServiceImplTest extends BaseServiceTest {
         String institutionType = "EC";
         String productId = "productId";
 
-        ClassPathResource pathResource = new ClassPathResource("stubs/BrokerInfo.json");
+        ClassPathResource pathResource = new ClassPathResource("stubs/BrokerResponse.json");
         byte[] resourceStream = Files.readAllBytes(pathResource.getFile().toPath());
-        List<BrokerResponse> brokerResponse = objectMapper.readValue(resourceStream, new TypeReference<List<BrokerResponse>>() {
+        List<BrokerResponse> brokerResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
         ResponseEntity<List<BrokerResponse>> responseEntity = ResponseEntity.ok(brokerResponse);

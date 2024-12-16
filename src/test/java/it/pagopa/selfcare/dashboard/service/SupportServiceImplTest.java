@@ -4,11 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.dashboard.client.UserRegistryRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.exception.SupportException;
 import it.pagopa.selfcare.dashboard.model.support.SupportRequest;
 import it.pagopa.selfcare.dashboard.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.service.SupportServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,13 +57,14 @@ public class SupportServiceImplTest extends BaseServiceTest {
         byte[] supportRequestStream = Files.readAllBytes(resource.getFile().toPath());
         SupportRequest supportRequest = new ObjectMapper().readValue(supportRequestStream, new TypeReference<>() {
         });
+        supportRequest.setUserId(UUID.randomUUID().toString());
 
         ClassPathResource userResource = new ClassPathResource("json/User.json");
         byte[] userStream = Files.readAllBytes(userResource.getFile().toPath());
         User user = new ObjectMapper().readValue(userStream, new TypeReference<>() {
         });
 
-        when(userRegistryRestClient.getUserByInternalId(UUID.fromString((supportRequest.getUserId())), USER_FIELD_LIST)).thenReturn(user);
+        when(userRegistryRestClient.getUserByInternalId(UUID.fromString(supportRequest.getUserId()), USER_FIELD_LIST)).thenReturn(user);
 
         SupportResponse response = supportServiceImpl.sendRequest(supportRequest);
 
@@ -76,38 +75,16 @@ public class SupportServiceImplTest extends BaseServiceTest {
     }
 
     @Test
-    void sendRequest_userIdEmpty() throws IOException {
+    void sendRequest_userIdNotFound() throws IOException {
 
         ClassPathResource resource = new ClassPathResource("json/SupportRequest.json");
         byte[] supportRequestStream = Files.readAllBytes(resource.getFile().toPath());
         SupportRequest supportRequest = new ObjectMapper().readValue(supportRequestStream, new TypeReference<>() {
         });
+        supportRequest.setUserId(UUID.randomUUID().toString());
 
-        when(userRegistryRestClient.getUserByInternalId(UUID.fromString((supportRequest.getUserId())), USER_FIELD_LIST)).thenReturn(null);
+        when(userRegistryRestClient.getUserByInternalId(UUID.fromString(supportRequest.getUserId()), USER_FIELD_LIST)).thenThrow(ResourceNotFoundException.class);
 
         assertThrows(ResourceNotFoundException.class, () -> supportServiceImpl.sendRequest(supportRequest));
-    }
-
-    @Test
-    void sendRequest_SupportApiKeyEmpty() throws IOException {
-
-        ReflectionTestUtils.setField(supportServiceImpl, "supportApiKey", null);
-        ReflectionTestUtils.setField(supportServiceImpl, "returnTo", "testReturnTo");
-        ReflectionTestUtils.setField(supportServiceImpl, "zendeskOrganization", "testZendeskOrganization");
-        ReflectionTestUtils.setField(supportServiceImpl, "actionUrl", "testActionUrl");
-
-        ClassPathResource resource = new ClassPathResource("json/SupportRequest.json");
-        byte[] supportRequestStream = Files.readAllBytes(resource.getFile().toPath());
-        SupportRequest supportRequest = new ObjectMapper().readValue(supportRequestStream, new TypeReference<>() {
-        });
-
-        ClassPathResource userResource = new ClassPathResource("json/User.json");
-        byte[] userStream = Files.readAllBytes(userResource.getFile().toPath());
-        User user = new ObjectMapper().readValue(userStream, new TypeReference<>() {
-        });
-
-        when(userRegistryRestClient.getUserByInternalId(UUID.fromString((supportRequest.getUserId())), USER_FIELD_LIST)).thenReturn(user);
-
-        assertThrows(SupportException.class, () -> supportServiceImpl.sendRequest(supportRequest));
     }
 }

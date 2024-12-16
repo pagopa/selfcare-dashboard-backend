@@ -2,13 +2,12 @@ package it.pagopa.selfcare.dashboard.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
-import it.pagopa.selfcare.dashboard.controller.SupportController;
-import it.pagopa.selfcare.dashboard.model.support.SupportRequest;
-import it.pagopa.selfcare.dashboard.model.support.SupportResponse;
-import it.pagopa.selfcare.dashboard.service.SupportService;
 import it.pagopa.selfcare.dashboard.model.mapper.SupportMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.SupportMapperImpl;
+import it.pagopa.selfcare.dashboard.model.support.SupportRequest;
 import it.pagopa.selfcare.dashboard.model.support.SupportRequestDto;
+import it.pagopa.selfcare.dashboard.model.support.SupportResponse;
+import it.pagopa.selfcare.dashboard.service.SupportService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

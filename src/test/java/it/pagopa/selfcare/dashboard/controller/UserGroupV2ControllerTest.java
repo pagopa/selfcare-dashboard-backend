@@ -4,17 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.commons.web.model.Page;
-import it.pagopa.selfcare.dashboard.controller.UserGroupV2Controller;
 import it.pagopa.selfcare.dashboard.model.groups.CreateUserGroup;
 import it.pagopa.selfcare.dashboard.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.dashboard.model.mapper.GroupMapper;
-import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
+import it.pagopa.selfcare.dashboard.model.mapper.GroupMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.GroupMapperV2Impl;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UserGroupIdResource;
 import it.pagopa.selfcare.dashboard.model.user_groups.UserGroupPlainResource;
+import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,10 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
     private GroupMapperV2Impl groupMapperV2;
 
     @Spy
-    private GroupMapper groupMapper;
+    private GroupMapperImpl groupMapper;
+
+    @Spy
+    private UserMapperImpl userMapper;
 
     @BeforeEach
     void setUp() {
@@ -292,7 +295,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         // given
         String groupId = "groupId";
 
-        ClassPathResource resource = new ClassPathResource("expectations/UserGroupInfo.json");
+        ClassPathResource resource = new ClassPathResource("json/UserGroupInfo.json");
         byte[] userGroupInfoStream;
         try {
             userGroupInfoStream = Files.readAllBytes(resource.getFile().toPath());
@@ -303,13 +306,16 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
 
         when(groupServiceMock.getUserGroupById(groupId, null)).thenReturn(userGroupInfo);
 
+        ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
+        byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
+
         // when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/" + groupId)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "expectations/UserGroupResource.json")))));
+                .andExpect(content().json(new String(userGroupByte)));
 
         // then
         verify(groupServiceMock, times(1)).getUserGroupById(groupId, null);
@@ -322,7 +328,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         String groupId = "groupId";
         String inst = "institutionId";
 
-        ClassPathResource resource = new ClassPathResource("expectations/UserGroupInfo.json");
+        ClassPathResource resource = new ClassPathResource("json/UserGroupInfo.json");
         byte[] userGroupInfoStream;
         try {
             userGroupInfoStream = Files.readAllBytes(resource.getFile().toPath());
@@ -333,6 +339,9 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
 
         when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
 
+        ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
+        byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
+
         // when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/" + groupId)
@@ -340,7 +349,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "expectations/UserGroupResource.json")))));
+                .andExpect(content().json(new String(userGroupByte)));
 
         // then
         verify(groupServiceMock, times(1)).getUserGroupById(groupId, inst);
@@ -364,6 +373,9 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
 
         when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
 
+        ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
+        byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
+
         // when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/" + groupId)
@@ -371,7 +383,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "json/UserGroupResource.json")))));
+                .andExpect(content().json(new String(userGroupByte)));
 
         // then
         verify(groupServiceMock, times(1)).getUserGroupById(groupId, inst);
@@ -475,7 +487,6 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         // then
         Assertions.assertEquals(1, pages.getTotalPages());
         Assertions.assertEquals(1, pages.getContent().size());
-        //   verify(groupServiceMock, times(1)).getUserGroups(instId, productId, userId, null);
         verifyNoMoreInteractions(groupServiceMock);
     }
 
@@ -495,8 +506,6 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         // when
         Assertions.assertEquals(1, pages.getTotalPages());
         Assertions.assertEquals(Collections.emptyList(), pages.getContent());
-        // then
-        //verify(groupServiceMock, times(1)).getUserGroups(instId, productId, userId, null);
         verifyNoMoreInteractions(groupServiceMock);
     }
 }

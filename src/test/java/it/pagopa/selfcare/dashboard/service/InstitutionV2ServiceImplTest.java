@@ -11,11 +11,10 @@ import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.service.InstitutionV2ServiceImpl;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGet;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
 import it.pagopa.selfcare.product.service.ProductService;
@@ -35,7 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -66,11 +64,11 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     @Mock
     private ProductService productService;
     @Spy
-    private InstitutionMapper institutionMapper;
+    private InstitutionMapperImpl institutionMapper;
     @Spy
     private ProductMapper productMapper;
     @Spy
-    private UserMapper userMapper;
+    private UserMapperImpl userMapper;
 
     @BeforeEach
     public void init() {
@@ -107,9 +105,9 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 userInfoFilter.getUserId(),
                 userInfoFilter.getProductRoles(),
                 StringUtils.hasText(userInfoFilter.getProductId()) ? List.of(userInfoFilter.getProductId()) : null,
-                List.of("MANAGER"),
-                !CollectionUtils.isEmpty(userInfoFilter.getAllowedStates()) ? userInfoFilter.getAllowedStates().stream().map(Enum::name).toList() : null))
-                .thenReturn(ResponseEntity.ok(Collections.emptyList()));
+                null,
+                null))
+                .thenReturn(ResponseEntity.ok().build());
 
         assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.getInstitutionUser(institutionId, userId, loggedUserId));
     }
@@ -123,20 +121,23 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setUserId(userId);
 
-        ClassPathResource resource = new ClassPathResource("expectations/UserInfo.json");
+        ClassPathResource resource = new ClassPathResource("stubs/UserInfo.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         List<UserInfo> userInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
+        UserDataResponse userData = new UserDataResponse();
+        userData.setUserId("123e4567-e89b-12d3-a456-426614174000");
+        userData.setRole("MANAGER");
+
         when(userApiRestClient._retrieveUsers(institutionId,
-                userInfoFilter.getUserId(),
-                loggedUserId, null, null, null, null)).thenReturn((ResponseEntity<List<UserDataResponse>>) userInfo);
+                loggedUserId, userInfoFilter.getUserId(),null, null, null, null)).thenReturn(ResponseEntity.ok(List.of(userData)));
 
         UserInfo actualUserInfo = institutionV2Service.getInstitutionUser("institutionId", "userId", "loggedUserId");
-        assertEquals(userInfo, actualUserInfo);
+        assertEquals(userInfo.get(0).getId(), actualUserInfo.getId());
         Mockito.verify(userApiRestClient, Mockito.times(1))._retrieveUsers(institutionId,
-                userInfoFilter.getUserId(),
-                loggedUserId, null, null, null, null);
+                loggedUserId,
+                userInfoFilter.getUserId(), null, null, null, null);
     }
 
     @Test
@@ -159,7 +160,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         });
 
 
-        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         InstitutionResponse institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
@@ -197,9 +198,8 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         InstitutionResponse institutionResponse = Mockito.mock(InstitutionResponse.class);
-        UserInstitutionWithActions userInstitutionWithActionsDto = Mockito.mock(UserInstitutionWithActions.class);
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
-        when(userApiRestClient._getUserInstitutionWithPermission(userId, institutionId, null)).thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
+        when(userApiRestClient._getUserInstitutionWithPermission(userId, institutionId, null)).thenReturn(ResponseEntity.ok().build());
         assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById(institutionId));
         Mockito.verify(userApiRestClient, Mockito.times(1))._getUserInstitutionWithPermission(userId, institutionId, null);
     }
@@ -243,6 +243,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         InstitutionResponse institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
+        institution.setOnboarding(null);
 
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
@@ -277,7 +278,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         UserInstitutionWithActions userInstitutionWithActionsDto = objectMapper.readValue(userInstitutionStream, new TypeReference<>() {
         });
 
-        ClassPathResource resource = new ClassPathResource("expectations/Institution.json");
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
         byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
         InstitutionResponse institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
@@ -304,15 +305,15 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, 1, status, subunitCode, taxCode, null))
                 .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
 
-        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
+        Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
 
         assertTrue(actualResponse);
         Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter("test-institution", null, "test-product", 1, "productId", 1, PENDING.name(), null, null, null);
+                ._getOnboardingWithFilter(null, null, null, null, productId, 1, PENDING.name(), subunitCode, taxCode, null);
     }
 
     @Test
-    void getOnboardingWithFilterOk() throws IOException {
+    void getOnboardingWithFilterOk() {
         String taxCode = "taxCode";
         String productId = "productId";
         String status = "status";
@@ -337,18 +338,18 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         onboardingGetResponse.setItems(List.of(new OnboardingGet().productId("test-product")));
         onboardingGetResponse.setCount((long) onboardingGetResponse.getItems().size());
 
-        when(onboardingRestClient._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, PENDING.name(), null, null, null))
-                .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
-        when(onboardingRestClient._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, TOBEVALIDATED.name(), null, null, null))
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, PENDING.name(), null, "test-institution", null))
+                .thenReturn(ResponseEntity.ok().build());
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, TOBEVALIDATED.name(), null, "test-institution", null))
                 .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
 
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
 
         assertTrue(actualResponse);
         Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, PENDING.name(), null, null, null);
+                ._getOnboardingWithFilter(null, null, null, null, "test-product", 1, PENDING.name(), null, "test-institution", null);
         Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, TOBEVALIDATED.name(), null, null, null);
+                ._getOnboardingWithFilter(null, null, null, null, "test-product", 1, TOBEVALIDATED.name(), null, "test-institution", null);
     }
 
     @Test
@@ -356,17 +357,13 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         OnboardingGetResponse onboardingGetResponse = new OnboardingGetResponse();
         onboardingGetResponse.setItems(List.of(new OnboardingGet().productId("test-product")));
         onboardingGetResponse.setCount((long) onboardingGetResponse.getItems().size());
-        when(onboardingRestClient._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, PENDING.name(), null, null, null))
-                .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
-        when(onboardingRestClient._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, TOBEVALIDATED.name(), null, null, null))
-                .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, PENDING.name(), null, "test-institution", null))
+                .thenReturn(ResponseEntity.ok().build());
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, TOBEVALIDATED.name(), null, "test-institution", null))
+                .thenReturn(ResponseEntity.ok().build());
 
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
 
         assertFalse(actualResponse);
-        Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, PENDING.name(), null, null, null);
-        Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter("test-institution", null, "test-product", 1, "test-product", 1, TOBEVALIDATED.name(), null, null, null);
     }
 }

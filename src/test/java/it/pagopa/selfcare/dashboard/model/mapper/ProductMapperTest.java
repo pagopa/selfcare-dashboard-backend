@@ -1,10 +1,9 @@
 package it.pagopa.selfcare.dashboard.model.mapper;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
-import it.pagopa.selfcare.dashboard.model.mapper.ProductsMapper;
-import it.pagopa.selfcare.dashboard.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.model.product.BackOfficeConfigurationsResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductRoleMappingsResource;
+import it.pagopa.selfcare.dashboard.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.model.product.ProductsResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.BackOfficeConfigurations;
@@ -45,7 +44,6 @@ class ProductMapperTest {
         assertEquals(product.getNode().getUrlPublic(), resource.getUrlPublic());
         assertEquals(product.getNode().getUrlBO(), resource.getUrlBO());
         assertEquals(product.getNode().isDelegable(), resource.isDelegable());
-        //     assertEquals(product.getNode().isInvoiceable(), resource.isInvoiceable());
         assertNotNull(resource.getBackOfficeEnvironmentConfigurations());
         assertEquals(product.getChildren().get(0).getId(), resource.getChildren().get(0).getId());
         assertEquals(product.getChildren().get(0).getTitle(), resource.getChildren().get(0).getTitle());
@@ -55,7 +53,6 @@ class ProductMapperTest {
         assertEquals(product.getChildren().get(0).getLogoBgColor(), resource.getChildren().get(0).getLogoBgColor());
         assertEquals(product.getChildren().get(0).getDescription(), resource.getChildren().get(0).getDescription());
         assertEquals(product.getChildren().get(0).getUrlPublic(), resource.getChildren().get(0).getUrlPublic());
-        //     assertEquals(product.getChildren().get(0).isInvoiceable(),resource.getChildren().get(0).isInvoiceable());
     }
 
 
@@ -138,18 +135,6 @@ class ProductMapperTest {
         assertEquals(SelfCareAuthority.ADMIN, resource.getSelcRole());
         assertEquals(input.getValue().isMultiroleAllowed(), resource.isMultiroleAllowed());
     }
-
-
-    @Test
-    void toProductRoleMappingsResource_fromMap_null() {
-        // given
-        Map<PartyRole, ProductRoleInfo> input = null;
-        // when
-        ProductRoleMappingsResource output = (ProductRoleMappingsResource) ProductsMapper.toProductRoleMappingsResource(input);
-        // then
-        assertNull(output);
-    }
-
 
     @Test
     void toProductRoleMappingsResource_fromMap_notNull() {

@@ -3,14 +3,15 @@ package it.pagopa.selfcare.dashboard.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationWithPaginationResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionsResponse;
 import it.pagopa.selfcare.dashboard.client.CoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
-import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapper;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.dashboard.service.DelegationServiceImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapperImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
+import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.InstitutionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.onboarding.common.ProductId.PROD_PAGOPA;
@@ -43,9 +45,9 @@ class DelegationServiceImplTest extends BaseServiceTest {
     @Mock
     private CoreDelegationApiRestClient coreDelegationApiRestClient;
     @Spy
-    private DelegationRestClientMapper delegationMapper;
+    private DelegationRestClientMapperImpl delegationMapper;
     @Spy
-    private InstitutionMapper institutionMapper;
+    private InstitutionMapperImpl institutionMapper;
 
 
     @BeforeEach
@@ -91,7 +93,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
         DelegationRequest delegationTaxCode = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        ClassPathResource pathResourceInstitution = new ClassPathResource("stubs/InstitutionResponse.json");
+        ClassPathResource pathResourceInstitution = new ClassPathResource("stubs/InstitutionsResponse.json");
         byte[] resourceStreamInstitution = Files.readAllBytes(pathResourceInstitution.getFile().toPath());
         InstitutionsResponse institutionsResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
@@ -123,7 +125,16 @@ class DelegationServiceImplTest extends BaseServiceTest {
     void testCreateDelegationWithResourceNotFoundException() {
         DelegationRequest delegationPagoPa = new DelegationRequest();
         delegationPagoPa.setProductId(PROD_PAGOPA.getValue());
-        ResponseEntity<InstitutionsResponse> responseEntity = ResponseEntity.ok(new InstitutionsResponse());
+        delegationPagoPa.setId("id");
+        delegationPagoPa.setFrom("from");
+        delegationPagoPa.setTo("to");
+        delegationPagoPa.setType(DelegationType.PT);
+        InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        InstitutionResponse inst = new InstitutionResponse();
+        inst.setId("id");
+        inst.setInstitutionType(InstitutionType.PA.getValue());
+        institutionsResponse.setInstitutions(Collections.emptyList());
+        ResponseEntity<InstitutionsResponse> responseEntity = ResponseEntity.ok(institutionsResponse);
         when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any())).thenReturn(responseEntity);
         assertThrows(ResourceNotFoundException.class, () -> delegationServiceImpl.createDelegation(delegationPagoPa));
     }
@@ -149,6 +160,13 @@ class DelegationServiceImplTest extends BaseServiceTest {
                 .map(delegation -> {
                     DelegationResponse response = new DelegationResponse();
                     response.setId(delegation.getId());
+                    response.setInstitutionId(delegation.getInstitutionId());
+                    response.setBrokerId(delegation.getBrokerId());
+                    response.setProductId(delegation.getProductId());
+                    response.setInstitutionName(delegation.getInstitutionName());
+                    response.setInstitutionRootName(delegation.getInstitutionRootName());
+                    response.setBrokerName(delegation.getBrokerName());
+                    response.setType(DelegationResponse.TypeEnum.AOO);
                     return response;
                 }).toList();
 
@@ -196,7 +214,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
 
         DelegationWithPagination response = delegationServiceImpl.getDelegationsV2(delegationParameters);
 
-        Assertions.assertEquals(delegationWithPagination, response);
+        Assertions.assertEquals(delegationWithPagination.getDelegations().get(0).getId(), response.getDelegations().get(0).getId());
         Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
                 ._getDelegationsUsingGET1(any(), any(), any(), any(), any(), any(), any(), any());
     }

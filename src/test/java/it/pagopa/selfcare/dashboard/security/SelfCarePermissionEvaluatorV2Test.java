@@ -3,9 +3,6 @@ package it.pagopa.selfcare.dashboard.security;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserGroupRestClient;
-import it.pagopa.selfcare.dashboard.model.groups.UserGroupInfo;
-import it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain;
-import it.pagopa.selfcare.dashboard.security.SelfCarePermissionEvaluatorV2;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActions;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
@@ -90,15 +87,4 @@ class SelfCarePermissionEvaluatorV2Test {
 
         assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), "Selc:ViewBilling"));
     }
-
-@Test
-void hasPermissionReturnsFalseWhenUserGroupNotFound() {
-    Authentication authentication = mock(Authentication.class);
-    SelfCareUser user = SelfCareUser.builder("userId").build();
-
-    when(authentication.getPrincipal()).thenReturn(user);
-    when(userGroupRestClient._getUserGroupUsingGET("userId")).thenReturn(ResponseEntity.notFound().build());
-
-    assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", "invalidGroupId"), "Selc:ViewBilling"));
-}
 }

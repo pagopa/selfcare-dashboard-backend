@@ -64,7 +64,7 @@ public class SwaggerConfig {
                         .description(environment.getProperty("swagger.description", "Api and Models"))
                         .version(environment.getProperty("swagger.version", environment.getProperty("spring.application.version")))
                         .build())
-                .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.web.controller")).build()
+                .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.controller")).build()
                 .tags(new Tag("institutions", environment.getProperty("swagger.dashboard.institutions.api.description")),
                         new Tag("pnPGInstitutions", environment.getProperty("swagger.dashboard.pnPGInstitutions.api.description")),
                         new Tag("token", environment.getProperty("swagger.dashboard.token.api.description")),

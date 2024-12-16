@@ -1,9 +1,8 @@
 package it.pagopa.selfcare.dashboard.service;
 
+import it.pagopa.selfcare.dashboard.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.connector.api.FileStorageConnector;
 import it.pagopa.selfcare.dashboard.exception.FileUploadException;
-import it.pagopa.selfcare.dashboard.service.FileStorageServiceImpl;
-import it.pagopa.selfcare.dashboard.config.CoreTestConfig;
 import it.pagopa.selfcare.dashboard.exception.FileValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
