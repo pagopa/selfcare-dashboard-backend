@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.ValidationException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +88,7 @@ class CoreConnectorImpl implements MsCoreConnector {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", taxCode);
         Assert.hasText(taxCode, REQUIRED_TAX_CODE_MESSAGE);
-        InstitutionsResponse institutions = coreInstitutionApiRestClient._getInstitutionsUsingGET(taxCode, subunitCode, origin, originId).getBody();
+        InstitutionsResponse institutions = coreInstitutionApiRestClient._getInstitutionsUsingGET(taxCode, subunitCode, origin, originId, null).getBody();
         log.debug("getInstitution result = {}", institutions);
         log.trace("getInstitution end");
         Assert.notNull(institutions, NO_INSTITUTION_FOUND);
