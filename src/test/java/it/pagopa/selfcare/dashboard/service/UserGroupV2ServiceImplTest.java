@@ -14,7 +14,11 @@ import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
+import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.User;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDataResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDetailResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,6 +121,42 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
 
         assertEquals(mockPage.getTotalElements(), result.getTotalElements());
         assertEquals(mockPage.getContent().get(0).getInstitutionId(), result.getContent().get(0).getInstitutionId());
+    }
+
+    @Test
+    void updateUserGroupSuccessfullyUpdatesGroup() {
+        String groupId = "groupId";
+        String userId = UUID.randomUUID().toString();
+        UpdateUserGroup group = mockInstance(new UpdateUserGroup());
+        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
+        group.setMembers(List.of(userId));
+        UserInstitutionResponse userInstitutionResponse = mockInstance(new UserInstitutionResponse(), "setUserId");
+        userInstitutionResponse.setUserId(userId);
+
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(mockInstance(new UserGroupResource())));
+        when(groupMapper.toUserGroupInfo(any())).thenReturn(userGroupInfo);
+        when(userInstitutionApiRestClient._retrieveUserInstitutions("setInstitutionId", null, List.of("setProductId"), null, List.of("ACTIVE","SUSPENDED"), null))
+                .thenReturn(ResponseEntity.ok(Collections.singletonList(userInstitutionResponse)));
+        when(groupMapper.toUpdateUserGroupDto(group)).thenReturn(mockInstance(new UpdateUserGroupDto()));
+
+        assertDoesNotThrow(() -> userGroupV2Service.updateUserGroup(groupId, group));
+        verify(userGroupRestClient, times(1))._updateUserGroupUsingPUT(eq(groupId), any(UpdateUserGroupDto.class));
+    }
+
+    @Test
+    void updateUserGroupThrowsInvalidMemberListExceptionWhenMembersNotAllowed() {
+        String groupId = "groupId";
+        UpdateUserGroup group = mockInstance(new UpdateUserGroup());
+        group.setMembers(List.of("userId1", "userId2"));
+        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
+
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(mockInstance(new UserGroupResource())));
+        when(groupMapper.toUserGroupInfo(any())).thenReturn(userGroupInfo);
+        when(userInstitutionApiRestClient._retrieveUserInstitutions("setInstitutionId", null, List.of("setProductId"), null, List.of("ACTIVE","SUSPENDED"), null))
+                .thenReturn(ResponseEntity.ok(Collections.singletonList(mockInstance(new UserInstitutionResponse()))));
+
+        InvalidMemberListException exception = assertThrows(InvalidMemberListException.class, () -> userGroupV2Service.updateUserGroup(groupId, group));
+        assertEquals("Some members in the list aren't allowed for this institution", exception.getMessage());
     }
 
     @Test
@@ -256,74 +296,15 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
         Assertions.assertDoesNotThrow(() -> userGroupV2Service.deleteMembersByUserId(UUID.randomUUID().toString(), "institutionId", "prod-io"));
     }
 
-/*    @Test
-    void addMemberToUserGroup() {
-
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        String productId = "productId";
-        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
-        foundGroup.setId(groupId);
-        UUID userId = randomUUID();
-        String id2 = randomUUID().toString();
-        String id3 = randomUUID().toString();
-        String id4 = randomUUID().toString();
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
-
-        userInfoMock1.setId(userId.toString());
-        userInfoMock2.setId(id2);
-        userInfoMock3.setId(id3);
-        userInfoMock4.setId(id4);
-
-        foundGroup.setMembers(List.of(userInfoMock2, userInfoMock3, userInfoMock4));
-        foundGroup.setCreatedAt(Instant.now());
-        foundGroup.setModifiedAt(Instant.now());
-        foundGroup.setInstitutionId(institutionId);
-        foundGroup.setProductId(productId);
-
-        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(groupId, userId);
-
-        assertDoesNotThrow(executable);
-        UserInfo.UserInfoFilter capturedFilter = filterCaptor.getValue();
-        assertNull(capturedFilter.getUserId());
-        assertNull(capturedFilter.getProductRoles());
-        assertNull(capturedFilter.getRole());
-        assertEquals(foundGroup.getProductId(), capturedFilter.getProductId());
-        assertEquals(List.of(ACTIVE, SUSPENDED), capturedFilter.getAllowedStates());
-    }*/
-
 
     @Test
     void addMemberToUserGroup_invalidMember() {
 
         String groupId = "groupId";
-        String institutionId = "institutionId";
         String productId = "productId";
         UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
         foundGroup.setId(groupId);
         UUID userId = randomUUID();
-        String id1 = randomUUID().toString();
-        String id2 = randomUUID().toString();
-        String id3 = randomUUID().toString();
-        String id4 = randomUUID().toString();
-        UserInfo userInfoMock1 = mockInstance(new UserInfo(), 1, "setId");
-        UserInfo userInfoMock2 = mockInstance(new UserInfo(), 2, "setId");
-        UserInfo userInfoMock3 = mockInstance(new UserInfo(), 3, "setId");
-        UserInfo userInfoMock4 = mockInstance(new UserInfo(), 4, "setId");
-
-        userInfoMock1.setId(id1);
-        userInfoMock2.setId(id2);
-        userInfoMock3.setId(id3);
-        userInfoMock4.setId(id4);
-
-        foundGroup.setMembers(List.of(userInfoMock2, userInfoMock3, userInfoMock4));
-        foundGroup.setCreatedAt(Instant.now());
-        foundGroup.setModifiedAt(Instant.now());
-        foundGroup.setInstitutionId(institutionId);
-        foundGroup.setProductId(productId);
 
         UserGroupResource userGroupResource = new UserGroupResource();
         userGroupResource.setProductId(productId);
@@ -338,25 +319,84 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
     }
 
     @Test
-    void addMemberToUserGroup_nullId() {
+    void addMemberToUserGroup_validMember() {
 
+        String groupId = "groupId";
+        String productId = "productId";
+        UserGroupInfo foundGroup = mockInstance(new UserGroupInfo(), "setId", "setInstitutionId");
+        foundGroup.setId(groupId);
         UUID userId = randomUUID();
+        UserInstitutionResponse userInstitutionResponse = mockInstance(new UserInstitutionResponse(), "setUserId");
+        userInstitutionResponse.setUserId(userId.toString());
 
-        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(null, userId);
+        UserGroupResource userGroupResource = new UserGroupResource();
+        userGroupResource.setProductId(productId);
+        when(userGroupRestClient._getUserGroupUsingGET(anyString())).thenReturn(ResponseEntity.ok(userGroupResource));
+        when(userInstitutionApiRestClient._retrieveUserInstitutions(null, null, List.of("productId"),null, List.of("ACTIVE","SUSPENDED"),null))
+                .thenReturn(ResponseEntity.ok(Collections.singletonList(userInstitutionResponse)));
 
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals(REQUIRED_GROUP_ID_MESSAGE, e.getMessage());
+        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(groupId, userId);
+
+       assertDoesNotThrow(executable);
+    }
+
+
+    @Test
+    void getUserGroupByIdThrowsInvalidUserGroupExceptionForMismatchedInstitutionId() {
+        String groupId = "groupId";
+        String institutionId = "institutionId";
+        UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
+        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
+        userGroupInfo.setInstitutionId("differentInstitutionId");
+
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
+        when(groupMapper.toUserGroupInfo(userGroupResource)).thenReturn(userGroupInfo);
+
+        InvalidUserGroupException exception = assertThrows(InvalidUserGroupException.class, () -> {
+            userGroupV2Service.getUserGroupById(groupId, institutionId);
+        });
+
+        assertEquals("Could not find a UserGroup for given institutionId", exception.getMessage());
     }
 
     @Test
-    void addMemberToUserGroup_nullUserId() {
-
+    void getUserGroupByIdWithInvalidInstitution() {
         String groupId = "groupId";
+        String institutionId = "institutionId";
+        UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
+        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
 
-        Executable executable = () -> userGroupV2Service.addMemberToUserGroup(groupId, null);
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
+        when(groupMapper.toUserGroupInfo(userGroupResource)).thenReturn(userGroupInfo);
 
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("A userId is required", e.getMessage());
+        Assertions.assertThrows(InvalidUserGroupException.class, () -> userGroupV2Service.getUserGroupById(groupId, institutionId),
+                "Could not find a UserGroup for given institutionId");
+    }
+
+    @Test
+    void getUserGroupByIdWithValidInstitution() {
+        UUID userId = randomUUID();
+        String groupId = "groupId";
+        String institutionId = "setInstitutionId";
+        UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
+        userGroupResource.setMembers(List.of(userId));
+        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
+
+        UserDataResponse user = mockInstance(new UserDataResponse());
+        user.setRole("MANAGER");
+        user.setStatus("ACTIVE");
+
+        UserDetailResponse userDetail = mockInstance(new UserDetailResponse());
+
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
+        when(userApiRestClient._retrieveUsers(anyString(), anyString(), any(), any(),any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(user)));
+        when(userApiRestClient._getUserDetailsById("setCreatedBy", "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
+        when(userApiRestClient._getUserDetailsById("setModifiedBy", "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
+
+        UserGroupInfo groupInfo = userGroupV2Service.getUserGroupById(groupId, institutionId);
+        Assertions.assertEquals(userGroupInfo.getInstitutionId(), groupInfo.getInstitutionId());
+        Assertions.assertEquals(userGroupInfo.getCreatedBy().getId(), groupInfo.getCreatedBy().getId());
+        Assertions.assertEquals(userGroupInfo.getModifiedBy().getId(), groupInfo.getModifiedBy().getId());
     }
 
     @Test
