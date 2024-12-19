@@ -146,7 +146,7 @@ class CoreConnectorImplTest extends BaseConnectorTest{
         InstitutionsResponse institutionsResponse = new InstitutionsResponse();
         institutionsResponse.setInstitutions(List.of(institutionMock));
 
-        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(institutionMock.getTaxCode(), null, null, null))
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(institutionMock.getTaxCode(), null, null, null, null))
                 .thenReturn(ResponseEntity.of(Optional.of(institutionsResponse)));
         // when
         List<Institution> institutions = msCoreConnector.getInstitutionsFromTaxCode(institutionMock.getTaxCode(), null, null, null);
@@ -154,7 +154,7 @@ class CoreConnectorImplTest extends BaseConnectorTest{
 
         assertEquals(institutions.get(0), institutionMapperSpy.toInstitution(institutionMock));
         verify(coreInstitutionApiRestClient, times(1))
-                ._getInstitutionsUsingGET(institutionMock.getTaxCode(), null, null, null);
+                ._getInstitutionsUsingGET(institutionMock.getTaxCode(), null, null, null, null);
     }
 
     @Test

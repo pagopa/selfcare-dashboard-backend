@@ -31,14 +31,16 @@
         }
       },
       "roleManagementURL": "role_management_url",
-      "contractTemplateUpdatedAt": "2022-01-01T00:00:00Z",
-      "contractTemplatePath": "contract_template_path",
-      "contractTemplateVersion": "contract_template_version",
       "institutionContractMappings": {
+        "default": {
+          "contractTemplatePath": "contract_template_path",
+          "contractTemplateVersion": "contract_template_version",
+          "attachments": []
+        },
         "PSP": {
-          "contractTemplateUpdatedAt": "2022-01-01T00:00:00Z",
           "contractTemplatePath": "value",
-          "contractTemplateVersion": "value1"
+          "contractTemplateVersion": "value1",
+          "attachments": []
         }
       },
       "enabled": true,
@@ -95,14 +97,16 @@
           }
         },
         "roleManagementURL": "role_management_url",
-        "contractTemplateUpdatedAt": "2022-01-01T00:00:00Z",
-        "contractTemplatePath": "contract_template_path",
-        "contractTemplateVersion": "contract_template_version",
         "institutionContractMappings": {
+          "default": {
+            "contractTemplatePath": "contract_template_path",
+            "contractTemplateVersion": "contract_template_version",
+            "attachments": []
+          },
           "PSP": {
-            "contractTemplateUpdatedAt": "2022-01-01T00:00:00Z",
             "contractTemplatePath": "value",
-            "contractTemplateVersion": "value1"
+            "contractTemplateVersion": "value1",
+            "attachments": []
           }
         },
         "enabled": true,
