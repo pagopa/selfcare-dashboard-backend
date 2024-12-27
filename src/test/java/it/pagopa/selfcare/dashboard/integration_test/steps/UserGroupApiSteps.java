@@ -1,0 +1,278 @@
+package it.pagopa.selfcare.dashboard.integration_test.steps;
+
+import io.cucumber.java.DataTableType;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.specification.RequestSpecification;
+import it.pagopa.selfcare.dashboard.model.user_groups.CreateUserGroupDto;
+import it.pagopa.selfcare.dashboard.model.user_groups.UpdateUserGroupDto;
+import it.pagopa.selfcare.dashboard.model.user_groups.UserGroupIdResource;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Map;
+
+public class UserGroupApiSteps {
+
+    @Autowired
+    private DashboardStepsUtil dashboardStepsUtil;
+
+    @DataTableType
+    public CreateUserGroupDto convertCreateRequest(Map<String, String> entry) {
+        return dashboardStepsUtil.toCreateUserGroupDto(entry);
+    }
+
+    @DataTableType
+    public UpdateUserGroupDto convertUpdateRequest(Map<String, String> entry) {
+        return dashboardStepsUtil.toUpdateUserGroupDto(entry);
+    }
+
+    @Given("the following user group details:")
+    public void theFollowingUserGroupDetails(List<CreateUserGroupDto> createUserGroupDtos) {
+        if (createUserGroupDtos != null && createUserGroupDtos.size() == 1)
+            dashboardStepsUtil.requests.setCreateUserGroupDto(createUserGroupDtos.get(0));
+    }
+
+    @And("I have data to update:")
+    public void iHaveDataToUpdate(List<UpdateUserGroupDto> updateUserGroupDtos) {
+        if (updateUserGroupDtos != null && updateUserGroupDtos.size() == 1)
+            dashboardStepsUtil.requests.setUpdateUserGroupDto(updateUserGroupDtos.get(0));
+    }
+
+
+    @When("I send a POST request to {string} with the given details to create usergroup")
+    public void iSendAPOSTRequestToWithTheGivenDetails(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .body(dashboardStepsUtil.requests.getCreateUserGroupDto())
+                .post(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 201) {
+            dashboardStepsUtil.responses.setUserGroupIdResource(response.body().as(UserGroupIdResource.class));
+        }else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a DELETE request to {string} to delete userGroup")
+    public void iSendADELETERequestTo(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .delete(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status != 204) {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a DELETE request to {string} to delete member")
+    public void iSendADELETERequestToToDeleteMember(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .pathParam("userId", dashboardStepsUtil.filter.getUserId())
+                .delete(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status != 204) {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a PUT request to {string} to update userGroup")
+    public void iSendAPUTRequestToWithAuthentication(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .body(dashboardStepsUtil.requests.getUpdateUserGroupDto())
+                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .put(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status != 204) {
+            dashboardStepsUtil. errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a POST request to {string} to update userGroup status")
+    public void iSendAPOSTRequestTo(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .put(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status != 204) {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a GET request to {string} to retrieve userGroup")
+    public void usergroupISendAGETRequestTo(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        if (dashboardStepsUtil.filter.getInstitutionId() != null) {
+            requestSpecification.queryParam("institutionId", dashboardStepsUtil.filter.getInstitutionId());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 201) {
+            dashboardStepsUtil.responses.setUserGroupResource(response.body().as(new TypeRef<>() {}));
+        }else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+
+    @When("I send a GET request to {string} to retrieve userGroups")
+    public void usergroupISendAGETRequestToToRetrieveUserGroups(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        if (dashboardStepsUtil.filter.getInstitutionId() != null) {
+            requestSpecification.queryParam("institutionId", dashboardStepsUtil.filter.getInstitutionId());
+        }
+        if (dashboardStepsUtil.filter.getProductId() != null) {
+            requestSpecification.queryParam("productId", dashboardStepsUtil.filter.getProductId());
+        }
+        if (dashboardStepsUtil.filter.getUserId() != null) {
+            requestSpecification.queryParam("userId", dashboardStepsUtil.filter.getUserId());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 201) {
+            dashboardStepsUtil. responses.setUserGroupPlainResource(response.body().as(new TypeRef<>() {}));
+        }else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a POST request to {string} to add userGroup member")
+    public void iSendAPOSTRequestToToAddUserGroupMember(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .pathParam("userId", dashboardStepsUtil.filter.getUserId())
+                .post(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status != 204) {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+
+    @And("the response should contain a valid user group id")
+    public void theResponseShouldContainAValidUserGroupId() {
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getUserGroupIdResource(), dashboardStepsUtil.responses.getUserGroupIdResource().getId());
+    }
+
+    @And("the response should contain a paginated list of user groups of {int} items on page {int}")
+    public void theResponseShouldContainAPaginatedListOfUserGroupsOfItemsOnPage(int items, int page) {
+
+    }
+
+    @And("the response should contain {int} item")
+    public void theResponseShouldContainItem(int item) {
+    }
+
+    @And("the response should contain the group details")
+    public void theResponseShouldContainTheGroupDetails() {
+
+    }
+
+    @And("the retrieved group should be changed status to {string}")
+    public void theRetrievedGroupShouldBeChangedStatusTo(String status) {
+    }
+
+    @And("the response should contains groupIds {string}")
+    public void theResponseShouldContainsGroupIds(String ids) {
+    }
+
+    @And("the retrieved group should be updated")
+    public void theRetrievedGroupShouldBeUpdated() {
+    }
+}

@@ -40,7 +40,7 @@ public class UserGroupV2Controller {
     @ApiResponses({
             @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
     })
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#group.getInstitutionId(), #group.getProductId(), null), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#group.getInstitutionId(), #group.getProductId(), null), 'Selc:ManageProductGroups')")
     public UserGroupIdResource createUserGroup(@RequestBody @Valid CreateUserGroupDto group) {
         log.trace("createGroup start");
         log.debug("createGroup group = {}", group);
@@ -55,7 +55,7 @@ public class UserGroupV2Controller {
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.deleteUserGroup}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public void deleteUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                 @PathVariable("id") String id) {
         log.trace("deleteGroup start");
@@ -68,7 +68,7 @@ public class UserGroupV2Controller {
     @PostMapping(value = "/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.activateUserGroup}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public void activateUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                   @PathVariable("id") String id) {
         log.trace("activateGroup start");
@@ -80,7 +80,7 @@ public class UserGroupV2Controller {
     @PostMapping(value = "/{id}/suspend", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.suspendUserGroup}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public void suspendUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                  @PathVariable("id") String id) {
         log.trace("suspendGroup start");
@@ -95,7 +95,7 @@ public class UserGroupV2Controller {
     @ApiResponses({
             @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
     })
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public void updateUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                 @PathVariable("id") String id,
                                 @RequestBody @Valid UpdateUserGroupDto groupDto) {
@@ -109,7 +109,7 @@ public class UserGroupV2Controller {
     @PostMapping(value = "/{id}/members/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.addMember}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public void addMemberToUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                      @PathVariable("id") String id,
                                      @ApiParam("${swagger.dashboard.user.model.id}")
@@ -123,7 +123,7 @@ public class UserGroupV2Controller {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroup}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public UserGroupResource getUserGroupById(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                               @PathVariable("id") String id,
                                               @ApiParam("${swagger.dashboard.user-group.model.institutionId}")
@@ -160,7 +160,7 @@ public class UserGroupV2Controller {
     @DeleteMapping(value = "/{userGroupId}/members/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.deleteMember}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(null, null, #userGroupId), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #userGroupId), 'Selc:ManageProductGroups')")
     public void deleteMemberFromUserGroup(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                           @PathVariable("userGroupId") String userGroupId,
                                           @ApiParam("${swagger.dashboard.user.model.id}")

@@ -40,7 +40,7 @@ public class DelegationController {
     @ApiResponses({
             @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
     })
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#delegationRequest.getFrom(), #delegationRequest.getProductId(), null), 'Selc:CreateDelegation')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#delegationRequest.getFrom(), #delegationRequest.getProductId(), null), 'Selc:CreateDelegation')")
     public DelegationIdResource createDelegation(@RequestBody @Valid DelegationRequestDto delegationRequest) {
         log.trace("createDelegation start");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "createDelegation request = {}", delegationRequest);
