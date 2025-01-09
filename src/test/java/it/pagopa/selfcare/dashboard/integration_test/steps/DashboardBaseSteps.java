@@ -129,7 +129,7 @@ public class DashboardBaseSteps{
         dashboardStepsUtil.filter.setOrder(Order.valueOf(order));
     }
 
-    @And("I have {string} as size filter")
+    @And("I have {int} as size filter")
     public void iHaveAsSizeFilter(int size) {
         dashboardStepsUtil.filter.setSize(size);
     }

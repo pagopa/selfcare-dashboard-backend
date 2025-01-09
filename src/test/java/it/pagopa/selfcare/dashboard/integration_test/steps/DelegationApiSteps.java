@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static it.pagopa.selfcare.dashboard.model.delegation.DelegationType.PT;
+
 public class DelegationApiSteps{
 
     @Autowired
@@ -123,14 +125,36 @@ public class DelegationApiSteps{
         }
     }
 
-    @And("the response should contain a list of delegations")
-    public void theResponseShouldContainAListOfDelegations() {
 
+    @And("the response should contain a list of delegations for all product")
+    public void theResponseShouldContainAListOfDelegationsForALlProduct() {
+        Assertions.assertFalse(dashboardStepsUtil.responses.getDelegationResource().isEmpty());
+        Assertions.assertEquals(2, dashboardStepsUtil.responses.getDelegationResource().size());
+        Assertions.assertEquals("prod-io", dashboardStepsUtil.responses.getDelegationResource().get(0).getProductId());
+        Assertions.assertEquals("prod-pagopa", dashboardStepsUtil.responses.getDelegationResource().get(1).getProductId());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getDelegationResource().get(0).getInstitutionId());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getDelegationResource().get(1).getInstitutionId());
+        Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationResource().get(0).getInstitutionName());
+        Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationResource().get(1).getInstitutionName());
+        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationResource().get(0).getBrokerName());
+        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationResource().get(1).getBrokerName());
+        Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationResource().get(0).getBrokerId());
+        Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationResource().get(1).getBrokerId());
+        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationResource().get(0).getType());
+        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationResource().get(1).getType());
+
+    }
+
+    @And("the response should contain a list of delegations only for {string}")
+    public void theResponseShouldContainAListOfDelegations(String productId) {
+        Assertions.assertFalse(dashboardStepsUtil.responses.getDelegationResource().isEmpty());
+        Assertions.assertEquals(1, dashboardStepsUtil.responses.getDelegationResource().size());
+        Assertions.assertEquals(productId, dashboardStepsUtil.responses.getDelegationResource().get(0).getProductId());
     }
 
     @And("the response should contain an empty list")
     public void theResponseShouldContainAnEmptyList() {
-        Assertions.assertTrue(dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().isEmpty());
+        Assertions.assertTrue(dashboardStepsUtil.responses.getDelegationResource().isEmpty());
     }
 
     @And("the response should contain a list of delegations filtered by {string}")
@@ -145,13 +169,29 @@ public class DelegationApiSteps{
 
     @And("the response contains delegation only for {string}")
     public void theResponseContainsDelegationOnlyFor(String productId) {
-        Assertions.assertTrue(dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().stream()
+        Assertions.assertTrue(dashboardStepsUtil.responses.getDelegationResource().stream()
                 .allMatch(delegation -> delegation.getProductId().equals(productId)));
     }
 
     @And("the response should contain a list of paginated delegations")
     public void theResponseShouldContainAListOfPaginatedDelegations() {
-
+        Assertions.assertFalse(dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().isEmpty());
+        Assertions.assertEquals(2, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().size());
+        Assertions.assertEquals(2, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getTotalElements());
+        Assertions.assertEquals(1, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getTotalPages());
+        Assertions.assertEquals(0, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getPageNo());
+        Assertions.assertEquals("prod-io", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getProductId());
+        Assertions.assertEquals("prod-pagopa", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getProductId());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getInstitutionId());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getInstitutionId());
+        Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getInstitutionName());
+        Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getInstitutionName());
+        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getBrokerName());
+        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getBrokerName());
+        Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getBrokerId());
+        Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getBrokerId());
+        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getType());
+        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getType());
     }
 
     @And("the response should contain a list of paginated delegations filtered by {string}")
@@ -160,11 +200,28 @@ public class DelegationApiSteps{
     }
 
     @And("the paginated response contains delegation only for {string}")
-    public void thePaginatedResponseContainsDelegationOnlyFor(String arg0) {
+    public void thePaginatedResponseContainsDelegationOnlyFor(String productId) {
+        Assertions.assertTrue(dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().stream()
+                .allMatch(delegation -> delegation.getProductId().equals(productId)));
     }
+
 
     @And("the response should contain a delegation id")
     public void theResponseShouldContainADelegationId() {
         Assertions.assertTrue(StringUtils.isNotBlank(dashboardStepsUtil.responses.getDelegationIdResource().getId()));
+    }
+
+    @And("the response should contain an empty list for paginatedApi")
+    public void theResponseShouldContainAnEmptyListForPaginatedApi() {
+        Assertions.assertEquals(0, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getTotalElements());
+        Assertions.assertTrue(dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().isEmpty());
+    }
+
+    @And("the response should contain a list of paginated delegations with other pages")
+    public void theResponseShouldContainAListOfPaginatedDelegationsWithOtherPages() {
+        Assertions.assertEquals(2, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getTotalElements());
+        Assertions.assertEquals(1, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().size());
+        Assertions.assertEquals(2, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getTotalPages());
+        Assertions.assertEquals(0, dashboardStepsUtil.responses.getDelegationWithPagination().getPageInfo().getPageNo());
     }
 }

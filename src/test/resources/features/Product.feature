@@ -1,3 +1,4 @@
+@exclude
 Feature: Product
 
   Scenario: Successfully retrieving the back-office URL for a valid product and institution

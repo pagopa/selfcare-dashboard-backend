@@ -146,5 +146,81 @@
     ],
     "userId": "35a78332-d038-4bfa-8e85-2cba7f6b7bf7",
     "userMailUuid": "ID_MAIL#9425e6ea-7d84-4c5e-9196-6f66b62800b2"
+  },
+  {
+    "_id": {
+      "$oid": "678004d29a9240780b3964c8"
+    },
+    "institutionDescription": "PT test",
+    "institutionId": "067327d3-bdd6-408d-8655-87e8f1960046",
+    "products": [
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        },
+        "env": "ROOT",
+        "productId": "prod-interop",
+        "productRole": "security",
+        "role": "OPERATOR",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        },
+        "env": "ROOT",
+        "productId": "prod-interop",
+        "productRole": "api",
+        "role": "OPERATOR",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        },
+        "env": "ROOT",
+        "productId": "prod-io",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        },
+        "env": "ROOT",
+        "productId": "prod-pn",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        },
+        "env": "ROOT",
+        "productId": "prod-pagopa",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228Z"
+        }
+      }
+    ],
+    "userId": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
+    "userMailUuid": "ID_MAIL#1b2ec3ce-2fb2-4dd9-bd83-7c085b368001"
   }
 ]

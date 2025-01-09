@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+
+  mockserver:
+    image: mockserver/mockserver
+    ports:
+      - '1080:1080'
+    environment:
+      - MOCKSERVER_INITIALIZATION_JSON_PATH=/config/*.json
+      - MOCKSERVER_ENABLE_CORS_FOR_API="true"
+      - MOCKSERVER_ENABLE_CORS_FOR_ALL_RESPONSES="true"
+    volumes:
+      - "./integration-test-config/mock:/config"
+    networks:
+      - develop-network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - "./integration-test-config/db:/docker-entrypoint-initdb.d"
+    networks:
+      - develop-network
+
+networks:
+  develop-network:
+    name: selfcare-develop-network
+
