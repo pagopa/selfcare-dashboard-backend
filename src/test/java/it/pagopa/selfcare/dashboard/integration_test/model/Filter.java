@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.integration_test.model;
 
 import it.pagopa.selfcare.dashboard.model.delegation.Order;
 import lombok.Data;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -24,4 +25,9 @@ public class Filter {
     private Order order;
     private String search;
     private String status;
+    private Pageable pageable;
+    private List<String> fields;
+    private String taxCode;
+    private String email;
+    private String mobilePhone;
 }

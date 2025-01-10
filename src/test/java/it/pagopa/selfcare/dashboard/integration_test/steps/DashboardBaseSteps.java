@@ -15,12 +15,14 @@ import it.pagopa.selfcare.dashboard.model.delegation.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -90,6 +92,46 @@ public class DashboardBaseSteps{
         dashboardStepsUtil.filter.setInstitutionType(institutionType);
     }
 
+    @Given("the userId is {string}")
+    public void asUserId(String userId) {
+        dashboardStepsUtil.filter.setUserId(userId);
+    }
+
+    @And("the productRoles are {string}")
+    public void theProductRoleIs(String productRoles) {
+        String[] fieldsArray = productRoles.split(",");
+        dashboardStepsUtil.filter.setProductRoles(List.of(fieldsArray));
+    }
+
+    @And("the fiscalCode is {string}")
+    public void theFiscalCodeIs(String taxCode) {
+        dashboardStepsUtil.filter.setTaxCode(taxCode);
+    }
+
+    @And("the fields are {string}")
+    public void theFieldsAre(String fields) {
+        String[] fieldsArray = fields.split(",");
+        dashboardStepsUtil.filter.setFields(List.of(fieldsArray));
+    }
+
+    @And("the mobilePhone is {string}")
+    public void theMobilePhoneIs(String mobilePhone) {
+        dashboardStepsUtil.filter.setMobilePhone(mobilePhone);
+    }
+
+
+    @And("the email is {string}")
+    public void theEmailIs(String email) {
+        dashboardStepsUtil.filter.setEmail(email);
+    }
+
+
+    @And("the roles are {string}")
+    public void theRolesAre(String roles) {
+        String[] fieldsArray = roles.split(",");
+        dashboardStepsUtil.filter.setRoles(List.of(fieldsArray));
+    }
+
     @And("the language is {string}")
     public void languageIs(String lang) {
         dashboardStepsUtil.filter.setLang(lang);
@@ -137,8 +179,7 @@ public class DashboardBaseSteps{
 
     @And("I set the page number to {int} and page size to {int}")
     public void iSetThePageNumberToAndPageSizeTo(int page, int size) {
-        dashboardStepsUtil.filter.setPage(page);
-        dashboardStepsUtil.filter.setSize(size);
+        dashboardStepsUtil.filter.setPageable(Pageable.ofSize(size).withPage(page));
     }
 
     @Given("I have a filter with sorting by {string}")

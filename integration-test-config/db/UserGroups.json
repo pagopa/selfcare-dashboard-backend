@@ -9,12 +9,12 @@
     "description": "io group description",
     "status": "ACTIVE",
     "members": [
-      "75003d64-7b8c-4768-b20c-cf66467d44c7"
+      "97a511a7-2acc-47b9-afed-2f3c65753b4a"
     ],
     "createdAt": {
       "$date": "2024-10-28T12:25:53.228+00:00"
     },
-    "createdBy": "4ba2832d-9c4c-40f3-9126-e1c72905ef14",
+    "createdBy": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
     "modifiedAt": null
   },
   {
@@ -27,12 +27,12 @@
     "description": "pagopa group description",
     "status": "SUSPENDED",
     "members": [
-      "75003d64-7b8c-4768-b20c-cf66467d44c7"
+      "97a511a7-2acc-47b9-afed-2f3c65753b4a"
     ],
     "createdAt": {
       "$date": "2024-10-28T12:25:53.228+00:00"
     },
-    "createdBy": "4ba2832d-9c4c-40f3-9126-e1c72905ef14",
+    "createdBy": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
     "modifiedAt": null
   },
   {
@@ -45,12 +45,12 @@
     "description": "interop group description",
     "status": "SUSPENDED",
     "members": [
-      "75003d64-7b8c-4768-b20c-cf66467d44c7"
+      "97a511a7-2acc-47b9-afed-2f3c65753b4a"
     ],
     "createdAt": {
       "$date": "2024-10-28T12:25:53.228+00:00"
     },
-    "createdBy": "4ba2832d-9c4c-40f3-9126-e1c72905ef14",
+    "createdBy": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
     "modifiedAt": null
   }
 ]

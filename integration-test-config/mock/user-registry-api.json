@@ -65,6 +65,26 @@
       "path": "/user-registry-mock/v1/users/{id}",
       "queryStringParameters": {
         "fl": [
+          "name,familyName"
+        ]
+      },
+      "pathParameters": {
+        "id": [
+          "97a511a7-2acc-47b9-afed-2f3c65753b4a"
+        ]
+      }
+    },
+    "httpResponseTemplate": {
+      "templateType": "VELOCITY",
+      "template": "{\"statusCode\":200,\"body\":{\"id\":\"97a511a7-2acc-47b9-afed-2f3c65753b4a\",\"name\":{\"certification\":\"SPID\",\"value\":\"john\"},\"familyName\":{\"certification\":\"SPID\",\"value\":\"Doe\"}}}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/user-registry-mock/v1/users/{id}",
+      "queryStringParameters": {
+        "fl": [
           "fiscalCode","name","familyName"
         ]
       },

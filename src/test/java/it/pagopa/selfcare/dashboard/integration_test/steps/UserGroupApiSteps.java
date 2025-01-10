@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.specification.RequestSpecification;
+import it.pagopa.selfcare.dashboard.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UpdateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UserGroupIdResource;
@@ -17,6 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import static it.pagopa.selfcare.dashboard.model.groups.UserGroupStatus.ACTIVE;
 
 public class UserGroupApiSteps {
 
@@ -103,7 +108,7 @@ public class UserGroupApiSteps {
 
         ExtractableResponse<?> response = requestSpecification
                 .when()
-                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .pathParam("userGroupId", dashboardStepsUtil.filter.getGroupId())
                 .pathParam("userId", dashboardStepsUtil.filter.getUserId())
                 .delete(url)
                 .then()
@@ -181,7 +186,7 @@ public class UserGroupApiSteps {
                 .extract();
 
         dashboardStepsUtil.status = response.statusCode();
-        if(dashboardStepsUtil.status == 201) {
+        if(dashboardStepsUtil.status == 200) {
             dashboardStepsUtil.responses.setUserGroupResource(response.body().as(new TypeRef<>() {}));
         }else {
             dashboardStepsUtil.errorMessage = response.body().asString();
@@ -208,6 +213,14 @@ public class UserGroupApiSteps {
             requestSpecification.queryParam("userId", dashboardStepsUtil.filter.getUserId());
         }
 
+        if (Objects.nonNull(dashboardStepsUtil.filter.getPageable())) {
+            requestSpecification.queryParam("size",dashboardStepsUtil.filter.getPageable().getPageSize());
+            requestSpecification.queryParam("page",dashboardStepsUtil.filter.getPageable().getPageNumber());
+            if(dashboardStepsUtil.filter.getPageable().getSort().isSorted()){
+                requestSpecification.queryParam("sort", dashboardStepsUtil.filter.getPageable().getSort().toString());
+            }
+        }
+
         ExtractableResponse<?> response = requestSpecification
                 .when()
                 .get(url)
@@ -215,8 +228,8 @@ public class UserGroupApiSteps {
                 .extract();
 
         dashboardStepsUtil.status = response.statusCode();
-        if(dashboardStepsUtil.status == 201) {
-            dashboardStepsUtil. responses.setUserGroupPlainResource(response.body().as(new TypeRef<>() {}));
+        if(dashboardStepsUtil.status == 200) {
+            dashboardStepsUtil. responses.setUserGroupPlainResourcePageable(response.body().as(new TypeRef<>() {}));
         }else {
             dashboardStepsUtil.errorMessage = response.body().asString();
         }
@@ -233,7 +246,7 @@ public class UserGroupApiSteps {
 
         ExtractableResponse<?> response = requestSpecification
                 .when()
-                .pathParam("groupId", dashboardStepsUtil.filter.getGroupId())
+                .pathParam("id", dashboardStepsUtil.filter.getGroupId())
                 .pathParam("userId", dashboardStepsUtil.filter.getUserId())
                 .post(url)
                 .then()
@@ -253,19 +266,28 @@ public class UserGroupApiSteps {
 
     @And("the response should contain a paginated list of user groups of {int} items on page {int}")
     public void theResponseShouldContainAPaginatedListOfUserGroupsOfItemsOnPage(int items, int page) {
-        Assertions.assertTrue(true);
-    }
-
-    @And("the response should contain {int} item")
-    public void theResponseShouldContainItem(int item) {
-        Assertions.assertTrue(true);
-
+        Assertions.assertFalse(dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getContent().isEmpty());
+        Assertions.assertEquals(items,dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getContent().size());
+        Assertions.assertEquals(page,dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getNumber());
     }
 
     @And("the response should contain the group details")
     public void theResponseShouldContainTheGroupDetails() {
-        Assertions.assertTrue(true);
+        Assertions.assertEquals(dashboardStepsUtil.filter.getGroupId(), dashboardStepsUtil.responses.getUserGroupResource().getId());
+        Assertions.assertEquals("updatedDescription", dashboardStepsUtil.responses.getUserGroupResource().getDescription());
+        Assertions.assertEquals("updated Name", dashboardStepsUtil.responses.getUserGroupResource().getName());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getUserGroupResource().getInstitutionId());
+        Assertions.assertEquals("prod-io", dashboardStepsUtil.responses.getUserGroupResource().getProductId());
+        Assertions.assertEquals(ACTIVE, dashboardStepsUtil.responses.getUserGroupResource().getStatus());
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getUserGroupResource().getCreatedAt());
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getUserGroupResource().getModifiedAt());
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getUserGroupResource().getCreatedBy());
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getUserGroupResource().getModifiedBy());
 
+        ProductUserResource productUserResource = dashboardStepsUtil.responses.getUserGroupResource().getMembers().get(0);
+        Assertions.assertEquals(UUID.fromString("97a511a7-2acc-47b9-afed-2f3c65753b4a"), productUserResource.getId());
+        Assertions.assertEquals("john", productUserResource.getName());
+        Assertions.assertEquals("Doe", productUserResource.getSurname());
 
     }
 
@@ -279,5 +301,22 @@ public class UserGroupApiSteps {
     public void theResponseShouldContainsGroupIds(String ids) {
         Assertions.assertTrue(true);
 
+    }
+
+    @And("the response should contain an empty group list")
+    public void theResponseShouldContainAnEmptyList() {
+        Assertions.assertTrue(dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getContent().isEmpty());
+        Assertions.assertEquals(0,dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getTotalElements());
+    }
+
+    @And("the response should contain {int} total pages with {int} total elements")
+    public void theResponseShouldContainTotalPagesWithTotalElements(int totalPages, int totalElement) {
+        Assertions.assertEquals(totalPages,dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getTotalPages());
+        Assertions.assertEquals(totalElement,dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getTotalElements());
+    }
+
+    @And("the user is removed from user group")
+    public void theUserIsRemovedFromUserGroup() {
+        //TODO GET AND CHECK
     }
 }
