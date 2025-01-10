@@ -6,6 +6,7 @@ import it.pagopa.selfcare.onboarding.common.Env;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -26,9 +27,9 @@ public class OnboardedProductWithActions {
 
   private Env env;
 
-  private LocalDateTime createdAt;
+  private OffsetDateTime createdAt;
 
-  private LocalDateTime updatedAt;
+  private OffsetDateTime updatedAt;
 
   private String delegationId;
 

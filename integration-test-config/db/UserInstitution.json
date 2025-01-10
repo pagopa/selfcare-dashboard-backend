@@ -8,7 +8,7 @@
     "products": [
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
@@ -16,12 +16,12 @@
         "role": "OPERATOR",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
@@ -29,12 +29,12 @@
         "role": "OPERATOR",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-io",
@@ -42,12 +42,12 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-pn",
@@ -55,12 +55,12 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-pagopa",
@@ -68,7 +68,7 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       }
     ],
@@ -79,12 +79,12 @@
     "_id": {
       "$oid": "6772b2ccb957efbe104b7393"
     },
-    "institutionDescription": "Comune di Castelbuono",
+    "institutionDescription": "Comune di Agrigento",
     "institutionId": "467ac77d-7faa-47bf-a60e-38ea74bd5fd2",
     "products": [
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
@@ -92,7 +92,7 @@
         "role": "OPERATOR",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       }
     ],
@@ -108,7 +108,7 @@
     "products": [
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-io",
@@ -116,7 +116,7 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       }
     ],
@@ -127,20 +127,20 @@
     "_id": {
       "$oid": "6772b2dfb957efbe104b7397"
     },
-    "institutionDescription": "Comune di Agrigento",
+    "institutionDescription": "Comune di Castelbuono",
     "institutionId": "c9a50656-f345-4c81-84be-5b2474470544",
     "products": [
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-io",
         "productRole": "admin",
-        "role": "DELEGATE",
-        "status": "DELETED",
+        "role": "OPERATOR",
+        "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       }
     ],
@@ -156,7 +156,7 @@
     "products": [
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
@@ -164,12 +164,12 @@
         "role": "OPERATOR",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
@@ -177,12 +177,12 @@
         "role": "OPERATOR",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-io",
@@ -190,12 +190,12 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-pn",
@@ -203,12 +203,12 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-pagopa",
@@ -216,11 +216,87 @@
         "role": "DELEGATE",
         "status": "ACTIVE",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228Z"
+          "$date": "2024-10-28T12:25:53.228+00:00"
         }
       }
     ],
     "userId": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
     "userMailUuid": "ID_MAIL#1b2ec3ce-2fb2-4dd9-bd83-7c085b368001"
+  },
+  {
+    "_id": {
+      "$oid": "6780e082987fa11bc66e0eaf"
+    },
+    "institutionDescription": "PT test",
+    "institutionId": "067327d3-bdd6-408d-8655-87e8f1960046",
+    "products": [
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-interop",
+        "productRole": "security",
+        "role": "OPERATOR",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-interop",
+        "productRole": "api",
+        "role": "OPERATOR",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-io",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-pn",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-pagopa",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      }
+    ],
+    "userId": "97a511a7-2acc-47b9-afed-2f3c65753ccc",
+    "userMailUuid": "ID_MAIL#1b2ec3ce-2fb2-4dd9-bd83-7c085b368333"
   }
 ]

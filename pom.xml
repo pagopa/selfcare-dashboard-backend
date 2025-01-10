@@ -349,7 +349,7 @@
                                 <additionalModelTypeAnnotations>@lombok.Builder; @lombok.NoArgsConstructor;
                                     @lombok.AllArgsConstructor
                                 </additionalModelTypeAnnotations>
-                                <dateLibrary>java8-localdatetime</dateLibrary>
+                                <dateLibrary>java8</dateLibrary>
                                 <delegatePattern>true</delegatePattern>
                                 <interfaceOnly>true</interfaceOnly>
                                 <annotationLibrary>none</annotationLibrary>

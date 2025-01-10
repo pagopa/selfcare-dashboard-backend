@@ -384,7 +384,7 @@
   },
   {
     "_id": "067327d3-bdd6-408d-8655-87e8f1960046",
-    "externalId": "85000870064",
+    "externalId": "99000870064",
     "origin": "IPA",
     "originId": "c_d277",
     "description": "comune di dernice",
@@ -392,7 +392,7 @@
     "digitalAddress": "protocollo@pec.comune.dernice.al.it",
     "address": "Via Roma N.17",
     "zipCode": "15056",
-    "taxCode": "85000870064",
+    "taxCode": "99000870064",
     "onboarding": [
       {
         "productId": "prod-io",
