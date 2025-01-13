@@ -317,6 +317,8 @@ public class UserGroupApiSteps {
 
     @And("the user is removed from user group")
     public void theUserIsRemovedFromUserGroup() {
-        //TODO GET AND CHECK
+        usergroupISendAGETRequestTo("/v2/user-groups/{id}");
+        Assertions.assertFalse(dashboardStepsUtil.responses.getUserGroupResource().getMembers()
+                .stream().anyMatch(member -> member.getId().equals(UUID.fromString(dashboardStepsUtil.filter.getUserId()))));
     }
 }

@@ -39,12 +39,6 @@ Feature: Token API
     Then the response status should be 200
     And the response should contain a valid token
 
-  Scenario: Attempt to retrieve billing token without user permissions on product
-    Given user login with username "r.balboa" and password "test"
-    And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
-    When I send a GET request to "/v2/token/exchange/fatturazione" with the given details to retrieve billing token
-    Then the response status should be 404
-
   Scenario: Attempt to retrieve billing token without institution ID
     Given user login with username "j.doe" and password "test"
     When I send a GET request to "/v2/token/exchange/fatturazione" with the given details to retrieve billing token

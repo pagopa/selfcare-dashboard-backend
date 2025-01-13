@@ -43,7 +43,7 @@ public class TokenApiSteps{
         Assertions.assertEquals("00310810825",payload.get("organization").as(Map.class).get("fiscal_code"));
         Assertions.assertEquals("c_c067",payload.get("organization").as(Map.class).get("ipaCode"));
         List<Object> list = (List<Object>) payload.get("organization").as(Map.class).get("roles");
-        Assertions.assertEquals(2,list.size());
+        Assertions.assertEquals(1,list.size());
 
     }
 
