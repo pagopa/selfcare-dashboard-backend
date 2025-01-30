@@ -1,4 +1,3 @@
-@exclude
 Feature: Token API
 
   ##token exchange

@@ -1,4 +1,3 @@
-@exclude
 Feature: Support
 
   Scenario: Successfully sending a support request with valid data

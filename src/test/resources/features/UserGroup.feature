@@ -1,4 +1,3 @@
-@exclude
 Feature: UserGroups
 
   Scenario: Successfully create a new user group
@@ -35,7 +34,7 @@ Feature: UserGroups
     When I send a POST request to "/v2/user-groups/" with the given details to create usergroup
     Then the response status should be 409
 
-  Scenario: Attempt to create a user group with missing required fields
+  Scenario: Attempt to create a user group with missing required fields (name)
     Given user login with username "j.doe" and password "test"
     And the following user group details:
       | description | productId  | institutionId                        | members                                                                   |
@@ -44,7 +43,7 @@ Feature: UserGroups
     Then the response status should be 400
     And the response should contain an error message "createUserGroupDto.name,must not be blank"
 
-  Scenario: Attempt to create a user group with missing required fields
+  Scenario: Attempt to create a user group with missing required fields (institutionId)
     Given user login with username "j.doe" and password "test"
     And the following user group details:
       | name       | description | productId   | members                                                                   |
@@ -53,7 +52,7 @@ Feature: UserGroups
     Then the response status should be 400
     And the response should contain an error message "createUserGroupDto.institutionId,must not be blank"
 
-  Scenario: Attempt to create a user group with missing required fields
+  Scenario: Attempt to create a user group with missing required fields (productId)
     Given user login with username "j.doe" and password "test"
     And the following user group details:
       | name       | description  | institutionId                        | members                                                                   |
@@ -62,7 +61,7 @@ Feature: UserGroups
     Then the response status should be 400
     And the response should contain an error message "createUserGroupDto.productId,must not be blank"
 
-  Scenario: Attempt to create a user group with missing required fields
+  Scenario: Attempt to create a user group with missing required fields (description)
     Given user login with username "j.doe" and password "test"
     And the following user group details:
       | name        | productId  | institutionId                        | members                                                                   |
@@ -71,7 +70,7 @@ Feature: UserGroups
     Then the response status should be 400
     And the response should contain an error message "createUserGroupDto.description,must not be blank"
 
-  Scenario: Attempt to create a user group with missing required fields
+  Scenario: Attempt to create a user group with missing required fields (members)
     Given user login with username "j.doe" and password "test"
     And the following user group details:
       | name       | description | productId  | institutionId                        |

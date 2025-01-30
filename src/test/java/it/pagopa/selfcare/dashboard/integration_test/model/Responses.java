@@ -1,13 +1,18 @@
 package it.pagopa.selfcare.dashboard.integration_test.model;
 
 import it.pagopa.selfcare.dashboard.model.IdentityTokenResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationIdResource;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationResource;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationWithPagination;
+import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.model.support.SupportResponse;
+import it.pagopa.selfcare.dashboard.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.model.user_groups.UserGroupIdResource;
 import it.pagopa.selfcare.dashboard.model.user_groups.UserGroupResource;
@@ -31,4 +36,9 @@ public class Responses {
     private UserGroupResource userGroupResource;
     private UserResource userResource;
     private List<ProductUserResource> productUserResource;
+    private InstitutionResource institutionResource;
+    private Institution institution;
+    private InstitutionUserDetailsResource institutionUserDetailsResource;
+    private List<InstitutionBaseResource> institutionBaseResourceList;
+    private UserIdResource userIdResource;
 }

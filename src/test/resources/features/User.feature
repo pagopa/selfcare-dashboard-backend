@@ -269,7 +269,7 @@ Feature: User
     When I send a PUT request to "/v2/users/{id}" to update user data
     Then the response status should be 404
 
-  Scenario: Updating user with mmobilePhone with less than 7 characters
+  Scenario: Updating user with mobilePhone with less than 7 characters
     Given user login with username "j.doe" and password "test"
     And the userId is "97a511a7-2acc-47b9-afed-2f3c65753b4a"
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
@@ -278,7 +278,7 @@ Feature: User
     Then the response status should be 400
     And the response should contain an error message "Il numero di telefono non è valido"
 
-  Scenario: Updating user with mmobilePhone with more than 15 characters
+  Scenario: Updating user with mobilePhone with more than 15 characters
     Given user login with username "j.doe" and password "test"
     And the userId is "97a511a7-2acc-47b9-afed-2f3c65753b4a"
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
@@ -287,7 +287,7 @@ Feature: User
     Then the response status should be 400
     And the response should contain an error message "Il numero di telefono non è valido"
 
-  Scenario: Updating user with mmobilePhone with alphanumeric characters
+  Scenario: Updating user with mobilePhone with alphanumeric characters
     Given user login with username "j.doe" and password "test"
     And the userId is "97a511a7-2acc-47b9-afed-2f3c65753b4a"
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"

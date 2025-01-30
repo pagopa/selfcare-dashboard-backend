@@ -107,3 +107,7 @@ Feature: Product
     And the response should not contain any product brokers
 
 
+  Scenario: Successfully retrieving the products tree
+
+
+
