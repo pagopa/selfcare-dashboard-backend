@@ -3826,7 +3826,7 @@
           },
           "role" : {
             "type" : "string",
-            "enum" : [ "ADMIN_EA", "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
+            "enum" : [ "ADMIN_EA", "ADMIN_EA_IO", "DELEGATE", "MANAGER", "OPERATOR", "SUB_DELEGATE" ]
           },
           "roleLabel" : {
             "type" : "string"
