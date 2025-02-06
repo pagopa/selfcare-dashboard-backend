@@ -3138,7 +3138,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available values: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA, ADMIN_EA_IO]"
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
           },
           "surname" : {
             "type" : "string",
@@ -3684,7 +3684,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's Selfcare role, available values: [ADMIN, ADMIN_EA, LIMITED]",
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
             "enum" : [ "ADMIN", "ADMIN_EA", "LIMITED" ]
           },
           "status" : {
@@ -3962,7 +3962,7 @@
           },
           "partyRole" : {
             "type" : "string",
-            "description" : "Party role, available values: MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA, ADMIN_EA_IO"
+            "description" : "Party role, available values: MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA"
           },
           "phasesAdditionAllowed" : {
             "type" : "array",
@@ -4468,7 +4468,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available values: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA, ADMIN_EA_IO]"
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
           }
         }
       },
