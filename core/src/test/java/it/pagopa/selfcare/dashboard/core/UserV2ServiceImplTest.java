@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.connector.model.institution.OnboardedProduct
 import it.pagopa.selfcare.dashboard.connector.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.connector.model.user.*;
 import it.pagopa.selfcare.dashboard.core.exception.InvalidOnboardingStatusException;
+import it.pagopa.selfcare.dashboard.core.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
 import it.pagopa.selfcare.product.entity.Product;
@@ -289,7 +290,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         final String productId = "productId";
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
-        String role = "MANAGER";
+        String role = "OPERATOR";
         Product product = getProduct();
 
         Institution institution = new Institution();
@@ -301,10 +302,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(PartyRole.MANAGER);
-
-        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
-        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        roleDto.setPartyRole(OPERATOR);
 
         when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
@@ -366,6 +364,97 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
     }
 
     @Test
+    void addUserProductRolesWithInvalidPartyRole() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        final Set<String> productRoles = Set.of("operator");
+        final Product product = getProduct();
+
+        final Institution institution = new Institution();
+        final OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, null),
+                "The product doesn't allow adding users directly with these role and productRoles");
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, "MANAGER"),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void addUserProductRolesWithInvalidPhasesAdditionAllowed() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        final Set<String> productRoles = Set.of("manager");
+        final String role = "MANAGER";
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoManager = new ProductRoleInfo();
+        productRoleInfoManager.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.ONBOARDING.value));
+        final ProductRole pr = new ProductRole();
+        pr.setCode("manager");
+        pr.setLabel("manager");
+        productRoleInfoManager.setRoles(List.of(pr));
+        product.setRoleMappings(Map.of(MANAGER, productRoleInfoManager));
+
+        final Institution institution = new Institution();
+        final OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void addUserProductRolesWithInvalidProductRoles() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        final Set<String> productRoles = Set.of("operator2", "operator0", "operator1");
+        final String role = "OPERATOR";
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
+        productRoleInfoOperator.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        final ProductRole pr1 = new ProductRole();
+        pr1.setCode("operator1");
+        pr1.setLabel("operator1");
+        final ProductRole pr2 = new ProductRole();
+        pr2.setCode("operator2");
+        pr2.setLabel("operator2");
+        productRoleInfoOperator.setRoles(List.of(pr1, pr2));
+        product.setRoleMappings(Map.of(PartyRole.OPERATOR, productRoleInfoOperator));
+
+        final Institution institution = new Institution();
+        final OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
     void createUsersByFiscalCode() {
 
         final String institutionId = "institutionId";
@@ -374,7 +463,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         UserToCreate userToCreate = new UserToCreate();
         HashSet<String> productRoles = new HashSet<>();
         productRoles.add(productRole);
-        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
 
         Product product = getProduct();
@@ -389,7 +478,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(MANAGER);
+        roleDto.setPartyRole(OPERATOR);
 
 
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
@@ -418,7 +507,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         UserToCreate userToCreate = new UserToCreate();
         HashSet<String> productRoles = new HashSet<>();
         productRoles.add(productRole);
-        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
 
         Product product = getProduct();
@@ -432,7 +521,7 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(PartyRole.MANAGER);
+        roleDto.setPartyRole(OPERATOR);
 
         when(productsConnectorMock.getProduct(productId)).thenReturn(product);
 
@@ -468,6 +557,98 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
 
         verify(msCoreConnectorMock, times(1)).getInstitution(institutionId);
         verifyNoMoreInteractions(userApiConnectorMock);
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithInvalidPartyRole() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final UserToCreate userToCreate = new UserToCreate();
+        final Set<String> productRoles = Set.of("manager");
+        userToCreate.setRole(MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        final Product product = getProduct();
+
+        final Institution institution = new Institution();
+        final OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithInvalidPhasesAdditionAllowed() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final UserToCreate userToCreate = new UserToCreate();
+        final Set<String> productRoles = Set.of("manager");
+        userToCreate.setRole(MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoManager = new ProductRoleInfo();
+        productRoleInfoManager.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.ONBOARDING.value));
+        final ProductRole pr = new ProductRole();
+        pr.setCode("manager");
+        pr.setLabel("manager");
+        productRoleInfoManager.setRoles(List.of(pr));
+        product.setRoleMappings(Map.of(MANAGER, productRoleInfoManager));
+
+        final Institution institution = new Institution();
+        final OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithInvalidProductRoles() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final UserToCreate userToCreate = new UserToCreate();
+        final Set<String> productRoles = Set.of("operator2", "operator0", "operator1");
+        userToCreate.setRole(OPERATOR);
+        userToCreate.setProductRoles(productRoles);
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
+        productRoleInfoOperator.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        final ProductRole pr1 = new ProductRole();
+        pr1.setCode("operator1");
+        pr1.setLabel("operator1");
+        final ProductRole pr2 = new ProductRole();
+        pr2.setCode("operator2");
+        pr2.setLabel("operator2");
+        productRoleInfoOperator.setRoles(List.of(pr1, pr2));
+        product.setRoleMappings(Map.of(PartyRole.OPERATOR, productRoleInfoOperator));
+
+        final Institution institution = new Institution();
+        final OnboardedProduct onboardedProduct = new OnboardedProduct();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(RelationshipState.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(productsConnectorMock.getProduct(productId)).thenReturn(product);
+        when(msCoreConnectorMock.getInstitution(institutionId)).thenReturn(institution);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
+                "The product doesn't allow adding users directly with these role and productRoles");
     }
 
     private static Product getProduct() {
