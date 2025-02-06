@@ -38,7 +38,7 @@ public class InstitutionUserResource {
     @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalPhone}")
     private String mobilePhone;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.selcRole}")
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
     private SelfCareAuthority role;
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.status}")
