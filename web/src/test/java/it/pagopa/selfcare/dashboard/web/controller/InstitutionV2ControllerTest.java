@@ -5,6 +5,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.connector.model.delegation.*;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserCount;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserToCreate;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
@@ -14,6 +15,7 @@ import it.pagopa.selfcare.dashboard.web.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.web.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2Impl;
+import it.pagopa.selfcare.dashboard.web.model.user.UserCountResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +37,7 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -471,6 +472,42 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
     }
 
+    @Test
+    void getUserCount() throws Exception {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String[] roles = { "role1", "role2" };
+        final String[] status = { "status1", "status2" };
+
+        final UserCount userCount = new UserCount();
+        userCount.setInstitutionId(institutionId);
+        userCount.setProductId(productId);
+        userCount.setRoles(Arrays.asList(roles));
+        userCount.setStatus(Arrays.asList(status));
+        userCount.setCount(2L);
+        when(userServiceMock.getUserCount(institutionId, productId, Arrays.asList(roles), Arrays.asList(status))).thenReturn(userCount);
+
+        final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/products/{productId}/users/count", institutionId, productId)
+                        .queryParam("roles", roles)
+                        .queryParam("status", status)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserCountResource resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        assertEquals(userCount.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(userCount.getProductId(), resource.getProductId());
+        assertIterableEquals(userCount.getRoles(), resource.getRoles());
+        assertIterableEquals(userCount.getStatus(), resource.getStatus());
+        assertEquals(userCount.getCount(), resource.getCount());
+
+        verify(userServiceMock, times(1))
+                .getUserCount(institutionId, productId, Arrays.asList(roles), Arrays.asList(status));
+        verifyNoMoreInteractions(userServiceMock);
+    }
 
     private DelegationWithInfo dummyDelegation() {
         DelegationWithInfo delegation = new DelegationWithInfo();

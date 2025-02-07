@@ -45,6 +45,7 @@ public interface UserMapper {
     @Mapping(target = "products", expression = "java(toProductInfoMap(userDashboardResponse.getProducts()))")
     UserInfo toUserInfo(UserDataResponse userDashboardResponse);
 
+    UserCount toUserCount(UsersCountResponse usersCountResponse);
 
     UserInstitutionWithActionsDto toUserInstitutionWithActionsDto(UserInstitutionWithActions userInstitutionWithActions);
 

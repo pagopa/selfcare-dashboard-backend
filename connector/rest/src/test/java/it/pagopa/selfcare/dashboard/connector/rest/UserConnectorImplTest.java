@@ -801,4 +801,38 @@ class UserConnectorImplTest extends BaseConnectorTest {
                 statusFilter);
     }
 
+    @Test
+    void getUserCount() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final List<String> roles = List.of("MANAGER", "DELEGATE");
+        final List<String> status = List.of("ACTIVE", "SUSPENDED");
+
+        final UsersCountResponse userCountResponse = new UsersCountResponse();
+        userCountResponse.setInstitutionId(institutionId);
+        userCountResponse.setProductId(productId);
+        userCountResponse.setRoles(List.of(
+                it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.MANAGER,
+                it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.DELEGATE
+        ));
+        userCountResponse.setStatus(List.of(
+                OnboardedProductState.ACTIVE,
+                OnboardedProductState.SUSPENDED)
+        );
+        userCountResponse.setCount(2L);
+        when(userInstitutionApiRestClient._getUsersCount(institutionId, productId, roles, status))
+                .thenReturn(ResponseEntity.ok(userCountResponse));
+
+        final UserCount userCount = userConnector.getUserCount(institutionId, productId, roles, status);
+        assertEquals(institutionId, userCount.getInstitutionId());
+        assertEquals(productId, userCount.getProductId());
+        assertIterableEquals(roles, userCount.getRoles());
+        assertIterableEquals(status, userCount.getStatus());
+        assertEquals(2L, userCount.getCount());
+
+        verify(userInstitutionApiRestClient, times(1))
+                ._getUsersCount(institutionId, productId, roles, status);
+        verifyNoMoreInteractions(userInstitutionApiRestClient);
+    }
+
 }

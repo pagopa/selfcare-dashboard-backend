@@ -159,6 +159,14 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.trace("createOrUpdateUserByUserId end");
     }
 
+    @Override
+    public UserCount getUserCount(String institutionId, String productId, List<String> roles, List<String> status) {
+        log.trace("getUserCount start");
+        UserCount userCount = userApiConnector.getUserCount(institutionId, productId, roles, status);
+        log.trace("getUserCount end");
+        return userCount;
+    }
+
     private Institution verifyOnboardingStatus(String institutionId, String productId) {
         Institution institution = msCoreConnector.getInstitution(institutionId);
         if (institution.getOnboarding() == null || institution.getOnboarding().stream()

@@ -69,6 +69,15 @@ public class UserConnectorImpl implements UserApiConnector {
 
     @Override
     @Retry(name = "retryTimeout")
+    public UserCount getUserCount(String institutionId, String productId, List<String> roles, List<String> status) {
+        log.trace("getUserCount start");
+        UsersCountResponse usersCountResponse = userInstitutionApiRestClient._getUsersCount(institutionId, productId, roles, status)
+                .getBody();
+        return userMapper.toUserCount(usersCountResponse);
+    }
+
+    @Override
+    @Retry(name = "retryTimeout")
     public UserInstitution getProducts(String institutionId, String userId) {
         log.trace("getProducts start");
         List<UserInstitutionResponse> institutionResponses = userInstitutionApiRestClient._retrieveUserInstitutions(
