@@ -509,6 +509,39 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         verifyNoMoreInteractions(userServiceMock);
     }
 
+    @Test
+    void getUserCountWithNullRolesAndStatus() throws Exception {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+
+        final UserCount userCount = new UserCount();
+        userCount.setInstitutionId(institutionId);
+        userCount.setProductId(productId);
+        userCount.setRoles(Arrays.asList("defaultRole1", "defaultRole2"));
+        userCount.setStatus(Arrays.asList("defaultStatus1", "defaultStatus2"));
+        userCount.setCount(2L);
+        when(userServiceMock.getUserCount(institutionId, productId, Collections.emptyList(), Collections.emptyList())).thenReturn(userCount);
+
+        final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/products/{productId}/users/count", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserCountResource resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        assertEquals(userCount.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(userCount.getProductId(), resource.getProductId());
+        assertIterableEquals(userCount.getRoles(), resource.getRoles());
+        assertIterableEquals(userCount.getStatus(), resource.getStatus());
+        assertEquals(userCount.getCount(), resource.getCount());
+
+        verify(userServiceMock, times(1))
+                .getUserCount(institutionId, productId, Collections.emptyList(), Collections.emptyList());
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
     private DelegationWithInfo dummyDelegation() {
         DelegationWithInfo delegation = new DelegationWithInfo();
         delegation.setInstitutionId("from");
