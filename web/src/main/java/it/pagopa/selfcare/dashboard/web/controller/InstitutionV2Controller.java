@@ -109,7 +109,9 @@ public class InstitutionV2Controller {
                                           @ApiParam(value = "${swagger.dashboard.user.model.statusList}")
                                           @RequestParam(name = "status", required = false) String[] status) {
         log.trace("getUserCount start");
-        UserCount userCount = userService.getUserCount(institutionId, productId, Arrays.asList(roles), Arrays.asList(status));
+        UserCount userCount = userService.getUserCount(institutionId, productId,
+                Optional.ofNullable(roles).map(Arrays::asList).orElse(Collections.emptyList()),
+                Optional.ofNullable(status).map(Arrays::asList).orElse(Collections.emptyList()));
         UserCountResource result = userMapperV2.toUserCountResource(userCount);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserCount result = {}", result);
         log.trace("getUserCount end");
