@@ -41,4 +41,6 @@ public interface UserApiConnector {
 
     UserInstitutionWithActionsDto getUserInstitutionWithActions(String userId, String institutionId, String productId);
 
+    UserCount getUserCount(String institutionId, String productId, List<String> roles, List<String> status);
+
 }

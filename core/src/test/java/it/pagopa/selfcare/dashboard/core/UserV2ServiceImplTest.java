@@ -651,6 +651,27 @@ public class UserV2ServiceImplTest extends BaseServiceTest {
                 "The product doesn't allow adding users directly with these role and productRoles");
     }
 
+    @Test
+    void getUserCount() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final List<String> roles = List.of("role1", "role2");
+        final List<String> status = List.of("status1", "status2");
+
+        final UserCount userCount = new UserCount();
+        userCount.setInstitutionId(institutionId);
+        userCount.setProductId(productId);
+        userCount.setRoles(roles);
+        userCount.setStatus(status);
+        userCount.setCount(2L);
+        when(userApiConnectorMock.getUserCount(institutionId, productId, roles, status)).thenReturn(userCount);
+
+        assertEquals(userCount, userV2ServiceImpl.getUserCount(institutionId, productId, roles, status));
+        verify(userApiConnectorMock, times(1))
+                .getUserCount(institutionId, productId, roles, status);
+        verifyNoMoreInteractions(userApiConnectorMock);
+    }
+
     private static Product getProduct() {
         Product product = new Product();
         Map<PartyRole, it.pagopa.selfcare.product.entity.ProductRoleInfo> map = new EnumMap<>(PartyRole.class);

@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.web.controller;
 
-import com.azure.core.annotation.QueryParam;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -11,6 +10,7 @@ import it.pagopa.selfcare.dashboard.connector.model.delegation.GetDelegationPara
 import it.pagopa.selfcare.dashboard.connector.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.connector.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.connector.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.connector.model.user.UserCount;
 import it.pagopa.selfcare.dashboard.connector.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.core.DelegationService;
 import it.pagopa.selfcare.dashboard.core.InstitutionV2Service;
@@ -22,6 +22,7 @@ import it.pagopa.selfcare.dashboard.web.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.web.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.web.model.mapper.UserMapperV2;
+import it.pagopa.selfcare.dashboard.web.model.user.UserCountResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.web.model.user.UserProductRoles;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
@@ -93,6 +91,28 @@ public class InstitutionV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutions result = {}", result);
         log.trace("getInstitutions end");
 
+        return result;
+    }
+
+    @GetMapping(value = "/{institutionId}/products/{productId}/users/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getUserCount}", nickname = "v2GetUserCount")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListProductUsers')")
+    public UserCountResource getUserCount(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                          @PathVariable("institutionId")
+                                          String institutionId,
+                                          @ApiParam("${swagger.dashboard.products.model.id}")
+                                          @PathVariable("productId")
+                                          String productId,
+                                          @ApiParam(value = "${swagger.dashboard.product-role-mappings.model.partyRoleList}")
+                                          @RequestParam(name = "roles", required = false) String[] roles,
+                                          @ApiParam(value = "${swagger.dashboard.user.model.statusList}")
+                                          @RequestParam(name = "status", required = false) String[] status) {
+        log.trace("getUserCount start");
+        UserCount userCount = userService.getUserCount(institutionId, productId, Arrays.asList(roles), Arrays.asList(status));
+        UserCountResource result = userMapperV2.toUserCountResource(userCount);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserCount result = {}", result);
+        log.trace("getUserCount end");
         return result;
     }
 
