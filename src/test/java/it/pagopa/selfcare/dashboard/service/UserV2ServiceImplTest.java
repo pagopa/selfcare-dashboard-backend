@@ -5,7 +5,9 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardedProductResponse;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.InvalidOnboardingStatusException;
+import it.pagopa.selfcare.dashboard.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
@@ -42,8 +44,7 @@ import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
 import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.*;
-import static it.pagopa.selfcare.onboarding.common.PartyRole.MANAGER;
-import static it.pagopa.selfcare.onboarding.common.PartyRole.OPERATOR;
+import static it.pagopa.selfcare.onboarding.common.PartyRole.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -65,6 +66,8 @@ class UserV2ServiceImplTest extends BaseServiceTest {
     private InstitutionMapperImpl institutionMapper;
     @Spy
     private UserMapperImpl userMapper;
+    @Mock
+    private UserInstitutionApiRestClient userInstitutionApiRestClient;
 
     @BeforeEach
     public void setUp() {
@@ -298,7 +301,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String productId = "productId";
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
-        String role = "MANAGER";
+        String role = "OPERATOR";
         Product product = getProduct();
 
         Institution institution = new Institution();
@@ -310,7 +313,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(PartyRole.MANAGER);
+        roleDto.setPartyRole(OPERATOR);
 
         AddUserRoleDto addRoleDto = new AddUserRoleDto();
         addRoleDto.setProduct(it.pagopa.selfcare.user.generated.openapi.v1.dto.Product.builder().productId(productId).build());
@@ -392,6 +395,102 @@ class UserV2ServiceImplTest extends BaseServiceTest {
     }
 
     @Test
+    void addUserProductRolesWithInvalidPartyRole() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        final Set<String> productRoles = Set.of("operator");
+        final Product product = getProduct();
+
+        final InstitutionResponse institution = new InstitutionResponse();
+        final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(productService.getProduct(productId)).thenReturn(product);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, null),
+                "The product doesn't allow adding users directly with these role and productRoles");
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, "MANAGER"),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void addUserProductRolesWithInvalidPhasesAdditionAllowed() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        final Set<String> productRoles = Set.of("manager");
+        final String role = "MANAGER";
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoManager = new ProductRoleInfo();
+        productRoleInfoManager.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.ONBOARDING.value));
+        final ProductRole pr = new ProductRole();
+        pr.setCode("manager");
+        pr.setLabel("manager");
+        productRoleInfoManager.setRoles(List.of(pr));
+        product.setRoleMappings(Map.of(MANAGER, productRoleInfoManager));
+
+        final InstitutionResponse institution = new InstitutionResponse();
+        final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(productService.getProduct(productId)).thenReturn(product);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void addUserProductRolesWithInvalidProductRoles() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String userId = "userId";
+        final Set<String> productRoles = Set.of("operator2", "operator0", "operator1");
+        final String role = "OPERATOR";
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoOperator = getProductRoleInfo();
+        product.setRoleMappings(Map.of(PartyRole.OPERATOR, productRoleInfoOperator));
+
+        final InstitutionResponse institution = new InstitutionResponse();
+        final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(productService.getProduct(productId)).thenReturn(product);
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    private static ProductRoleInfo getProductRoleInfo() {
+        final ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
+        productRoleInfoOperator.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        final ProductRole pr1 = new ProductRole();
+        pr1.setCode("operator1");
+        pr1.setLabel("operator1");
+        final ProductRole pr2 = new ProductRole();
+        pr2.setCode("operator2");
+        pr2.setLabel("operator2");
+        productRoleInfoOperator.setRoles(List.of(pr1, pr2));
+        return productRoleInfoOperator;
+    }
+
+    @Test
     void createUsersByFiscalCode() {
         final String institutionId = "institutionId";
         final String productId = "productId";
@@ -399,7 +498,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         UserToCreate userToCreate = new UserToCreate();
         HashSet<String> productRoles = new HashSet<>();
         productRoles.add(productRole);
-        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
 
         Product product = getProduct();
@@ -421,7 +520,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(MANAGER);
+        roleDto.setPartyRole(OPERATOR);
 
         when(productService.getProduct(productId)).thenReturn(product);
         when(userApiRestClient._createOrUpdateByFiscalCode(any())).thenReturn(ResponseEntity.ok("userId"));
@@ -443,7 +542,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         UserToCreate userToCreate = new UserToCreate();
         HashSet<String> productRoles = new HashSet<>();
         productRoles.add(productRole);
-        userToCreate.setRole(PartyRole.MANAGER);
+        userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
 
         Product product = getProduct();
@@ -457,7 +556,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         CreateUserDto.Role roleDto = new CreateUserDto.Role();
         roleDto.setProductRole("operator");
         roleDto.setLabel("operator");
-        roleDto.setPartyRole(PartyRole.MANAGER);
+        roleDto.setPartyRole(OPERATOR);
 
         InstitutionResponse institutionMock = new InstitutionResponse();
         institutionMock.setId(institutionId);
@@ -498,6 +597,126 @@ class UserV2ServiceImplTest extends BaseServiceTest {
 
         verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
         verifyNoMoreInteractions(userApiRestClient);
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithInvalidPartyRole() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final UserToCreate userToCreate = new UserToCreate();
+        final Set<String> productRoles = Set.of("manager");
+        userToCreate.setRole(MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        final Product product = getProduct();
+
+        final InstitutionResponse institution = new InstitutionResponse();
+        final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(productService.getProduct(productId)).thenReturn(product);
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithInvalidPhasesAdditionAllowed() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final UserToCreate userToCreate = new UserToCreate();
+        final Set<String> productRoles = Set.of("manager");
+        userToCreate.setRole(MANAGER);
+        userToCreate.setProductRoles(productRoles);
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoManager = new ProductRoleInfo();
+        productRoleInfoManager.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.ONBOARDING.value));
+        final ProductRole pr = new ProductRole();
+        pr.setCode("manager");
+        pr.setLabel("manager");
+        productRoleInfoManager.setRoles(List.of(pr));
+        product.setRoleMappings(Map.of(MANAGER, productRoleInfoManager));
+
+        final InstitutionResponse institution = new InstitutionResponse();
+        final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(productService.getProduct(productId)).thenReturn(product);
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void createUsersByFiscalCodeWithInvalidProductRoles() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final UserToCreate userToCreate = new UserToCreate();
+        final Set<String> productRoles = Set.of("operator2", "operator0", "operator1");
+        userToCreate.setRole(OPERATOR);
+        userToCreate.setProductRoles(productRoles);
+
+        final Product product = getProduct();
+        final ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
+        productRoleInfoOperator.setPhasesAdditionAllowed(List.of(PHASE_ADDITION_ALLOWED.DASHBOARD_ASYNC.value, PHASE_ADDITION_ALLOWED.DASHBOARD.value));
+        final ProductRole pr1 = new ProductRole();
+        pr1.setCode("operator1");
+        pr1.setLabel("operator1");
+        final ProductRole pr2 = new ProductRole();
+        pr2.setCode("operator2");
+        pr2.setLabel("operator2");
+        productRoleInfoOperator.setRoles(List.of(pr1, pr2));
+        product.setRoleMappings(Map.of(PartyRole.OPERATOR, productRoleInfoOperator));
+
+        final InstitutionResponse institution = new InstitutionResponse();
+        final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
+        onboardedProduct.setProductId(productId);
+        onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        institution.setOnboarding(List.of(onboardedProduct));
+
+        when(productService.getProduct(productId)).thenReturn(product);
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+
+        assertThrows(InvalidProductRoleException.class,
+                () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
+                "The product doesn't allow adding users directly with these role and productRoles");
+    }
+
+    @Test
+    void getUserCount() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final List<String> roles = List.of(MANAGER.name(), DELEGATE.name());
+        final List<String> status = List.of(PENDING.name(), ACTIVE.name());
+        final UsersCountResponse userCount = getUsersCountResponse();
+        when(userInstitutionApiRestClient._getUsersCount(institutionId, productId, roles, status)).thenReturn(ResponseEntity.ok(userCount));
+
+        assertEquals(userCount, userV2ServiceImpl.getUserCount(institutionId, productId, roles, status));
+        verify(userInstitutionApiRestClient, times(1))
+                ._getUsersCount(institutionId, productId, roles, status);
+        verifyNoMoreInteractions(userInstitutionApiRestClient);
+    }
+
+    private static UsersCountResponse getUsersCountResponse() {
+        final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.MANAGER, it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.DELEGATE);
+        final List<OnboardedProductState> expectedStatus = List.of(OnboardedProductState.PENDING, OnboardedProductState.ACTIVE);
+
+        final UsersCountResponse userCount = new UsersCountResponse();
+        userCount.setInstitutionId("institutionId");
+        userCount.setProductId("productId");
+        userCount.setRoles(expectedRoles);
+        userCount.setStatus(expectedStatus);
+        userCount.setCount(2L);
+        return userCount;
     }
 
     private static Product getProduct() {

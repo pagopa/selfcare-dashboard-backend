@@ -6,12 +6,12 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationWithPagination
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionsResponse;
 import it.pagopa.selfcare.dashboard.client.CoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
+import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
+import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
-import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,7 +72,7 @@ public class DelegationServiceImpl implements DelegationService {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", delegation.getTo());
         Assert.hasText(delegation.getTo(), REQUIRED_TAX_CODE_MESSAGE);
-        InstitutionsResponse institutionsResponse = coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null).getBody();
+        InstitutionsResponse institutionsResponse = coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null, null).getBody();
         if (institutionsResponse != null) {
             List<Institution> institutions = institutionsResponse.getInstitutions().stream().map(institutionMapper::toInstitution).toList();
             Institution partner = institutions.stream()

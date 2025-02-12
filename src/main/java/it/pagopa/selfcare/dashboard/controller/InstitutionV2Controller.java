@@ -5,24 +5,26 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.model.CreateUserDto;
+import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationWithPagination;
 import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2;
+import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
+import it.pagopa.selfcare.dashboard.model.user.UserIdResource;
+import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
-import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
-import it.pagopa.selfcare.dashboard.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
-import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2;
-import it.pagopa.selfcare.dashboard.model.user.UserIdResource;
-import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
@@ -35,10 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
@@ -215,5 +214,32 @@ public class InstitutionV2Controller {
             log.trace("getInstitutionOnboardingPending end");
             return ResponseEntity.ok().build();
         }
+    }
+
+    @GetMapping(value = "/{institutionId}/products/{productId}/users/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getUserCount}", nickname = "v2GetUserCount")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListProductUsers')")
+    public UserCountResource getUserCount(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                          @PathVariable("institutionId")
+                                          String institutionId,
+                                          @ApiParam("${swagger.dashboard.products.model.id}")
+                                          @PathVariable("productId")
+                                          String productId,
+                                          @ApiParam(value = "${swagger.dashboard.product-role-mappings.model.partyRoleList}")
+                                          @RequestParam(name = "roles", required = false) String[] roles,
+                                          @ApiParam(value = "${swagger.dashboard.user.model.statusList}")
+                                          @RequestParam(name = "status", required = false) String[] status) {
+        log.trace("getUserCount start");
+        UsersCountResponse userCount = userService.getUserCount(
+                institutionId,
+                productId,
+                Optional.ofNullable(roles).map(Arrays::asList).orElse(Collections.emptyList()),
+                Optional.ofNullable(status).map(Arrays::asList).orElse(Collections.emptyList())
+        );
+        UserCountResource result = userMapperV2.toUserCountResource(userCount);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserCount result = {}", result);
+        log.trace("getUserCount end");
+        return result;
     }
 }

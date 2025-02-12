@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.model.user.UpdateUserRequestDto;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserToCreate;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,4 +32,6 @@ public interface UserV2Service {
     String createUsers(String institutionId, String productId, UserToCreate userToCreate);
 
     void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role);
+
+    UsersCountResponse getUserCount(String institutionId, String productId, List<String> roles, List<String> status);
 }

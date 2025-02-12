@@ -3,19 +3,23 @@ package it.pagopa.selfcare.dashboard.service;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
-import it.pagopa.selfcare.dashboard.model.user.*;
+import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
+import it.pagopa.selfcare.dashboard.exception.InvalidOnboardingStatusException;
+import it.pagopa.selfcare.dashboard.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
-import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
-import it.pagopa.selfcare.dashboard.exception.InvalidOnboardingStatusException;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
 import it.pagopa.selfcare.product.entity.Product;
+import it.pagopa.selfcare.product.entity.ProductRole;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.*;
+
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.*;
 
 
 @Slf4j
@@ -38,6 +45,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     private final CoreInstitutionApiRestClient coreInstitutionApiRestClient;
     private final InstitutionMapper institutionMapper;
     private final UserMapper userMapper;
+    private final UserInstitutionApiRestClient userInstitutionApiRestClient;
 
     private final List<RelationshipState> allowedStates;
     static final String REQUIRED_INSTITUTION_ID_MESSAGE = "An Institution id is required";
@@ -45,7 +53,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     public UserV2ServiceImpl(
             UserGroupV2Service userGroupService, ProductService productService,
             UserApiRestClient userApiRestClient, CoreInstitutionApiRestClient coreInstitutionApiRestClient,
-            InstitutionMapper institutionMapper, UserMapper userMapper,
+            InstitutionMapper institutionMapper, UserMapper userMapper, UserInstitutionApiRestClient userInstitutionApiRestClient,
             @Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates
     ) {
         this.userGroupService = userGroupService;
@@ -54,6 +62,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         this.coreInstitutionApiRestClient = coreInstitutionApiRestClient;
         this.institutionMapper = institutionMapper;
         this.userMapper = userMapper;
+        this.userInstitutionApiRestClient = userInstitutionApiRestClient;
         this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
     }
 
@@ -191,8 +200,8 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
-        List<CreateUserDto.Role> role = retrieveRole(productId, userDto.getProductRoles(), userDto.getRole());
-        String userId = createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
+        Product product = verifyProductPhasesAndRoles(productId, institution.getInstitutionType(), userDto.getRole(), userDto.getProductRoles());
+        List<CreateUserDto.Role> role = retrieveRole(product, userDto.getProductRoles(), userDto.getRole());        String userId = createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
     }
@@ -243,9 +252,18 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.debug("createOrUpdateUserByUserId userId = {}", userId);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
         PartyRole partyRole = Optional.ofNullable(role).map(PartyRole::valueOf).orElse(null);
-        List<CreateUserDto.Role> roleDto = retrieveRole(productId, productRoles, partyRole);
+        Product product = verifyProductPhasesAndRoles(productId, institution.getInstitutionType(), partyRole, productRoles);
+        List<CreateUserDto.Role> roleDto = retrieveRole(product, productRoles, partyRole);
         createOrUpdateUserByUserId(institution, productId, userId, roleDto);
         log.trace("createOrUpdateUserByUserId end");
+    }
+
+    @Override
+    public UsersCountResponse getUserCount(String institutionId, String productId, List<String> roles, List<String> status) {
+        log.trace("getUserCount start");
+        UsersCountResponse userCount = userInstitutionApiRestClient._getUsersCount(institutionId, productId, roles, status).getBody();
+        log.trace("getUserCount end");
+        return userCount;
     }
 
 
@@ -264,9 +282,7 @@ public class UserV2ServiceImpl implements UserV2Service {
      * To retrieve the party role, it uses the roleMappings of the product filtering by a white list of party roles (Only SUB_DELEGATE and OPERATOR are allowed
      * as Role to be assigned to a user in add Users ProductRoles operation).
      */
-    private List<CreateUserDto.Role> retrieveRole(String productId, Set<String> productRoles, PartyRole partyRole) {
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct productId = {}", productId);
-        Product product = productService.getProduct(productId);
+    private List<CreateUserDto.Role> retrieveRole(Product product, Set<String> productRoles, PartyRole partyRole) {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct product = {}", product);
         return productRoles.stream().map(productRole -> {
             CreateUserDto.Role role = new CreateUserDto.Role();
@@ -293,6 +309,39 @@ public class UserV2ServiceImpl implements UserV2Service {
         }
         AddUserRoleDto addUserRoleDto = addUserRoleDtoBuilder.build();
         userApiRestClient._createOrUpdateByUserId(userId, addUserRoleDto);
+    }
+
+    /**
+     * <p>Get the product and verify if his phasesAdditionAllowed field allow to add users directly from dashboard with the specified partyRole and productRoles
+     * or throw an exception.</p>
+     *
+     * <p>Dashboard can add the user directly if the phasesAdditionAllowed contains the "dashboard" string else additional steps
+     * needs to be performed by the user (ex: sign additional documentation) and an onboarding procedure is required</p>
+     *
+     * <p>All the productRoles must be present in the roles of the ProductRoleInfo</p>
+     *
+     * @param productId product id
+     * @param institutionType institution type
+     * @param partyRole role to use
+     * @param productRoles a set of productRoles
+     * @return the product
+     * @throws InvalidProductRoleException if dashboard can not add the user directly with the partyRole specified
+     */
+    private Product verifyProductPhasesAndRoles(String productId, String institutionType, PartyRole partyRole, Set<String> productRoles) {
+        final Product product = productService.getProduct(productId);
+        return Optional.ofNullable(partyRole)
+                // If partyRole is present ==> get the ProductRoleInfo
+                .map(pr -> product.getRoleMappings(institutionType).get(pr))
+                // Check if phasesAdditionAllowed contains the "dashboard" string
+                .filter(pri -> pri.getPhasesAdditionAllowed().stream().anyMatch(PHASE_ADDITION_ALLOWED.DASHBOARD.value::equals))
+                // Obtain a set of validRoles from the product role info
+                .map(pri -> pri.getRoles().stream().map(ProductRole::getCode).collect(Collectors.toSet()))
+                // Check if all the productRoles in input are validRoles
+                .filter(validRoles -> validRoles.containsAll(productRoles))
+                // If all the previous filters are successful ==> Return the product
+                .map(i -> product)
+                // If any of the previous filters fail ==> throw exception
+                .orElseThrow(() -> new InvalidProductRoleException("The product doesn't allow adding users directly with these role and productRoles"));
     }
 
 }

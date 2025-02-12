@@ -3,9 +3,8 @@ package it.pagopa.selfcare.dashboard.model.mapper;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.model.user.*;
-import it.pagopa.selfcare.dashboard.model.user.CertifiedFieldResource;
-import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,6 +23,8 @@ public interface UserMapperV2 {
     @Mapping(target = "email", expression = "java(toCertifiedFieldResource(model.getEmail()))")
     @Mapping(target = "mobilePhone", expression = "java(toCertifiedFieldResource(model.getMobilePhone()))")
     UserResource toUserResource(User model);
+
+    UserCountResource toUserCountResource(UsersCountResponse userCount);
 
     UpdateUserRequestDto fromUpdateUser(UpdateUserDto userDto);
 

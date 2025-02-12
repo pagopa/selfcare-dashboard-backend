@@ -11,12 +11,15 @@ import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
+import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.model.user.UserToCreate;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +37,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState.PENDING;
+import static it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.DELEGATE;
+import static it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.MANAGER;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -482,6 +485,82 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
                 .verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
         verifyNoMoreInteractions(institutionV2ServiceMock);
 
+    }
+
+    @Test
+    void getUserCount() throws Exception {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String[] roles = { MANAGER.name(),  DELEGATE.name() };
+        final String[] status = { PENDING.name(), PENDING.name() };
+        final UsersCountResponse userCount = getUsersCountResponse();
+        when(userServiceMock.getUserCount(institutionId, productId, Arrays.asList(roles), Arrays.asList(status))).thenReturn(userCount);
+
+        final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/products/{productId}/users/count", institutionId, productId)
+                        .queryParam("roles",roles)
+                        .queryParam("status", status)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserCountResource resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        assertEquals(userCount.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(userCount.getProductId(), resource.getProductId());
+        assertEquals(userCount.getRoles().get(0).getValue(), resource.getRoles().get(0));
+        assertEquals(userCount.getRoles().get(1).getValue(), resource.getRoles().get(1));
+        assertEquals(userCount.getStatus().get(0).getValue(), resource.getStatus().get(0));
+        assertEquals(userCount.getStatus().get(1).getValue(), resource.getStatus().get(1));
+        assertEquals(userCount.getCount(), resource.getCount());
+
+        verify(userServiceMock, times(1))
+                .getUserCount(institutionId, productId, Arrays.asList(roles), Arrays.asList(status));
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
+    @Test
+    void getUserCountWithNullRolesAndStatus() throws Exception {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+
+        final UsersCountResponse userCount = getUsersCountResponse();
+        when(userServiceMock.getUserCount(institutionId, productId, Collections.emptyList(), Collections.emptyList())).thenReturn(userCount);
+
+        final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/products/{productId}/users/count", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserCountResource resource = objectMapper.readValue(
+                result.getResponse().getContentAsString(), new TypeReference<>() {});
+        assertEquals(userCount.getInstitutionId(), resource.getInstitutionId());
+        assertEquals(userCount.getProductId(), resource.getProductId());
+        assertEquals(userCount.getRoles().get(0).getValue(), resource.getRoles().get(0));
+        assertEquals(userCount.getRoles().get(1).getValue(), resource.getRoles().get(1));
+        assertEquals(userCount.getStatus().get(0).getValue(), resource.getStatus().get(0));
+        assertEquals(userCount.getStatus().get(1).getValue(), resource.getStatus().get(1));
+        assertEquals(userCount.getCount(), resource.getCount());
+
+        verify(userServiceMock, times(1))
+                .getUserCount(institutionId, productId, Collections.emptyList(), Collections.emptyList());
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
+    private static UsersCountResponse getUsersCountResponse() {
+        final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(MANAGER, DELEGATE);
+        final List<OnboardedProductState> expectedStatus = List.of(OnboardedProductState.PENDING, OnboardedProductState.ACTIVE);
+
+        final UsersCountResponse userCount = new UsersCountResponse();
+        userCount.setInstitutionId("institutionId");
+        userCount.setProductId("productId");
+        userCount.setRoles(expectedRoles);
+        userCount.setStatus(expectedStatus);
+        userCount.setCount(2L);
+        return userCount;
     }
 
 
