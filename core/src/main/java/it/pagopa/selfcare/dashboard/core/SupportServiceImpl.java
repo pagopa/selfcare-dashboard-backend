@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static it.pagopa.selfcare.dashboard.connector.model.user.User.Fields.*;
 
@@ -50,10 +47,10 @@ public class SupportServiceImpl implements SupportService {
         log.trace("sendRequest start");
         log.debug("sendRequest request = {}", supportRequest);
 
+        supportRequest.setName(getNameFromMail(supportRequest.getEmail()));
         if(StringUtils.hasText(supportRequest.getUserId())) {
             try {
                 User user = userRegistryConnector.getUserByInternalId(supportRequest.getUserId(), USER_FIELD_LIST);
-                supportRequest.setName(user.getName().getValue().concat(" " + user.getFamilyName().getValue()));
                 supportRequest.setUserFields(UserField.builder().aux_data(user.getFiscalCode()).build());
             } catch (Exception e) {
                 throw new ResourceNotFoundException("User with id " + supportRequest.getUserId() + " not found");
@@ -104,4 +101,13 @@ public class SupportServiceImpl implements SupportService {
         }
         return urlBuilder.toString();
     }
+
+    private String getNameFromMail(String email) {
+        return Optional.ofNullable(email)
+                .map(m -> m.indexOf("@"))
+                .filter(i -> i > -1)
+                .map(i -> email.substring(0, i))
+                .orElse(email);
+    }
+
 }
