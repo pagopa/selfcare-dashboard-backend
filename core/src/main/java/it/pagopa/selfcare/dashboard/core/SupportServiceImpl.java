@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.connector.model.support.SupportRequest;
 import it.pagopa.selfcare.dashboard.connector.model.support.SupportResponse;
 import it.pagopa.selfcare.dashboard.connector.model.support.UserField;
 import it.pagopa.selfcare.dashboard.connector.model.user.User;
+import it.pagopa.selfcare.dashboard.core.utils.EmailUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -50,10 +51,10 @@ public class SupportServiceImpl implements SupportService {
         log.trace("sendRequest start");
         log.debug("sendRequest request = {}", supportRequest);
 
+        supportRequest.setName(EmailUtils.getUsername(supportRequest.getEmail()));
         if(StringUtils.hasText(supportRequest.getUserId())) {
             try {
                 User user = userRegistryConnector.getUserByInternalId(supportRequest.getUserId(), USER_FIELD_LIST);
-                supportRequest.setName(user.getName().getValue().concat(" " + user.getFamilyName().getValue()));
                 supportRequest.setUserFields(UserField.builder().aux_data(user.getFiscalCode()).build());
             } catch (Exception e) {
                 throw new ResourceNotFoundException("User with id " + supportRequest.getUserId() + " not found");
@@ -104,4 +105,5 @@ public class SupportServiceImpl implements SupportService {
         }
         return urlBuilder.toString();
     }
+
 }
