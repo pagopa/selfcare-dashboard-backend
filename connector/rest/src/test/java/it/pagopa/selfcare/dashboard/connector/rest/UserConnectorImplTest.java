@@ -73,7 +73,8 @@ class UserConnectorImplTest extends BaseConnectorTest {
         String userId = "userId";
         when(userApiRestClient._getUserProductsInfo(userId, null,
                 List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name()))).thenThrow(ResourceNotFoundException.class);
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> userConnector.getUserInstitutions(userId));
+        final List<InstitutionBase> userInstitutions = userConnector.getUserInstitutions(userId);
+        Assertions.assertTrue(userInstitutions.isEmpty());
     }
 
     @Test
