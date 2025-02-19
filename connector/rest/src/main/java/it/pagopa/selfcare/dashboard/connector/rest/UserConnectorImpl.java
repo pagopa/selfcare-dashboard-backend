@@ -43,8 +43,15 @@ public class UserConnectorImpl implements UserApiConnector {
     @Retry(name = "retryTimeout")
     public List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
-        UserInfoResponse userInfoResponse = userApiRestClient._getUserProductsInfo(userId, null,
-                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+
+        UserInfoResponse userInfoResponse;
+        try {
+            userInfoResponse = userApiRestClient._getUserProductsInfo(userId, null,
+                    List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+        } catch (ResourceNotFoundException ex) {
+            log.debug("getUserProducts - User with id {} not found", userId);
+            return List.of();
+        }
 
         if(Objects.isNull(userInfoResponse) ||
                 Objects.isNull(userInfoResponse.getInstitutions())) return List.of();
