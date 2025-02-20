@@ -102,6 +102,15 @@ class UserV2ServiceImplTest extends BaseServiceTest {
     }
 
     @Test
+    void getInstitutions_NotFound(){
+        String userId = "userId";
+        when(userApiRestClient._getUserProductsInfo(userId, null, List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())))
+                .thenThrow(ResourceNotFoundException.class);
+        Collection<InstitutionBase> result = userV2ServiceImpl.getInstitutions(userId);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
     void getUserById() throws IOException {
 
         String userId = "userId";

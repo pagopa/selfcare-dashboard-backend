@@ -78,8 +78,14 @@ public class UserV2ServiceImpl implements UserV2Service {
 
     private List<InstitutionBase> getUserInstitutions(String userId) {
         log.trace("getUserProducts start");
-        UserInfoResponse userInfoResponse = userApiRestClient._getUserProductsInfo(userId, null,
-                List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+        UserInfoResponse userInfoResponse;
+        try {
+            userInfoResponse = userApiRestClient._getUserProductsInfo(userId, null,
+                    List.of(ACTIVE.name(), PENDING.name(), TOBEVALIDATED.name())).getBody();
+        } catch (ResourceNotFoundException ex) {
+            log.debug("getUserProducts - User with id {} not found", userId);
+            return List.of();
+        }
 
         if (Objects.isNull(userInfoResponse) ||
                 Objects.isNull(userInfoResponse.getInstitutions())) return List.of();
@@ -201,7 +207,8 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
         Product product = verifyProductPhasesAndRoles(productId, institution.getInstitutionType(), userDto.getRole(), userDto.getProductRoles());
-        List<CreateUserDto.Role> role = retrieveRole(product, userDto.getProductRoles(), userDto.getRole());        String userId = createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
+        List<CreateUserDto.Role> role = retrieveRole(product, userDto.getProductRoles(), userDto.getRole());
+        String userId = createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
     }

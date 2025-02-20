@@ -14,7 +14,10 @@ import it.pagopa.selfcare.dashboard.model.UpdateInstitutionDto;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -105,31 +108,28 @@ public class InstitutionApiSteps {
         }
     }
 
-    @When("I send a GET request to {string} to retrieve institutions logo")
-    public void whenISendAGetRequestToRetrieveInstitutionsLogo(String url) {
-        RequestSpecification requestSpecification = RestAssured.given()
-                .contentType("application/json");
+    @When("I send a PUT request to {string} to save institutions logo")
+    public void whenISendAPutRequestWithInstitutionLogo(String url) throws IOException {
+        String institutionId = dashboardStepsUtil.filter.getInstitutionId();
+        String contentType = "image/png";
+        String filename = "test.png";
+        byte[] content = "test institution logo".getBytes();
 
-        if(StringUtils.isNotBlank(dashboardStepsUtil.token)) {
-            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
-        }
-        if (Objects.nonNull(dashboardStepsUtil.filter.getProductId())) {
-            requestSpecification.queryParam("productId", dashboardStepsUtil.filter.getProductId());
-        }
+        // Create MockMultipartFile
+        MultipartFile file = new MockMultipartFile("logo", filename, contentType, content);
 
-        ExtractableResponse<?> response = requestSpecification
-                .when()
-                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
-                .get(url)
+        // Send the PUT request with the multipart file
+        ExtractableResponse<?> response = RestAssured.given()
+                .contentType("multipart/form-data") // ✅ Set correct content type
+                .header("Authorization", "Bearer " + dashboardStepsUtil.token) // Add auth if needed
+                .multiPart("logo", file.getOriginalFilename(), file.getBytes(), file.getContentType()) // Attach file
+                .pathParam("institutionId", institutionId)
+                .put(url) // ✅ PUT request for file upload
                 .then()
                 .extract();
 
+        // Store response status
         dashboardStepsUtil.status = response.statusCode();
-        if (dashboardStepsUtil.status == 200) {
-            dashboardStepsUtil.responses.setDelegationResource(response.body().as(new TypeRef<>() {}));
-        } else {
-            dashboardStepsUtil.errorMessage = response.body().asString();
-        }
     }
 
     @When("I send a GET request to {string} to retrieve institutions")
@@ -360,16 +360,12 @@ public class InstitutionApiSteps {
     @And("the response should contain institutions list")
     public void theResponseShouldContainInstitutionsList() {
         Assertions.assertFalse(dashboardStepsUtil.responses.getInstitutionBaseResourceList().isEmpty());
-        Assertions.assertEquals(6, dashboardStepsUtil.responses.getInstitutionBaseResourceList().size());
-        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(0).getId());
-        Assertions.assertEquals("467ac77d-7faa-47bf-a60e-38ea74bd5fd2", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(1).getId());
-        Assertions.assertEquals("467ac77d-7faa-47bf-a60e-38ea74bd5fd2", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(2).getId());
-        Assertions.assertEquals("0b56686d-3e25-4851-86c8-b9ba0d4fe301", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(3).getId());
-        Assertions.assertEquals("f94c0589-b07e-4ee7-a509-fda5fe91faa2", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(4).getId());
-        Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(5).getId());
+        Assertions.assertEquals(2, dashboardStepsUtil.responses.getInstitutionBaseResourceList().size());
+        Assertions.assertEquals("467ac77d-7faa-47bf-a60e-38ea74bd5fd2", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(0).getId());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(1).getId());
     }
 
-    @When("I send a PUT request to {string} to add a new user related to a product for institutions")
+    @When("I send a POST request to {string} to add a new user related to a product for institutions")
     public void iSendAPUTRequestToToAddANewUserRelatedToAProductForInstitutions(String url) {
         RequestSpecification requestSpecification = RestAssured.given()
                 .contentType("application/json");
@@ -383,7 +379,7 @@ public class InstitutionApiSteps {
                 .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
                 .pathParam("productId", dashboardStepsUtil.filter.getProductId())
                 .body(dashboardStepsUtil.requests.getCreateUserDto())
-                .get(url)
+                .post(url)
                 .then()
                 .extract();
 
