@@ -219,7 +219,7 @@ public class InstitutionV2Controller {
     @GetMapping(value = "/{institutionId}/products/{productId}/users/count", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getUserCount}", nickname = "v2GetUserCount")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.web.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListProductUsers')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListProductUsers')")
     public UserCountResource getUserCount(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                           @PathVariable("institutionId")
                                           String institutionId,

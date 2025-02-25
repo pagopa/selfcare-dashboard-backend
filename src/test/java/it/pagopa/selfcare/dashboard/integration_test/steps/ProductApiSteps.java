@@ -82,6 +82,25 @@ public class ProductApiSteps{
         }
     }
 
+    @When("I send a GET request to {string} to retrieve products tree")
+    public void iSendAGETRequestToToRetrieveProductsTree(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+    }
+
     @When("I send a GET request to {string} to retrieve back-office URL")
     public void iSendAGETRequestToToRetrieveBackOfficeURL(String url) {
         RequestSpecification requestSpecification = RestAssured.given()

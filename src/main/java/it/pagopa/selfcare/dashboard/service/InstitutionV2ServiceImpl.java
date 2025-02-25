@@ -8,11 +8,11 @@ import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.user.OnboardedProductWithActions;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserInstitutionWithActionsDto;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +122,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");
         log.trace("getUserInstitutionWithActions start");
-        UserInstitutionWithActionsDto userInstitutionWithActionsDto = userMapper.toUserInstitutionWithActionsDto(userApiRestClient._getUserInstitutionWithPermission(userId, institutionId, null).getBody());
+        UserInstitutionWithActionsDto userInstitutionWithActionsDto = userMapper.toUserInstitutionWithActionsDto(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null).getBody());
 
         if (Objects.isNull(userInstitutionWithActionsDto))
             throw new AccessDeniedException(String.format("User %s has not associations with institution %s", userId, institutionId));

@@ -13,6 +13,8 @@ import it.pagopa.selfcare.dashboard.model.delegation.DelegationType;
 import it.pagopa.selfcare.dashboard.model.institution.*;
 import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.model.support.SupportRequestDto;
+import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
+import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UpdateUserGroupDto;
 import org.springframework.stereotype.Component;
@@ -105,6 +107,10 @@ public class DashboardStepsUtil {
         institution.setRootParent(mapRootParent(entry.get("rootParent")));
 
         return institution;
+    }
+
+    private List<String> mapList(String json) {
+        return mapList(json, String.class);
     }
 
 
@@ -239,6 +245,27 @@ public class DashboardStepsUtil {
         createUserDto.setProductRoles(mapProductRoles(entry.get("productRoles")));
 
         return createUserDto;
+    }
+
+    public UserProductRoles toUserProductRoles(Map<String, String> entry) {
+        UserProductRoles createUserDto = new UserProductRoles();
+
+        createUserDto.setRole(entry.get("role"));
+        createUserDto.setProductRoles(mapProductRoles(entry.get("productRoles")));
+
+        return createUserDto;
+    }
+
+    public UserCountResource toUserCountResource(Map<String, String> entry) {
+        UserCountResource userCountResource = new UserCountResource();
+
+        userCountResource.setInstitutionId(entry.get("institutionId"));
+        userCountResource.setProductId(entry.get("productId"));
+        userCountResource.setRoles(mapList(entry.get("roles")));
+        userCountResource.setStatus(mapList(entry.get("status")));
+        userCountResource.setCount(Long.valueOf(entry.get("count")));
+
+        return userCountResource;
     }
 
     private Set<String> mapProductRoles(String roles) {

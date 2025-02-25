@@ -11,6 +11,8 @@ import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyDto;
 import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.model.UpdateInstitutionDto;
+import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
+import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,16 @@ public class InstitutionApiSteps {
     @DataTableType
     public CreateUserDto convertCreateUserRequest(Map<String, String> entry) {
         return dashboardStepsUtil.toCreateUserDto(entry);
+    }
+
+    @DataTableType
+    public UserProductRoles convertUserProductRoles(Map<String, String> entry) {
+        return dashboardStepsUtil.toUserProductRoles(entry);
+    }
+
+    @DataTableType
+    public UserCountResource convertUserCountResource(Map<String, String> entry) {
+        return dashboardStepsUtil.toUserCountResource(entry);
     }
 
     @When("I send a POST request to {string} to create a institution")
@@ -159,6 +171,55 @@ public class InstitutionApiSteps {
         }
     }
 
+    @When("I send a GET request to {string} to pending onboardings")
+    public void whenISendAGetRequestToRetrieveOnboardingsPending(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)) {
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+        if (Objects.nonNull(dashboardStepsUtil.filter.getTaxCode())) {
+            requestSpecification.queryParam("taxCode", dashboardStepsUtil.filter.getTaxCode());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("productId", dashboardStepsUtil.filter.getProductId())
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+
+    }
+
+    @When("I send a GET request to {string} to get users count")
+    public void whenISendAGetRequestToGetUsersCount(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)) {
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
+                .pathParam("productId", dashboardStepsUtil.filter.getProductId())
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if (dashboardStepsUtil.status == 200) {
+            dashboardStepsUtil.responses.setUserCountResource(response.body().as(new TypeRef<>() {}));
+        } else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
     @And("the following geo-taxonomy request details:")
     public void theFollowingGeoTaxonomyRequestDetails(List<GeographicTaxonomyDto> geographicTaxonomyDtos) {
         GeographicTaxonomyListDto geographicTaxonomyListDto = new GeographicTaxonomyListDto();
@@ -193,6 +254,8 @@ public class InstitutionApiSteps {
     public void theFollowingInstitutionDescriptionRequestDetails(List<UpdateInstitutionDto> updateInstitutionDtos) {
         if (updateInstitutionDtos != null && updateInstitutionDtos.size() == 1) {
             dashboardStepsUtil.requests.setUpdateInstitutionDto(updateInstitutionDtos.get(0));
+        } else {
+            dashboardStepsUtil.requests.setUpdateInstitutionDto(new UpdateInstitutionDto());
         }
     }
 
@@ -365,8 +428,8 @@ public class InstitutionApiSteps {
         Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getInstitutionBaseResourceList().get(1).getId());
     }
 
-    @When("I send a POST request to {string} to add a new user related to a product for institutions")
-    public void iSendAPUTRequestToToAddANewUserRelatedToAProductForInstitutions(String url) {
+    @When("I send a POST request to {string} to create a new user related to a product for institutions")
+    public void iSendAPUTRequestToToCreateANewUserRelatedToAProductForInstitutions(String url) {
         RequestSpecification requestSpecification = RestAssured.given()
                 .contentType("application/json");
 
@@ -391,6 +454,33 @@ public class InstitutionApiSteps {
         }
     }
 
+    @When("I send a PUT request to {string} to add a new user related to a product for institutions")
+    public void iSendAPUTRequestToToAddANewUserRelatedToAProductForInstitutions(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)) {
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
+                .pathParam("productId", dashboardStepsUtil.filter.getProductId())
+                .pathParam("userId", dashboardStepsUtil.filter.getUserId())
+                .body(dashboardStepsUtil.requests.getUserProductRoles())
+                .put(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if (dashboardStepsUtil.status == 200) {
+            dashboardStepsUtil.responses.setDelegationResource(response.body().as(new TypeRef<>() {}));
+        } else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
     @And("the following user data request details:")
         public void theFollowingUserDataRequestDetails(List<CreateUserDto> createUserDtos) {
             if (createUserDtos != null && createUserDtos.size() == 1) {
@@ -398,10 +488,22 @@ public class InstitutionApiSteps {
             }
     }
 
+    @And("the following user product request details:")
+    public void theFollowingUserProductRequestDetails(List<UserProductRoles> userProductRoles) {
+        if (userProductRoles != null && userProductRoles.size() == 1) {
+            dashboardStepsUtil.requests.setUserProductRoles(userProductRoles.get(0));
+        }
+    }
+
     @And("the UserIdResource response should contain userId {string}")
     public void theUserIdResourceResponseShouldContainUserId(String userId) {
         Assertions.assertTrue(StringUtils.isNotBlank(dashboardStepsUtil.responses.getUserIdResource().getId().toString()));
         Assertions.assertEquals(dashboardStepsUtil.responses.getUserIdResource().getId().toString(), dashboardStepsUtil.filter.getUserId());
+    }
+
+    @And("the response should contain an empty institutions list")
+    public void theResponseShouldContainAnEmptyInstitutionsList() {
+        Assertions.assertTrue(dashboardStepsUtil.responses.getInstitutionBaseResourceList().isEmpty());
     }
 
 }

@@ -1,4 +1,3 @@
-@exclude
 Feature: Product
 
   Scenario: Successfully retrieving the back-office URL for a valid product and institution
@@ -107,7 +106,10 @@ Feature: Product
     And the response should not contain any product brokers
 
 
-  Scenario: Successfully retrieving the products tree
+  Scenario: Successfully retrieving products tree
+    Given user login with username "j.doe" and password "test"
+    When I send a GET request to "/v1/institutions/products" to retrieve products tree
+    Then the response status should be 200
 
 
 

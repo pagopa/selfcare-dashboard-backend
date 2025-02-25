@@ -22,6 +22,27 @@
       }
     },
     {
+      "username": "s.froid",
+      "password": "test",
+      "jwtHeader": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "kid": "jwt_test_kid"
+      },
+      "jwtPayload": {
+        "family_name": "Sigmund",
+        "fiscal_number": "SGMFRD67R25A124E",
+        "name": "Froid",
+        "spid_level": "https://www.spid.gov.it/SpidL2",
+        "from_aa": false,
+        "uid": "45a78331-d039-4bfa-8e85-2cbe7f6b7bc8",
+        "level": "L2",
+        "aud": "api.dev.selfcare.pagopa.it",
+        "iss": "SPID",
+        "jti": "_2f603a8bc36b1231b1a6"
+      }
+    },
+    {
       "username": "r.balboa",
       "password": "test",
       "jwtHeader": {

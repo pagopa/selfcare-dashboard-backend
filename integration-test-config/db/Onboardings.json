@@ -142,6 +142,12 @@
         "productRole": "admin",
         "role": "DELEGATE",
         "userMailUuid": "a0155d9a-97be-4e29-8623-0b0ba427c280"
+      },
+      {
+        "_id": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "userMailUuid": "ID_CONTACTS#8370aa38-a2ab-404b-9b8a-10487167332e"
       }
     ],
     "workflowType": "CONTRACT_REGISTRATION",

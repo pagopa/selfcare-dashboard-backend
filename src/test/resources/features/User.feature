@@ -181,16 +181,16 @@ Feature: User
 
   Scenario: Successfully retrieve users for given institutionId without filters
     Given user login with username "j.doe" and password "test"
-    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     When I send a GET request to "/v2/users/institution/{institutionId}" to retrieve user product data
     Then the response status should be 200
-    And the response should contain 6 items
+    And the response should contain 8 items
 
 
   Scenario: Successfully retrieve users for given institutionId with productRoles filter
     Given user login with username "j.doe" and password "test"
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
-    And the productRoles are "admin,security"
+    And the productRoles are "admin"
     When I send a GET request to "/v2/users/institution/{institutionId}" to retrieve user product data
     Then the response status should be 200
     And the response should contain 5 items
