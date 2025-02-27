@@ -193,7 +193,7 @@ Feature: institution
       | john | Doe     | PRVTNT80A41H401T | jd@test.it | test | admin        |
     When I send a POST request to "/v2/institutions/{institutionId}/products/{productId}/users" to create a new user related to a product for institutions
     Then the response status should be 400
-    And the response should contain an error message "Invalid role: test. Allowed values are: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA, ADMIN_EA_IO]"
+    And the response should contain an error message "Invalid role: test. Allowed values are: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA]"
 
   Scenario: Attempt to create user product by institutionId and productId with invalid request body
     Given user login with username "j.doe" and password "test"

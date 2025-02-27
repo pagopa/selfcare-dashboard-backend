@@ -165,7 +165,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         InstitutionResponse institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userApiRestClient._getUserInstitutionWithPermission(userId, institutionId, null))
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null))
                 .thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId))
                 .thenReturn(ResponseEntity.ok(institution));
@@ -283,7 +283,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         InstitutionResponse institution = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(userApiRestClient._getUserInstitutionWithPermission(userId, institutionId, null)).thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
+        when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null)).thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
 
         Institution result = institutionV2Service.findInstitutionById(institutionId);
