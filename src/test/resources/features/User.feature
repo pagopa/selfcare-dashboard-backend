@@ -25,7 +25,6 @@ Feature: User
     Then the response status should be 204
     And the user product should be "SUSPENDED" only on filtered product roles
 
-
   Scenario: Successfully activate user with 2 roles on prod-interop with productRole filter
     Given user login with username "j.doe" and password "test"
     And the userId is "4a7be530-1c36-41f4-8967-c479fb2d7fa9"
@@ -186,7 +185,6 @@ Feature: User
     Then the response status should be 200
     And the response should contain 8 items
 
-
   Scenario: Successfully retrieve users for given institutionId with productRoles filter
     Given user login with username "j.doe" and password "test"
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
@@ -295,8 +293,3 @@ Feature: User
     When I send a PUT request to "/v2/users/{id}" to update user data
     Then the response status should be 400
     And the response should contain an error message "Il numero di telefono non è valido"
-
-
-
-
-

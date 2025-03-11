@@ -14,6 +14,16 @@ services:
     networks:
       - develop-network
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: azurite
+    ports:
+      - "10000:10000"  # Expose blob service
+    volumes:
+      - "./integration-test-config/blobStorage:/data"
+    networks:
+      - develop-network
+
   mongodb:
     image: mongo:latest
     ports:

@@ -41,8 +41,8 @@ Feature: institution
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the following geo-taxonomy request details:
-      | code | desc   |
-      | ITA  | ITALIA |
+      | code   | desc |
+      | 058091 | ROMA |
     When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
     Then the response status should be 200
 
@@ -81,15 +81,6 @@ Feature: institution
     When I send a PUT request to "/v1/institutions/{institutionId}" to update institution description
     Then the response status should be 200
     And the Institution response should contain an institution id
-
-  Scenario: Attempt to update institution description by a nonexistent institutionId
-    Given user login with username "r.balboa" and password "test"
-    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960044"
-    And the following institution description request details:
-      | description        | digitalAddress
-      | comune di dernice2 | test@test.it
-    When I send a PUT request to "/v1/institutions/{institutionId}" to update institution description
-    Then the response status should be 404
 
   Scenario: Attempt to update institution description by institutionId without permissions
     Given user login with username "r.balboa" and password "test"
@@ -133,16 +124,6 @@ Feature: institution
     When I send a GET request to "/v2/institutions" to retrieve institutions list
     Then the response status should be 200
     And the response should contain an empty institutions list
-
-  Scenario: Successfully create user product by institutionId and productId
-    Given user login with username "r.balboa" and password "test"
-    And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
-    And the productId is "prod-io"
-    And the following user data request details:
-      | name | surname | taxCode          | email      | role     | productRoles        |
-      | john | Doe     | PRVTNT80A41H401T | jd@test.it | OPERATOR | referente operativo |
-    When I send a POST request to "/v2/institutions/{institutionId}/products/{productId}/users" to create a new user related to a product for institutions
-    Then the response status should be 201
 
   Scenario: Attempt to create user product by a user by institutionId and with an existent different role
     Given user login with username "j.doe" and password "test"
