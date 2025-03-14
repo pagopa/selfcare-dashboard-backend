@@ -114,7 +114,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     @Override
     public Institution findInstitutionById(String institutionId) {
         log.trace("findInstitutionById start");
-        log.debug("findInstitutionById institutionId = {}", institutionId);
+        log.debug("findInstitutionById institutionId = {}", Encode.forJava(institutionId));
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         String userId = ((SelfCareUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         log.trace("getInstitution start");
