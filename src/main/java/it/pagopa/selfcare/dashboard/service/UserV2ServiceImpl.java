@@ -23,6 +23,7 @@ import it.pagopa.selfcare.product.entity.ProductRole;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -149,7 +150,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public void updateUser(String id, String institutionId, UpdateUserRequestDto userDto) {
         log.trace("updateUser start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "updateUser id = {}, institutionId = {}, userDto = {}", id, institutionId, userDto);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "updateUser id = {}, institutionId = {}, userDto = {}", Encode.forJava(id), Encode.forJava(institutionId), userDto);
         Assert.notNull(id, "UUID is required");
         Assert.hasText(institutionId, "An institutionId is required");
         Assert.notNull(userDto, "A userDto is required");
@@ -164,7 +165,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, List<String> productRoles, List<String> roles, String loggedUserId) {
         log.trace("getUsersByInstitutionId start");
-        log.debug("getUsersByInstitutionId institutionId = {}", institutionId);
+        log.debug("getUsersByInstitutionId institutionId = {}", Encode.forJava(institutionId));
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
         userInfoFilter.setProductRoles(productRoles);
@@ -256,7 +257,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role) {
         log.trace("createOrUpdateUserByUserId start");
-        log.debug("createOrUpdateUserByUserId userId = {}", userId);
+        log.debug("createOrUpdateUserByUserId userId = {}", Encode.forJava(userId));
         Institution institution = verifyOnboardingStatus(institutionId, productId);
         PartyRole partyRole = Optional.ofNullable(role).map(PartyRole::valueOf).orElse(null);
         Product product = verifyProductPhasesAndRoles(productId, institution.getInstitutionType(), partyRole, productRoles);

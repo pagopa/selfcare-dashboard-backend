@@ -4,15 +4,15 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
-import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.exception.InvalidUserGroupException;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.groups.*;
 import it.pagopa.selfcare.dashboard.model.mapper.GroupMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
+import it.pagopa.selfcare.dashboard.model.user.User;
+import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
@@ -22,10 +22,10 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDataResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -83,7 +83,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void delete(String groupId) {
         log.trace("delete start");
-        log.debug("delete groupId = {}", groupId);
+        log.debug("delete groupId = {}", Encode.forJava(groupId));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         userGroupRestClient._deleteGroupUsingDELETE(groupId);
         log.trace("delete end");
@@ -92,7 +92,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void activate(String groupId) {
         log.trace("activate start");
-        log.debug("activate groupId = {}", groupId);
+        log.debug("activate groupId = {}", Encode.forJava(groupId));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         userGroupRestClient._activateGroupUsingPOST(groupId);
         log.trace("activate end");
@@ -124,7 +124,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void suspend(String groupId) {
         log.trace("suspend start");
-        log.debug("suspend groupId = {}", groupId);
+        log.debug("suspend groupId = {}", Encode.forJava(groupId));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         userGroupRestClient._suspendGroupUsingPOST(groupId);
         log.trace("suspend end");
@@ -133,7 +133,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void updateUserGroup(String groupId, UpdateUserGroup group) {
         log.trace("updateUserGroup start");
-        log.debug("updateUserGroup groupId = {}, group = {}", groupId, group);
+        log.debug("updateUserGroup groupId = {}, group = {}", Encode.forJava(groupId), group);
         UserGroupInfo userGroupInfo = groupMapper.toUserGroupInfo(userGroupRestClient._getUserGroupUsingGET(groupId).getBody());
         log.debug("getUseGroupById groupInfo = {}", userGroupInfo);
 
@@ -156,7 +156,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void addMemberToUserGroup(String groupId, UUID userId) {
         log.trace("addMemberToUserGroup start");
-        log.debug("addMemberToUserGroup groupId = {}, userId = {}", groupId, userId);
+        log.debug("addMemberToUserGroup groupId = {}, userId = {}", Encode.forJava(groupId), Encode.forJava(userId.toString()));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
 

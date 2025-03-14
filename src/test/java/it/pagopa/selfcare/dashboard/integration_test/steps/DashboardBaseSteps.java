@@ -44,7 +44,6 @@ public class DashboardBaseSteps{
                 .findFirst()
                 .orElse(null);
         dashboardStepsUtil.token = generateToken(jwtData);
-        log.info(dashboardStepsUtil.token);
     }
 
     @And("The response body contains:")
