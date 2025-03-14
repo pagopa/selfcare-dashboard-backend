@@ -57,7 +57,7 @@ class BrokerServiceImplTest extends BaseServiceTest {
         List<BrokerInfo> brokerInfo = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        byte[] resourceBrokerPsp = Files.readAllBytes(Paths.get("src/test/resources/stubs/BrokerPsp.json"));
+        byte[] resourceBrokerPsp = Files.readAllBytes(Paths.get("src/test/resources/stubs/brokerPsp.json"));
         List<BrokerPsp> brokerPspInfo = objectMapper.readValue(resourceBrokerPsp, new TypeReference<>() {
         });
 

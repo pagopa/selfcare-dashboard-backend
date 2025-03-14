@@ -64,7 +64,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     @Override
     public UserInfo getInstitutionUser(String institutionId, String userId, String loggedUserId) {
         log.trace("getInstitutionUser start");
-        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
+        log.debug("getInstitutionUser institutionId = {}, userId = {}", Encode.forJava(institutionId), Encode.forJava(userId));
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.hasText(userId, REQUIRED_USER_ID);
@@ -79,7 +79,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     private Optional<UserInfo> getUserInfo(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getInstitutionUsers start");
         log.debug("getInstitutionUsers institutionId = {}, productId = {}, role = {}, productRoles = {}",
-                institutionId, userInfoFilter.getProductId(), userInfoFilter.getRole(), userInfoFilter.getProductRoles());
+                Encode.forJava(institutionId), userInfoFilter.getProductId(), userInfoFilter.getRole(), userInfoFilter.getProductRoles());
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(userInfoFilter, A_USER_INFO_FILTER_OBJECT_IS_REQUIRED);
 
