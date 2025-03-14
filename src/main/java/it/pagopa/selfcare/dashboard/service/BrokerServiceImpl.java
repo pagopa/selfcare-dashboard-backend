@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.client.MsBackOfficeStationApiClient;
 import it.pagopa.selfcare.dashboard.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.model.mapper.BrokerMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -80,7 +81,7 @@ public class BrokerServiceImpl implements BrokerService {
     @Override
     public List<BrokerInfo> findInstitutionsByProductAndType(String productId, String institutionType) {
         log.trace("findInstitutionsByProductAndType start");
-        log.debug("findInstitutionsByProductAndType productId = {}, type = {}", productId, institutionType);
+        log.debug("findInstitutionsByProductAndType productId = {}, type = {}", Encode.forJava(productId), Encode.forJava(institutionType));
         List<BrokerResponse> brokerResponses = coreInstitutionApiRestClient._getInstitutionBrokersUsingGET(productId, institutionType).getBody();
         List<BrokerInfo> brokers = brokerMapper.fromInstitutions(brokerResponses);
         log.debug("findInstitutionsByProductAndType result = {}", brokers);

@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -70,7 +71,7 @@ public class DelegationServiceImpl implements DelegationService {
 
     private void setToInstitutionId(DelegationRequest delegation) {
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", delegation.getTo());
+        log.debug("getInstitution institutionId = {}", Encode.forJava(delegation.getTo()));
         Assert.hasText(delegation.getTo(), REQUIRED_TAX_CODE_MESSAGE);
         InstitutionsResponse institutionsResponse = coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null, null).getBody();
         if (institutionsResponse != null) {
@@ -89,7 +90,7 @@ public class DelegationServiceImpl implements DelegationService {
     @Override
     public List<Delegation> getDelegations(GetDelegationParameters delegationParameters) {
         log.trace("getDelegations start");
-        log.debug("getDelegations productId = {}, type = {}", delegationParameters.getFrom(), delegationParameters.getProductId());
+        log.debug("getDelegations productId = {}, type = {}", Encode.forJava(delegationParameters.getFrom()), Encode.forJava(delegationParameters.getProductId()));
         List<DelegationResponse> delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET(
                         delegationParameters.getFrom(),
                         delegationParameters.getTo(),
@@ -115,7 +116,7 @@ public class DelegationServiceImpl implements DelegationService {
     @Override
     public DelegationWithPagination getDelegationsV2(GetDelegationParameters delegationParameters) {
         log.trace("getDelegationsV2 start");
-        log.debug("getDelegationsV2 productId = {}, type = {}", delegationParameters.getFrom(), delegationParameters.getProductId());
+        log.debug("getDelegationsV2 productId = {}, type = {}", Encode.forJava(delegationParameters.getFrom()), Encode.forJava(delegationParameters.getProductId()));
         DelegationWithPaginationResponse delegationsResponse = coreDelegationApiRestClient._getDelegationsUsingGET1(
                         delegationParameters.getFrom(),
                         delegationParameters.getTo(),

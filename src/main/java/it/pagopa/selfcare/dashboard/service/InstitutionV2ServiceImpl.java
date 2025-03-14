@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserInstitutionWithActionsDto;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +90,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
     private Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, userInfoFilter = {}", institutionId, userInfoFilter);
+        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), Encode.forJava(userInfoFilter.toString()));
 
         List<String> roles = Arrays.stream(PartyRole.values())
                 .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
@@ -117,7 +118,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         String userId = ((SelfCareUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
+        log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
         Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");
