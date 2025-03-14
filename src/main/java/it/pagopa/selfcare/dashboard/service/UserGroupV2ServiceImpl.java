@@ -156,7 +156,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void addMemberToUserGroup(String groupId, UUID userId) {
         log.trace("addMemberToUserGroup start");
-        log.debug("addMemberToUserGroup groupId = {}, userId = {}", Encode.forJava(groupId), Encode.forJava(userId.toString()));
+        log.debug("addMemberToUserGroup groupId = {}, userId = {}", Encode.forJava(groupId), userId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
 
@@ -179,7 +179,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void deleteMemberFromUserGroup(String groupId, UUID userId) {
         log.trace("deleteMemberFromUserGroup start");
-        log.debug("deleteMemberFromUserGroup groupId = {}, userId = {}", Encode.forJava(groupId), Encode.forJava(userId.toString()));
+        log.debug("deleteMemberFromUserGroup groupId = {}, userId = {}", Encode.forJava(groupId), userId);
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
         userGroupRestClient._deleteMemberFromUserGroupUsingDELETE(groupId, userId);
