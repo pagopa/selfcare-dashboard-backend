@@ -90,7 +90,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
     private Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), Encode.forJava(userInfoFilter.toString()));
+        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
 
         List<String> roles = Arrays.stream(PartyRole.values())
                 .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))

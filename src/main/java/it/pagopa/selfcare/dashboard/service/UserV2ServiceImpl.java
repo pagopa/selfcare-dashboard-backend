@@ -179,7 +179,7 @@ public class UserV2ServiceImpl implements UserV2Service {
 
     private Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, userInfoFilter = {}", institutionId, userInfoFilter);
+        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
 
