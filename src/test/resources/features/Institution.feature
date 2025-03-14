@@ -1,4 +1,4 @@
-Feature: institution
+Feature: Institution
 
   Scenario: Successfully save institution logo by institutionId
     Given user login with username "j.doe" and password "test"
@@ -6,13 +6,7 @@ Feature: institution
     When I send a PUT request to "/v1/institutions/{institutionId}/logo" to save institutions logo
     Then the response status should be 200
 
-  Scenario: Attempt to save institution logo by a nonexistent institutionId
-    Given user login with username "r.balboa" and password "test"
-    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960044"
-    When I send a PUT request to "/v1/institutions/{institutionId}/logo" to save institutions logo
-    Then the response status should be 404
-
-  Scenario: Attempt to save institution logo by institutionId without permissions
+  Scenario: Attempt to save institution logo by institutionId without permissions (not onboarded)
     Given user login with username "r.balboa" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     When I send a PUT request to "/v1/institutions/{institutionId}/logo" to save institutions logo
@@ -21,21 +15,55 @@ Feature: institution
   Scenario: Successfully retrieve institution by institutionId
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
-    When I send a GET request to "/v1/institutions/{institutionId}" to retrieve institutions
+    When I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
     Then the response status should be 200
-    And the Institution Resource response should contain an institution id
+    And The response body contains:
+      | id                   | 067327d3-bdd6-408d-8655-87e8f1960046  |
+      | externalId           | 99000870064                           |
+      | originId             | c_d277                                |
+      | origin               | IPA                                   |
+      | institutionType      | PT                                    |
+      | name                 | comune di dernice                     |
+      | category             | Comuni e loro Consorzi e Associazioni |
+      | categoryCode         | L6                                    |
+      | fiscalCode           | 99000870064                           |
+      | mailAddress          | protocollo@pec.comune.dernice.al.it   |
+      | address              | Via Roma N.17                         |
+      | zipCode              | 15056                                 |
+    And The response body contains the list "products" of size 4
 
-  Scenario: Attempt to retrieve institution by institutionId without permissions
+  Scenario: Attempt to retrieve institution by institutionId without permissions (not onboarded)
     Given user login with username "r.balboa" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
-    When I send a GET request to "/v1/institutions/{institutionId}" to retrieve institutions
+    When I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
     Then the response status should be 404
 
-  Scenario: Attempt to retrieve nonexistent institution by institutionId
+  Scenario: Successfully retrieve institution by institutionId v2
+    Given user login with username "j.doe" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
+    Then the response status should be 200
+    And The response body contains:
+      | id                   | 067327d3-bdd6-408d-8655-87e8f1960046  |
+      | externalId           | 99000870064                           |
+      | originId             | c_d277                                |
+      | origin               | IPA                                   |
+      | institutionType      | PT                                    |
+      | name                 | comune di dernice                     |
+      | category             | Comuni e loro Consorzi e Associazioni |
+      | categoryCode         | L6                                    |
+      | fiscalCode           | 99000870064                           |
+      | mailAddress          | protocollo@pec.comune.dernice.al.it   |
+      | address              | Via Roma N.17                         |
+      | zipCode              | 15056                                 |
+    And The response body contains the list "products" of size 4
+
+  Scenario: Attempt to retrieve institution by institutionId v2 without permission (not onboarded)
     Given user login with username "r.balboa" and password "test"
-    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960044"
-    When I send a GET request to "/v1/institutions/{institutionId}" to retrieve delegations
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
     Then the response status should be 404
+
 
   Scenario: Successfully update institution geo-taxonomy by institutionId
     Given user login with username "j.doe" and password "test"
@@ -45,30 +73,24 @@ Feature: institution
       | 058091 | ROMA |
     When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
     Then the response status should be 200
+    And I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
+    And The response body contains:
+      | geographicTaxonomies | [[code:058091, desc:ROMA - COMUNE]] |
 
   Scenario: Attempt to update institution geo-taxonomy by institutionId with invalid request body
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the following geo-taxonomy request details:
-      | code   | desc
+      | code   | desc |
     When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
     Then the response status should be 400
 
-  Scenario: Attempt to update institution geo-taxonomy by a nonexistent institutionId
-    Given user login with username "r.balboa" and password "test"
-    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960044"
-    And the following geo-taxonomy request details:
-      | code   | desc
-      | 058091 | ROMA - COMUNE
-    When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
-    Then the response status should be 404
-
-  Scenario: Attempt to update institution geo-taxonomy by institutionId without permissions
+  Scenario: Attempt to update institution geo-taxonomy by institutionId without permissions (not onboarded)
     Given user login with username "r.balboa" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the following geo-taxonomy request details:
-      | code   | desc
-      | 058091 | ROMA - COMUNE
+      | code   | desc          |
+      | 058091 | ROMA - COMUNE |
     When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
     Then the response status should be 404
 
@@ -76,18 +98,22 @@ Feature: institution
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the following institution description request details:
-      | description        | digitalAddress
-      | comune di dernice2 | test@test.it
+      | description        | digitalAddress |
+      | comune di dernice2 | test@test.it   |
     When I send a PUT request to "/v1/institutions/{institutionId}" to update institution description
     Then the response status should be 200
     And the Institution response should contain an institution id
+    And I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
+    And The response body contains:
+      | name        | comune di dernice2 |
+      | mailAddress | test@test.it       |
 
-  Scenario: Attempt to update institution description by institutionId without permissions
+  Scenario: Attempt to update institution description by institutionId without permissions (not onboarded)
     Given user login with username "r.balboa" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the following institution description request details:
-      | description        | digitalAddress
-      | comune di dernice2 | test@test.it
+      | description        | digitalAddress |
+      | comune di dernice2 | test@test.it   |
     When I send a PUT request to "/v1/institutions/{institutionId}" to update institution description
     Then the response status should be 404
 
@@ -97,21 +123,28 @@ Feature: institution
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
     When I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
     Then the response status should be 200
-    And the response should contain userId
+    And The response body contains:
+      | id         | 97a511a7-2acc-47b9-afed-2f3c65753b4a |
+      | name       | john                                 |
+      | surname    | Doe                                  |
+      | role       | ADMIN                                |
+      | status     | ACTIVE                               |
+      | fiscalCode | PRVTNT80A41H401T                     |
+    And The response body contains the list "products" of size 4
 
-  Scenario: Attempt to retrieve nonexistent institution user by institutionId
+  Scenario: Attempt to retrieve institution user by institutionId without permissions (not onboarded)
     Given user login with username "j.doe" and password "test"
-    And the userId is "17a511a7-2acc-47b9-afed-2f3c65853b4a"
-    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
-    When I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
-    Then the response status should be 404
-
-  Scenario: Attempt to retrieve institution user by institutionId without permissions
-    Given user login with username "r.balboa" and password "test"
     And the userId is "17a511a7-2acc-47b9-afed-2f3c65853b4a"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     When I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
     Then the response status should be 404
+
+  Scenario: Attempt to retrieve institution user by institutionId without permissions (OPERATOR)
+    Given user login with username "j.doe" and password "test"
+    And the userId is "35a78332-d038-4bfa-8e85-2cba7f6b7bf7"
+    And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
+    When I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
+    Then the response status should be 403
 
   Scenario: Successfully retrieve institutions
     Given user login with username "j.doe" and password "test"
@@ -145,7 +178,7 @@ Feature: institution
     When I send a POST request to "/v2/institutions/{institutionId}/products/{productId}/users" to create a new user related to a product for institutions
     Then the response status should be 400
 
-  Scenario: Attempt to create user product by a nonexistent institutionId and productId
+  Scenario: Attempt to create user product by an institutionId and productId without permission (not onboarded)
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1970046"
     And the productId is "prod-io"
@@ -155,7 +188,7 @@ Feature: institution
     When I send a POST request to "/v2/institutions/{institutionId}/products/{productId}/users" to create a new user related to a product for institutions
     Then the response status should be 404
 
-  Scenario: Attempt to create user product by institutionId and productId without permissions
+  Scenario: Attempt to create user product by institutionId and productId without permissions (OPERATOR)
     Given user login with username "j.doe" and password "test"
     And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
     And the productId is "prod-interop"
@@ -197,6 +230,11 @@ Feature: institution
       | OPERATOR | security     |
     When I send a PUT request to "/v2/institutions/{institutionId}/products/{productId}/users/{userId}" to add a new user related to a product for institutions
     Then the response status should be 201
+    And I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
+    Then the response status should be 200
+    And The response body contains:
+      | id         | 35a78332-d038-4bfa-8e85-2cba7f6b7bf7 |
+    And The response body contains the list "products" of size 2
 
   Scenario: Attempt to add user by institutionId, productId and userId without permission
     Given user login with username "j.doe" and password "test"
@@ -242,19 +280,6 @@ Feature: institution
     When I send a PUT request to "/v2/institutions/{institutionId}/products/{productId}/users/{userId}" to add a new user related to a product for institutions
     Then the response status should be 400
 
-  Scenario: Successfully retrieve institution by institutionId v2
-    Given user login with username "j.doe" and password "test"
-    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
-    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institutions
-    Then the response status should be 200
-    And the Institution Resource response should contain an institution id
-
-  Scenario: Attempt to retrieve institution by institutionId not found v2
-    Given user login with username "r.balboa" and password "test"
-    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
-    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institutions
-    Then the response status should be 404
-
   Scenario: Successfully retrieve institution onboardings PENDING
     Given user login with username "j.doe" and password "test"
     And the productId is "prod-interop"
@@ -274,15 +299,17 @@ Feature: institution
     And the institution ID is "c9a50656-f345-4c81-84be-5b2474470544" and the product ID is "prod-pagopa"
     When I send a GET request to "/v2/institutions/{institutionId}/products/{productId}/users/count" to get users count
     Then the response status should be 200
+    And The response body contains:
+      | count | 2 |
 
-  Scenario: Attempt to get User Count without permission
+  Scenario: Attempt to get User Count without permission (OPERATOR)
     Given user login with username "j.doe" and password "test"
     And the institution ID is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2" and the product ID is "prod-interop"
     When I send a GET request to "/v2/institutions/{institutionId}/products/{productId}/users/count" to get users count
     Then the response status should be 403
 
-  Scenario: Attempt to get User Count institution not found
-    Given user login with username "j.doe" and password "test"
-    And the institution ID is "467ac77d-7faa-47bf-a60e-38ea74bd5fd1" and the product ID is "prod-interop"
+  Scenario: Attempt to get User Count institution without permission (not onboarded)
+    Given user login with username "r.balboa" and password "test"
+    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-interop"
     When I send a GET request to "/v2/institutions/{institutionId}/products/{productId}/users/count" to get users count
     Then the response status should be 404

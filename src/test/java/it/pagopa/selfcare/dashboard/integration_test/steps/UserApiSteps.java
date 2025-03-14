@@ -8,11 +8,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.specification.RequestSpecification;
 import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
+import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
+import it.pagopa.selfcare.dashboard.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static com.mongodb.assertions.Assertions.assertNull;
@@ -23,6 +27,9 @@ public class UserApiSteps{
 
     @Autowired
     private DashboardStepsUtil dashboardStepsUtil;
+
+    @Autowired
+    private InstitutionApiSteps institutionApiSteps;
 
     @When("I send a POST request to {string} to update user status")
     public void iSendAPOSTRequestTo(String url) {
@@ -224,22 +231,28 @@ public class UserApiSteps{
 
     }
 
-    @And("the user product should be {string} on each product roles")
-    public void theUserShouldBeSuspendedOnEachProductRoles(String status) {
-        //TODO: QUANDO SARA IMPLEMENTATA LA CHIAMATA PER LA GET USER INSTITUTION, DOVRA' ESSERE INVOCATO IL METODO CHE FA TALE CHIAMATA E DOVRANNO ESSERE
-        //VERIFICATI SCRITTE LE ASSERZIONI SUGLI STATI DEI PRODOTTI
-    }
-
     @And("the user product should be {string} only on filtered product roles")
     public void theUserShouldBeSuspendedOnlyOnFilteredProductRoles(String status) {
-        //TODO: QUANDO SARA IMPLEMENTATA LA CHIAMATA PER LA GET USER INSTITUTION, DOVRA' ESSERE INVOCATO IL METODO CHE FA TALE CHIAMATA E DOVRANNO ESSERE
-        //VERIFICATI SCRITTE LE ASSERZIONI SUGLI STATI DEI PRODOTTI
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        dashboardStepsUtil.getResponses().getInstitutionUserDetailsResource().getProducts().stream()
+                .filter(p ->
+                        p.getId().equals(dashboardStepsUtil.filter.getProductId()))
+                .toList().get(0)
+                .getRoleInfos().stream()
+                .filter(r ->
+                        r.getRole().equals(dashboardStepsUtil.filter.getProductRoles().get(0)))
+                .forEach( roleInfo -> assertEquals(status, roleInfo.getStatus()));
     }
 
     @And("the user product should be {string}")
     public void theUserShouldBeSuspended(String status) {
-        //TODO: QUANDO SARA IMPLEMENTATA LA CHIAMATA PER LA GET USER INSTITUTION, DOVRA' ESSERE INVOCATO IL METODO CHE FA TALE CHIAMATA E DOVRANNO ESSERE
-        //VERIFICATI SCRITTE LE ASSERZIONI SUGLI STATI DEI PRODOTTI
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        dashboardStepsUtil.getResponses().getInstitutionUserDetailsResource().getProducts().stream()
+                .filter(p ->
+                        p.getId().equals(dashboardStepsUtil.filter.getProductId()))
+                .toList().get(0)
+                .getRoleInfos()
+                .forEach( roleInfo -> assertEquals(status, roleInfo.getStatus()));
     }
 
     @And("the response should contain the user data")
@@ -278,11 +291,38 @@ public class UserApiSteps{
 
     @And("the user email should be updated")
     public void theUserEmailShouldBeUpdated() {
-        //TODO: GET USER INSTITUTION CONTROLLARE CHE IL CAMPO userMailUpdatedAt SIA DIVERSO DA NULL E CHE IL CAMPO userMailUuid SIA DIVERSO DA ID_CONTACTS#8370aa38-a2ab-404b-9b8a-10487167332e
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        assertEquals(dashboardStepsUtil.filter.getEmail(), dashboardStepsUtil.getResponses().getInstitutionUserDetailsResource().getEmail());
     }
 
     @And("the user mobilePhone should be updated")
     public void theUserMobilePhoneShouldBeUpdated() {
-        //TODO: GET USER INSTITUTION CONTROLLARE CHE IL CAMPO userMailUpdatedAt SIA DIVERSO DA NULL E CHE IL CAMPO userMailUuid SIA DIVERSO DA ID_CONTACTS#8370aa38-a2ab-404b-9b8a-10487167332e
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        assertEquals(dashboardStepsUtil.filter.getMobilePhone(), dashboardStepsUtil.getResponses().getInstitutionUserDetailsResource().getMobilePhone());
+    }
+
+    @And("the user product should not contain the mentioned product")
+    public void theUserProductShouldNotContainTheMentionedProduct() {
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        List<ProductInfoResource> response = dashboardStepsUtil.getResponses().getInstitutionUserDetailsResource().getProducts().stream()
+                .filter(p ->
+                        p.getId().equals(dashboardStepsUtil.filter.getProductId()))
+                .toList();
+
+        assertEquals(Collections.EMPTY_LIST, response);
+    }
+
+    @And("the user product should not contain the mentioned roles info")
+    public void theUserProductShouldNotContainTheMentionedRolesInfo() {
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
+        List<ProductRoleInfoResource> response = dashboardStepsUtil.getResponses().getInstitutionUserDetailsResource().getProducts().stream()
+                .filter(p ->
+                        p.getId().equals(dashboardStepsUtil.filter.getProductId()))
+                .toList().get(0)
+                .getRoleInfos().stream()
+                .filter(r ->
+                        r.getRole().equals(dashboardStepsUtil.filter.getProductRoles().get(0))).toList();
+        assertEquals(Collections.EMPTY_LIST, response);
     }
 }

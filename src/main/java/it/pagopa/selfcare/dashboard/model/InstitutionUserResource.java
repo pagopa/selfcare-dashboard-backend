@@ -19,7 +19,6 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.UUID;
-//todo questa classe stava in src web
 @Data
 public class InstitutionUserResource {
 

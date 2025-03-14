@@ -77,7 +77,7 @@ Feature: User
     And the productRoles are "security"
     When I send a DELETE request to "/v2/users/{userId}" to delete user product
     Then the response status should be 204
-    And the user product should be "DELETED" only on filtered product roles
+    And the user product should not contain the mentioned roles info
 
   Scenario: Successfully delete user on prod-io when user is member of a group
     Given user login with username "j.doe" and password "test"
@@ -88,7 +88,7 @@ Feature: User
     And I send a POST request to "/v2/user-groups/{id}/members/{userId}" to add userGroup member
     When I send a DELETE request to "/v2/users/{userId}" to delete user product
     Then the response status should be 204
-    And the user product should be "DELETED"
+    And the user product should not contain the mentioned product
     And the user is removed from user group
 
   Scenario: Successfully delete user on prod-pagopa when user is not member of a group
@@ -98,7 +98,7 @@ Feature: User
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
     When I send a DELETE request to "/v2/users/{userId}" to delete user product
     Then the response status should be 204
-    And the user product should be "DELETED"
+    And the user product should not contain the mentioned product
 
   Scenario: Try to delete user with given userId without required filter
     Given user login with username "j.doe" and password "test"
@@ -250,6 +250,7 @@ Feature: User
     When I send a PUT request to "/v2/users/{id}" to update user data
     Then the response status should be 204
     And the user mobilePhone should be updated
+    And the user email should be updated
 
   Scenario: Updating user email for given userId without institutionId
     Given user login with username "j.doe" and password "test"

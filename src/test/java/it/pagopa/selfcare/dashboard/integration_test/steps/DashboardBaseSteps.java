@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -43,6 +44,21 @@ public class DashboardBaseSteps{
                 .findFirst()
                 .orElse(null);
         dashboardStepsUtil.token = generateToken(jwtData);
+        log.info(dashboardStepsUtil.token);
+    }
+
+    @And("The response body contains:")
+    public void checkResponseBody(Map<String, String> expectedKeyValues) {
+        expectedKeyValues.forEach((expectedKey, expectedValue) -> {
+            final String currentValue = dashboardStepsUtil.getResponse().body().jsonPath().getString(expectedKey);
+            Assertions.assertEquals(expectedValue, currentValue, String.format("The field %s does not contain the expected value", expectedKey));
+        });
+    }
+
+    @And("The response body contains the list {string} of size {int}")
+    public void checkResponseBodyListSize(String expectedJsonPath, int expectedSize) {
+        final int currentSize = dashboardStepsUtil.getResponse().body().jsonPath().getList(expectedJsonPath).size();
+        Assertions.assertEquals(expectedSize, currentSize);
     }
 
     public TestProperties readDataPopulation() {

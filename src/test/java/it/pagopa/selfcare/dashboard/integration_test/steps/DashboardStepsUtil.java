@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.integration_test.steps;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.response.ExtractableResponse;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.dashboard.integration_test.model.Filter;
 import it.pagopa.selfcare.dashboard.integration_test.model.Requests;
@@ -17,6 +18,8 @@ import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
 import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UpdateUserGroupDto;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@Getter
+@Setter
 public class DashboardStepsUtil {
 
     protected String errorMessage;
@@ -32,6 +37,7 @@ public class DashboardStepsUtil {
     protected Responses responses = new Responses();
     protected Requests requests = new Requests();
     protected String token;
+    protected ExtractableResponse<?> response;
 
     public InstitutionUserDetailsResource toInstitutionUserDetailsResource(Map<String, String> entry) {
         InstitutionUserDetailsResource userResource = new InstitutionUserDetailsResource();
