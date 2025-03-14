@@ -33,7 +33,7 @@ module "apim_api_bff_dashboard" {
   service_url = format("https://%s", var.private_dns_name)
 
   content_format = "openapi+json"
-  content_value = templatefile("../../app/src/main/resources/swagger/api-docs.json", {
+  content_value = templatefile("../../src/main/resources/swagger/api-docs.json", {
     url      = format("%s.%s", var.api_dns_zone_prefix, var.external_domain)
     basePath = local.base_path
   })

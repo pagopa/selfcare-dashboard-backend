@@ -15,10 +15,8 @@ trigger:
       - release-*
   paths:
     include:
-      - app/*
-      - core/*
-      - integration/*
-      - web/*
+      - integration-test-config/*
+      - src/*
       - pom.xml
 
 pr: none

@@ -1,5 +1,5 @@
-#oa3_spec: app/src/main/resources/swagger/api-docs.json
-oa3_spec: app/src/main/resources/swagger/api-docs.json
+#oa3_spec: src/main/resources/swagger/api-docs.json
+oa3_spec: src/main/resources/swagger/api-docs.json
 name: opex_api-dashboard
 location: West Europe
 timespan: 30m # Default, a number or a timespan https://docs.microsoft.com/en-us/azure/data-explorer/kusto/query/scalar-data-types/timespan
