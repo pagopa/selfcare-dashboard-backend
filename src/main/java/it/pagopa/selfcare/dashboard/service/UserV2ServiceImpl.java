@@ -103,7 +103,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public void deleteUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("delete start");
-        log.debug("delete userId = {} for institutionId = {}, productId = {} and productRole = {}", userId, institutionId, productId, productRole);
+        log.debug("delete userId = {} for institutionId = {}, productId = {} and productRole = {}", Encode.forJava(userId) , Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(productRole));
         userApiRestClient._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.DELETED, productRole);
         userGroupService.deleteMembersByUserId(userId, institutionId, productId);
         log.trace("delete end");
@@ -112,7 +112,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public void activateUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("activate start");
-        log.debug("activate userId = {} for institutionId = {}, productId = {} and productRole = {}", userId, institutionId, productId, productRole);
+        log.debug("activate userId = {} for institutionId = {}, productId = {} and productRole = {}", Encode.forJava(userId), Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(productRole));
         userApiRestClient._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.ACTIVE, productRole);
         log.trace("activate end");
 
@@ -121,7 +121,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public void suspendUserProduct(String userId, String institutionId, String productId, String productRole) {
         log.trace("suspend start");
-        log.debug("suspend userId = {} for institutionId = {} and product = {}", userId, institutionId, productId);
+        log.debug("suspend userId = {} for institutionId = {} and product = {}", Encode.forJava(userId), Encode.forJava(institutionId), Encode.forJava(productId));
         userApiRestClient._updateUserProductStatus(userId, institutionId, productId, OnboardedProductState.SUSPENDED, productRole);
         log.trace("suspend end");
     }
@@ -129,7 +129,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public User getUserById(String userId, String institutionId, List<String> fields) {
         log.trace("getUserById start");
-        log.debug("getUserById id = {}", userId);
+        log.debug("getUserById id = {}", Encode.forJava(userId));
         String fieldsString = !CollectionUtils.isEmpty(fields) ? String.join(",", fields) : null;
         User user = userMapper.toUser(userApiRestClient._getUserDetailsById(userId, fieldsString, institutionId).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
@@ -140,7 +140,7 @@ public class UserV2ServiceImpl implements UserV2Service {
     @Override
     public User searchUserByFiscalCode(String fiscalCode, String institutionId) {
         log.trace("searchByFiscalCode start");
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", fiscalCode);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode fiscalCode = {}", Encode.forJava(fiscalCode));
         User user = userMapper.toUser(userApiRestClient._searchUserByFiscalCode(institutionId, SearchUserDto.builder().fiscalCode(fiscalCode).build()).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "searchByFiscalCode user = {}", user);
         log.trace("searchByFiscalCode end");

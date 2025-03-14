@@ -179,7 +179,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public void deleteMemberFromUserGroup(String groupId, UUID userId) {
         log.trace("deleteMemberFromUserGroup start");
-        log.debug("deleteMemberFromUserGroup groupId = {}, userId = {}", groupId, userId);
+        log.debug("deleteMemberFromUserGroup groupId = {}, userId = {}", Encode.forJava(groupId), Encode.forJava(userId.toString()));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         Assert.notNull(userId, "A userId is required");
         userGroupRestClient._deleteMemberFromUserGroupUsingDELETE(groupId, userId);
@@ -189,7 +189,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public UserGroupInfo getUserGroupById(String groupId, String institutionId) {
         log.trace("getUserGroupById start");
-        log.debug("getUserGroupById groupId = {}", groupId);
+        log.debug("getUserGroupById groupId = {}", Encode.forJava(groupId));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         UserGroupResource response = userGroupRestClient._getUserGroupUsingGET(groupId).getBody();
         UserGroupInfo userGroupInfo = groupMapper.toUserGroupInfo(response);
@@ -245,7 +245,7 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public Page<UserGroup> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable) {
         log.trace("getUserGroups start");
-        log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", institutionId, productId, userId, pageable);
+        log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(userId.toString()), Encode.forJava(pageable.toString()));
         UserGroupFilter userGroupFilter = new UserGroupFilter();
         userGroupFilter.setInstitutionId(Optional.ofNullable(institutionId));
         userGroupFilter.setUserId(Optional.ofNullable(userId));
