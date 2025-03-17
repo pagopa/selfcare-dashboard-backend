@@ -55,6 +55,7 @@ class InstitutionServiceImplTest extends BaseServiceTest {
     @BeforeEach
     public void setUp() {
         super.setUp();
+        SecurityContextHolder.clearContext();
     }
 
     @Test
