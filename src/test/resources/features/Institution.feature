@@ -1,3 +1,4 @@
+@institution
 Feature: Institution
 
   Scenario: Successfully save institution logo by institutionId

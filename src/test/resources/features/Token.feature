@@ -1,3 +1,4 @@
+@token
 Feature: Token API
 
   ##token exchange

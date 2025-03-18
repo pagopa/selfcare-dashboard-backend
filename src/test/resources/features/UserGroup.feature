@@ -1,3 +1,4 @@
+@userGroup
 Feature: UserGroups
 
   Scenario: Successfully create a new user group

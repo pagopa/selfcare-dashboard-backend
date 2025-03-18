@@ -1,3 +1,4 @@
+@user
 Feature: User
   Scenario: Successfully suspend user with 2 roles on prod-interop without productRole filter
     Given user login with username "j.doe" and password "test"

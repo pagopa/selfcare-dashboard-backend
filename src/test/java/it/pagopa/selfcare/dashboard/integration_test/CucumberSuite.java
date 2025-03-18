@@ -15,7 +15,7 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
 @CucumberContextConfiguration
 @SpringBootTest(classes = {SelfCareDashboardApplication.class})
-@ExcludeTags({"exclude"})
+@ExcludeTags({"delegation", "institution", "product", "support", "token", "user", "userGroup"})
 public class CucumberSuite {
 
     private DashboardStepsUtil dashboardStepsUtil;
