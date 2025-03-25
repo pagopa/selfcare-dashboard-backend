@@ -1,9 +1,0 @@
-[
-  {
-    "id": "institutionBaseId",
-    "name": "institutionBaseName",
-    "userRole": "userRole",
-    "status": "status",
-    "parentDescription": "parentDescription"
-  }
-]

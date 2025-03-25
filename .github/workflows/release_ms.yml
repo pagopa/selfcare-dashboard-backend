@@ -6,12 +6,9 @@ on:
       - main
       - releases/*
     paths:
-      - 'app/**'
-      - 'connector/**'
-      - 'connector-api/**'
-      - 'core/**'
       - 'infra/**'
-      - 'web/**'
+      - 'integration-test-config/**'
+      - "src/**"
       - 'pom.xml'
 
   workflow_dispatch:
