@@ -1,8 +1,8 @@
 # Primo stage: usiamo un'immagine con git per clonare il repository
-FROM bitnami/git AS git-stage
+FROM bitnami/git@sha256:c683e3e16f35d2cd2066732052d1d3e5a6b22fa40b14df6d3cd756cdf59be9e0 AS git-stage
 WORKDIR /repo
 RUN git clone https://github.com/pagopa/selfcare-infra.git
 
-FROM mcr.microsoft.com/azure-cli
+FROM mcr.microsoft.com/azure-cli@sha256:9b224206c67c480d6d4c4b3dee8b80f95f8512446df179bd5dad044c6253a7a1
 COPY --from=git-stage /repo/selfcare-infra/src/core/resources /workspace/resources/resources
 CMD ["/bin/sh", "-c", "/initAzurite.sh"]
