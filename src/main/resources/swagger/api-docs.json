@@ -4325,6 +4325,10 @@
         "required" : [ "email" ],
         "type" : "object",
         "properties" : {
+          "data" : {
+            "type" : "string",
+            "description" : "Technical data"
+          },
           "email" : {
             "type" : "string",
             "description" : "User's email",

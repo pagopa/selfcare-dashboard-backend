@@ -78,7 +78,7 @@ public class SupportApiSteps{
     public void theResponseShouldContainARedirectURLWithoutProductId() {
         Assertions.assertNotNull(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl());
         Assertions.assertTrue(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains(dashboardStepsUtil.requests.getSupportRequestDto().getInstitutionId()));
-        Assertions.assertFalse(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("productId"));
+        Assertions.assertFalse(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("product"));
     }
 
     @And("the response should contain a redirect URL without institutionId but with productId")
@@ -92,6 +92,22 @@ public class SupportApiSteps{
     public void theResponseShouldContainARedirectURLWithoutProductIdAndInstitutionId() {
         Assertions.assertNotNull(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl());
         Assertions.assertFalse(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("institutionId"));
-        Assertions.assertFalse(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("productId"));
+        Assertions.assertFalse(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("product"));
+    }
+
+    @And("the response should contain a redirect URL with productId and data")
+    public void theResponseShouldContainARedirectURLWithProductIdAndData() {
+        final String expectedProductId = dashboardStepsUtil.requests.getSupportRequestDto().getProductId();
+        final String expectedData = dashboardStepsUtil.requests.getSupportRequestDto().getData();
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl());
+        Assertions.assertTrue(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("?product=" + expectedProductId));
+        Assertions.assertTrue(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("&data=" + expectedData));
+    }
+
+    @And("the response should contain a redirect URL with data")
+    public void theResponseShouldContainARedirectURLWithData() {
+        final String expectedData = dashboardStepsUtil.requests.getSupportRequestDto().getData();
+        Assertions.assertNotNull(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl());
+        Assertions.assertTrue(dashboardStepsUtil.responses.getSupportResponse().getRedirectUrl().contains("?data=" + expectedData));
     }
 }

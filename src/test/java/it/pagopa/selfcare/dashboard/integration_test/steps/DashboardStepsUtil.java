@@ -320,6 +320,7 @@ public class DashboardStepsUtil {
         supportRequestDto.setUserId(entry.get("userId"));
         supportRequestDto.setInstitutionId(entry.get("institutionId"));
         supportRequestDto.setProductId(entry.get("productId"));
+        supportRequestDto.setData(entry.get("data"));
         return supportRequestDto;
     }
 

@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.model.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import it.pagopa.selfcare.dashboard.validator.UrlEncoded;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -23,5 +24,9 @@ public class SupportRequestDto {
 
     @ApiModelProperty(value = "${swagger.dashboard.support.model.institutionId}")
     private String institutionId;
+
+    @ApiModelProperty(value = "${swagger.dashboard.support.model.data}")
+    @UrlEncoded
+    private String data;
 
 }
