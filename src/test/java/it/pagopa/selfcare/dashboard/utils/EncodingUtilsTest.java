@@ -9,6 +9,8 @@ public class EncodingUtilsTest {
 
     @Test
     void isUrlEncodedTest() {
+        assertTrue(EncodingUtils.isUrlEncoded(""));
+        assertTrue(EncodingUtils.isUrlEncoded(null));
         assertTrue(EncodingUtils.isUrlEncoded("file%3A%2F%2F%2Fhome%2Fuser"));
         assertTrue(EncodingUtils.isUrlEncoded("%E2%9C%93"));
         assertTrue(EncodingUtils.isUrlEncoded("%7B%22key%22%3A123%7D"));
