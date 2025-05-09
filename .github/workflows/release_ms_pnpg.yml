@@ -31,6 +31,7 @@ jobs:
     with:
       environment: dev
       tf_environment: dev-pnpg
+      path_openapi_docs: src/main/resources/swagger/api-docs.json
       dir: 'infra/container_apps'
 
   release_uat:
@@ -41,6 +42,7 @@ jobs:
     with:
       environment: uat
       tf_environment: uat-pnpg
+      path_openapi_docs: src/main/resources/swagger/api-docs.json
       dir: 'infra/container_apps'
 
   release_prod:
@@ -51,4 +53,5 @@ jobs:
     with:
       environment: prod
       tf_environment: prod-pnpg
+      path_openapi_docs: src/main/resources/swagger/api-docs.json
       dir: 'infra/container_apps'
