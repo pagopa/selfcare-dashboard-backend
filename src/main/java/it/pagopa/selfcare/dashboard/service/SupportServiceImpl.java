@@ -110,6 +110,11 @@ public class SupportServiceImpl implements SupportService {
                     "&institution=" + supportRequest.getInstitutionId()
                     : "?institution=" + supportRequest.getInstitutionId());
         }
+        if(Objects.nonNull(supportRequest.getData())) {
+            urlBuilder.append(urlBuilder.indexOf("?") != -1 ?
+                    "&data=" + supportRequest.getData()
+                    : "?data=" + supportRequest.getData());
+        }
         return urlBuilder.toString();
     }
 }

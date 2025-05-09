@@ -75,6 +75,40 @@ public class SupportServiceImplTest extends BaseServiceTest {
     }
 
     @Test
+    void sendRequest_withData() throws IOException {
+
+        ReflectionTestUtils.setField(supportServiceImpl, "supportApiKey", "testSupportApiKey");
+        ReflectionTestUtils.setField(supportServiceImpl, "returnTo", "testReturnTo");
+        ReflectionTestUtils.setField(supportServiceImpl, "zendeskOrganization", "testZendeskOrganization");
+        ReflectionTestUtils.setField(supportServiceImpl, "actionUrl", "testActionUrl");
+
+        SupportResponse expectation = new SupportResponse();
+        expectation.setRedirectUrl("testReturnTo?product=productId&institution=institutionId&data=%7B%22logId%22%3A%20%22hello%20world%22%7D");
+        expectation.setActionUrl("testActionUrl");
+
+        ClassPathResource resource = new ClassPathResource("json/SupportRequest.json");
+        byte[] supportRequestStream = Files.readAllBytes(resource.getFile().toPath());
+        SupportRequest supportRequest = new ObjectMapper().readValue(supportRequestStream, new TypeReference<>() {
+        });
+        supportRequest.setUserId(UUID.randomUUID().toString());
+        supportRequest.setData("%7B%22logId%22%3A%20%22hello%20world%22%7D");
+
+        ClassPathResource userResource = new ClassPathResource("json/User.json");
+        byte[] userStream = Files.readAllBytes(userResource.getFile().toPath());
+        User user = new ObjectMapper().readValue(userStream, new TypeReference<>() {
+        });
+
+        when(userRegistryRestClient.getUserByInternalId(UUID.fromString(supportRequest.getUserId()), USER_FIELD_LIST)).thenReturn(user);
+
+        SupportResponse response = supportServiceImpl.sendRequest(supportRequest);
+
+        Assertions.assertEquals(expectation.getRedirectUrl(), response.getRedirectUrl());
+        Assertions.assertEquals(expectation.getActionUrl(), response.getActionUrl());
+        Assertions.assertNotNull(response.getJwt());
+        Mockito.verify(userRegistryRestClient, Mockito.times(1)).getUserByInternalId(UUID.fromString((supportRequest.getUserId())), USER_FIELD_LIST);
+    }
+
+    @Test
     void sendRequest_userIdNotFound() throws IOException {
 
         ClassPathResource resource = new ClassPathResource("json/SupportRequest.json");

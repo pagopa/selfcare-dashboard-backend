@@ -27,7 +27,7 @@ services:
 
   azure-cli:
     build:
-      context: "/."
+      context: "."
       dockerfile: "integration-test-config/azure-cli/Dockerfile-azure-cli"
     container_name: azure-cli
     depends_on:
