@@ -19,9 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static com.mongodb.assertions.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserApiSteps{
 
