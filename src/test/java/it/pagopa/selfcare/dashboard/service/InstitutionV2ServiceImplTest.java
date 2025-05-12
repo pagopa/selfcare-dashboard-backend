@@ -5,6 +5,8 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.OnboardingRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
@@ -46,6 +48,7 @@ import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
 import static it.pagopa.selfcare.commons.base.security.PartyRole.OPERATOR;
 import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.PENDING;
 import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.TOBEVALIDATED;
+import static it.pagopa.selfcare.onboarding.common.ProductId.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -365,5 +368,54 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
 
         assertFalse(actualResponse);
+    }
+
+    @Test
+    void getOnboardingsInfo_WithoutFilter() {
+        String institutionId = "institutionId";
+
+        OnboardingResponse onboardingResponsePagopa = new OnboardingResponse();
+        onboardingResponsePagopa.setProductId(PROD_PAGOPA.name());
+        onboardingResponsePagopa.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        OnboardingResponse onboardingResponseIo = new OnboardingResponse();
+        onboardingResponseIo.setProductId(PROD_IO.name());
+        onboardingResponseIo.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboardingResponsePagopa, onboardingResponseIo));
+
+        doReturn(ResponseEntity.of(Optional.of(onboardingsResponse)))
+                .when(coreInstitutionApiRestClient)
+                ._getOnboardingsInstitutionUsingGET(institutionId, null);
+
+        OnboardingsResponse response = institutionV2Service.getOnboardingsInfoResponse(institutionId, null);
+        Assertions.assertEquals(2, response.getOnboardings().size());
+    }
+
+
+    @Test
+    void getOnboardingsInfo_WithFilter() {
+        String institutionId = "institutionId";
+        List<String> products = List.of(PROD_PAGOPA.name(), PROD_DASHBOARD_PSP.name());
+
+        OnboardingResponse onboardingResponsePagopa = new OnboardingResponse();
+        onboardingResponsePagopa.setProductId(PROD_PAGOPA.name());
+        onboardingResponsePagopa.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        OnboardingResponse onboardingResponseDashboard = new OnboardingResponse();
+        onboardingResponseDashboard.setProductId(PROD_DASHBOARD_PSP.name());
+        onboardingResponseDashboard.setStatus(OnboardingResponse.StatusEnum.DELETED);
+        OnboardingResponse onboardingResponseIo = new OnboardingResponse();
+        onboardingResponseIo.setProductId(PROD_IO.name());
+        onboardingResponseIo.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboardingResponsePagopa, onboardingResponseDashboard, onboardingResponseIo));
+
+        doReturn(ResponseEntity.of(Optional.of(onboardingsResponse)))
+                .when(coreInstitutionApiRestClient)
+                ._getOnboardingsInstitutionUsingGET(institutionId, null);
+
+        OnboardingsResponse response = institutionV2Service.getOnboardingsInfoResponse(institutionId, products);
+        Assertions.assertEquals(1, response.getOnboardings().size());
     }
 }

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.model.InstitutionResource;
@@ -15,12 +16,10 @@ import it.pagopa.selfcare.dashboard.model.delegation.Order;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.OnboardingMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2;
-import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
-import it.pagopa.selfcare.dashboard.model.user.UserIdResource;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
@@ -52,6 +51,7 @@ public class InstitutionV2Controller {
     private final InstitutionResourceMapper institutionResourceMapper;
     private final UserMapper userMapper;
     private final UserMapperV2 userMapperV2;
+    private final OnboardingMapper onboardingMapper;
     private final DelegationService delegationService;
 
     @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -240,6 +240,32 @@ public class InstitutionV2Controller {
         UserCountResource result = userMapperV2.toUserCountResource(userCount);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserCount result = {}", result);
         log.trace("getUserCount end");
+        return result;
+    }
+
+    @GetMapping(value = "/{institutionId}/onboardings-info", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getOnboardingsInfo}", nickname = "v2GetOnboardingsInfo")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewContract')")
+    public List<OnboardingInfo> getOnboardingsInfo(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                    @PathVariable("institutionId")
+                                                    String institutionId,
+                                                   @ApiParam(value = "${swagger.dashboard.institutions.model.products}")
+                                                    @RequestParam(name = "products", required = false) String[] products) {
+        log.trace("getOnboardingsInfo start");
+        OnboardingsResponse onboardingsResponse =
+                institutionV2Service.getOnboardingsInfoResponse(
+                        institutionId,
+                        Optional.ofNullable(products).map(Arrays::asList).orElse(Collections.emptyList())
+                );
+
+        List<OnboardingInfo> result =
+                onboardingsResponse.getOnboardings().stream()
+                        .map(onboardingMapper::toOnboardingInfo)
+                        .toList();
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getOnboardingsInfo result = {}", result);
+        log.trace("getOnboardingsInfo end");
         return result;
     }
 }

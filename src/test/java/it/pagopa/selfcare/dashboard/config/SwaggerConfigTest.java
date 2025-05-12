@@ -88,6 +88,9 @@ class SwaggerConfigTest {
     @MockBean
     private InstitutionResourceMapper institutionResourceMapper;
 
+    @MockBean
+    private OnboardingMapper onboardingMapper;
+
     @Autowired
     WebApplicationContext context;
 
