@@ -30,4 +30,5 @@ public class Filter {
     private String taxCode;
     private String email;
     private String mobilePhone;
+    private List<String> products;
 }

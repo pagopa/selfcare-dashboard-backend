@@ -214,4 +214,17 @@ public class DashboardBaseSteps{
         Assertions.assertEquals(expectedStatusCode, dashboardStepsUtil.status);
     }
 
+    @And("the products are {string}")
+    public void theProductsAre(String roles) {
+        String[] fieldsArray = roles.split(",");
+        dashboardStepsUtil.filter.setProducts(List.of(fieldsArray));
+    }
+
+    @And("The response body is a list of size {int}")
+    public void checkResponseBodySize(int expectedSize) {
+        List<?> responseList = dashboardStepsUtil.getResponse().body().jsonPath().getList("$");
+        Assertions.assertEquals(expectedSize, responseList.size());
+    }
+
+
 }

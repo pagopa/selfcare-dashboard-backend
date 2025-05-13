@@ -245,7 +245,12 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     @Override
     public Page<UserGroup> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable) {
         log.trace("getUserGroups start");
-        log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(userId.toString()), Encode.forJava(pageable.toString()));
+        log.debug("getUserGroups institutionId = {}, productId = {}, userId = {}, pageable = {}",
+                Encode.forJava(institutionId),
+                Encode.forJava(productId),
+                Encode.forJava(Optional.ofNullable(userId).map(Object::toString).orElse("")),
+                Encode.forJava(Optional.ofNullable(pageable).map(Object::toString).orElse(""))
+        );
         UserGroupFilter userGroupFilter = new UserGroupFilter();
         userGroupFilter.setInstitutionId(Optional.ofNullable(institutionId));
         userGroupFilter.setUserId(Optional.ofNullable(userId));
