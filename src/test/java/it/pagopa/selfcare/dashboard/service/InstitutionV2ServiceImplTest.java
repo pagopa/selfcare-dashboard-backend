@@ -74,7 +74,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     private UserMapperImpl userMapper;
 
     @BeforeEach
-    public void init() {
+    void init() {
         super.setUp();
     }
 
