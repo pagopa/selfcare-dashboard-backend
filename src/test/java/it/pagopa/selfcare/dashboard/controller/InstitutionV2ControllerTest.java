@@ -3,18 +3,18 @@ package it.pagopa.selfcare.dashboard.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
+import it.pagopa.selfcare.dashboard.model.mapper.OnboardingMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
-import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
-import it.pagopa.selfcare.dashboard.model.user.UserToCreate;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
@@ -40,12 +40,13 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
+import static it.pagopa.selfcare.onboarding.common.ProductId.PROD_IO;
+import static it.pagopa.selfcare.onboarding.common.ProductId.PROD_IO_PREMIUM;
 import static it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState.PENDING;
 import static it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.DELEGATE;
 import static it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.MANAGER;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -66,7 +67,8 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     DelegationService delegationServiceMock;
     @Spy
     private UserMapperV2Impl userMapper;
-
+    @Spy
+    private OnboardingMapperImpl onboardingMapper;
     @Spy
     private UserMapperImpl userMapperImpl;
     @Spy
@@ -550,6 +552,37 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         verifyNoMoreInteractions(userServiceMock);
     }
 
+    @Test
+    void getOnboardingsInfo() throws Exception {
+        final String institutionId = "institutionId";
+        final String[] products = { PROD_IO.name(),  PROD_IO_PREMIUM.name() };
+        final OnboardingsResponse onboardingsResponse = getOnboardingsResponse();
+
+        when(institutionV2ServiceMock.getOnboardingsInfoResponse(institutionId, Arrays.asList(products))).thenReturn(onboardingsResponse);
+
+        final MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/onboardings-info", institutionId)
+                        .queryParam("products", products)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        List<OnboardingInfo> resource = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        assertEquals(onboardingsResponse.getOnboardings().get(0).getProductId(), resource.get(0).getProductId());
+        assertEquals(onboardingsResponse.getOnboardings().get(0).getStatus().getValue(), resource.get(0).getStatus());
+        assertTrue(resource.get(0).getContractAvailable());
+        assertEquals(onboardingsResponse.getOnboardings().get(1).getProductId(), resource.get(1).getProductId());
+        assertEquals(onboardingsResponse.getOnboardings().get(1).getStatus().getValue(), resource.get(1).getStatus());
+        assertFalse(resource.get(1).getContractAvailable());
+
+        verify(institutionV2ServiceMock, times(1))
+                .getOnboardingsInfoResponse(institutionId, Arrays.asList(products));
+        verifyNoMoreInteractions(institutionV2ServiceMock);
+    }
+
+
     private static UsersCountResponse getUsersCountResponse() {
         final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(MANAGER, DELEGATE);
         final List<OnboardedProductState> expectedStatus = List.of(OnboardedProductState.PENDING, OnboardedProductState.ACTIVE);
@@ -574,5 +607,22 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         delegation.setInstitutionName("setInstitutionFromName");
         delegation.setBrokerName("setInstitutionFromRootName");
         return delegation;
+    }
+
+    private static OnboardingsResponse getOnboardingsResponse() {
+        final OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+
+        final OnboardingResponse onboardingResponse = new OnboardingResponse();
+        onboardingResponse.setProductId(PROD_IO.name());
+        onboardingResponse.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboardingResponse.setContract("contract");
+
+        final OnboardingResponse onboardingResponse1 = new OnboardingResponse();
+        onboardingResponse1.setProductId(PROD_IO_PREMIUM.name());
+        onboardingResponse1.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+
+        onboardingsResponse.setOnboardings(List.of(onboardingResponse, onboardingResponse1));
+
+        return onboardingsResponse;
     }
 }

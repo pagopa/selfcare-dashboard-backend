@@ -2,6 +2,8 @@ package it.pagopa.selfcare.dashboard.service;
 
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.OnboardingRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
@@ -146,6 +148,32 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         return institution;
     }
 
+    @Override
+    public OnboardingsResponse getOnboardingsInfoResponse(String institutionId, List<String> products) {
+        log.trace("getOnboardingsResponse start");
+
+        OnboardingsResponse onboardingsResponse = Optional.ofNullable(
+                coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null).getBody()
+        ).orElse(new OnboardingsResponse());
+
+        List<OnboardingResponse> filteredOnboardings = Optional.ofNullable(products)
+                .filter(prods -> !prods.isEmpty())
+                .map(prods -> onboardingsResponse.getOnboardings().stream()
+                        .filter(onboarding -> prods.contains(onboarding.getProductId()) && OnboardingResponse.StatusEnum.ACTIVE.equals(onboarding.getStatus()))
+                        .toList())
+                .orElse(onboardingsResponse.getOnboardings().stream()
+                        .filter(onboarding -> OnboardingResponse.StatusEnum.ACTIVE.equals(onboarding.getStatus()))
+                        .toList());
+
+        OnboardingsResponse filteredResponse = new OnboardingsResponse();
+        filteredResponse.setOnboardings(filteredOnboardings);
+
+        log.trace("getOnboardingsResponse end");
+        return filteredResponse;
+    }
+
+
+
     private OnboardedProductWithActions getOnBoardedProductWithActions(String productId, UserInstitutionWithActionsDto userInstitutionWithActionsDto) {
         return userInstitutionWithActionsDto.getProducts().stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);
     }
@@ -165,8 +193,10 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     }
 
     private static boolean checkOnboardingPresence(ResponseEntity<OnboardingGetResponse> response) {
-        return Objects.nonNull(response)
-                && Objects.nonNull(response.getBody())
-                && !CollectionUtils.isEmpty(response.getBody().getItems());
+        return Optional.ofNullable(response)
+                .map(ResponseEntity::getBody)
+                .map(OnboardingGetResponse::getItems)
+                .filter(items -> !items.isEmpty())
+                .isPresent();
     }
 }
