@@ -193,8 +193,10 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     }
 
     private static boolean checkOnboardingPresence(ResponseEntity<OnboardingGetResponse> response) {
-        return Objects.nonNull(response)
-                && Objects.nonNull(response.getBody())
-                && !CollectionUtils.isEmpty(response.getBody().getItems());
+        return Optional.ofNullable(response)
+                .map(ResponseEntity::getBody)
+                .map(OnboardingGetResponse::getItems)
+                .filter(items -> !items.isEmpty())
+                .isPresent();
     }
 }
