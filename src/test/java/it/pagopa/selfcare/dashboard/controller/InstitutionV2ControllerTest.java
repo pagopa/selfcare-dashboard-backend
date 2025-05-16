@@ -26,15 +26,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -580,6 +585,31 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         verify(institutionV2ServiceMock, times(1))
                 .getOnboardingsInfoResponse(institutionId, Arrays.asList(products));
         verifyNoMoreInteractions(institutionV2ServiceMock);
+    }
+
+    @Test
+    void getContract() throws Exception {
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String text = "text";
+        byte[] bytes = text.getBytes();
+        InputStream is = new ByteArrayInputStream(bytes);
+
+        Resource resource = Mockito.mock(Resource.class);
+        when(resource.getInputStream()).thenReturn(is);
+        when(resource.getFilename()).thenReturn("contract.pdf");
+
+        when(institutionV2ServiceMock.getContract(institutionId, productId)).thenReturn(resource);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/contract", institutionId)
+                        .queryParam("productId", productId)
+                        .accept(MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().bytes(bytes))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=contract.pdf"));
+
+        verify(institutionV2ServiceMock, times(1)).getContract(institutionId, productId);
     }
 
 

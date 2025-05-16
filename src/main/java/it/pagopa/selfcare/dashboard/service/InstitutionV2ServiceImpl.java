@@ -6,6 +6,7 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.OnboardingRestClient;
+import it.pagopa.selfcare.dashboard.client.TokenRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,7 +47,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     private final UserApiRestClient userApiRestClient;
     private final CoreInstitutionApiRestClient coreInstitutionApiRestClient;
     private final OnboardingRestClient onboardingRestClient;
-
+    private final TokenRestClient tokenRestClient;
     private final UserMapper userMapper;
     private final InstitutionMapper institutionMapper;
 
@@ -54,11 +56,13 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
                                     UserApiRestClient userApiRestClient,
                                     CoreInstitutionApiRestClient coreInstitutionApiRestClient,
                                     OnboardingRestClient onboardingRestClient,
+                                    TokenRestClient tokenRestClient,
                                     UserMapper userMapper, InstitutionMapper institutionMapper) {
         this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
         this.userApiRestClient = userApiRestClient;
         this.coreInstitutionApiRestClient = coreInstitutionApiRestClient;
         this.onboardingRestClient = onboardingRestClient;
+        this.tokenRestClient = tokenRestClient;
         this.userMapper = userMapper;
         this.institutionMapper = institutionMapper;
     }
@@ -172,6 +176,26 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         return filteredResponse;
     }
 
+    @Override
+    public Resource getContract(String institutionId, String productId) {
+        OnboardingsResponse onboardingsResponse = Optional.ofNullable(
+                coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId).getBody()
+        ).orElseGet(() -> {
+            OnboardingsResponse emptyResponse = new OnboardingsResponse();
+            emptyResponse.setOnboardings(Collections.emptyList());
+            return emptyResponse;
+        });
+
+        OnboardingResponse onboarding = Optional.ofNullable(onboardingsResponse.getOnboardings())
+                .orElse(Collections.emptyList()).stream()
+                .filter(onb -> OnboardingResponse.StatusEnum.ACTIVE.equals(onb.getStatus()))
+                .max(Comparator.comparing(OnboardingResponse::getCreatedAt))
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No active onboarding found for institution " + institutionId + " and product " + productId
+                ));
+
+        return tokenRestClient._getContractSigned(onboarding.getTokenId()).getBody();
+    }
 
 
     private OnboardedProductWithActions getOnBoardedProductWithActions(String productId, UserInstitutionWithActionsDto userInstitutionWithActionsDto) {
@@ -188,7 +212,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     }
 
     private Boolean getOnboardingWithFilter(String taxCode, String subunitCode, String productId, String status) {
-        ResponseEntity<OnboardingGetResponse> response = onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, 1, status, subunitCode, taxCode, null);
+        ResponseEntity<OnboardingGetResponse> response = onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, null,1, null, status, subunitCode, taxCode, null, null);
         return checkOnboardingPresence(response);
     }
 

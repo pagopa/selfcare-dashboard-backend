@@ -1,8 +1,5 @@
 package it.pagopa.selfcare.dashboard.security;
 
-import io.cucumber.java.sl.In;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
@@ -10,23 +7,16 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.config.ExchangeTokenProperties;
-import it.pagopa.selfcare.dashboard.exception.InvalidRequestException;
 import it.pagopa.selfcare.dashboard.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.model.groups.UserGroup;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
-import it.pagopa.selfcare.dashboard.model.user.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
-import it.pagopa.selfcare.onboarding.common.PartyRole;
-import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.Institution;
 import it.pagopa.selfcare.product.entity.Product;
-import it.pagopa.selfcare.product.entity.ProductRole;
-import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
@@ -35,8 +25,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,29 +32,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.TestingAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.base.security.PartyRole.MANAGER;
-import static it.pagopa.selfcare.commons.utils.TestUtils.checkNotNullFields;
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.data.support.PageableExecutionUtils.getPage;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ExchangeTokenServiceV2Test {
