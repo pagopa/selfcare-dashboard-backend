@@ -9,6 +9,7 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.client.OnboardingRestClient;
+import it.pagopa.selfcare.dashboard.client.TokenRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
@@ -31,7 +32,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -40,6 +43,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +70,8 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     private OnboardingRestClient onboardingRestClient;
     @Mock
     private ProductService productService;
+    @Mock
+    private TokenRestClient tokenRestClient;
     @Spy
     private InstitutionMapperImpl institutionMapper;
     @Spy
@@ -305,14 +311,14 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         onboardingGetResponse.setItems(List.of(new OnboardingGet().productId(productId)));
         onboardingGetResponse.setCount((long) onboardingGetResponse.getItems().size());
 
-        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, 1, status, subunitCode, taxCode, null))
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, null,1, null, status, subunitCode, taxCode, null, null))
                 .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
 
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
 
         assertTrue(actualResponse);
         Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter(null, null, null, null, productId, 1, PENDING.name(), subunitCode, taxCode, null);
+                ._getOnboardingWithFilter(null, null, null, null, productId, null, 1, null, PENDING.name(), subunitCode, taxCode, null, null);
     }
 
     @Test
@@ -329,9 +335,9 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         doReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)))
                 .when(onboardingRestClient)
-                ._getOnboardingWithFilter(null, null, null, null, productId, 1, status, null, taxCode, null);
+                ._getOnboardingWithFilter(null, null, null, null, productId, null,1, null, status, null, taxCode, null, null);
 
-        boolean onboardingGetInfo = onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, 1, status, null, taxCode, null).getBody() != null;
+        boolean onboardingGetInfo = onboardingRestClient._getOnboardingWithFilter(null, null, null, null, productId, null, 1, null, status, null, taxCode, null, null).getBody() != null;
         Assertions.assertTrue(onboardingGetInfo);
     }
 
@@ -341,18 +347,18 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         onboardingGetResponse.setItems(List.of(new OnboardingGet().productId("test-product")));
         onboardingGetResponse.setCount((long) onboardingGetResponse.getItems().size());
 
-        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, PENDING.name(), null, "test-institution", null))
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", null,1, null, PENDING.name(), null, "test-institution", null, null))
                 .thenReturn(ResponseEntity.ok().build());
-        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, TOBEVALIDATED.name(), null, "test-institution", null))
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, TOBEVALIDATED.name(), null, "test-institution", null, null))
                 .thenReturn(ResponseEntity.of(Optional.of(onboardingGetResponse)));
 
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
 
         assertTrue(actualResponse);
         Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter(null, null, null, null, "test-product", 1, PENDING.name(), null, "test-institution", null);
+                ._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, PENDING.name(), null, "test-institution", null, null);
         Mockito.verify(onboardingRestClient, Mockito.times(1))
-                ._getOnboardingWithFilter(null, null, null, null, "test-product", 1, TOBEVALIDATED.name(), null, "test-institution", null);
+                ._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, TOBEVALIDATED.name(), null, "test-institution", null, null);
     }
 
     @Test
@@ -360,9 +366,9 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         OnboardingGetResponse onboardingGetResponse = new OnboardingGetResponse();
         onboardingGetResponse.setItems(List.of(new OnboardingGet().productId("test-product")));
         onboardingGetResponse.setCount((long) onboardingGetResponse.getItems().size());
-        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, PENDING.name(), null, "test-institution", null))
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, PENDING.name(), null, "test-institution", null, null))
                 .thenReturn(ResponseEntity.ok().build());
-        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", 1, TOBEVALIDATED.name(), null, "test-institution", null))
+        when(onboardingRestClient._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, TOBEVALIDATED.name(), null, "test-institution", null, null))
                 .thenReturn(ResponseEntity.ok().build());
 
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
@@ -417,5 +423,92 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         OnboardingsResponse response = institutionV2Service.getOnboardingsInfoResponse(institutionId, products);
         Assertions.assertEquals(1, response.getOnboardings().size());
+    }
+
+    @Test
+    void getContract_shouldReturnContract_whenActiveOnboardingExists() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String tokenId = "token123";
+        Resource expectedContract = new ByteArrayResource("contract".getBytes());
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setCreatedAt(OffsetDateTime.now());
+        onboarding.setTokenId(tokenId);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+        when(tokenRestClient._getContractSigned(tokenId))
+                .thenReturn(ResponseEntity.ok(expectedContract));
+
+        Resource result = institutionV2Service.getContract(institutionId, productId);
+
+        assertEquals(expectedContract, result);
+    }
+
+    @Test
+    void getContract_shouldThrowException_whenNoActiveOnboarding() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.DELETED);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                institutionV2Service.getContract(institutionId, productId)
+        );
+    }
+
+    @Test
+    void getContract_shouldHandleNullResponseBody() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+                .thenReturn(ResponseEntity.ok(null));
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                institutionV2Service.getContract(institutionId, productId)
+        );
+    }
+
+    @Test
+    void getContract_shouldReturnMostRecentActiveOnboarding() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String tokenId = "token-latest";
+        Resource expectedContract = new ByteArrayResource("contract".getBytes());
+
+        OnboardingResponse older = new OnboardingResponse();
+        older.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        older.setCreatedAt(OffsetDateTime.now().minusDays(1));
+        older.setTokenId("token-old");
+
+        OnboardingResponse newer = new OnboardingResponse();
+        newer.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        newer.setCreatedAt(OffsetDateTime.now());
+        newer.setTokenId(tokenId);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(older, newer));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+        when(tokenRestClient._getContractSigned(tokenId))
+                .thenReturn(ResponseEntity.ok(expectedContract));
+
+        Resource result = institutionV2Service.getContract(institutionId, productId);
+
+        assertEquals(expectedContract, result);
     }
 }
