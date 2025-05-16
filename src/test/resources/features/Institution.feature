@@ -352,3 +352,21 @@ Feature: Institution
     And the institution ID is "c9a50656-f345-4c81-84be-5b2474470544"
     When I send a GET request to "/v2/institutions/{institutionId}/onboardings-info" to get onboardings info
     Then the response status should be 403
+
+  Scenario: Successfully get Contract
+    Given user login with username "j.doe" and password "test"
+    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-io"
+    When I send a GET request to "/v2/institutions/{institutionId}/contract" to get contract
+    Then the response status should be 200
+
+  Scenario: Attempt to get Contract without permission
+    Given user login with username "r.balboa" and password "test"
+    And the institution ID is "c9a50656-f345-4c81-84be-5b2474470544" and the product ID is "prod-io"
+    When I send a GET request to "/v2/institutions/{institutionId}/contract" to get contract
+    Then the response status should be 403
+
+  Scenario: Attempt to get a non-available contract
+    Given user login with username "j.doe" and password "test"
+    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-pagopa"
+    When I send a GET request to "/v2/institutions/{institutionId}/contract" to get contract
+    Then the response status should be 404
