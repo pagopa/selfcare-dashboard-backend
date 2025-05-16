@@ -286,7 +286,7 @@ public class InstitutionV2Controller {
                                                    @ApiParam(value = "${swagger.dashboard.products.model.id}")
                                                    @RequestParam(name = "productId") String productId) throws IOException {
         log.trace("getContract start");
-        log.debug("getContract institutionId = {}, productId = {}", institutionId, productId);
+        log.debug("getContract institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
         Resource contract = institutionV2Service.getContract(institutionId, productId);
         return getResponseEntity(contract);
     }
