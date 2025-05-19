@@ -292,9 +292,7 @@ public class InstitutionV2Controller {
     }
 
     private ResponseEntity<byte[]> getResponseEntity(Resource contract) throws IOException {
-        InputStream inputStream = null;
-        try {
-            inputStream = contract.getInputStream();
+        try (InputStream inputStream = contract.getInputStream()) {
             byte[] byteArray = IOUtils.toByteArray(inputStream);
 
             HttpHeaders headers = new HttpHeaders();
@@ -305,8 +303,6 @@ public class InstitutionV2Controller {
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(byteArray);
-        } finally {
-            IOUtils.close(inputStream);
         }
     }
 
