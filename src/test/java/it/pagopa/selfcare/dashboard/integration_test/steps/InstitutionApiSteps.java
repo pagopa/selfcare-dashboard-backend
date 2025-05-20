@@ -188,6 +188,34 @@ public class InstitutionApiSteps {
         }
     }
 
+    @When("I send a GET request to {string} to get contract")
+    public void whenISendAGetRequestToGetContract(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)) {
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        if (Objects.nonNull(dashboardStepsUtil.filter.getProductId())) {
+            requestSpecification.queryParam("productId", dashboardStepsUtil.filter.getProductId());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if (dashboardStepsUtil.status == 200) {
+            dashboardStepsUtil.setResponse(response);
+        } else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
     @And("the following geo-taxonomy request details:")
     public void theFollowingGeoTaxonomyRequestDetails(List<GeographicTaxonomyDto> geographicTaxonomyDtos) {
         GeographicTaxonomyListDto geographicTaxonomyListDto = new GeographicTaxonomyListDto();

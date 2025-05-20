@@ -26,7 +26,10 @@ import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.owasp.encoder.Encode;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +39,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 
 @Slf4j
@@ -268,4 +275,36 @@ public class InstitutionV2Controller {
         log.trace("getOnboardingsInfo end");
         return result;
     }
+
+    @GetMapping(value = "/{institutionId}/contract", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getContract}", nickname = "v2GetContract")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewContract')")
+    public ResponseEntity<byte[]> getContract(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                                   @PathVariable("institutionId")
+                                                   String institutionId,
+                                                   @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                                   @RequestParam(name = "productId") String productId) throws IOException {
+        log.trace("getContract start");
+        log.debug("getContract institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
+        Resource contract = institutionV2Service.getContract(institutionId, productId);
+        return getResponseEntity(contract);
+    }
+
+    private ResponseEntity<byte[]> getResponseEntity(Resource contract) throws IOException {
+        try (InputStream inputStream = contract.getInputStream()) {
+            byte[] byteArray = IOUtils.toByteArray(inputStream);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, APPLICATION_OCTET_STREAM_VALUE);
+            headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + contract.getFilename());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(byteArray);
+        }
+    }
+
+
 }

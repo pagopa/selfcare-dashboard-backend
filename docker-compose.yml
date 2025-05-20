@@ -36,6 +36,7 @@ services:
       - develop-network
     volumes:
       - "./integration-test-config/blobStorageInit/initAzurite.sh:/initAzurite.sh"
+      - "./integration-test-config/blobStorageInit/signed_IO_accordo_adesione.pdf:/workspace/signed_IO_accordo_adesione.pdf"
     environment:
       - SELFCARE_INFRA_PRIVATE_ENV=dev
       - GITHUB_TOKEN=REPLACE_WITH_TOKEN
