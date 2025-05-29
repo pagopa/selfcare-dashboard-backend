@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.service;
 
-import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
@@ -27,8 +26,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -50,6 +47,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     private final TokenRestClient tokenRestClient;
     private final UserMapper userMapper;
     private final InstitutionMapper institutionMapper;
+    private final UserV2ServiceImpl userV2Service;
 
     @Autowired
     public InstitutionV2ServiceImpl(@Value("${dashboard.institution.getUsers.filter.states}") String[] allowedStates,
@@ -57,7 +55,9 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
                                     CoreInstitutionApiRestClient coreInstitutionApiRestClient,
                                     OnboardingRestClient onboardingRestClient,
                                     TokenRestClient tokenRestClient,
-                                    UserMapper userMapper, InstitutionMapper institutionMapper) {
+                                    UserMapper userMapper,
+                                    InstitutionMapper institutionMapper,
+                                    UserV2ServiceImpl userV2Service) {
         this.allowedStates = allowedStates != null && allowedStates.length != 0 ? Arrays.stream(allowedStates).map(RelationshipState::valueOf).toList() : null;
         this.userApiRestClient = userApiRestClient;
         this.coreInstitutionApiRestClient = coreInstitutionApiRestClient;
@@ -65,6 +65,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         this.tokenRestClient = tokenRestClient;
         this.userMapper = userMapper;
         this.institutionMapper = institutionMapper;
+        this.userV2Service = userV2Service;
     }
 
     @Override
@@ -89,32 +90,9 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(userInfoFilter, A_USER_INFO_FILTER_OBJECT_IS_REQUIRED);
 
-        return getUsers(institutionId, userInfoFilter, loggedUserId)
+        return userV2Service.getUsers(institutionId, userInfoFilter, loggedUserId)
                 .stream()
                 .findFirst();
-    }
-
-    private Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
-        log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
-
-        List<String> roles = Arrays.stream(PartyRole.values())
-                .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
-                .map(Enum::name)
-                .toList();
-
-        return Optional.ofNullable(userApiRestClient._retrieveUsers(institutionId,
-                                loggedUserId,
-                                userInfoFilter.getUserId(),
-                                userInfoFilter.getProductRoles(),
-                                StringUtils.hasText(userInfoFilter.getProductId()) ? List.of(userInfoFilter.getProductId()) : null,
-                                !CollectionUtils.isEmpty(roles) ? roles : null,
-                                !CollectionUtils.isEmpty(userInfoFilter.getAllowedStates()) ? userInfoFilter.getAllowedStates().stream().map(Enum::name).toList() : null)
-                        .getBody())
-                .map(userDataResponses -> userDataResponses.stream()
-                        .map(userMapper::toUserInfo)
-                        .toList())
-                .orElse(Collections.emptyList());
     }
 
     @Override

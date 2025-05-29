@@ -194,6 +194,15 @@ Feature: User
     Then the response status should be 200
     And the response should contain 5 items
 
+  Scenario: Successfully retrieve users for given institutionId with roles and product filter
+    Given user login with username "j.doe" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
+    And the roles are "DELEGATE"
+    When I send a GET request to "/v2/users/institution/{institutionId}" to retrieve user product data
+    Then the response status should be 200
+    And the response should contain 1 items
+
   Scenario: Successfully retrieve users for given institutionId with productId filter
     Given user login with username "j.doe" and password "test"
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"

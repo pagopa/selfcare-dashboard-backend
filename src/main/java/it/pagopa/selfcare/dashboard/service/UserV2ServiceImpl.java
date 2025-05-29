@@ -177,23 +177,18 @@ public class UserV2ServiceImpl implements UserV2Service {
         return result;
     }
 
-    private Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
+    public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
-
-        List<String> roles = Arrays.stream(it.pagopa.selfcare.commons.base.security.PartyRole.values())
-                .filter(partyRole -> partyRole.getSelfCareAuthority().equals(userInfoFilter.getRole()))
-                .map(Enum::name)
-                .toList();
 
         return Optional.ofNullable(userApiRestClient._retrieveUsers(institutionId,
                                 loggedUserId,
                                 userInfoFilter.getUserId(),
                                 userInfoFilter.getProductRoles(),
                                 StringUtils.hasText(userInfoFilter.getProductId()) ? List.of(userInfoFilter.getProductId()) : null,
-                                !CollectionUtils.isEmpty(roles) ? roles : null,
+                                userInfoFilter.getRoles(),
                                 !CollectionUtils.isEmpty(userInfoFilter.getAllowedStates()) ? userInfoFilter.getAllowedStates().stream().map(Enum::name).toList() : null)
                         .getBody())
                 .map(userDataResponses -> userDataResponses.stream()
