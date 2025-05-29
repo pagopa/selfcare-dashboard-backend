@@ -13,7 +13,6 @@ import it.pagopa.selfcare.dashboard.client.TokenRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
@@ -39,7 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -78,6 +76,8 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     private ProductMapper productMapper;
     @Spy
     private UserMapperImpl userMapper;
+    @Mock
+    private UserV2ServiceImpl userV2Service;
 
     @BeforeEach
     void init() {
@@ -106,17 +106,8 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setUserId(userId);
-        userInfoFilter.setAllowedStates(List.of(RelationshipState.ACTIVE));
 
-        when(userApiRestClient._retrieveUsers(
-                institutionId,
-                loggedUserId,
-                userInfoFilter.getUserId(),
-                userInfoFilter.getProductRoles(),
-                StringUtils.hasText(userInfoFilter.getProductId()) ? List.of(userInfoFilter.getProductId()) : null,
-                null,
-                null))
-                .thenReturn(ResponseEntity.ok().build());
+        when(userV2Service.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(Collections.emptyList());
 
         assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.getInstitutionUser(institutionId, userId, loggedUserId));
     }
@@ -139,14 +130,11 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         userData.setUserId("123e4567-e89b-12d3-a456-426614174000");
         userData.setRole("MANAGER");
 
-        when(userApiRestClient._retrieveUsers(institutionId,
-                loggedUserId, userInfoFilter.getUserId(),null, null, null, null)).thenReturn(ResponseEntity.ok(List.of(userData)));
+        when(userV2Service.getUsers(institutionId, userInfoFilter, loggedUserId)).thenReturn(userInfo);
 
         UserInfo actualUserInfo = institutionV2Service.getInstitutionUser("institutionId", "userId", "loggedUserId");
         assertEquals(userInfo.get(0).getId(), actualUserInfo.getId());
-        Mockito.verify(userApiRestClient, Mockito.times(1))._retrieveUsers(institutionId,
-                loggedUserId,
-                userInfoFilter.getUserId(), null, null, null, null);
+        Mockito.verify(userV2Service, Mockito.times(1)).getUsers(institutionId, userInfoFilter, loggedUserId);
     }
 
     @Test
