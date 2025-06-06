@@ -44,3 +44,7 @@ resilience4j:
         wait-duration: 5s
         retry-exceptions:
           - feign.RetryableException
+
+feature:
+  viewcontract:
+    enabled: ${FEATURE_VIEWCONTRACT_ENABLED:false}
