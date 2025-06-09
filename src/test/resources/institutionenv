@@ -20,7 +20,7 @@ STORAGE_ENDPOINT=localhost
 BLOB_STORAGE_PRODUCT_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
 PRODUCT_STORAGE_CONTAINER=products
 
-SELFCARE_USER_URL=http://userms:8080
+SELFCARE_USER_URL=http://userms:8081
 USERVICE_USER_REGISTRY_URL=http://mockserver:1080/user-registry-mock/v1
 USERVICE_PARTY_REGISTRY_PROXY_URL=http://mockserver:1080/party-registry-mock
 USER_REGISTRY_API_KEY=123
