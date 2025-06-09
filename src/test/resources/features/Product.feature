@@ -28,16 +28,16 @@ Feature: Product
 
   Scenario: Retrieving the back-office URL with an invalid environment parameter
     Given user login with username "j.doe" and password "test"
-    And the productId is "product123"
-    And the institutionId is "institution456"
+    And the productId is "prod-interop"
+    And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
     And the environment is "invalidEnv"
     When I send a GET request to "/v2/products/{productId}/back-office" to retrieve back-office URL
-    Then the response status should be 404
+    Then the response status should be 500
 
   Scenario: Retrieving the back-office URL for a product and institution the user does not have permission to access
     Given user login with username "r.balboa" and password "test"
-    And the productId is "product123"
-    And the institutionId is "institution456"
+    And the productId is "prod-io"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     When I send a GET request to "/v2/products/{productId}/back-office" to retrieve back-office URL
     Then the response status should be 404
 

@@ -22,13 +22,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-bom</artifactId>
-                <version>7.20.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>5.10.1</version>
@@ -87,12 +80,6 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
             <version>1.50</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-java</artifactId>
-            <version>7.20.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -206,6 +193,12 @@
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>4.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.pagopa.selfcare</groupId>
+            <artifactId>cucumber-sdk</artifactId>
+            <version>0.0.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -431,6 +424,11 @@
             <id>selfcare-onboarding</id>
             <name>Selfcare Onboarding SDK</name>
             <url>https://maven.pkg.github.com/pagopa/selfcare-onboarding</url>
+        </repository>
+        <repository>
+            <id>selfcare</id>
+            <name>Selfcare SDK</name>
+            <url>https://maven.pkg.github.com/pagopa/selfcare</url>
         </repository>
     </repositories>
 </project>

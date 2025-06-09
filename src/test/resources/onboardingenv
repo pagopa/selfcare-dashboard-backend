@@ -1,0 +1,14 @@
+MONGODB-CONNECTION-STRING=mongodb://mongodb:27017/
+JWT-PUBLIC-KEY=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnpt9gVNzDW6FpBk/TwNCqd+URprAD3tfGhYWhq2sAxDAP5u9GxgHybFQ8XGNY3yeb9rp5lxLqAcxOg5j19i0tvjkK/Q7GUezteY8xpEfRLJxglIaux/sM8M82YiHCwAjgQPF+EmIPboER5fLLnvDXyl+FYzcGhwPc8Z8AGlYjv8mgijrffSpbjtd7FF0I6WxIqKFHFhIsfUMezBa7NTMSIrxp5dACCMetrKkggTK3Yq8DP86nWuSdDsjIGLrIQFuMQOALr46cSafvHMFK5B/iIDfFLAek7Kg2tELHXWdcctjdPwsc38EXb3P2Fi70WOcLg9lAx9EDgizVLaG5obCCQIDAQAB
+
+USER-REGISTRY-API-KEY=123
+USER_REGISTRY_URL=http://mockserver:1080/user-registry-mock/v1
+MS_CORE_URL=http://institutionms:8082
+MS_PARTY_REGISTRY_URL=http://mockserver:1080/party-registry-mock
+
+MS_USER_URL=http://userms:8080
+ONBOARDING_ALLOWED_INSTITUTIONS_PRODUCTS={'prod-interop': ['0123456789']}
+STORAGE_CONTAINER_PRODUCT=products
+BLOB-STORAGE-PRODUCT-CONNECTION-STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+STORAGE_CONTAINER_CONTRACT=resources
+BLOB-STORAGE-CONTRACT-CONNECTION-STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
