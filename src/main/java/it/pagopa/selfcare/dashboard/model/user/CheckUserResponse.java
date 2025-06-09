@@ -9,11 +9,11 @@ import lombok.Data;
 public class CheckUserResponse {
 
     @ApiModelProperty(value = "${swagger.dashboard.institutions.model.checkUserResponse}")
-    private final Boolean result;
+    private final Boolean isUserOnboarded;
 
     @JsonCreator
-    public CheckUserResponse(@JsonProperty("result") Boolean result) {
-        this.result = result;
+    public CheckUserResponse(@JsonProperty("isUserOnboarded") Boolean isUserOnboarded) {
+        this.isUserOnboarded = isUserOnboarded;
     }
 }
 

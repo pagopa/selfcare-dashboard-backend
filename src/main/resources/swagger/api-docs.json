@@ -3469,7 +3469,7 @@
         "title" : "CheckUserResponse",
         "type" : "object",
         "properties" : {
-          "result" : {
+          "isUserOnboarded" : {
             "type" : "boolean",
             "description" : "Boolean indicating the presence of a user given its fiscal code, institutionId and productId",
             "example" : false

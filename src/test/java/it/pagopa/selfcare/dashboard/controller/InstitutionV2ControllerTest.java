@@ -628,7 +628,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
                         .contentType(APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(userDto)))
                         .andExpect(status().isOk())
-                        .andExpect(content().string("{\"result\":true}"))
+                        .andExpect(content().string("{\"isUserOnboarded\":true}"))
                         .andReturn();
 
         verify(userServiceMock, times(1)).checkUser(fiscalCode, institutionId, productId);
