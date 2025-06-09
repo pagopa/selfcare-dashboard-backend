@@ -1241,7 +1241,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "type" : "boolean"
+                  "$ref" : "#/components/schemas/CheckUserResponse"
                 }
               }
             }
@@ -3462,6 +3462,17 @@
           "value" : {
             "type" : "string",
             "description" : "Field value"
+          }
+        }
+      },
+      "CheckUserResponse" : {
+        "title" : "CheckUserResponse",
+        "type" : "object",
+        "properties" : {
+          "result" : {
+            "type" : "boolean",
+            "description" : "Boolean indicating the presence of a user given its fiscal code, institutionId and productId",
+            "example" : false
           }
         }
       },

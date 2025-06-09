@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.model.user.CheckUserResponse;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -256,7 +257,7 @@ public class UserApiSteps{
 
         dashboardStepsUtil.status = response.statusCode();
         if(dashboardStepsUtil.status == 200){
-            dashboardStepsUtil.responses.setCheckUserResponse(response.as(Boolean.class));
+            dashboardStepsUtil.responses.setCheckUserResponse(response.as(CheckUserResponse.class));
         }else{
             dashboardStepsUtil.errorMessage = response.body().asString();
         }

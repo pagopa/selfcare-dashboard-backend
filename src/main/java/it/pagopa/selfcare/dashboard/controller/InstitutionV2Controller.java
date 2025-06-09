@@ -308,7 +308,7 @@ public class InstitutionV2Controller {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.checkUser}", nickname = "v2CheckUser")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListProductUsers')")
-    public ResponseEntity<Boolean> checkUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public ResponseEntity<CheckUserResponse> checkUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
                                               @ApiParam(value = "${swagger.dashboard.products.model.id}")
                                               @PathVariable(name = "productId") String productId,
@@ -320,7 +320,7 @@ public class InstitutionV2Controller {
         log.debug("checkUser institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
         Boolean isUserAlreadyOnboarded = userService.checkUser(searchUserDto.getFiscalCode(), institutionId, productId);
         log.trace("checkUser end");
-        return ResponseEntity.ok().body(isUserAlreadyOnboarded);
+        return ResponseEntity.ok().body(new CheckUserResponse(isUserAlreadyOnboarded));
     }
 
 

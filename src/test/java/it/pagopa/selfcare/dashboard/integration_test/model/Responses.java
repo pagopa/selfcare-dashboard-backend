@@ -12,6 +12,7 @@ import it.pagopa.selfcare.dashboard.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductRoleMappingsResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.model.support.SupportResponse;
+import it.pagopa.selfcare.dashboard.model.user.CheckUserResponse;
 import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
 import it.pagopa.selfcare.dashboard.model.user.UserIdResource;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
@@ -43,5 +44,5 @@ public class Responses {
     private List<InstitutionBaseResource> institutionBaseResourceList;
     private UserIdResource userIdResource;
     private UserCountResource userCountResource;
-    private Boolean checkUserResponse;
+    private CheckUserResponse checkUserResponse;
 }
