@@ -482,5 +482,48 @@
       "templateType": "VELOCITY",
       "template": "{\"statusCode\":404,\"body\":{\"title\":\"Not Found\",\"status\":404,\"detail\":\"An error occurred during a downstream service request\",\"instance\":\"/users/35a78332-d038-4bfa-8e85-2cba7f6b7bf7\"}}"
     }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/user-registry-mock/v1/users/search",
+      "queryStringParameters": {
+        "fl": [
+          "name,familyName,fiscalCode"
+        ]
+      },
+      "body": {
+        "type": "JSON",
+        "json": {
+          "fiscalCode": "blbrki80A41H401T"
+        }
+      }
+    },
+    "httpResponseTemplate": {
+      "templateType": "VELOCITY",
+      "template": "{\"statusCode\":200,\"body\":{\"id\":\"35a78332-d038-4bfa-8e85-2cba7f6b7bf7\",\"fiscalCode\":\"blbrki80A41H401T\",\"name\":{\"certification\":\"SPID\",\"value\":\"rocky\"},\"familyName\":{\"certification\":\"SPID\",\"value\":\"Balboa\"}}}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/user-registry-mock/v1/users/search",
+      "queryStringParameters": {
+        "fl": [
+          "name,familyName,fiscalCode"
+        ]
+      },
+      "body": {
+        "type": "JSON",
+        "json": {
+          "fiscalCode": "CCCVTNT80A41H401C"
+        },
+        "matchType": "STRICT"
+      }
+    },
+    "httpResponseTemplate": {
+      "templateType": "VELOCITY",
+      "template": "{\"statusCode\":404,\"body\":\"Not Found\"}"
+    }
   }
 ]

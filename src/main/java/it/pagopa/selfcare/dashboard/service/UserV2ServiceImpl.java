@@ -269,6 +269,15 @@ public class UserV2ServiceImpl implements UserV2Service {
         return userCount;
     }
 
+    @Override
+    public Boolean checkUser(String fiscalCode, String institutionId, String productId) {
+        SearchUserDto searchUserDto = SearchUserDto
+                .builder()
+                .fiscalCode(fiscalCode)
+                .build();
+        return userInstitutionApiRestClient._checkUserUsingPOST(institutionId, productId, searchUserDto).getBody();
+    }
+
 
     private Institution verifyOnboardingStatus(String institutionId, String productId) {
         Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());

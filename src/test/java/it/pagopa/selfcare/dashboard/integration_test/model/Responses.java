@@ -43,4 +43,5 @@ public class Responses {
     private List<InstitutionBaseResource> institutionBaseResourceList;
     private UserIdResource userIdResource;
     private UserCountResource userCountResource;
+    private Boolean checkUserResponse;
 }

@@ -416,4 +416,9 @@ public class InstitutionApiSteps {
         Assertions.assertTrue(dashboardStepsUtil.responses.getInstitutionBaseResourceList().isEmpty());
     }
 
+    @And("the response of check-user should be {string}")
+    public void theCheckUserResponseShouldBeString(String expected) {
+        Assertions.assertEquals(expected, dashboardStepsUtil.getResponses().getCheckUserResponse().toString());
+    }
+
 }

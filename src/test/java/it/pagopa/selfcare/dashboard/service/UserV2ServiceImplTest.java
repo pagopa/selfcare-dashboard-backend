@@ -715,6 +715,21 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         verifyNoMoreInteractions(userInstitutionApiRestClient);
     }
 
+    @Test
+    void checkUser() {
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        final String fiscalCode = "fiscalCode";
+        SearchUserDto userDto = new SearchUserDto(fiscalCode);
+
+        when(userInstitutionApiRestClient._checkUserUsingPOST(institutionId, productId, userDto)).thenReturn(ResponseEntity.ok(Boolean.TRUE));
+
+        assertEquals(Boolean.TRUE, userV2ServiceImpl.checkUser(fiscalCode, institutionId, productId));
+        verify(userInstitutionApiRestClient, times(1))
+                ._checkUserUsingPOST(institutionId, productId,userDto);
+        verifyNoMoreInteractions(userInstitutionApiRestClient);
+    }
+
     private static UsersCountResponse getUsersCountResponse() {
         final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.MANAGER, it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.DELEGATE);
         final List<OnboardedProductState> expectedStatus = List.of(OnboardedProductState.PENDING, OnboardedProductState.ACTIVE);
