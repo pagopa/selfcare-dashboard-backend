@@ -11,12 +11,12 @@ Feature: UserGroups
     And the response should contain a valid user group id
 
   Scenario: Attempt to create a group without permissions
-    Given user login with username "j.doe" and password "test"
+    Given user login with username "r.balboa" and password "test"
     And the following user group details:
       | name       | description | productId       | institutionId                        | members                                                                   |
       | Group Name | TestGroup   | prod-io-premium | c9a50656-f345-4c81-84be-5b2474470544 | 525db33f-967f-4a82-8984-c606225e714a,a1b7c86b-d195-41d8-8291-7c3467abfd30 |
     When I send a POST request to "/v2/user-groups/" with the given details to create usergroup
-    Then the response status should be 404
+    Then the response status should be 403
 
   Scenario: Attempt to create a group with invalid members:
     Given user login with username "j.doe" and password "test"

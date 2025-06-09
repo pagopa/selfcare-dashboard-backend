@@ -7,13 +7,13 @@ Feature: Delegation
       | from                                 | to                                    | productId          | type | institutionToName | institutionFromName  |
       | c9a50656-f345-4c81-84be-5b2474470544 | 067327d3-bdd6-408d-8655-87e8f1960046  | prod-io-premium    | PT   | PT test           | Comune di Castelbuono|
     When I send a POST request to "/v1/delegations" to create a delegation
-    Then the response status should be 404
+    Then the response status should be 403
 
   Scenario: Successfully creating a delegation with valid data
     Given user login with username "j.doe" and password "test"
     And the following delegation request details:
       | from                                 | to                                    | productId  | type | institutionToName | institutionFromName  |
-      | c9a50656-f345-4c81-84be-5b2474470544 | 067327d3-bdd6-408d-8655-87e8f1960046  | prod-io    | PT   | PT test           | Comune di Castelbuono|
+      | c9a50656-f345-4c81-84be-5b2474470544 | 067327d3-bdd6-408d-8655-87e8f1960046  | prod-io    | AOO  | AOO test          | Comune di Castelbuono|
     When I send a POST request to "/v1/delegations" to create a delegation
     Then the response status should be 201
     And the response should contain a delegation id
@@ -67,7 +67,7 @@ Feature: Delegation
     Given user login with username "j.doe" and password "test"
     And the following delegation request details:
       | from                                 | to           | productId    | type | institutionToName | institutionFromName  |
-      | c9a50656-f345-4c81-84be-5b2474470544 | 99000870064  | prod-pagopa  | PT   | PT test           | Comune di Castelbuono|
+      | c9a50656-f345-4c81-84be-5b2474470544 | 99000870064  | prod-pagopa  | AOO  | AOO test          | Comune di Castelbuono|
     When I send a POST request to "/v1/delegations" to create a delegation
     Then the response status should be 201
     And the response should contain a delegation id
