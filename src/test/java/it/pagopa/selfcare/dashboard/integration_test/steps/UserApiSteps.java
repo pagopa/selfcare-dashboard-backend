@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.model.user.CheckUserResponse;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -227,6 +228,39 @@ public class UserApiSteps{
             dashboardStepsUtil.errorMessage = response.body().asString();
         }
 
+    }
+
+    @When("I send a POST request to {string} to check user from taxCode")
+    public void iSendAPOSTRequestToCheckUserFromTaxCode(String url) {
+
+        SearchUserDto searchUserDto = new SearchUserDto();
+
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.filter.getTaxCode())){
+            searchUserDto.setFiscalCode(dashboardStepsUtil.filter.getTaxCode());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .body(searchUserDto)
+                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
+                .pathParam("productId", dashboardStepsUtil.filter.getProductId())
+                .post(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 200){
+            dashboardStepsUtil.responses.setCheckUserResponse(response.as(CheckUserResponse.class));
+        }else{
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
     }
 
     @And("the user product should be {string} only on filtered product roles")

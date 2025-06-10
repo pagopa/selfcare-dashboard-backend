@@ -7,6 +7,7 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
+import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
@@ -612,6 +613,41 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         verify(institutionV2ServiceMock, times(1)).getContract(institutionId, productId);
     }
 
+    @Test
+    void checkUser() throws Exception {
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String fiscalCode = "fiscalCode";
+        SearchUserDto userDto = new SearchUserDto();
+        userDto.setFiscalCode(fiscalCode);
+
+        when(userServiceMock.checkUser(fiscalCode, institutionId, productId)).thenReturn(Boolean.TRUE);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post(BASE_URL + "/{institutionId}/product/{productId}/check-user", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                        .andExpect(status().isOk())
+                        .andExpect(content().string("{\"isUserOnboarded\":true}"))
+                        .andReturn();
+
+        verify(userServiceMock, times(1)).checkUser(fiscalCode, institutionId, productId);
+    }
+
+    @Test
+    void checkUser_nullFiscalCode() throws Exception {
+        String institutionId = "institutionId";
+        String productId = "productId";
+        SearchUserDto userDto = new SearchUserDto();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post(BASE_URL + "/{institutionId}/product/{productId}/check-user", institutionId, productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+    }
 
     private static UsersCountResponse getUsersCountResponse() {
         final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(MANAGER, DELEGATE);

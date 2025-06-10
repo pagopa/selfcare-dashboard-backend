@@ -34,4 +34,6 @@ public interface UserV2Service {
     void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role);
 
     UsersCountResponse getUserCount(String institutionId, String productId, List<String> roles, List<String> status);
+
+    Boolean checkUser(String fiscalCode, String institutionId, String productId);
 }
