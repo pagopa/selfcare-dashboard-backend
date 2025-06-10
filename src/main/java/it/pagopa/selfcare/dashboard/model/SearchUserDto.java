@@ -11,7 +11,7 @@ public class SearchUserDto {
 
     @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
     @JsonProperty(required = true)
-    @NotBlank
+    @NotBlank(message = "Fiscal code is required")
     private String fiscalCode;
 
 }

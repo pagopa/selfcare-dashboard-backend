@@ -8,9 +8,7 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.aspect.ApiFeatureFlag;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
-import it.pagopa.selfcare.dashboard.model.InstitutionResource;
-import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
+import it.pagopa.selfcare.dashboard.model.*;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationWithPagination;
 import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.model.delegation.Order;
@@ -305,6 +303,25 @@ public class InstitutionV2Controller {
                     .headers(headers)
                     .body(byteArray);
         }
+    }
+
+    @PostMapping(value = "/{institutionId}/product/{productId}/check-user")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.checkUser}", nickname = "v2CheckUser")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListProductUsers')")
+    public ResponseEntity<CheckUserResponse> checkUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId") String institutionId,
+                                              @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                              @PathVariable(name = "productId") String productId,
+                                              @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                              @RequestBody
+                                              @Valid
+                                              SearchUserDto searchUserDto) {
+        log.trace("checkUser start");
+        log.debug("checkUser institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
+        Boolean isUserAlreadyOnboarded = userService.checkUser(searchUserDto.getFiscalCode(), institutionId, productId);
+        log.trace("checkUser end");
+        return ResponseEntity.ok().body(new CheckUserResponse(isUserAlreadyOnboarded));
     }
 
 

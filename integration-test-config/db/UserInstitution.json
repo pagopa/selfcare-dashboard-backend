@@ -348,5 +348,66 @@
     ],
     "userId": "4a7be530-1c36-41f4-8967-c479fb2d7fa9",
     "userMailUuid": "ID_CONTACTS#4a7be530-1c36-41f4-8967-c479fb2d7fa9"
+  },
+  {
+    "_id": {
+      "$oid": "5882e1dfe058efba207e6293"
+    },
+    "institutionDescription": "Comune di Caserta",
+    "institutionId": "2a4c94f1-5d11-41f1-89e9-9fef0de4fbfe",
+    "products": [
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-io",
+        "productRole": "operator",
+        "role": "OPERATOR",
+        "status": "SUSPENDED",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      }
+    ],
+    "userId": "35a78332-d038-4bfa-8e85-2cba7f6b7bf7",
+    "userMailUuid": "ID_MAIL#9425e6ea-7d84-4c5e-9196-6f66b62800b2"
+  },
+  {
+    "_id": {
+      "$oid": "4832e1efe058efba207e6288"
+    },
+    "institutionDescription": "Comune di Caserta",
+    "institutionId": "2a4c94f1-5d11-41f1-89e9-9fef0de4fbfe",
+    "products": [
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-io",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      },
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-interop",
+        "productRole": "admin",
+        "role": "DELEGATE",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      }
+    ],
+    "userId": "97a511a7-2acc-47b9-afed-2f3c65753b4a",
+    "userMailUuid": "ID_CONTACTS#8370aa38-a2ab-404b-9b8a-10487167332e"
   }
 ]
