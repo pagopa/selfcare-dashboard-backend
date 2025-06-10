@@ -5,9 +5,9 @@ USER_REGISTRY_URL=http://mockserver:1080/user-registry-mock/v1
 MS_CORE_URL=http://institutionms:8082
 MS_PARTY_REGISTRY_URL=http://mockserver:1080/party-registry-mock
 
-
 ONBOARDING_ALLOWED_INSTITUTIONS_PRODUCTS={'prod-interop':['*'],'prod-pn':['*'],'prod-io':['*'],'prod-io-premium':['*'],'prod-pagopa':['*'],'prod-fd':['*'],'prod-fd-garantito': ['*']}
 STORAGE_CONTAINER_PRODUCT=products
 BLOB_STORAGE_CONN_STRING_PRODUCT=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
 STORAGE_CONTAINER_CONTRACT=resources
 BLOB_STORAGE_CONN_STRING_CONTRACT=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+BLOB-STORAGE-CONTRACT-CONNECTION-STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;

@@ -11,7 +11,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.ComposeContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.io.File;
@@ -30,7 +29,6 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest(classes = {SelfCareDashboardApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
-@ExcludeTags({/*"delegation", "institution", "product", "support", "token", "user", "userGroup"*/})
 public class CucumberSuite {
 
     private DashboardStepsUtil dashboardStepsUtil;
@@ -42,14 +40,6 @@ public class CucumberSuite {
 
         composeContainer = new ComposeContainer(new File("docker-compose.yml"))
                 .withLocalCompose(true)
-//                .withLogConsumer("userms", new Slf4jLogConsumer(log))
-                .withLogConsumer("institutionms", new Slf4jLogConsumer(log))
-//                .withLogConsumer("usergroupms", new Slf4jLogConsumer(log))
-//                .waitingFor("userms", Wait.forListeningPort())
- //              .waitingFor("institutionms", Wait.forListeningPort())
-//                .waitingFor("usergroupms", Wait.forListeningPort())
-                .waitingFor("institutionms", Wait.forLogMessage(".*Started SelfCareCoreApplication.*\\n", 1)
-                        .withStartupTimeout(Duration.ofMinutes(5)))
                 .waitingFor("azure-cli", Wait.forLogMessage(".*BLOBSTORAGE INITIALIZED.*\\n", 1)
                         .withStartupTimeout(Duration.ofMinutes(5)));
         composeContainer.start();

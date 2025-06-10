@@ -33,6 +33,7 @@ Feature: Product
     And the environment is "invalidEnv"
     When I send a GET request to "/v2/products/{productId}/back-office" to retrieve back-office URL
     Then the response status should be 500
+    And the response should contain an error message "Invalid Request"
 
   Scenario: Retrieving the back-office URL for a product and institution the user does not have permission to access
     Given user login with username "r.balboa" and password "test"
