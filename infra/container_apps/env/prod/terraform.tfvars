@@ -134,6 +134,10 @@ app_settings = [
   {
     name  = "ONBOARDING_URL"
     value = "http://selc-p-onboarding-ms-ca"
+  },
+  {
+    name  = "FEATURE_VIEWCONTRACT_ENABLED"
+    value = "false"
   }
 ]
 

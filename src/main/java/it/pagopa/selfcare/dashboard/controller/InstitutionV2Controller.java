@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
+import it.pagopa.selfcare.dashboard.aspect.ApiFeatureFlag;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.*;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationWithPagination;
@@ -252,11 +253,11 @@ public class InstitutionV2Controller {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getOnboardingsInfo}", nickname = "v2GetOnboardingsInfo")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewContract')")
+    @ApiFeatureFlag("feature.viewcontract.enabled")
     public List<OnboardingInfo> getOnboardingsInfo(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                    @PathVariable("institutionId")
-                                                    String institutionId,
+                                                   @PathVariable("institutionId") String institutionId,
                                                    @ApiParam(value = "${swagger.dashboard.institutions.model.products}")
-                                                    @RequestParam(name = "products", required = false) String[] products) {
+                                                   @RequestParam(name = "products", required = false) String[] products) {
         log.trace("getOnboardingsInfo start");
         OnboardingsResponse onboardingsResponse =
                 institutionV2Service.getOnboardingsInfoResponse(
@@ -278,11 +279,11 @@ public class InstitutionV2Controller {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getContract}", nickname = "v2GetContract")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewContract')")
+    @ApiFeatureFlag("feature.viewcontract.enabled")
     public ResponseEntity<byte[]> getContract(@ApiParam("${swagger.dashboard.institutions.model.id}")
-                                                   @PathVariable("institutionId")
-                                                   String institutionId,
-                                                   @ApiParam(value = "${swagger.dashboard.products.model.id}")
-                                                   @RequestParam(name = "productId") String productId) throws IOException {
+                                              @PathVariable("institutionId") String institutionId,
+                                              @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                              @RequestParam(name = "productId") String productId) throws IOException {
         log.trace("getContract start");
         log.debug("getContract institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
         Resource contract = institutionV2Service.getContract(institutionId, productId);
