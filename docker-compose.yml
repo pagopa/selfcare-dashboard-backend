@@ -16,7 +16,6 @@ services:
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite@sha256:0a47e12e3693483cef5c71f35468b91d751611f172d2f97414e9c69113b106d9
-    container_name: azurite
     ports:
       - "10000:10000"
     command: "azurite --blobHost 0.0.0.0 --inMemoryPersistence"
@@ -29,7 +28,6 @@ services:
     build:
       context: "."
       dockerfile: "integration-test-config/azure-cli/Dockerfile-azure-cli"
-    container_name: azure-cli
     depends_on:
       - azurite
     networks:
@@ -37,9 +35,9 @@ services:
     volumes:
       - "./integration-test-config/blobStorageInit/initAzurite.sh:/initAzurite.sh"
       - "./integration-test-config/blobStorageInit/signed_IO_accordo_adesione.pdf:/workspace/signed_IO_accordo_adesione.pdf"
+      - "./integration-test-config/blobStorageInit/products.json:/workspace/products.json"
     environment:
       - SELFCARE_INFRA_PRIVATE_ENV=dev
-      - GITHUB_TOKEN=REPLACE_WITH_TOKEN
 
   mongodb:
     image: mongo:latest@sha256:1cb283500219e8fc0b61b328ea5a199a395a753d88b17351c58874fb425223cb
@@ -49,6 +47,50 @@ services:
       - "./integration-test-config/db:/docker-entrypoint-initdb.d"
     networks:
       - develop-network
+
+  userms:
+    image: ghcr.io/pagopa/selfcare-user-ms:latest
+    ports:
+      - '8081:8080'
+    env_file:
+      - "./src/test/resources/userenv"
+    networks:
+      - develop-network
+    depends_on:
+      - mongodb
+
+  onboardingms:
+    image: ghcr.io/pagopa/selfcare-onboarding-ms:latest
+    ports:
+      - '8080:8080'
+    env_file:
+      - "./src/test/resources/onboardingenv"
+    networks:
+      - develop-network
+    depends_on:
+      - mongodb
+
+  institutionms:
+    image: ghcr.io/pagopa/selfcare-institution-ms:latest
+    ports:
+      - '8082:8082'
+    env_file:
+      - "./src/test/resources/institutionenv"
+    networks:
+      - develop-network
+    depends_on:
+      - mongodb
+
+  usergroupms:
+    image: ghcr.io/pagopa/selfcare-user-group-ms:latest
+    ports:
+      - '8083:8083'
+    env_file:
+      - "./src/test/resources/usergroupenv"
+    networks:
+      - develop-network
+    depends_on:
+      - mongodb
 
 networks:
   develop-network:

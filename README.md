@@ -49,3 +49,10 @@ You can run your application using:
 ```
 
 Application will respond to the url http://localhost:8080
+
+## Cucumber Tests (Integration Tests)
+A new suite of integration tests written with cucumber was added in `it.pagopa.selfcare.dashboard.integration_test` package.
+
+To run the Cucumber tests locally, execute it.pagopa.selfcare.dashboard.integration_testCucumberSuite
+
+To run a single test or a specific feature file, open the file and press the play button for the corresponding test (or the file). 

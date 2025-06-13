@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static it.pagopa.selfcare.dashboard.model.delegation.DelegationType.PT;
+import static it.pagopa.selfcare.dashboard.model.delegation.DelegationType.AOO;
 
 public class DelegationApiSteps{
 
@@ -136,12 +136,12 @@ public class DelegationApiSteps{
         Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getDelegationResource().get(1).getInstitutionId());
         Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationResource().get(0).getInstitutionName());
         Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationResource().get(1).getInstitutionName());
-        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationResource().get(0).getBrokerName());
-        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationResource().get(1).getBrokerName());
+        Assertions.assertEquals("AOO test", dashboardStepsUtil.responses.getDelegationResource().get(0).getBrokerName());
+        Assertions.assertEquals("AOO test", dashboardStepsUtil.responses.getDelegationResource().get(1).getBrokerName());
         Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationResource().get(0).getBrokerId());
         Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationResource().get(1).getBrokerId());
-        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationResource().get(0).getType());
-        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationResource().get(1).getType());
+        Assertions.assertEquals(AOO, dashboardStepsUtil.responses.getDelegationResource().get(0).getType());
+        Assertions.assertEquals(AOO, dashboardStepsUtil.responses.getDelegationResource().get(1).getType());
 
     }
 
@@ -186,12 +186,12 @@ public class DelegationApiSteps{
         Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getInstitutionId());
         Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getInstitutionName());
         Assertions.assertEquals("Comune di Castelbuono", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getInstitutionName());
-        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getBrokerName());
-        Assertions.assertEquals("PT test", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getBrokerName());
+        Assertions.assertEquals("AOO test", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getBrokerName());
+        Assertions.assertEquals("AOO test", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getBrokerName());
         Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getBrokerId());
         Assertions.assertEquals("067327d3-bdd6-408d-8655-87e8f1960046", dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getBrokerId());
-        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getType());
-        Assertions.assertEquals(PT, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getType());
+        Assertions.assertEquals(AOO, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(0).getType());
+        Assertions.assertEquals(AOO, dashboardStepsUtil.responses.getDelegationWithPagination().getDelegations().get(1).getType());
     }
 
     @And("the response should contain a list of paginated delegations filtered by {string}")
