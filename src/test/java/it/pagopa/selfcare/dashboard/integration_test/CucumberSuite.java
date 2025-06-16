@@ -24,7 +24,10 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
-@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
+@ConfigurationParameters({
+    @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty"),
+    @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "html:target/cucumber-report/cucumber.html"),
+})
 @CucumberContextConfiguration
 @TestPropertySource(locations = "classpath:application-test.properties")
 @SpringBootTest(classes = {SelfCareDashboardApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

@@ -15,6 +15,7 @@ on:
       - "src/**"
       - 'docker-compose.yml'
       - 'pom.xml'
+  workflow_dispatch:
 
 jobs:
   integration_tests_ms:
@@ -43,3 +44,9 @@ jobs:
         working-directory: .
         run:  mvn test -Dtest=it.pagopa.selfcare.dashboard.integration_test.CucumberSuite -Dsurefire.failIfNoSpecifiedTests=false
         shell: bash
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: target/cucumber-report/cucumber.html
