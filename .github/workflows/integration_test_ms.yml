@@ -15,6 +15,7 @@ on:
       - "src/**"
       - 'docker-compose.yml'
       - 'pom.xml'
+  workflow_dispatch:
 
 jobs:
   integration_tests_ms:
@@ -40,6 +41,14 @@ jobs:
           servers: '[{"id": "selfcare-onboarding", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}, {"id": "selfcare", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}]'
 
       - name: Run Integration Tests
+        id: int_tests
         working-directory: .
         run:  mvn test -Dtest=it.pagopa.selfcare.dashboard.integration_test.CucumberSuite -Dsurefire.failIfNoSpecifiedTests=false
         shell: bash
+
+      - name: Upload Test Results
+        if: always() && (steps.int_tests.conclusion == 'success' || steps.int_tests.conclusion == 'failure')
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report
+          path: target/cucumber-report/cucumber.html
