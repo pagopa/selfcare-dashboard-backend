@@ -47,7 +47,7 @@ jobs:
         shell: bash
 
       - name: Upload Test Results
-        if: steps.int_tests.outcome == 'success' || steps.int_tests.outcome == 'failure'
+        if: always() && (steps.int_tests.conclusion == 'success' || steps.int_tests.conclusion == 'failure')
         uses: actions/upload-artifact@v4
         with:
           name: cucumber-report
