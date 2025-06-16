@@ -41,11 +41,13 @@ jobs:
           servers: '[{"id": "selfcare-onboarding", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}, {"id": "selfcare", "username": "${{ github.actor }}", "password": "${{ secrets.GITHUB_TOKEN }}"}]'
 
       - name: Run Integration Tests
+        id: int_tests
         working-directory: .
         run:  mvn test -Dtest=it.pagopa.selfcare.dashboard.integration_test.CucumberSuite -Dsurefire.failIfNoSpecifiedTests=false
         shell: bash
 
       - name: Upload Test Results
+        if: steps.int_tests.outcome == 'success' || steps.int_tests.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: cucumber-report
