@@ -21,4 +21,10 @@ public class OnboardedProductResource {
     private List<String> userProductActions;
 
     private Boolean isAggregator;
+
+    private String origin;
+
+    private String originId;
+
+    private String institutionType;
 }

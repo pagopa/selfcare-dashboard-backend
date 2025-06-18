@@ -4085,8 +4085,17 @@
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
+          "institutionType" : {
+            "type" : "string"
+          },
           "isAggregator" : {
             "type" : "boolean"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originId" : {
+            "type" : "string"
           },
           "productId" : {
             "type" : "string"
@@ -4116,8 +4125,17 @@
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
+          "institutionType" : {
+            "type" : "string"
+          },
           "isAggregator" : {
             "type" : "boolean"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originId" : {
+            "type" : "string"
           },
           "productId" : {
             "type" : "string"
