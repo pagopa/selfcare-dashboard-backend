@@ -43,6 +43,7 @@ public class CucumberSuite {
 
         composeContainer = new ComposeContainer(new File("docker-compose.yml"))
                 .withLocalCompose(true)
+                .withPull(true)
                 .waitingFor("azure-cli", Wait.forLogMessage(".*BLOBSTORAGE INITIALIZED.*\\n", 1)
                         .withStartupTimeout(Duration.ofMinutes(5)));
         composeContainer.start();
