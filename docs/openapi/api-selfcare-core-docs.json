@@ -337,10 +337,129 @@
     },
     "/v2/delegations" : {
       "get" : {
-        "tags" : [ "Delegation" ],
+        "tags" : [ "Delegation", "external-v2", "support" ],
         "summary" : "Retrieve institution's delegations with pagination",
         "description" : "Retrieve institution's delegations with pagination",
         "operationId" : "getDelegationsUsingGET_1",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "The internal identifier of the institution",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "brokerId",
+          "in" : "query",
+          "description" : "The internal identifier of the institution",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "search",
+          "in" : "query",
+          "description" : "Description ente",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "taxCode",
+          "in" : "query",
+          "description" : "Institution's tax code",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "order",
+          "in" : "query",
+          "description" : "Order to show response NONE, ASC, DESC",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ASC", "DESC", "NONE" ]
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "page",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DelegationWithPaginationResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/delegations/delegations-with-pagination" : {
+      "get" : {
+        "tags" : [ "Delegation", "external-v2", "support" ],
+        "summary" : "Retrieve institution's delegations with pagination",
+        "description" : "Retrieve institution's delegations with pagination",
+        "operationId" : "getDelegationsUsingGET_2",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "query",
@@ -797,7 +916,7 @@
           "schema" : {
             "type" : "string"
           }
-        } ],
+        }],
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -1608,7 +1727,7 @@
         } ]
       },
       "put" : {
-        "tags" : [ "Institution" ],
+        "tags" : [ "Institution", "support", "support-pnpg" ],
         "summary" : "update institution data of given institution",
         "description" : "update institution data of given institution",
         "operationId" : "updateInstitutionUsingPUT",
@@ -2634,6 +2753,16 @@
           "billing" : {
             "$ref" : "#/components/schemas/BillingResponse"
           },
+          "institutionType" : {
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originId" : {
+            "type" : "string"
+          },
           "pricingPlan" : {
             "type" : "string"
           },
@@ -2667,6 +2796,9 @@
           },
           "existsInRegistry" : {
             "type" : "boolean"
+          },
+          "istatCode" : {
+            "type" : "string"
           },
           "taxId" : {
             "type" : "string"
@@ -3157,6 +3289,9 @@
         "title" : "InstitutionPut",
         "type" : "object",
         "properties" : {
+          "address" : {
+            "type" : "string"
+          },
           "description" : {
             "type" : "string"
           },
@@ -3169,7 +3304,16 @@
               "type" : "string"
             }
           },
+          "onboardings" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/OnboardingPut"
+            }
+          },
           "parentDescription" : {
+            "type" : "string"
+          },
+          "zipCode" : {
             "type" : "string"
           }
         }
@@ -3236,6 +3380,9 @@
           "institutionType" : {
             "type" : "string",
             "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
+          "istatCode" : {
+            "type" : "string"
           },
           "onboarding" : {
             "type" : "array",
@@ -3337,6 +3484,9 @@
           },
           "institutionType" : {
             "type" : "string"
+          },
+          "isTest" : {
+            "type" : "boolean"
           },
           "istatCode" : {
             "type" : "string"
@@ -3454,6 +3604,12 @@
           "ivassCode" : {
             "type" : "string"
           },
+          "onboardings" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Onboarding"
+            }
+          },
           "parentDescription" : {
             "type" : "string"
           },
@@ -3518,19 +3674,20 @@
             "type" : "string",
             "format" : "date-time"
           },
+          "institutionType" : {
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
           "isAggregator" : {
             "type" : "boolean"
           },
-          "productId" : {
-            "type" : "string"
-          },
           "origin" : {
-              "type" : "string"
+            "type" : "string"
           },
           "originId" : {
             "type" : "string"
           },
-          "institutionType" : {
+          "productId" : {
             "type" : "string"
           },
           "status" : {
@@ -3555,6 +3712,68 @@
             "items" : {
               "$ref" : "#/components/schemas/InstitutionProduct"
             }
+          }
+        }
+      },
+      "Onboarding" : {
+        "title" : "Onboarding",
+        "type" : "object",
+        "properties" : {
+          "billing" : {
+            "$ref" : "#/components/schemas/Billing"
+          },
+          "closedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "contract" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "institutionType" : {
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
+          "isAggregator" : {
+            "type" : "boolean"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originId" : {
+            "type" : "string"
+          },
+          "pricingPlan" : {
+            "type" : "string"
+          },
+          "productId" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
+          },
+          "tokenId" : {
+            "type" : "string"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "OnboardingPut" : {
+        "title" : "OnboardingPut",
+        "type" : "object",
+        "properties" : {
+          "productId" : {
+            "type" : "string"
+          },
+          "vatNumber" : {
+            "type" : "string"
           }
         }
       },
@@ -3630,8 +3849,18 @@
             "type" : "string",
             "format" : "date-time"
           },
+          "institutionType" : {
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
           "isAggregator" : {
             "type" : "boolean"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originId" : {
+            "type" : "string"
           },
           "pricingPlan" : {
             "type" : "string"
@@ -3760,6 +3989,9 @@
             "type" : "string"
           },
           "injectionInstitutionType" : {
+            "type" : "string"
+          },
+          "istatCode" : {
             "type" : "string"
           },
           "taxCode" : {

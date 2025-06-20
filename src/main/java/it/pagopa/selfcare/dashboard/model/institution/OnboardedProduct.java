@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.model.institution;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import lombok.Data;
 
 import java.util.List;
@@ -16,5 +16,5 @@ public class OnboardedProduct {
     private Boolean isAggregator;
     private String origin;
     private String originId;
-    private String institutionType;
+    private InstitutionType institutionType;
 }

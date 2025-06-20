@@ -4086,7 +4086,8 @@
             "$ref" : "#/components/schemas/Billing"
           },
           "institutionType" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"
@@ -4126,7 +4127,8 @@
             "$ref" : "#/components/schemas/Billing"
           },
           "institutionType" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"
@@ -4163,6 +4165,19 @@
             "type" : "boolean",
             "description" : "Boolean indicating the presence of a contract",
             "example" : false
+          },
+          "institutionType" : {
+            "type" : "string",
+            "description" : "Institution Type",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+          },
+          "origin" : {
+            "type" : "string",
+            "description" : "Product's data origin"
+          },
+          "originId" : {
+            "type" : "string",
+            "description" : "Product's identifier related to origin"
           },
           "productId" : {
             "type" : "string",
