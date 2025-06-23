@@ -41,7 +41,10 @@
         "publicServices": false,
         "recipientCode": "setRecipientCode",
         "vatNumber": "setVatNumber"
-      }
+      },
+      "origin": "setOrigin",
+      "originId": "setOriginId",
+      "institutionType": "AS"
     }
   ],
   "origin": "setOrigin",

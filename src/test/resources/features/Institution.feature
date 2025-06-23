@@ -19,18 +19,21 @@ Feature: Institution
     When I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
     Then the response status should be 200
     And The response body contains:
-      | id                   | 067327d3-bdd6-408d-8655-87e8f1960046  |
-      | externalId           | 99000870064                           |
-      | originId             | c_d277                                |
-      | origin               | IPA                                   |
-      | institutionType      | PT                                    |
-      | name                 | comune di dernice                     |
-      | category             | Comuni e loro Consorzi e Associazioni |
-      | categoryCode         | L6                                    |
-      | fiscalCode           | 99000870064                           |
-      | mailAddress          | protocollo@pec.comune.dernice.al.it   |
-      | address              | Via Roma N.17                         |
-      | zipCode              | 15056                                 |
+      | id                          | 067327d3-bdd6-408d-8655-87e8f1960046  |
+      | externalId                  | 99000870064                           |
+      | originId                    | c_d277                                |
+      | origin                      | IPA                                   |
+      | institutionType             | PT                                    |
+      | name                        | comune di dernice                     |
+      | category                    | Comuni e loro Consorzi e Associazioni |
+      | categoryCode                | L6                                    |
+      | fiscalCode                  | 99000870064                           |
+      | mailAddress                 | protocollo@pec.comune.dernice.al.it   |
+      | address                     | Via Roma N.17                         |
+      | zipCode                     | 15056                                 |
+      | products[0].origin          | IPA                                   |
+      | products[0].originId        | c_d277                                |
+      | products[0].institutionType | PT                                    |
     And The response body contains the list "products" of size 4
 
   Scenario: Attempt to retrieve institution by institutionId without permissions (not onboarded)
@@ -45,18 +48,22 @@ Feature: Institution
     When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
     Then the response status should be 200
     And The response body contains:
-      | id                   | 067327d3-bdd6-408d-8655-87e8f1960046  |
-      | externalId           | 99000870064                           |
-      | originId             | c_d277                                |
-      | origin               | IPA                                   |
-      | institutionType      | PT                                    |
-      | name                 | comune di dernice                     |
-      | category             | Comuni e loro Consorzi e Associazioni |
-      | categoryCode         | L6                                    |
-      | fiscalCode           | 99000870064                           |
-      | mailAddress          | protocollo@pec.comune.dernice.al.it   |
-      | address              | Via Roma N.17                         |
-      | zipCode              | 15056                                 |
+      | id                          | 067327d3-bdd6-408d-8655-87e8f1960046  |
+      | externalId                  | 99000870064                           |
+      | originId                    | c_d277                                |
+      | origin                      | IPA                                   |
+      | institutionType             | PT                                    |
+      | name                        | comune di dernice                     |
+      | category                    | Comuni e loro Consorzi e Associazioni |
+      | categoryCode                | L6                                    |
+      | fiscalCode                  | 99000870064                           |
+      | mailAddress                 | protocollo@pec.comune.dernice.al.it   |
+      | address                     | Via Roma N.17                         |
+      | zipCode                     | 15056                                 |
+      | products[0].origin          | IPA                                   |
+      | products[0].originId        | c_d277                                |
+      | products[0].institutionType | PT                                    |
+
     And The response body contains the list "products" of size 4
 
   Scenario: Attempt to retrieve institution by institutionId v2 without permission (not onboarded)
@@ -324,12 +331,21 @@ Feature: Institution
       | [0].productId         | prod-io      |
       | [0].status            | ACTIVE       |
       | [0].contractAvailable | true         |
+      | [0].institutionType   | PT           |
+      | [0].origin            | IPA          |
+      | [0].originId          | c_d277       |
       | [1].productId         | prod-pagopa  |
       | [1].status            | ACTIVE       |
       | [1].contractAvailable | true         |
+      | [1].institutionType   | PT           |
+      | [1].origin            | IPA          |
+      | [1].originId          | c_d277       |
       | [2].productId         | prod-interop |
       | [2].status            | ACTIVE       |
       | [2].contractAvailable | true         |
+      | [2].institutionType   | PT           |
+      | [2].origin            | IPA          |
+      | [2].originId          | c_d277       |
     And The response body is a list of size 3
 
   Scenario: Successfully get Onboardings Info with products filter
@@ -342,9 +358,15 @@ Feature: Institution
     | [0].productId         | prod-io     |
     | [0].status            | ACTIVE      |
     | [0].contractAvailable | true        |
+    | [0].institutionType   | PT          |
+    | [0].origin            | IPA         |
+    | [0].originId          | c_d277      |
     | [1].productId         | prod-pagopa |
     | [1].status            | ACTIVE      |
     | [1].contractAvailable | true        |
+    | [1].institutionType   | PT          |
+    | [1].origin            | IPA         |
+    | [1].originId          | c_d277      |
     And The response body is a list of size 2
 
   Scenario: Attempt to get Onboardings Info without permission

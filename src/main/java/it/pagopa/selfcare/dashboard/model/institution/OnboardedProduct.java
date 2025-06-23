@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.model.institution;
 
+import it.pagopa.selfcare.commons.base.utils.InstitutionType;
 import lombok.Data;
 
 import java.util.List;
@@ -13,4 +14,7 @@ public class OnboardedProduct {
     private Billing billing;
     private List<String> userProductActions;
     private Boolean isAggregator;
+    private String origin;
+    private String originId;
+    private InstitutionType institutionType;
 }

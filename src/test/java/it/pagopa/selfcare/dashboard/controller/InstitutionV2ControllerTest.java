@@ -578,9 +578,15 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         assertEquals(onboardingsResponse.getOnboardings().get(0).getProductId(), resource.get(0).getProductId());
         assertEquals(onboardingsResponse.getOnboardings().get(0).getStatus().getValue(), resource.get(0).getStatus());
+        assertEquals(onboardingsResponse.getOnboardings().get(0).getOrigin(), resource.get(0).getOrigin());
+        assertEquals(onboardingsResponse.getOnboardings().get(0).getOriginId(), resource.get(0).getOriginId());
+        assertEquals(onboardingsResponse.getOnboardings().get(0).getInstitutionType().getValue(), resource.get(0).getInstitutionType().name());
         assertTrue(resource.get(0).getContractAvailable());
         assertEquals(onboardingsResponse.getOnboardings().get(1).getProductId(), resource.get(1).getProductId());
         assertEquals(onboardingsResponse.getOnboardings().get(1).getStatus().getValue(), resource.get(1).getStatus());
+        assertEquals(onboardingsResponse.getOnboardings().get(1).getOrigin(), resource.get(1).getOrigin());
+        assertEquals(onboardingsResponse.getOnboardings().get(1).getOriginId(), resource.get(1).getOriginId());
+        assertEquals(onboardingsResponse.getOnboardings().get(1).getInstitutionType().getValue(), resource.get(1).getInstitutionType().name());
         assertFalse(resource.get(1).getContractAvailable());
 
         verify(institutionV2ServiceMock, times(1))
@@ -682,10 +688,16 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         onboardingResponse.setProductId(PROD_IO.name());
         onboardingResponse.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
         onboardingResponse.setContract("contract");
+        onboardingResponse.setOrigin("IPA");
+        onboardingResponse.setOriginId("c_d277");
+        onboardingResponse.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PT);
 
         final OnboardingResponse onboardingResponse1 = new OnboardingResponse();
         onboardingResponse1.setProductId(PROD_IO_PREMIUM.name());
         onboardingResponse1.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboardingResponse1.setOrigin("IPA");
+        onboardingResponse1.setOriginId("c_d277");
+        onboardingResponse1.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PT);
 
         onboardingsResponse.setOnboardings(List.of(onboardingResponse, onboardingResponse1));
 
