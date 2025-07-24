@@ -11,3 +11,4 @@ BLOB_STORAGE_CONN_STRING_PRODUCT=DefaultEndpointsProtocol=http;AccountName=devst
 STORAGE_CONTAINER_CONTRACT=resources
 BLOB_STORAGE_CONN_STRING_CONTRACT=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
 BLOB-STORAGE-CONTRACT-CONNECTION-STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+JAVA_TOOL_OPTIONS=-Duser.timezone=GMT -Duser.language=en -Duser.country=US
