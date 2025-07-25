@@ -288,6 +288,30 @@
   },
   {
     "_id": {
+      "$oid": "f3a9c1d4b7e84f1c9d2a3e7b"
+    },
+    "institutionDescription": "COMUNE DI MORANSENGO-TONENGO",
+    "institutionId": "f94c0589-b07e-4ee7-a509-fda5fe91faa2",
+    "products": [
+      {
+        "createdAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        },
+        "env": "ROOT",
+        "productId": "prod-pn-pg",
+        "productRole": "admin",
+        "role": "MANAGER",
+        "status": "ACTIVE",
+        "updatedAt": {
+          "$date": "2024-10-28T12:25:53.228+00:00"
+        }
+      }
+    ],
+    "userId": "45a78331-d039-4bfa-8e85-2cbe7f6b7bc8",
+    "userMailUuid": "ID_CONTACTS#8370aa38-a2ab-404b-9b8a-10487167332e"
+  },
+  {
+    "_id": {
       "$oid": "678517128591d3b756e49814"
     },
     "institutionDescription": "Comune di Castelbuono",

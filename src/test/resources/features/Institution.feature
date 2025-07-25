@@ -103,18 +103,27 @@ Feature: Institution
     Then the response status should be 404
 
   Scenario: Successfully update institution description by institutionId
+    Given user login with username "s.froid" and password "test"
+    And the institutionId is "f94c0589-b07e-4ee7-a509-fda5fe91faa2"
+    And the following institution description request details:
+      | description                   | digitalAddress |
+      | COMUNE DI MORANSENGO-TONENGO2 | test@test.it   |
+    When I send a PUT request to "/v1/institutions/{institutionId}" to update institution description
+    Then the response status should be 200
+    And the Institution response should contain an institution id
+    And I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
+    And The response body contains:
+      | name        | COMUNE DI MORANSENGO-TONENGO2 |
+      | mailAddress | test@test.it                  |
+
+  Scenario: Attempt to update institution description by institutionId without permissions (prod different from prod-pn-pg)
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the following institution description request details:
       | description        | digitalAddress |
       | comune di dernice2 | test@test.it   |
     When I send a PUT request to "/v1/institutions/{institutionId}" to update institution description
-    Then the response status should be 200
-    And the Institution response should contain an institution id
-    And I send a GET request to "/v1/institutions/{institutionId}" to retrieve institution
-    And The response body contains:
-      | name        | comune di dernice2 |
-      | mailAddress | test@test.it       |
+    Then the response status should be 403
 
   Scenario: Attempt to update institution description by institutionId without permissions (not onboarded)
     Given user login with username "r.balboa" and password "test"
