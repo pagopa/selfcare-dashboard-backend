@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.controller;
 
 import io.swagger.annotations.*;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Page;
 import it.pagopa.selfcare.commons.web.model.mapper.PageMapper;
 import it.pagopa.selfcare.dashboard.model.groups.CreateUserGroup;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -125,18 +127,32 @@ public class UserGroupV2Controller {
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroup}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public UserGroupResource getUserGroupById(@ApiParam("${swagger.dashboard.user-group.model.id}")
-                                              @PathVariable("id") String id,
-                                              @ApiParam("${swagger.dashboard.user-group.model.institutionId}")
-                                              @RequestParam(value = "institutionId", required = false) String institutionId) {
+                                              @PathVariable("id") String id) {
         log.trace("getUserGroup start");
-        log.debug("getUserGroup id = {}, institutionId = {}", id, institutionId);
-        UserGroupInfo groupInfo = groupService.getUserGroupById(id, institutionId);
+        log.debug("getUserGroup id = {}", id);
+        UserGroupInfo groupInfo = groupService.getUserGroupById(id);
         UserGroupResource groupResource = groupMapper.toResource(groupInfo,userMapper);
         log.debug("getUserGroup result = {}", groupResource);
         log.trace("getUserGroup end");
         return groupResource;
     }
 
+    @GetMapping(value = "/me/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroup}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ListProductGroups')")
+    public UserGroupResource getMyUserGroupById(@ApiParam("${swagger.dashboard.user-group.model.id}")
+                                                @PathVariable("id") String id,
+                                                Authentication authentication) {
+        log.trace("getMyUserGroupById start");
+        SelfCareUser user = (SelfCareUser) authentication.getPrincipal();
+        log.debug("getMyUserGroupById id = {}, memberId = {}", id, user.getId());
+        UserGroupInfo groupInfo = groupService.getUserGroupById(id, user.getId());
+        UserGroupResource groupResource = groupMapper.toResource(groupInfo,userMapper);
+        log.debug("getMyUserGroupById result = {}", groupResource);
+        log.trace("getMyUserGroupById end");
+        return groupResource;
+    }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

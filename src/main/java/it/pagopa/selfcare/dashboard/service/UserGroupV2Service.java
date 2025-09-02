@@ -26,7 +26,9 @@ public interface UserGroupV2Service {
 
     void deleteMemberFromUserGroup(String groupId, UUID userId);
 
-    UserGroupInfo getUserGroupById(String groupId, String institutionId);
+    UserGroupInfo getUserGroupById(String groupId);
+
+    UserGroupInfo getUserGroupById(String groupId, String memberId);
 
     Page<UserGroup> getUserGroups(String institutionId, String productId, UUID userId, Pageable pageable);
 }

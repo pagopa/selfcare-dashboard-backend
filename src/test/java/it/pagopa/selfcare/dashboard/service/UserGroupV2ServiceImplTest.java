@@ -7,16 +7,12 @@ import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.InvalidMemberListException;
 import it.pagopa.selfcare.dashboard.exception.InvalidUserGroupException;
 import it.pagopa.selfcare.dashboard.model.groups.*;
-import it.pagopa.selfcare.dashboard.model.mapper.GroupMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.GroupMapperImpl;
-import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.User;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDataResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDetailResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
@@ -25,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -35,16 +30,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.Instant;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
-import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.ACTIVE;
-import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.SUSPENDED;
 import static it.pagopa.selfcare.dashboard.service.UserGroupV2ServiceImpl.REQUIRED_GROUP_ID_MESSAGE;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,19 +68,9 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
         super.setUp();
     }
 
-
-    @Test
-    void getUserGroupByIdMismatch() {
-        String groupId = "GroupId";
-        String institutionId = "mismatchInstitutionId";
-        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(mockInstance(new UserGroupResource())));
-        assertThrows(InvalidUserGroupException.class, () -> userGroupV2Service.getUserGroupById(groupId, institutionId));
-    }
-
     @Test
     void getUserGroupByIdNullGroupId() {
-        String institutionId = "InstitutionId";
-        assertThrows(IllegalArgumentException.class, () -> userGroupV2Service.getUserGroupById(null, institutionId));
+        assertThrows(IllegalArgumentException.class, () -> userGroupV2Service.getUserGroupById(null));
     }
 
     @Test
@@ -340,44 +321,10 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
        assertDoesNotThrow(executable);
     }
 
-
     @Test
-    void getUserGroupByIdThrowsInvalidUserGroupExceptionForMismatchedInstitutionId() {
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
-        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
-        userGroupInfo.setInstitutionId("differentInstitutionId");
-
-        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
-        when(groupMapper.toUserGroupInfo(userGroupResource)).thenReturn(userGroupInfo);
-
-        InvalidUserGroupException exception = assertThrows(InvalidUserGroupException.class, () -> {
-            userGroupV2Service.getUserGroupById(groupId, institutionId);
-        });
-
-        assertEquals("Could not find a UserGroup for given institutionId", exception.getMessage());
-    }
-
-    @Test
-    void getUserGroupByIdWithInvalidInstitution() {
-        String groupId = "groupId";
-        String institutionId = "institutionId";
-        UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
-        UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
-
-        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
-        when(groupMapper.toUserGroupInfo(userGroupResource)).thenReturn(userGroupInfo);
-
-        Assertions.assertThrows(InvalidUserGroupException.class, () -> userGroupV2Service.getUserGroupById(groupId, institutionId),
-                "Could not find a UserGroup for given institutionId");
-    }
-
-    @Test
-    void getUserGroupByIdWithValidInstitution() {
+    void getUserGroupById() {
         UUID userId = randomUUID();
         String groupId = "groupId";
-        String institutionId = "setInstitutionId";
         UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
         userGroupResource.setMembers(List.of(userId));
         UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
@@ -393,10 +340,76 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
         when(userApiRestClient._getUserDetailsById("setCreatedBy", "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
         when(userApiRestClient._getUserDetailsById("setModifiedBy", "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
 
-        UserGroupInfo groupInfo = userGroupV2Service.getUserGroupById(groupId, institutionId);
+        UserGroupInfo groupInfo = userGroupV2Service.getUserGroupById(groupId);
         Assertions.assertEquals(userGroupInfo.getInstitutionId(), groupInfo.getInstitutionId());
         Assertions.assertEquals(userGroupInfo.getCreatedBy().getId(), groupInfo.getCreatedBy().getId());
         Assertions.assertEquals(userGroupInfo.getModifiedBy().getId(), groupInfo.getModifiedBy().getId());
+    }
+
+    @Test
+    void getUserGroupByIdAndMemberId() {
+        final String groupId = "groupId";
+        final UUID memberUUID = UUID.randomUUID();
+        final String memberId = memberUUID.toString();
+
+        final UserGroupResource userGroupResource = new UserGroupResource();
+        userGroupResource.setId(groupId);
+        userGroupResource.setProductId("productId");
+        userGroupResource.setStatus(UserGroupResource.StatusEnum.ACTIVE);
+        userGroupResource.setInstitutionId("institutionId");
+        userGroupResource.setName("groupName");
+        userGroupResource.setDescription("groupDescription");
+        userGroupResource.setMembers(List.of(memberUUID));
+        userGroupResource.setCreatedBy("");
+
+        final UserDataResponse userDataResponse = new UserDataResponse();
+        userDataResponse.setId("userInstitutionId");
+        userDataResponse.setUserId(memberId);
+        userDataResponse.setStatus("ACTIVE");
+        userDataResponse.setRole("MANAGER");
+        userDataResponse.setInstitutionId("institutionId");
+
+        final UserDetailResponse userDetailResponse = new UserDetailResponse();
+        userDetailResponse.setId(memberId);
+
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
+        when(userApiRestClient._retrieveUsers(anyString(), anyString(), any(), any(),any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(userDataResponse)));
+        when(userApiRestClient._getUserDetailsById(anyString(), anyString(), anyString())).thenReturn(ResponseEntity.ok(userDetailResponse));
+
+        Assertions.assertDoesNotThrow(() -> userGroupV2Service.getUserGroupById(groupId, memberId));
+    }
+
+    @Test
+    void getUserGroupByIdAndNonExistentMemberId() {
+        final String groupId = "groupId";
+        final UUID memberUUID = UUID.randomUUID();
+        final String memberId = memberUUID.toString();
+
+        final UserGroupResource userGroupResource = new UserGroupResource();
+        userGroupResource.setId(groupId);
+        userGroupResource.setProductId("productId");
+        userGroupResource.setStatus(UserGroupResource.StatusEnum.ACTIVE);
+        userGroupResource.setInstitutionId("institutionId");
+        userGroupResource.setName("groupName");
+        userGroupResource.setDescription("groupDescription");
+        userGroupResource.setMembers(List.of(UUID.fromString("81b90c5e-67e4-44bc-85d3-3556f409f11d")));
+        userGroupResource.setCreatedBy("");
+
+        final UserDataResponse userDataResponse = new UserDataResponse();
+        userDataResponse.setId("userInstitutionId");
+        userDataResponse.setUserId("81b90c5e-67e4-44bc-85d3-3556f409f11d");
+        userDataResponse.setStatus("ACTIVE");
+        userDataResponse.setRole("MANAGER");
+        userDataResponse.setInstitutionId("institutionId");
+
+        final UserDetailResponse userDetailResponse = new UserDetailResponse();
+        userDetailResponse.setId("81b90c5e-67e4-44bc-85d3-3556f409f11d");
+
+        when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
+        when(userApiRestClient._retrieveUsers(anyString(), anyString(), any(), any(),any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(userDataResponse)));
+        when(userApiRestClient._getUserDetailsById(anyString(), anyString(), anyString())).thenReturn(ResponseEntity.ok(userDetailResponse));
+
+        Assertions.assertThrows(InvalidUserGroupException.class, () -> userGroupV2Service.getUserGroupById(groupId, memberId));
     }
 
     @Test

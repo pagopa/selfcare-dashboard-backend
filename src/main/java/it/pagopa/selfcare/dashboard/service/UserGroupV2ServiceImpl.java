@@ -187,19 +187,14 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
     }
 
     @Override
-    public UserGroupInfo getUserGroupById(String groupId, String institutionId) {
+    public UserGroupInfo getUserGroupById(String groupId) {
         log.trace("getUserGroupById start");
         log.debug("getUserGroupById groupId = {}", Encode.forJava(groupId));
         Assert.hasText(groupId, REQUIRED_GROUP_ID_MESSAGE);
         UserGroupResource response = userGroupRestClient._getUserGroupUsingGET(groupId).getBody();
         UserGroupInfo userGroupInfo = groupMapper.toUserGroupInfo(response);
 
-        Optional.ofNullable(institutionId).ifPresent(value -> {
-            if (!value.equalsIgnoreCase(userGroupInfo.getInstitutionId())) {
-                throw new InvalidUserGroupException("Could not find a UserGroup for given institutionId");
-            }
-        });
-
+        final String institutionId = userGroupInfo.getInstitutionId();
         List<UserInfo> members = new ArrayList<>();
 
         userGroupInfo.getMembers().forEach(user -> {
@@ -216,6 +211,14 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
             userGroupInfo.setModifiedBy(modifiedBy);
         }
         return userGroupInfo;
+    }
+
+    @Override
+    public UserGroupInfo getUserGroupById(String groupId, String memberId) {
+        final UserGroupInfo userGroup = getUserGroupById(groupId);
+        return Optional.of(userGroup)
+                .filter(g -> userGroup.getMembers().stream().anyMatch(u -> u.getId().equals(memberId)))
+                .orElseThrow(() -> new InvalidUserGroupException("User is not member of group"));
     }
 
     private UserInfo getUserByUserIdInstitutionIdAndProductAndStates(String userId, String institutionId, String productId, List<String> states) {
