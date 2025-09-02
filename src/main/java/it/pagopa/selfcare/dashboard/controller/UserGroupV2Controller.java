@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.model.mapper.GroupMapperV2;
 import it.pagopa.selfcare.dashboard.model.user_groups.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -129,7 +130,7 @@ public class UserGroupV2Controller {
     public UserGroupResource getUserGroupById(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                               @PathVariable("id") String id) {
         log.trace("getUserGroup start");
-        log.debug("getUserGroup id = {}", id);
+        log.debug("getUserGroup id = {}", Encode.forJava(id));
         UserGroupInfo groupInfo = groupService.getUserGroupById(id);
         UserGroupResource groupResource = groupMapper.toResource(groupInfo,userMapper);
         log.debug("getUserGroup result = {}", groupResource);
@@ -146,7 +147,7 @@ public class UserGroupV2Controller {
                                                 Authentication authentication) {
         log.trace("getMyUserGroupById start");
         SelfCareUser user = (SelfCareUser) authentication.getPrincipal();
-        log.debug("getMyUserGroupById id = {}, memberId = {}", id, user.getId());
+        log.debug("getMyUserGroupById id = {}, memberId = {}", Encode.forJava(id), user.getId());
         UserGroupInfo groupInfo = groupService.getUserGroupById(id, user.getId());
         UserGroupResource groupResource = groupMapper.toResource(groupInfo,userMapper);
         log.debug("getMyUserGroupById result = {}", groupResource);
