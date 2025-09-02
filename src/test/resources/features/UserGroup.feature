@@ -234,8 +234,8 @@ Feature: UserGroups
     Given user login with username "j.doe" and password "test"
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
-    And the response should contain a paginated list of user groups of 3 items on page 0
-    And the response should contain 1 total pages with 3 total elements
+    And the response should contain a paginated list of user groups of 4 items on page 0
+    And the response should contain 1 total pages with 4 total elements
 
   Scenario: Successfully retrieve a paginated list of user groups
     Given user login with username "j.doe" and password "test"
@@ -243,15 +243,15 @@ Feature: UserGroups
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
     And the response should contain a paginated list of user groups of 2 items on page 0
-    And the response should contain 2 total pages with 3 total elements
+    And the response should contain 2 total pages with 4 total elements
 
   Scenario: Successfully retrieve a paginated list of user groups
     Given user login with username "j.doe" and password "test"
     And I set the page number to 1 and page size to 2
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
-    And the response should contain a paginated list of user groups of 1 items on page 1
-    And the response should contain 2 total pages with 3 total elements
+    And the response should contain a paginated list of user groups of 2 items on page 1
+    And the response should contain 2 total pages with 4 total elements
 
   Scenario: No user groups found for the provided filters
     Given user login with username "j.doe" and password "test"
