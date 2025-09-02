@@ -215,8 +215,8 @@ Feature: UserGroups
     And the response should contain the group details
 
   Scenario: Attempt to retrieve a group of which you are NOT a member
-    Given user login with username "r.balboa" and password "test"
-    And I have groupId "6759f8df78b6af202b222d29"
+    Given user login with username "j.doe" and password "test"
+    And I have groupId "68b703f2e027600fe56ceabf"
     When I send a GET request to "/v2/user-groups/me/{id}" to retrieve userGroup
     Then the response status should be 404
 
