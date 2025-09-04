@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.utils.TestUtils;
 import it.pagopa.selfcare.commons.web.model.Page;
 import it.pagopa.selfcare.dashboard.model.groups.CreateUserGroup;
@@ -304,7 +305,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         }
         UserGroupInfo userGroupInfo = new ObjectMapper().readValue(userGroupInfoStream, UserGroupInfo.class);
 
-        when(groupServiceMock.getUserGroupById(groupId, null)).thenReturn(userGroupInfo);
+        when(groupServiceMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
 
         ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
         byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
@@ -318,41 +319,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
                 .andExpect(content().json(new String(userGroupByte)));
 
         // then
-        verify(groupServiceMock, times(1)).getUserGroupById(groupId, null);
-        verifyNoMoreInteractions(groupServiceMock);
-    }
-
-    @Test
-    void getUserGroupWithInstitutionId() throws Exception {
-        // given
-        String groupId = "groupId";
-        String inst = "institutionId";
-
-        ClassPathResource resource = new ClassPathResource("json/UserGroupInfo.json");
-        byte[] userGroupInfoStream;
-        try {
-            userGroupInfoStream = Files.readAllBytes(resource.getFile().toPath());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read resource file", e);
-        }
-        UserGroupInfo userGroupInfo = new ObjectMapper().readValue(userGroupInfoStream, UserGroupInfo.class);
-
-        when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
-
-        ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
-        byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
-
-        // when
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL + "/" + groupId)
-                        .queryParam("institutionId", inst)
-                        .contentType(APPLICATION_JSON_VALUE)
-                        .accept(APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk())
-                .andExpect(content().json(new String(userGroupByte)));
-
-        // then
-        verify(groupServiceMock, times(1)).getUserGroupById(groupId, inst);
+        verify(groupServiceMock, times(1)).getUserGroupById(groupId);
         verifyNoMoreInteractions(groupServiceMock);
     }
 
@@ -360,7 +327,6 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
     void getUserGroupWithoutMailUuid() throws Exception {
         // given
         String groupId = "groupId";
-        String inst = "institutionId";
 
         ClassPathResource resource = new ClassPathResource("json/UserGroupInfoWithoutMailUuid.json");
         byte[] userGroupInfoStream;
@@ -371,7 +337,7 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         }
         UserGroupInfo userGroupInfo = new ObjectMapper().readValue(userGroupInfoStream, UserGroupInfo.class);
 
-        when(groupServiceMock.getUserGroupById(groupId, inst)).thenReturn(userGroupInfo);
+        when(groupServiceMock.getUserGroupById(groupId)).thenReturn(userGroupInfo);
 
         ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
         byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
@@ -379,14 +345,50 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         // when
         mockMvc.perform(MockMvcRequestBuilders
                         .get(BASE_URL + "/" + groupId)
-                        .queryParam("institutionId", inst)
                         .contentType(APPLICATION_JSON_VALUE)
                         .accept(APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(new String(userGroupByte)));
 
         // then
-        verify(groupServiceMock, times(1)).getUserGroupById(groupId, inst);
+        verify(groupServiceMock, times(1)).getUserGroupById(groupId);
+        verifyNoMoreInteractions(groupServiceMock);
+    }
+
+    @Test
+    void getMyUserGroup() throws Exception {
+        // given
+        String groupId = "groupId";
+        String userId = "userId";
+        final SelfCareUser user = SelfCareUser.builder(userId).build();
+        final Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        ClassPathResource resource = new ClassPathResource("json/UserGroupInfo.json");
+        byte[] userGroupInfoStream;
+        try {
+            userGroupInfoStream = Files.readAllBytes(resource.getFile().toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read resource file", e);
+        }
+        UserGroupInfo userGroupInfo = new ObjectMapper().readValue(userGroupInfoStream, UserGroupInfo.class);
+
+        when(groupServiceMock.getUserGroupById(groupId, userId)).thenReturn(userGroupInfo);
+
+        ClassPathResource userGroupResource = new ClassPathResource("json/UserGroupResource.json");
+        byte[] userGroupByte = Files.readAllBytes(userGroupResource.getFile().toPath());
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/me/" + groupId)
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(userGroupByte)));
+
+        // then
+        verify(groupServiceMock, times(1)).getUserGroupById(groupId, userId);
         verifyNoMoreInteractions(groupServiceMock);
     }
 

@@ -2338,12 +2338,12 @@
         } ]
       }
     },
-    "/v2/user-groups/{id}" : {
+    "/v2/user-groups/me/{id}" : {
       "get" : {
         "tags" : [ "user-groups" ],
-        "summary" : "getUserGroupById",
-        "description" : "Service to get a specific UserGroup entity",
-        "operationId" : "getUserGroupByIdUsingGET",
+        "summary" : "getMyUserGroupById",
+        "description" : "Service to get a specific UserGroup entity but only if you are member of it",
+        "operationId" : "getMyUserGroupByIdUsingGET",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2353,12 +2353,76 @@
           "schema" : {
             "type" : "string"
           }
-        }, {
-          "name" : "institutionId",
-          "in" : "query",
-          "description" : "Users group's institutionId",
-          "required" : false,
-          "style" : "form",
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserGroupResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/user-groups/{id}" : {
+      "get" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "getUserGroupById",
+        "description" : "Service to get a specific UserGroup entity even if you are not member of it",
+        "operationId" : "getUserGroupByIdUsingGET",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Users group's unique identifier",
+          "required" : true,
+          "style" : "simple",
           "schema" : {
             "type" : "string"
           }

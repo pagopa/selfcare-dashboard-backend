@@ -200,19 +200,24 @@ Feature: UserGroups
     When I send a GET request to "/v2/user-groups/{id}" to retrieve userGroup
     Then the response status should be 404
 
-  Scenario: Attempt to retrieve a group with a valid ID with valid institutionId filter
+  Scenario: Attempt to retrieve a group with a valid ID
     Given user login with username "j.doe" and password "test"
     And I have groupId "6759f8df78b6af202b222d29"
-    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
     When I send a GET request to "/v2/user-groups/{id}" to retrieve userGroup
     Then the response status should be 200
     And the response should contain the group details
 
-  Scenario: Attempt to retrieve a group with a valid ID with invalid institutionId filter
+  Scenario: Attempt to retrieve a group of which you are a member
     Given user login with username "j.doe" and password "test"
     And I have groupId "6759f8df78b6af202b222d29"
-    And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
-    When I send a GET request to "/v2/user-groups/{id}" to retrieve userGroup
+    When I send a GET request to "/v2/user-groups/me/{id}" to retrieve userGroup
+    Then the response status should be 200
+    And the response should contain the group details
+
+  Scenario: Attempt to retrieve a group of which you are NOT a member
+    Given user login with username "j.doe" and password "test"
+    And I have groupId "68b703f2e027600fe56ceabf"
+    When I send a GET request to "/v2/user-groups/me/{id}" to retrieve userGroup
     Then the response status should be 404
 
   Scenario: Successfully retrieve user groups with valid filters
@@ -229,8 +234,8 @@ Feature: UserGroups
     Given user login with username "j.doe" and password "test"
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
-    And the response should contain a paginated list of user groups of 3 items on page 0
-    And the response should contain 1 total pages with 3 total elements
+    And the response should contain a paginated list of user groups of 4 items on page 0
+    And the response should contain 1 total pages with 4 total elements
 
   Scenario: Successfully retrieve a paginated list of user groups
     Given user login with username "j.doe" and password "test"
@@ -238,15 +243,15 @@ Feature: UserGroups
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
     And the response should contain a paginated list of user groups of 2 items on page 0
-    And the response should contain 2 total pages with 3 total elements
+    And the response should contain 2 total pages with 4 total elements
 
   Scenario: Successfully retrieve a paginated list of user groups
     Given user login with username "j.doe" and password "test"
     And I set the page number to 1 and page size to 2
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
-    And the response should contain a paginated list of user groups of 1 items on page 1
-    And the response should contain 2 total pages with 3 total elements
+    And the response should contain a paginated list of user groups of 2 items on page 1
+    And the response should contain 2 total pages with 4 total elements
 
   Scenario: No user groups found for the provided filters
     Given user login with username "j.doe" and password "test"
