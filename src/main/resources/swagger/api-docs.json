@@ -2342,7 +2342,7 @@
       "get" : {
         "tags" : [ "user-groups" ],
         "summary" : "getMyUserGroupById",
-        "description" : "Service to get a specific UserGroup entity",
+        "description" : "Service to get a specific UserGroup entity but only if you are member of it",
         "operationId" : "getMyUserGroupByIdUsingGET",
         "parameters" : [ {
           "name" : "id",
@@ -2415,7 +2415,7 @@
       "get" : {
         "tags" : [ "user-groups" ],
         "summary" : "getUserGroupById",
-        "description" : "Service to get a specific UserGroup entity",
+        "description" : "Service to get a specific UserGroup entity even if you are not member of it",
         "operationId" : "getUserGroupByIdUsingGET",
         "parameters" : [ {
           "name" : "id",

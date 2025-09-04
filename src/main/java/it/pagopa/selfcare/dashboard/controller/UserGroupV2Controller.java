@@ -140,7 +140,7 @@ public class UserGroupV2Controller {
 
     @GetMapping(value = "/me/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroup}")
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getMyUserGroup}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ListProductGroups')")
     public UserGroupResource getMyUserGroupById(@ApiParam("${swagger.dashboard.user-group.model.id}")
                                                 @PathVariable("id") String id,
