@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -158,19 +159,41 @@ public class UserGroupV2Controller {
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getUserGroups}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ManageProductGroups')")
     public Page<UserGroupPlainResource> getUserGroups(@ApiParam("${swagger.dashboard.user-group.model.institutionId}")
-                                                      @RequestParam(value = "institutionId", required = false) String institutionId,
+                                                      @RequestParam(value = "institutionId") String institutionId,
                                                       @ApiParam("${swagger.dashboard.user-group.model.productId}")
-                                                      @RequestParam(value = "productId", required = false) String productId,
+                                                      @RequestParam(value = "productId") String productId,
                                                       @ApiParam("${swagger.dashboard.user.model.id}")
                                                       @RequestParam(value = "userId", required = false) UUID memberId,
                                                       Pageable pageable) {
         log.trace("getUserGroups start");
-        log.debug("getUserGroups institutionId = {}, productId = {}, pageable = {}", institutionId, productId, pageable);
+        log.debug("getUserGroups institutionId = {}, productId = {}, memberId= {}, pageable = {}", Encode.forJava(institutionId),
+                Encode.forJava(productId), Encode.forJava(Optional.ofNullable(memberId).map(UUID::toString).orElse("")), Encode.forJava(pageable.toString()));
         Page<UserGroupPlainResource> groups = PageMapper.map(groupService.getUserGroups(institutionId, productId, memberId, pageable)
                 .map(groupMapperV2::toPlainUserGroupResource));
         log.debug("getUserGroups result = {}", groups);
         log.trace("getUserGroups end");
+        return groups;
+    }
+
+    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.user-group.api.getMyUserGroups}")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListProductGroups')")
+    public Page<UserGroupPlainResource> getMyUserGroups(@ApiParam("${swagger.dashboard.user-group.model.institutionId}")
+                                                        @RequestParam(value = "institutionId") String institutionId,
+                                                        @ApiParam("${swagger.dashboard.user-group.model.productId}")
+                                                        @RequestParam(value = "productId") String productId,
+                                                        Pageable pageable,
+                                                        Authentication authentication) {
+        log.trace("getMyUserGroups start");
+        SelfCareUser user = (SelfCareUser) authentication.getPrincipal();
+        log.debug("getMyUserGroups institutionId = {}, productId = {}, memberId = {}, pageable = {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(user.getId()), Encode.forJava(pageable.toString()));
+        Page<UserGroupPlainResource> groups = PageMapper.map(groupService.getUserGroups(institutionId, productId, UUID.fromString(user.getId()), pageable)
+                .map(groupMapperV2::toPlainUserGroupResource));
+        log.debug("getMyUserGroups result = {}", groups);
+        log.trace("getMyUserGroups end");
         return groups;
     }
 

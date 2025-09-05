@@ -230,8 +230,10 @@ Feature: UserGroups
     And the response should contain a paginated list of user groups of 1 items on page 0
     And the response should contain 1 total pages with 1 total elements
 
-  Scenario: Successfully retrieve user groups without any filters
+  Scenario: Successfully retrieve user groups without memberId
     Given user login with username "j.doe" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
     And the response should contain a paginated list of user groups of 4 items on page 0
@@ -240,6 +242,8 @@ Feature: UserGroups
   Scenario: Successfully retrieve a paginated list of user groups
     Given user login with username "j.doe" and password "test"
     And I set the page number to 0 and page size to 2
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
     And the response should contain a paginated list of user groups of 2 items on page 0
@@ -248,20 +252,38 @@ Feature: UserGroups
   Scenario: Successfully retrieve a paginated list of user groups
     Given user login with username "j.doe" and password "test"
     And I set the page number to 1 and page size to 2
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
     And the response should contain a paginated list of user groups of 2 items on page 1
     And the response should contain 2 total pages with 4 total elements
 
-  Scenario: No user groups found for the provided filters
+  Scenario: Access denied while searching groups with an operator user
     Given user login with username "j.doe" and password "test"
     And the institutionId is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2"
     And the productId is "prod-interop"
     And I have memberId "35a78332-d038-4bfa-8e85-2cba7f6b7bf7"
     When I send a GET request to "/v2/user-groups" to retrieve userGroups
+    Then the response status should be 403
+
+  Scenario: No user groups found for the provided filters
+    Given user login with username "j.doe" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    And the productId is "prod-pagopa"
+    When I send a GET request to "/v2/user-groups" to retrieve userGroups
     Then the response status should be 200
     And the response should contain an empty group list
 
+  Scenario: Successfully retrieve groups the user is member of
+    Given user login with username "j.doe" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
+    When I send a GET request to "/v2/user-groups/me" to retrieve userGroups
+    Then the response status should be 200
+    And the response should contain a paginated list of user groups of 3 items on page 0
+    And the response should contain 1 total pages with 3 total elements
+    And the response should not contain userGroup "68b703f2e027600fe56ceabf"
 
   Scenario: Successfully add a member to a group
     Given user login with username "j.doe" and password "test"

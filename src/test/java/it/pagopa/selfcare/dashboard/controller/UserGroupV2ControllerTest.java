@@ -510,4 +510,27 @@ class UserGroupV2ControllerTest extends BaseControllerTest {
         Assertions.assertEquals(Collections.emptyList(), pages.getContent());
         verifyNoMoreInteractions(groupServiceMock);
     }
+
+    @Test
+    void getMyUserGroups() throws Exception {
+        String instId = "institutionId";
+        String productId = "prod-io";
+        UUID userId = UUID.randomUUID();
+        Pageable pageable = mock(Pageable.class);
+
+        final SelfCareUser user = SelfCareUser.builder(userId.toString()).build();
+        final Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        byte[] userGroupStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "UserGroup.json"));
+        UserGroup userGroup = objectMapper.readValue(userGroupStream, new TypeReference<>() {});
+        when(groupServiceMock.getUserGroups(eq(instId), eq(productId), eq(userId), any(Pageable.class)))
+                .thenAnswer(invocation -> getPage(List.of(userGroup), invocation.getArgument(3, Pageable.class), () -> 1L));
+
+        Page<UserGroupPlainResource> pages = userGroupV2Controller.getMyUserGroups(instId, productId, pageable, authentication);
+        Assertions.assertEquals(1, pages.getTotalPages());
+        Assertions.assertEquals(1, pages.getContent().size());
+        verifyNoMoreInteractions(groupServiceMock);
+    }
+
 }
