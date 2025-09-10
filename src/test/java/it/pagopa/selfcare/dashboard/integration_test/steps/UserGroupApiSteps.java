@@ -315,6 +315,12 @@ public class UserGroupApiSteps {
         Assertions.assertEquals(totalElement,dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getTotalElements());
     }
 
+    @And("the response should not contain userGroup {string}")
+    public void theResponseShouldNotContainUserGroup(String id) {
+        Assertions.assertFalse(dashboardStepsUtil.responses.getUserGroupPlainResourcePageable().getContent().stream()
+                .anyMatch(g -> g.getId().equals(id)));
+    }
+
     @And("the user is removed from user group")
     public void theUserIsRemovedFromUserGroup() {
         usergroupISendAGETRequestTo("/v2/user-groups/{id}");

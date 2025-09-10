@@ -2150,13 +2150,13 @@
       "get" : {
         "tags" : [ "user-groups" ],
         "summary" : "getUserGroups",
-        "description" : "Service that allows to get a list of UserGroup entities",
+        "description" : "Service that allows to get a list of UserGroup entities even if you are not member of it",
         "operationId" : "getUserGroupsUsingGET",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "query",
           "description" : "Users group's institutionId",
-          "required" : false,
+          "required" : true,
           "style" : "form",
           "schema" : {
             "type" : "string"
@@ -2200,7 +2200,7 @@
           "name" : "productId",
           "in" : "query",
           "description" : "Users group's productId",
-          "required" : false,
+          "required" : true,
           "style" : "form",
           "schema" : {
             "type" : "string"
@@ -2321,6 +2321,123 @@
           },
           "409" : {
             "description" : "Conflict"
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v2/user-groups/me" : {
+      "get" : {
+        "tags" : [ "user-groups" ],
+        "summary" : "getMyUserGroups",
+        "description" : "Service that allows to get a list of UserGroup entities but only if you are member of it",
+        "operationId" : "getMyUserGroupsUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "query",
+          "description" : "Users group's institutionId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "description" : "The page number to access (0 indexed, defaults to 0)",
+          "required" : false,
+          "style" : "form",
+          "allowReserved" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Number of records per page (defaults to 20, max 2000)",
+          "required" : false,
+          "style" : "form",
+          "allowReserved" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "description" : "Sorting criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+          "required" : false,
+          "style" : "form",
+          "allowReserved" : true,
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Users group's productId",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageOfUserGroupPlainResource"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
           },
           "500" : {
             "description" : "Internal Server Error",
