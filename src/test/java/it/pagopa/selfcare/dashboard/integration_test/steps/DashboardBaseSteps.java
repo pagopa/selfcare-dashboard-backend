@@ -60,6 +60,12 @@ public class DashboardBaseSteps{
         Assertions.assertEquals(expectedSize, currentSize);
     }
 
+    @And("The response body doesn't contain field {string}")
+    public void checkResponseBodyMissingKey(String expectedJsonPath) {
+        final String currentValue = dashboardStepsUtil.getResponse().body().jsonPath().getString(expectedJsonPath);
+        Assertions.assertNull(currentValue);
+    }
+
     public TestProperties readDataPopulation() {
         TestProperties testProperties = null;
         try {
