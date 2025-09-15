@@ -23,7 +23,6 @@ Feature: Institution
       | externalId                  | 99000870064                           |
       | originId                    | c_d277                                |
       | origin                      | IPA                                   |
-      | institutionType             | PT                                    |
       | name                        | comune di dernice                     |
       | category                    | Comuni e loro Consorzi e Associazioni |
       | categoryCode                | L6                                    |
@@ -35,6 +34,8 @@ Feature: Institution
       | products[0].originId        | c_d277                                |
       | products[0].institutionType | PT                                    |
     And The response body contains the list "products" of size 4
+    # Field institutionType not present if productId not specified in request
+    And The response body doesn't contain field "institutionType"
 
   Scenario: Attempt to retrieve institution by institutionId without permissions (not onboarded)
     Given user login with username "r.balboa" and password "test"
@@ -52,7 +53,6 @@ Feature: Institution
       | externalId                  | 99000870064                           |
       | originId                    | c_d277                                |
       | origin                      | IPA                                   |
-      | institutionType             | PT                                    |
       | name                        | comune di dernice                     |
       | category                    | Comuni e loro Consorzi e Associazioni |
       | categoryCode                | L6                                    |
@@ -63,8 +63,9 @@ Feature: Institution
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
       | products[0].institutionType | PT                                    |
-
     And The response body contains the list "products" of size 4
+    # Field institutionType not present if productId not specified in request
+    And The response body doesn't contain field "institutionType"
 
   Scenario: Attempt to retrieve institution by institutionId v2 without permission (not onboarded)
     Given user login with username "r.balboa" and password "test"
