@@ -4,6 +4,7 @@ locals {
   api_name     = var.is_pnpg ? format("selc-%s-pnpg-api-bff-dashboard", var.env_short) : format("selc-%s-api-bff-dashboard", var.env_short)
   display_name = var.is_pnpg ? "BFF PNPG Dashboard API" : "BFF Dashboard API"
   base_path    = var.is_pnpg ? "imprese/dashboard" : "dashboard"
+  openapi_title= var.is_pnpg ? "selc-pnpg-dashboard" : "selc-dashboard"
 }
 
 
@@ -34,8 +35,9 @@ module "apim_api_bff_dashboard" {
 
   content_format = "openapi+json"
   content_value = templatefile("../../src/main/resources/swagger/api-docs.json", {
-    url      = format("%s.%s", var.api_dns_zone_prefix, var.external_domain)
-    basePath = local.base_path
+    openapi_title = local.openapi_title
+    url           = format("%s.%s", var.api_dns_zone_prefix, var.external_domain)
+    basePath      = local.base_path
   })
 
   subscription_required = false
