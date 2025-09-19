@@ -325,8 +325,12 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
     void getUserGroupById() {
         UUID userId = randomUUID();
         String groupId = "groupId";
+        String createdBy = "9c28efd4-a876-464a-bf2b-95a4bec60715";
+        String modifiedBy = "61658143-1870-4238-a54c-5029e2a70d4f";
         UserGroupResource userGroupResource = mockInstance(new UserGroupResource());
         userGroupResource.setMembers(List.of(userId));
+        userGroupResource.setCreatedBy(createdBy);
+        userGroupResource.setModifiedBy(modifiedBy);
         UserGroupInfo userGroupInfo = mockInstance(new UserGroupInfo());
 
         UserDataResponse user = mockInstance(new UserDataResponse());
@@ -337,8 +341,8 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
 
         when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
         when(userApiRestClient._retrieveUsers(anyString(), anyString(), any(), any(),any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(user)));
-        when(userApiRestClient._getUserDetailsById("setCreatedBy", "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
-        when(userApiRestClient._getUserDetailsById("setModifiedBy", "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
+        when(userApiRestClient._getUserDetailsById(createdBy, "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
+        when(userApiRestClient._getUserDetailsById(modifiedBy, "name,familyName", "setInstitutionId")).thenReturn(ResponseEntity.ok(userDetail));
 
         UserGroupInfo groupInfo = userGroupV2Service.getUserGroupById(groupId);
         Assertions.assertEquals(userGroupInfo.getInstitutionId(), groupInfo.getInstitutionId());
@@ -369,12 +373,8 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
         userDataResponse.setRole("MANAGER");
         userDataResponse.setInstitutionId("institutionId");
 
-        final UserDetailResponse userDetailResponse = new UserDetailResponse();
-        userDetailResponse.setId(memberId);
-
         when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
         when(userApiRestClient._retrieveUsers(anyString(), anyString(), any(), any(),any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(userDataResponse)));
-        when(userApiRestClient._getUserDetailsById(anyString(), anyString(), anyString())).thenReturn(ResponseEntity.ok(userDetailResponse));
 
         Assertions.assertDoesNotThrow(() -> userGroupV2Service.getUserGroupById(groupId, memberId));
     }
@@ -393,7 +393,6 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
         userGroupResource.setName("groupName");
         userGroupResource.setDescription("groupDescription");
         userGroupResource.setMembers(List.of(UUID.fromString("81b90c5e-67e4-44bc-85d3-3556f409f11d")));
-        userGroupResource.setCreatedBy("");
 
         final UserDataResponse userDataResponse = new UserDataResponse();
         userDataResponse.setId("userInstitutionId");
@@ -402,12 +401,8 @@ class UserGroupV2ServiceImplTest extends BaseServiceTest {
         userDataResponse.setRole("MANAGER");
         userDataResponse.setInstitutionId("institutionId");
 
-        final UserDetailResponse userDetailResponse = new UserDetailResponse();
-        userDetailResponse.setId("81b90c5e-67e4-44bc-85d3-3556f409f11d");
-
         when(userGroupRestClient._getUserGroupUsingGET(groupId)).thenReturn(ResponseEntity.ok(userGroupResource));
         when(userApiRestClient._retrieveUsers(anyString(), anyString(), any(), any(),any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(userDataResponse)));
-        when(userApiRestClient._getUserDetailsById(anyString(), anyString(), anyString())).thenReturn(ResponseEntity.ok(userDetailResponse));
 
         Assertions.assertThrows(InvalidUserGroupException.class, () -> userGroupV2Service.getUserGroupById(groupId, memberId));
     }
