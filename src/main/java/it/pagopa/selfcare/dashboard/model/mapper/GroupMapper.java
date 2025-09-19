@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.model.user.CertifiedField;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user_groups.*;
+import it.pagopa.selfcare.dashboard.utils.EncodingUtils;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
 import org.mapstruct.Mapper;
@@ -121,7 +122,7 @@ public interface GroupMapper {
         return Optional.ofNullable(model)
                 .map(user -> {
                     PlainUserResource resource = new PlainUserResource();
-                    resource.setId(UUID.fromString(user.getId()));
+                    resource.setId(EncodingUtils.toUUIDOrNull(user.getId()));
                     Optional.ofNullable(user.getName())
                             .map(CertifiedField::getValue)
                             .ifPresent(resource::setName);
