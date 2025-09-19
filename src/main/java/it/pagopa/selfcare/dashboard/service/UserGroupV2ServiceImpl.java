@@ -206,15 +206,15 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
         userGroupInfo.setMembers(members);
 
         // createdBy
-        Optional.ofNullable(userGroupInfo.getCreatedBy()).filter(user -> EncodingUtils.isUUID(user.getId())).ifPresent(user -> {
+        Optional.ofNullable(userGroupInfo.getCreatedBy()).filter(user -> EncodingUtils.isUUID(user.getId())).ifPresentOrElse(user -> {
             User createdBy = getUserById(user.getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
             userGroupInfo.setCreatedBy(createdBy);
-        });
+        }, () -> userGroupInfo.setCreatedBy(null));
         // modifiedBy
-        Optional.ofNullable(userGroupInfo.getModifiedBy()).filter(user -> EncodingUtils.isUUID(user.getId())).ifPresent(user -> {
+        Optional.ofNullable(userGroupInfo.getModifiedBy()).filter(user -> EncodingUtils.isUUID(user.getId())).ifPresentOrElse(user -> {
             User modifiedBy = getUserById(user.getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
             userGroupInfo.setModifiedBy(modifiedBy);
-        });
+        }, () -> userGroupInfo.setModifiedBy(null));
 
         return userGroupInfo;
     }
