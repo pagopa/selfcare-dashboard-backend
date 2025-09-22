@@ -33,9 +33,11 @@
   "institutionType": "AS",
   "onboarding": [
     {
-      "productId": "setProductId",
+      "productId": "prod-pagopa",
       "isAggregator": true,
       "createdAt": "2024-06-11T10:09:30.154695400+02:00",
+      "institutionType": "PT",
+      "status": "ACTIVE",
       "billing": {
         "publicServices": false,
         "recipientCode": "setRecipientCode",

@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.exception.InvalidProductRoleException;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
+import it.pagopa.selfcare.dashboard.model.institution.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
@@ -202,11 +203,24 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.trace("createOrUpdateUserByFiscalCode start");
         log.debug("createOrUpdateUserByFiscalCode userDto = {}", userDto);
         Institution institution = verifyOnboardingStatus(institutionId, productId);
-        Product product = verifyProductPhasesAndRoles(productId, institution.getInstitutionType(), userDto.getRole(), userDto.getProductRoles());
+        OnboardedProduct validOnboarding = getValidOnboarding(institutionId, productId, institution);
+        Product product = verifyProductPhasesAndRoles(productId, validOnboarding.getInstitutionType().toString(), userDto.getRole(), userDto.getProductRoles());
         List<CreateUserDto.Role> role = retrieveRole(product, userDto.getProductRoles(), userDto.getRole());
         String userId = createOrUpdateUserByFiscalCode(institution, productId, userDto, role);
         log.trace("createOrUpdateUserByFiscalCode end");
         return userId;
+    }
+
+    private static OnboardedProduct getValidOnboarding(String institutionId, String productId, Institution institution) {
+        return institution.getOnboarding().stream()
+                .filter(onb ->
+                        productId.equals(onb.getProductId())
+                                && ACTIVE.equals(onb.getStatus())
+                )
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Institution %s not active for product %s",
+                                institutionId, productId)));
     }
 
     private String createOrUpdateUserByFiscalCode(Institution institution, String productId, UserToCreate userDto, List<CreateUserDto.Role> roles) {
@@ -254,8 +268,9 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", Encode.forJava(userId));
         Institution institution = verifyOnboardingStatus(institutionId, productId);
+        OnboardedProduct validOnboarding = getValidOnboarding(institutionId, productId, institution);
         PartyRole partyRole = Optional.ofNullable(role).map(PartyRole::valueOf).orElse(null);
-        Product product = verifyProductPhasesAndRoles(productId, institution.getInstitutionType(), partyRole, productRoles);
+        Product product = verifyProductPhasesAndRoles(productId, validOnboarding.getInstitutionType().toString(), partyRole, productRoles);
         List<CreateUserDto.Role> roleDto = retrieveRole(product, productRoles, partyRole);
         createOrUpdateUserByUserId(institution, productId, userId, roleDto);
         log.trace("createOrUpdateUserByUserId end");
