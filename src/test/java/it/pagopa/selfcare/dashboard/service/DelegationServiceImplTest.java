@@ -1,14 +1,13 @@
 package it.pagopa.selfcare.dashboard.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationWithPaginationResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionsResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.client.CoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
+import it.pagopa.selfcare.dashboard.model.delegation.DelegationRequest;
+import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.InstitutionType;
@@ -120,6 +119,46 @@ class DelegationServiceImplTest extends BaseServiceTest {
         Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
                 ._createDelegationUsingPOST(any());
     }
+
+    @Test
+    void testCreateDelegationPagoPaWithValidInstitution() {
+        DelegationRequest delegation = new DelegationRequest();
+        delegation.setProductId(PROD_PAGOPA.getValue());
+        delegation.setTo("taxCode");
+        delegation.setFrom("from");
+        delegation.setType(DelegationType.PT);
+
+        InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        InstitutionResponse institutionResponse = new InstitutionResponse();
+        institutionResponse.setId("institutionId");
+        institutionResponse.setOnboarding(List.of(
+                new OnboardedProductResponse()
+                        .productId(PROD_PAGOPA.getValue())
+                        .status(OnboardedProductResponse.StatusEnum.ACTIVE)
+        ));
+
+        institutionsResponse.setInstitutions(List.of(institutionResponse));
+
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(institutionsResponse));
+
+        DelegationResponse delegationResponse = new DelegationResponse();
+        delegationResponse.setId("delegationId");
+
+        when(coreDelegationApiRestClient._createDelegationUsingPOST(any()))
+                .thenReturn(ResponseEntity.ok(delegationResponse));
+
+        DelegationId result = delegationServiceImpl.createDelegation(delegation);
+
+        Assertions.assertEquals("delegationId", result.getId());
+        Assertions.assertEquals("institutionId", delegation.getTo());
+
+        Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
+                ._getInstitutionsUsingGET(any(), any(), any(), any(), any());
+        Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
+                ._createDelegationUsingPOST(any());
+    }
+
 
     @Test
     void testCreateDelegationWithResourceNotFoundException() {
