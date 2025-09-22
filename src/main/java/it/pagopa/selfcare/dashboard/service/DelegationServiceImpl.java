@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
+import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
@@ -73,16 +74,30 @@ public class DelegationServiceImpl implements DelegationService {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", Encode.forJava(delegation.getTo()));
         Assert.hasText(delegation.getTo(), REQUIRED_TAX_CODE_MESSAGE);
-        InstitutionsResponse institutionsResponse = coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null, null).getBody();
+
+        InstitutionsResponse institutionsResponse =
+                coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null, null).getBody();
+
         if (institutionsResponse != null) {
-            List<Institution> institutions = institutionsResponse.getInstitutions().stream().map(institutionMapper::toInstitution).toList();
+            List<Institution> institutions = institutionsResponse.getInstitutions()
+                    .stream()
+                    .map(institutionMapper::toInstitution)
+                    .toList();
+
             Institution partner = institutions.stream()
-                    .filter(institution -> InstitutionType.PT.name().equals(institution.getInstitutionType()))
+                    .filter(institution -> institution.getOnboarding() != null &&
+                            institution.getOnboarding().stream()
+                                    .anyMatch(onb ->
+                                            delegation.getProductId().equals(onb.getProductId())
+                                                    && RelationshipState.ACTIVE.equals(onb.getStatus())
+                                            && InstitutionType.PT.equals(onb.getInstitutionType())
+                                    )
+                    )
                     .findFirst()
-                    .orElse(institutions.stream().findFirst()
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                    String.format(INSTITUTION_TAX_CODE_NOT_FOUND, delegation.getTo()))
-                            ));
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            String.format(INSTITUTION_TAX_CODE_NOT_FOUND, delegation.getTo()))
+                    );
+
             delegation.setTo(partner.getId());
         }
     }

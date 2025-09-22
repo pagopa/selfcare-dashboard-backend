@@ -1,13 +1,11 @@
 package it.pagopa.selfcare.dashboard.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.DelegationWithPaginationResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
-import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionsResponse;
+import it.pagopa.selfcare.core.generated.openapi.v1.dto.*;
 import it.pagopa.selfcare.dashboard.client.CoreDelegationApiRestClient;
 import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.model.delegation.DelegationRequest;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
@@ -120,6 +118,40 @@ class DelegationServiceImplTest extends BaseServiceTest {
         Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
                 ._createDelegationUsingPOST(any());
     }
+
+    @Test
+    void testCreateDelegationPagoPaWithNoActiveOnboarding() {
+        DelegationRequest delegation = new DelegationRequest();
+        delegation.setProductId(PROD_PAGOPA.getValue());
+        delegation.setTo("taxCode");
+        delegation.setFrom("from");
+        delegation.setType(DelegationType.PT);
+
+        InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        InstitutionResponse institutionResponse = new InstitutionResponse();
+        institutionResponse.setId("institutionId");
+
+        institutionResponse.setOnboarding(List.of(
+                new OnboardedProductResponse()
+                        .productId(PROD_PAGOPA.getValue())
+                        .status(OnboardedProductResponse.StatusEnum.DELETED)
+        ));
+        institutionsResponse.setInstitutions(List.of(institutionResponse));
+
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(institutionsResponse));
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                delegationServiceImpl.createDelegation(delegation)
+        );
+
+        Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
+                ._getInstitutionsUsingGET(any(), any(), any(), any(), any());
+        Mockito.verify(coreDelegationApiRestClient, Mockito.never())
+                ._createDelegationUsingPOST(any());
+    }
+
+
 
     @Test
     void testCreateDelegationWithResourceNotFoundException() {

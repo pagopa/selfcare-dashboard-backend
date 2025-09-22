@@ -60,7 +60,7 @@ public class SwaggerConfig {
     public Docket swaggerSpringPlugin(@Autowired TypeResolver typeResolver) {
         return (new Docket(DocumentationType.OAS_30))
                 .apiInfo(new ApiInfoBuilder()
-                        .title(environment.getProperty("swagger.title", environment.getProperty("spring.application.name")))
+                        .title("${openapi_title}")
                         .description(environment.getProperty("swagger.description", "Api and Models"))
                         .version(environment.getProperty("swagger.version", environment.getProperty("spring.application.version")))
                         .build())
