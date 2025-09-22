@@ -121,7 +121,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
     }
 
     @Test
-    void testCreateDelegationPagoPaWithValidInstitution() {
+    void testCreateDelegationPagoPaWithNoActiveOnboarding() {
         DelegationRequest delegation = new DelegationRequest();
         delegation.setProductId(PROD_PAGOPA.getValue());
         delegation.setTo("taxCode");
@@ -131,33 +131,27 @@ class DelegationServiceImplTest extends BaseServiceTest {
         InstitutionsResponse institutionsResponse = new InstitutionsResponse();
         InstitutionResponse institutionResponse = new InstitutionResponse();
         institutionResponse.setId("institutionId");
+
         institutionResponse.setOnboarding(List.of(
                 new OnboardedProductResponse()
                         .productId(PROD_PAGOPA.getValue())
-                        .status(OnboardedProductResponse.StatusEnum.ACTIVE)
+                        .status(OnboardedProductResponse.StatusEnum.DELETED)
         ));
-
         institutionsResponse.setInstitutions(List.of(institutionResponse));
 
         when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(institutionsResponse));
 
-        DelegationResponse delegationResponse = new DelegationResponse();
-        delegationResponse.setId("delegationId");
-
-        when(coreDelegationApiRestClient._createDelegationUsingPOST(any()))
-                .thenReturn(ResponseEntity.ok(delegationResponse));
-
-        DelegationId result = delegationServiceImpl.createDelegation(delegation);
-
-        Assertions.assertEquals("delegationId", result.getId());
-        Assertions.assertEquals("institutionId", delegation.getTo());
+        assertThrows(ResourceNotFoundException.class, () ->
+                delegationServiceImpl.createDelegation(delegation)
+        );
 
         Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
                 ._getInstitutionsUsingGET(any(), any(), any(), any(), any());
-        Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
+        Mockito.verify(coreDelegationApiRestClient, Mockito.never())
                 ._createDelegationUsingPOST(any());
     }
+
 
 
     @Test
