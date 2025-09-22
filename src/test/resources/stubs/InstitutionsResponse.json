@@ -36,7 +36,7 @@
       "productId": "prod-pagopa",
       "isAggregator": true,
       "createdAt": "2024-06-11T10:09:30.154695400+02:00",
-      "institutionType": "PA",
+      "institutionType": "PT",
       "status": "ACTIVE",
       "billing": {
         "publicServices": false,
