@@ -1,7 +1,7 @@
 {
   "openapi" : "3.0.3",
   "info" : {
-    "title" : "${openapi_title}",
+    "title" : "selc-dashboard",
     "description" : "Self Care Dashboard API documentation",
     "version" : "0.0.1-SNAPSHOT"
   },
