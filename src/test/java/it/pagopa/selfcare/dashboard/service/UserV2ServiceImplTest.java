@@ -333,6 +333,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         OnboardedProductResponse onb = new OnboardedProductResponse();
         onb.setProductId(productId);
         onb.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onb.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PA);
 
         institutionMock.setOnboarding(List.of(onb));
 
@@ -368,6 +369,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         OnboardedProductResponse onb = new OnboardedProductResponse();
         onb.setProductId(productId);
         onb.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onb.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.GPU);
 
         institutionMock.setOnboarding(List.of(onb));
 
@@ -415,6 +417,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
         onboardedProduct.setProductId(productId);
         onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.GSP);
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
@@ -450,6 +453,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
         onboardedProduct.setProductId(productId);
         onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PA);
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
@@ -476,6 +480,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
         onboardedProduct.setProductId(productId);
         onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PT);
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
@@ -523,6 +528,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         OnboardedProductResponse onb = new OnboardedProductResponse();
         onb.setProductId(productId);
         onb.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onb.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PRV);
 
         institutionMock.setOnboarding(List.of(onb));
 
@@ -573,6 +579,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         OnboardedProductResponse onboardedProductResponse = new OnboardedProductResponse();
         onboardedProductResponse.setProductId(productId);
         onboardedProductResponse.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProductResponse.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PA);
 
         institutionMock.setOnboarding(List.of(onboardedProductResponse));
 
@@ -623,6 +630,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
         onboardedProduct.setProductId(productId);
         onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PRV);
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(productService.getProduct(productId)).thenReturn(product);
@@ -655,6 +663,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
         onboardedProduct.setProductId(productId);
         onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PA);
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(productService.getProduct(productId)).thenReturn(product);
@@ -690,6 +699,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final OnboardedProductResponse onboardedProduct = new OnboardedProductResponse();
         onboardedProduct.setProductId(productId);
         onboardedProduct.setStatus(OnboardedProductResponse.StatusEnum.ACTIVE);
+        onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PA);
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(productService.getProduct(productId)).thenReturn(product);
