@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
+import it.pagopa.selfcare.dashboard.utils.EncodingUtils;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.CreateUserGroupDto;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.PageOfUserGroupResource;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UpdateUserGroupDto;
@@ -204,12 +205,17 @@ public class UserGroupV2ServiceImpl implements UserGroupV2Service {
 
         userGroupInfo.setMembers(members);
 
-        User createdBy = getUserById(userGroupInfo.getCreatedBy().getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
-        userGroupInfo.setCreatedBy(createdBy);
-        if (userGroupInfo.getModifiedBy() != null) {
-            User modifiedBy = getUserById(userGroupInfo.getModifiedBy().getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
+        // createdBy
+        Optional.ofNullable(userGroupInfo.getCreatedBy()).filter(user -> EncodingUtils.isUUID(user.getId())).ifPresentOrElse(user -> {
+            User createdBy = getUserById(user.getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
+            userGroupInfo.setCreatedBy(createdBy);
+        }, () -> userGroupInfo.setCreatedBy(null));
+        // modifiedBy
+        Optional.ofNullable(userGroupInfo.getModifiedBy()).filter(user -> EncodingUtils.isUUID(user.getId())).ifPresentOrElse(user -> {
+            User modifiedBy = getUserById(user.getId(), institutionId, FIELD_LIST.stream().map(Enum::name).toList());
             userGroupInfo.setModifiedBy(modifiedBy);
-        }
+        }, () -> userGroupInfo.setModifiedBy(null));
+
         return userGroupInfo;
     }
 
