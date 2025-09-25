@@ -35,4 +35,7 @@ public class CreateUserDto {
     @NotEmpty
     private Set<String> productRoles;
 
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.toAddOnAggregates}")
+    private Boolean toAddOnAggregates;
+
 }

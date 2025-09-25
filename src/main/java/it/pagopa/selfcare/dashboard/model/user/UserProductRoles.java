@@ -14,4 +14,7 @@ public class UserProductRoles {
 
     @NotEmpty
     Set<String> productRoles;
+
+    @ApiModelProperty(value = "${swagger.dashboard.user.model.toAddOnAggregates}")
+    private Boolean toAddOnAggregates;
 }

@@ -196,6 +196,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         final String userId = "userId";
         UserProductRoles userProductRoles = new UserProductRoles();
         userProductRoles.setProductRoles(Set.of("admin"));
+        userProductRoles.setToAddOnAggregates(true);
 
         Authentication authentication = mock(Authentication.class);
 
@@ -211,7 +212,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         // then
         verify(userServiceMock, times(1))
-                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles(), userProductRoles.getRole());
+                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getToAddOnAggregates(), userProductRoles.getProductRoles(), userProductRoles.getRole());
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -225,6 +226,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         UserProductRoles userProductRoles = new UserProductRoles();
         userProductRoles.setProductRoles(Set.of("admin"));
         userProductRoles.setRole("MANAGER");
+        userProductRoles.setToAddOnAggregates(true);
 
         Authentication authentication = mock(Authentication.class);
 
@@ -240,7 +242,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         // then
         verify(userServiceMock, times(1))
-                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles(), userProductRoles.getRole());
+                .addUserProductRoles(institutionId, productId, userId, userProductRoles.getToAddOnAggregates(), userProductRoles.getProductRoles(), userProductRoles.getRole());
         verifyNoMoreInteractions(userServiceMock);
     }
 
@@ -278,6 +280,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         createUserDto.setTaxCode("ABC123");
         createUserDto.setEmail("john.doe@example.com");
         createUserDto.setProductRoles(Set.of("admin"));
+        createUserDto.setToAddOnAggregates(true);
 
         UserToCreate userToCreate = userMapper.toUserToCreate(createUserDto);
 
@@ -314,6 +317,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         createUserDto.setEmail("john.doe@example.com");
         createUserDto.setProductRoles(Set.of("admin"));
         createUserDto.setRole("MANAGER");
+        createUserDto.setToAddOnAggregates(true);
 
         UserToCreate userToCreate = userMapper.toUserToCreate(createUserDto);
 

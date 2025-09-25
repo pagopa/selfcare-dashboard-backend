@@ -31,7 +31,7 @@ public interface UserV2Service {
 
     String createUsers(String institutionId, String productId, UserToCreate userToCreate);
 
-    void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role);
+    void addUserProductRoles(String institutionId, String productId, String userId, Boolean toAddOnAggregates, Set<String> productRoles, String role);
 
     UsersCountResponse getUserCount(String institutionId, String productId, List<String> roles, List<String> status);
 

@@ -13,4 +13,5 @@ public class UserToCreate {
     private String email;
     private PartyRole role;
     private Set<String> productRoles;
+    private Boolean toAddOnAggregates;
 }
