@@ -249,6 +249,7 @@ public class DashboardStepsUtil {
         createUserDto.setEmail(entry.get("email"));
         createUserDto.setRole(entry.get("role"));
         createUserDto.setProductRoles(mapProductRoles(entry.get("productRoles")));
+        createUserDto.setToAddOnAggregates(Boolean.valueOf(entry.get("toAddOnAggregates")));
 
         return createUserDto;
     }
@@ -258,6 +259,7 @@ public class DashboardStepsUtil {
 
         createUserDto.setRole(entry.get("role"));
         createUserDto.setProductRoles(mapProductRoles(entry.get("productRoles")));
+        createUserDto.setToAddOnAggregates(Boolean.valueOf(entry.get("toAddOnAggregates")));
 
         return createUserDto;
     }
