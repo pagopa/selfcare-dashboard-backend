@@ -237,7 +237,7 @@ public class UserV2ServiceImpl implements UserV2Service {
                 .institutionId(institution.getId())
                 .institutionDescription(institution.getDescription())
                 .user(buildUser(userDto))
-                .product(buildProduct(productId, roles));
+                .product(buildProduct(productId, roles, userDto.getToAddOnAggregates()));
 
         if (!Objects.isNull(institution.getRootParent())) {
             builder.institutionRootName(institution.getRootParent().getDescription());
@@ -255,16 +255,17 @@ public class UserV2ServiceImpl implements UserV2Service {
                 .build();
     }
 
-    private Product1 buildProduct(String productId, List<CreateUserDto.Role> roles) {
+    private Product1 buildProduct(String productId, List<CreateUserDto.Role> roles, Boolean toAddOnAggregates) {
         return Product1.builder()
                 .productRoles(roles.stream().map(CreateUserDto.Role::getProductRole).toList())
                 .role(roles.get(0).getPartyRole().name())
                 .productId(productId)
+                .toAddOnAggregates(toAddOnAggregates)
                 .build();
     }
 
     @Override
-    public void addUserProductRoles(String institutionId, String productId, String userId, Set<String> productRoles, String role) {
+    public void addUserProductRoles(String institutionId, String productId, String userId, Boolean toAddOnAggregates, Set<String> productRoles, String role) {
         log.trace("createOrUpdateUserByUserId start");
         log.debug("createOrUpdateUserByUserId userId = {}", Encode.forJava(userId));
         Institution institution = verifyOnboardingStatus(institutionId, productId);
@@ -272,7 +273,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         PartyRole partyRole = Optional.ofNullable(role).map(PartyRole::valueOf).orElse(null);
         Product product = verifyProductPhasesAndRoles(productId, validOnboarding.getInstitutionType().toString(), partyRole, productRoles);
         List<CreateUserDto.Role> roleDto = retrieveRole(product, productRoles, partyRole);
-        createOrUpdateUserByUserId(institution, productId, userId, roleDto);
+        createOrUpdateUserByUserId(institution, productId, userId, roleDto, toAddOnAggregates);
         log.trace("createOrUpdateUserByUserId end");
     }
 
@@ -320,7 +321,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         }).toList();
     }
 
-    private void createOrUpdateUserByUserId(Institution institution, String productId, String userId, List<CreateUserDto.Role> roles) {
+    private void createOrUpdateUserByUserId(Institution institution, String productId, String userId, List<CreateUserDto.Role> roles, Boolean toAddOnAggregates) {
 
         var addUserRoleDtoBuilder = AddUserRoleDto.builder()
                 .institutionId(institution.getId())
@@ -329,6 +330,7 @@ public class UserV2ServiceImpl implements UserV2Service {
                         .productRoles(roles.stream().map(CreateUserDto.Role::getProductRole).toList())
                         .role(roles.get(0).getPartyRole().name())
                         .productId(productId)
+                        .toAddOnAggregates(toAddOnAggregates)
                         .build());
 
         if (!Objects.isNull(institution.getRootParent())) {
