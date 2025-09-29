@@ -176,6 +176,16 @@ Feature: Institution
     Then the response status should be 200
     And the response should contain an empty institutions list
 
+  Scenario: Successfully create user product by a user by institutionId
+    Given user login with username "j.doe" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-pagopa"
+    And the following user data request details:
+      | name  | surname | taxCode          | email      | role     | productRoles | toAddOnAggregates |
+      | Rocky | Balboa  | blbrki80A41H401T | rb@test.it | OPERATOR | operator     | true              |
+    When I send a POST request to "/v2/institutions/{institutionId}/products/{productId}/users" to create a new user related to a product for institutions
+    Then the response status should be 201
+
   Scenario: Attempt to create user product by a user by institutionId and with an existent different role
     Given user login with username "j.doe" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
@@ -244,15 +254,15 @@ Feature: Institution
     And the productId is "prod-interop"
     And the userId is "35a78332-d038-4bfa-8e85-2cba7f6b7bf7"
     And the following user product request details:
-      | role     | productRoles |
-      | OPERATOR | security     |
+      | role     | productRoles | toAddOnAggregates |
+      | OPERATOR | security     | true              |
     When I send a PUT request to "/v2/institutions/{institutionId}/products/{productId}/users/{userId}" to add a new user related to a product for institutions
     Then the response status should be 201
     And I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
     Then the response status should be 200
     And The response body contains:
       | id         | 35a78332-d038-4bfa-8e85-2cba7f6b7bf7 |
-    And The response body contains the list "products" of size 2
+    And The response body contains the list "products" of size 3
 
   Scenario: Attempt to add user by institutionId, productId and userId without permission
     Given user login with username "j.doe" and password "test"
@@ -318,7 +328,7 @@ Feature: Institution
     When I send a GET request to "/v2/institutions/{institutionId}/products/{productId}/users/count" to get users count
     Then the response status should be 200
     And The response body contains:
-      | count | 2 |
+      | count | 3 |
 
   Scenario: Attempt to get User Count without permission (OPERATOR)
     Given user login with username "j.doe" and password "test"

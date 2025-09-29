@@ -144,7 +144,7 @@ public class InstitutionV2Controller {
                                     UserProductRoles userProductRoles) {
         log.trace("addUserProductRoles start");
         log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
-        userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getProductRoles(), userProductRoles.getRole());
+        userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getToAddOnAggregates(), userProductRoles.getProductRoles(), userProductRoles.getRole());
         log.trace("addUserProductRoles end");
     }
 

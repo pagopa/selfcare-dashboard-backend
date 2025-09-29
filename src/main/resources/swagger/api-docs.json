@@ -3691,6 +3691,11 @@
           "taxCode" : {
             "type" : "string",
             "description" : "User's fiscal code"
+          },
+          "toAddOnAggregates" : {
+            "type" : "boolean",
+            "description" : "Enable automatic management of group assignment",
+            "example" : false
           }
         }
       },
@@ -5102,6 +5107,11 @@
           "role" : {
             "type" : "string",
             "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
+          },
+          "toAddOnAggregates" : {
+            "type" : "boolean",
+            "description" : "Enable automatic management of group assignment",
+            "example" : false
           }
         }
       },

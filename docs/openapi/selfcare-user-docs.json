@@ -1817,6 +1817,9 @@
           },
           "delegationId" : {
             "type" : "string"
+          },
+          "toAddOnAggregates" : {
+            "type" : "boolean"
           }
         }
       },
@@ -1840,6 +1843,9 @@
             "items" : {
               "type" : "string"
             }
+          },
+          "toAddOnAggregates" : {
+            "type" : "boolean"
           }
         }
       },

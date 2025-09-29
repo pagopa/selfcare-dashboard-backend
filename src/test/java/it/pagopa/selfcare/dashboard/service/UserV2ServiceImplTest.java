@@ -311,6 +311,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
         String role = "OPERATOR";
+        Boolean toAddOnAggregates = true;
         Product product = getProduct();
 
         Institution institution = new Institution();
@@ -340,7 +341,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
         when(productService.getProduct(productId)).thenReturn(product);
 
-        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role);
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, role);
 
         verify(userApiRestClient, times(1))._createOrUpdateByUserId(anyString(), any());
         verifyNoMoreInteractions(userApiRestClient);
@@ -352,6 +353,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String productId = "productId";
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
+        Boolean toAddOnAggregates = true;
         Product product = getProduct();
 
         Institution institution = new Institution();
@@ -381,7 +383,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
         when(productService.getProduct(productId)).thenReturn(product);
 
-        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, OPERATOR.name());
+        userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, OPERATOR.name());
 
         verify(userApiRestClient, times(1))._createOrUpdateByUserId(anyString(), any());
         verifyNoMoreInteractions(userApiRestClient);
@@ -394,13 +396,14 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String userId = "userId";
         Set<String> productRoles = new HashSet<>(List.of("operator"));
         String role = "MANAGER";
+        Boolean toAddOnAggregates = true;
 
         InstitutionResponse institution = new InstitutionResponse();
         institution.setId(institutionId);
 
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
 
-        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role));
+        Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, role));
 
         verifyNoInteractions(userApiRestClient);
     }
@@ -411,6 +414,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String productId = "productId";
         final String userId = "userId";
         final Set<String> productRoles = Set.of("operator");
+        Boolean toAddOnAggregates = true;
         final Product product = getProduct();
 
         final InstitutionResponse institution = new InstitutionResponse();
@@ -424,11 +428,11 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         when(productService.getProduct(productId)).thenReturn(product);
 
         assertThrows(InvalidProductRoleException.class,
-                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, null),
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, null),
                 "The product doesn't allow adding users directly with these role and productRoles");
 
         assertThrows(InvalidProductRoleException.class,
-                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, "MANAGER"),
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, "MANAGER"),
                 "The product doesn't allow adding users directly with these role and productRoles");
     }
 
@@ -439,6 +443,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String userId = "userId";
         final Set<String> productRoles = Set.of("manager");
         final String role = "MANAGER";
+        Boolean toAddOnAggregates = true;
 
         final Product product = getProduct();
         final ProductRoleInfo productRoleInfoManager = new ProductRoleInfo();
@@ -460,7 +465,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         when(productService.getProduct(productId)).thenReturn(product);
 
         assertThrows(InvalidProductRoleException.class,
-                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role),
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, role),
                 "The product doesn't allow adding users directly with these role and productRoles");
     }
 
@@ -471,6 +476,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String userId = "userId";
         final Set<String> productRoles = Set.of("operator2", "operator0", "operator1");
         final String role = "OPERATOR";
+        Boolean toAddOnAggregates = true;
 
         final Product product = getProduct();
         final ProductRoleInfo productRoleInfoOperator = getProductRoleInfo();
@@ -487,7 +493,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         when(productService.getProduct(productId)).thenReturn(product);
 
         assertThrows(InvalidProductRoleException.class,
-                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, productRoles, role),
+                () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, role),
                 "The product doesn't allow adding users directly with these role and productRoles");
     }
 
@@ -514,6 +520,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         productRoles.add(productRole);
         userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
+        userToCreate.setToAddOnAggregates(true);
 
         Product product = getProduct();
 
@@ -559,6 +566,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         productRoles.add(productRole);
         userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
+        userToCreate.setToAddOnAggregates(true);
 
         Product product = getProduct();
 
@@ -603,6 +611,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         HashSet<String> productRoles = new HashSet<>();
         productRoles.add("operator");
         userToCreate.setProductRoles(productRoles);
+        userToCreate.setToAddOnAggregates(true);
 
         InstitutionResponse institutionMock = new InstitutionResponse();
         institutionMock.setId(institutionId);
@@ -623,6 +632,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final Set<String> productRoles = Set.of("manager");
         userToCreate.setRole(MANAGER);
         userToCreate.setProductRoles(productRoles);
+        userToCreate.setToAddOnAggregates(true);
 
         final Product product = getProduct();
 
@@ -649,6 +659,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final Set<String> productRoles = Set.of("manager");
         userToCreate.setRole(MANAGER);
         userToCreate.setProductRoles(productRoles);
+        userToCreate.setToAddOnAggregates(true);
 
         final Product product = getProduct();
         final ProductRoleInfo productRoleInfoManager = new ProductRoleInfo();
@@ -682,6 +693,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final Set<String> productRoles = Set.of("operator2", "operator0", "operator1");
         userToCreate.setRole(OPERATOR);
         userToCreate.setProductRoles(productRoles);
+        userToCreate.setToAddOnAggregates(true);
 
         final Product product = getProduct();
         final ProductRoleInfo productRoleInfoOperator = new ProductRoleInfo();
