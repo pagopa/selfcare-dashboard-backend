@@ -12,7 +12,6 @@ import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
-import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +89,6 @@ public class DelegationServiceImpl implements DelegationService {
                                     .anyMatch(onb ->
                                             delegation.getProductId().equals(onb.getProductId())
                                                     && RelationshipState.ACTIVE.equals(onb.getStatus())
-                                            && InstitutionType.PT.equals(onb.getInstitutionType())
                                     )
                     )
                     .findFirst()
