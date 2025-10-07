@@ -157,7 +157,7 @@
         } ]
       },
       "post" : {
-        "tags" : [ "Delegation" ],
+        "tags" : [ "Delegation", "support" ],
         "summary" : "Create an association between institution id and technical partner",
         "description" : "Create an association between institution id and technical partner",
         "operationId" : "createDelegationUsingPOST",
@@ -203,6 +203,196 @@
           },
           "409" : {
             "description" : "Conflict",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/delegations/delegates/{institutionId}" : {
+      "get" : {
+        "tags" : [ "Delegation", "external-v2" ],
+        "summary" : "Returns the delegates of an institution with the details of each",
+        "description" : "Returns the list of institutions of all delegations created by the institution specified in the request path parameter.<br><br> Example: /delegations/delegates/A --> Returns institution details of B,C,D<br><br> <img src=\"https://img.plantuml.biz/plantuml/svg/SoWkIImgoStCIybDBE0goIzGACbNICelASdFLKZ9B4fDBidCp-FIKaWhoi-rKl3CAox9B2a5YIauScbf0HMZ2ZfX4tJ69kZ2vP0Aj1HgCG00\">",
+        "operationId" : "getDelegateInstitutionsUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "The internal identifier of the institution",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Delegation's type",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "AOO", "EA", "PT" ]
+          }
+        }, {
+          "name" : "cursor",
+          "in" : "query",
+          "description" : "ID of the last returned element from where to continue to get another page of results",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Page size",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DelegationInstitutionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/delegations/delegators/{institutionId}" : {
+      "get" : {
+        "tags" : [ "Delegation", "external-v2" ],
+        "summary" : "Returns the delegators of an institution with the details of each",
+        "description" : "Returns the list of institutions that have granted a delegation to the institution specified in the request path parameter.<br><br> Example: /delegations/delegators/D --> Returns institution details of A,B,C<br><br> <img src=\"https://img.plantuml.biz/plantuml/svg/SoWkIImgoStCIybDBE0goIzGACbNICelASdFLKZ9B4fDBidCp-FI1efQANZc5PTabfI2H1HSk7Hr5TAAydDHXHsn2pjX5tRcSaW5MWor7000\">",
+        "operationId" : "getDelegatorInstitutionsUsingGET",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "The internal identifier of the institution",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "description" : "Delegation's type",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "AOO", "EA", "PT" ]
+          }
+        }, {
+          "name" : "cursor",
+          "in" : "query",
+          "description" : "ID of the last returned element from where to continue to get another page of results",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "Page size",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DelegationInstitutionResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
             "content" : {
               "application/problem+json" : {
                 "schema" : {
@@ -281,7 +471,7 @@
     },
     "/delegations/{delegationId}" : {
       "delete" : {
-        "tags" : [ "Delegation" ],
+        "tags" : [ "Delegation", "support" ],
         "summary" : "Delete an association between institution id and technical partner setting its status to DELETED and setting delegation to false on institution if it has no more delegations",
         "description" : "Delete an association between institution id and technical partner setting its status to DELETED and setting delegation to false on institution if it has no more delegations",
         "operationId" : "deleteDelegationUsingDELETE",
@@ -916,7 +1106,16 @@
           "schema" : {
             "type" : "string"
           }
-        }],
+        }, {
+          "name" : "enableSubunits",
+          "in" : "query",
+          "description" : "enableSubunits",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "boolean"
+          }
+        } ],
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -1689,6 +1888,15 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "productId",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "responses" : {
           "200" : {
@@ -2214,7 +2422,7 @@
           "style" : "simple",
           "schema" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           }
         } ],
         "responses" : {
@@ -2693,9 +2901,6 @@
           "id" : {
             "type" : "string"
           },
-          "institutionType" : {
-            "type" : "string"
-          },
           "origin" : {
             "type" : "string"
           },
@@ -2755,7 +2960,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "origin" : {
             "type" : "string"
@@ -2864,6 +3069,29 @@
           },
           "pec" : {
             "type" : "string"
+          }
+        }
+      },
+      "DelegationInstitutionResponse" : {
+        "title" : "DelegationInstitutionResponse",
+        "type" : "object",
+        "properties" : {
+          "delegationId" : {
+            "type" : "string"
+          },
+          "delegationProductId" : {
+            "type" : "string"
+          },
+          "delegationType" : {
+            "type" : "string",
+            "enum" : [ "AOO", "EA", "PT" ]
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "institution" : {
+            "$ref" : "#/components/schemas/InstitutionResponse"
           }
         }
       },
@@ -3105,7 +3333,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "subunitCode" : {
             "type" : "string"
@@ -3163,8 +3391,18 @@
           "contractPath" : {
             "type" : "string"
           },
+          "institutionType" : {
+            "type" : "string",
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
+          },
           "isAggregator" : {
             "type" : "boolean"
+          },
+          "origin" : {
+            "type" : "string"
+          },
+          "originId" : {
+            "type" : "string"
           },
           "pricingPlan" : {
             "type" : "string"
@@ -3379,9 +3617,12 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "istatCode" : {
+            "type" : "string"
+          },
+          "legalForm" : {
             "type" : "string"
           },
           "onboarding" : {
@@ -3489,6 +3730,9 @@
             "type" : "boolean"
           },
           "istatCode" : {
+            "type" : "string"
+          },
+          "legalForm" : {
             "type" : "string"
           },
           "logo" : {
@@ -3599,7 +3843,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "ivassCode" : {
             "type" : "string"
@@ -3676,7 +3920,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"
@@ -3735,7 +3979,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"
@@ -3851,7 +4095,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"

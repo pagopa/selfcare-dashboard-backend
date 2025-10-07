@@ -155,7 +155,7 @@ public class UserV2ServiceImpl implements UserV2Service {
         Assert.notNull(id, "UUID is required");
         Assert.hasText(institutionId, "An institutionId is required");
         Assert.notNull(userDto, "A userDto is required");
-        final Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());
+        final Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         if (Objects.isNull(institution)) {
             throw new ResourceNotFoundException("There is no institution for given institutionId");
         }
@@ -296,7 +296,7 @@ public class UserV2ServiceImpl implements UserV2Service {
 
 
     private Institution verifyOnboardingStatus(String institutionId, String productId) {
-        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());
+        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         if (institution.getOnboarding() == null || institution.getOnboarding().stream()
                 .noneMatch(onboarding -> onboarding.getProductId().equals(productId) && onboarding.getStatus().equals(RelationshipState.ACTIVE))
         ) {

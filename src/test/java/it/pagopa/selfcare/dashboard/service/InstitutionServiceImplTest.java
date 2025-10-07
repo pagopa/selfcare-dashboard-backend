@@ -73,13 +73,13 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {
         });
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionResponse));
         Institution institution = institutionMapper.toInstitution(institutionResponse);
 
         Institution result = institutionService.getInstitutionById(institutionId);
 
         Assertions.assertEquals(institution, result);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 
     @Test
@@ -87,11 +87,11 @@ class InstitutionServiceImplTest extends BaseServiceTest {
 
         String institutionId = "institutionId";
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok().build());
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok().build());
 
         Institution result = institutionService.getInstitutionById(institutionId);
         Assertions.assertNull(result);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 
     @Test
@@ -237,10 +237,10 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionResponse));
 
         institutionService.findInstitutionById(institutionId);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 
     @Test
@@ -263,10 +263,10 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionResponse));
 
         institutionService.findInstitutionById(institutionId);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 
     @Test
@@ -289,11 +289,11 @@ class InstitutionServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionResponse = objectMapper.readValue(resourceStreamInstitution, new TypeReference<>() {
         });
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionResponse));
 
         Institution result = institutionService.findInstitutionById(institutionId);
         Assertions.assertEquals(institutionMapper.toInstitution(institutionResponse), result);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 
     @Test
@@ -306,10 +306,10 @@ class InstitutionServiceImplTest extends BaseServiceTest {
 
         String institutionId = "institutionId";
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok().build());
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok().build());
 
         Institution result = institutionService.findInstitutionById(institutionId);
         Assertions.assertNull(result);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 }

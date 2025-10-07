@@ -164,7 +164,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null))
                 .thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId))
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(institution));
 
         Institution result = institutionV2Service.findInstitutionById(institutionId);
@@ -173,7 +173,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Mockito.verify(userApiRestClient, Mockito.times(1))
                 ._getUserInstitutionWithPermission(institutionId, userId, null);
         Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
-                ._retrieveInstitutionByIdUsingGET(institutionId);
+                ._retrieveInstitutionByIdUsingGET(institutionId, null);
     }
 
     @Test
@@ -195,7 +195,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 Collections.singletonList(new SelfCareGrantedAuthority("institutionId", Collections.singleton(productGrantedAuthority))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         InstitutionResponse institutionResponse = Mockito.mock(InstitutionResponse.class);
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionResponse));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionResponse));
         when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null)).thenReturn(ResponseEntity.ok().build());
         assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById(institutionId));
         Mockito.verify(userApiRestClient, Mockito.times(1))._getUserInstitutionWithPermission(institutionId, userId, null);
@@ -222,7 +222,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
 
         when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null)).thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(null));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(null));
         assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.findInstitutionById(institutionId));
     }
 
@@ -252,7 +252,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null)).thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
         assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.findInstitutionById(institutionId));
     }
 
@@ -281,7 +281,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         });
 
         when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null)).thenReturn(ResponseEntity.ok(userInstitutionWithActionsDto));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
 
         Institution result = institutionV2Service.findInstitutionById(institutionId);
         Assertions.assertEquals("LIMITED", result.getOnboarding().get(0).getUserRole());

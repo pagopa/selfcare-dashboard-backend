@@ -108,13 +108,13 @@ class DelegationServiceImplTest extends BaseServiceTest {
         DelegationResponse result = new DelegationResponse();
         result.setId("id");
 
-        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(delegationTaxCode.getTo(), null, null, null, null)).thenReturn(responseEntityInstitution);
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(delegationTaxCode.getTo(), null, null, null, null, null)).thenReturn(responseEntityInstitution);
         when(coreDelegationApiRestClient._createDelegationUsingPOST(any())).thenReturn(responseEntityDelegation);
 
         DelegationId response = delegationServiceImpl.createDelegation(delegation);
         Assertions.assertEquals(delegationId.getId(), response.getId());
         Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
-                ._getInstitutionsUsingGET(delegationTaxCode.getTo(), null, null, null, null);
+                ._getInstitutionsUsingGET(delegationTaxCode.getTo(), null, null, null, null, null);
         Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
                 ._createDelegationUsingPOST(any());
     }
@@ -138,7 +138,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
         ));
         institutionsResponse.setInstitutions(List.of(institutionResponse));
 
-        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any()))
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any()))
                 .thenReturn(ResponseEntity.ok(institutionsResponse));
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -146,7 +146,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
         );
 
         Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
-                ._getInstitutionsUsingGET(any(), any(), any(), any(), any());
+                ._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any());
         Mockito.verify(coreDelegationApiRestClient, Mockito.never())
                 ._createDelegationUsingPOST(any());
     }
@@ -167,7 +167,7 @@ class DelegationServiceImplTest extends BaseServiceTest {
         inst.setInstitutionType(InstitutionType.PA.getValue());
         institutionsResponse.setInstitutions(Collections.emptyList());
         ResponseEntity<InstitutionsResponse> responseEntity = ResponseEntity.ok(institutionsResponse);
-        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any())).thenReturn(responseEntity);
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any())).thenReturn(responseEntity);
         assertThrows(ResourceNotFoundException.class, () -> delegationServiceImpl.createDelegation(delegationPagoPa));
     }
 

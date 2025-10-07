@@ -4273,7 +4273,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"
@@ -4314,7 +4314,7 @@
           },
           "institutionType" : {
             "type" : "string",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "isAggregator" : {
             "type" : "boolean"
@@ -4355,7 +4355,7 @@
           "institutionType" : {
             "type" : "string",
             "description" : "Institution Type",
-            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PSP", "PT", "REC", "SA", "SCP" ]
+            "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
           },
           "origin" : {
             "type" : "string",
