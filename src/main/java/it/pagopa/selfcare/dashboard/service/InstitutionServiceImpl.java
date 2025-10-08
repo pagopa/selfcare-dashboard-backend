@@ -9,9 +9,9 @@ import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomy;
 import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomyList;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.UpdateInstitutionResource;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.product.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
@@ -57,7 +57,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Institution getInstitutionById(String institutionId) {
         log.trace("getInstitution start");
-        Institution result = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());
+        Institution result = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
         return result;
@@ -101,7 +101,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         log.trace("findInstitutionById start");
         log.debug("findInstitutionById institutionId = {}", institutionId);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());
+        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         if (institution != null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Optional<? extends GrantedAuthority> selcAuthority = authentication.getAuthorities()
@@ -120,10 +120,8 @@ public class InstitutionServiceImpl implements InstitutionService {
                             .peek(product -> product.setUserRole(LIMITED.name()))
                             .toList());
                 } else {
-                    institution.getOnboarding().forEach(product -> {
-                        Optional.ofNullable(userAuthProducts.get(product.getProductId()))
-                                .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null));
-                    });
+                    institution.getOnboarding().forEach(product -> Optional.ofNullable(userAuthProducts.get(product.getProductId()))
+                            .ifPresentOrElse(authority -> product.setUserRole(authority.getAuthority()), () -> product.setUserRole(null)));
                 }
             }
         }

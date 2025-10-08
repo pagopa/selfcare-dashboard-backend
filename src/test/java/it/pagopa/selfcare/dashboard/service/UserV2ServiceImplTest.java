@@ -281,12 +281,12 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         InstitutionResponse institution = new InstitutionResponse();
         institutionMock.setId(institutionId);
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
 
         Executable executable = () -> userV2ServiceImpl.updateUser(userId, institutionId, user);
 
         assertDoesNotThrow(executable);
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
         verify(userApiRestClient, times(1))._updateUserRegistryAndSendNotification(eq(userId), eq(institutionId), any(UpdateUserRequest.class));
         verifyNoMoreInteractions(userApiRestClient);
     }
@@ -296,7 +296,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         final String institutionId = "institutionId";
         final String userId = "userId";
         final UpdateUserRequestDto user = mockInstance(new UpdateUserRequestDto());
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok().build());
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok().build());
         Executable executable = () -> userV2ServiceImpl.updateUser(userId, institutionId, user);
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, executable);
@@ -338,7 +338,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
 
         institutionMock.setOnboarding(List.of(onb));
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionMock));
         when(productService.getProduct(productId)).thenReturn(product);
 
         userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, role);
@@ -380,7 +380,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         roleDto.setLabel("operator");
         roleDto.setPartyRole(OPERATOR);
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionMock));
         when(productService.getProduct(productId)).thenReturn(product);
 
         userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, OPERATOR.name());
@@ -401,7 +401,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         InstitutionResponse institution = new InstitutionResponse();
         institution.setId(institutionId);
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
 
         Assertions.assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.addUserProductRoles(institutionId, productId, userId, toAddOnAggregates, productRoles, role));
 
@@ -424,7 +424,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.GSP);
         institution.setOnboarding(List.of(onboardedProduct));
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
         when(productService.getProduct(productId)).thenReturn(product);
 
         assertThrows(InvalidProductRoleException.class,
@@ -461,7 +461,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PA);
         institution.setOnboarding(List.of(onboardedProduct));
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
         when(productService.getProduct(productId)).thenReturn(product);
 
         assertThrows(InvalidProductRoleException.class,
@@ -489,7 +489,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         onboardedProduct.setInstitutionType(OnboardedProductResponse.InstitutionTypeEnum.PT);
         institution.setOnboarding(List.of(onboardedProduct));
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
         when(productService.getProduct(productId)).thenReturn(product);
 
         assertThrows(InvalidProductRoleException.class,
@@ -546,7 +546,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
 
         when(productService.getProduct(productId)).thenReturn(product);
         when(userApiRestClient._createOrUpdateByFiscalCode(any())).thenReturn(ResponseEntity.ok("userId"));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionMock));
 
         String userId = userV2ServiceImpl.createUsers(institutionId, productId, userToCreate);
 
@@ -593,7 +593,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
 
         when(productService.getProduct(productId)).thenReturn(product);
         when(userApiRestClient._createOrUpdateByFiscalCode(any())).thenReturn(ResponseEntity.ok("userId"));
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionMock));
 
         String userId = userV2ServiceImpl.createUsers(institutionId, productId, userToCreate);
 
@@ -616,11 +616,11 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         InstitutionResponse institutionMock = new InstitutionResponse();
         institutionMock.setId(institutionId);
 
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institutionMock));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionMock));
 
         assertThrows(InvalidOnboardingStatusException.class, () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate));
 
-        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId);
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
         verifyNoMoreInteractions(userApiRestClient);
     }
 
@@ -644,7 +644,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(productService.getProduct(productId)).thenReturn(product);
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
 
         assertThrows(InvalidProductRoleException.class,
                 () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
@@ -678,7 +678,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(productService.getProduct(productId)).thenReturn(product);
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
 
         assertThrows(InvalidProductRoleException.class,
                 () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),
@@ -715,7 +715,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         institution.setOnboarding(List.of(onboardedProduct));
 
         when(productService.getProduct(productId)).thenReturn(product);
-        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId)).thenReturn(ResponseEntity.ok(institution));
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institution));
 
         assertThrows(InvalidProductRoleException.class,
                 () -> userV2ServiceImpl.createUsers(institutionId, productId, userToCreate),

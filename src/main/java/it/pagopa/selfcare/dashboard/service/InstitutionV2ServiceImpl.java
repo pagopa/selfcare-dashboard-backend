@@ -103,7 +103,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         String userId = ((SelfCareUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
-        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId).getBody());
+        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");
         log.trace("getUserInstitutionWithActions start");

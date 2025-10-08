@@ -75,7 +75,7 @@ public class DelegationServiceImpl implements DelegationService {
         Assert.hasText(delegation.getTo(), REQUIRED_TAX_CODE_MESSAGE);
 
         InstitutionsResponse institutionsResponse =
-                coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null, null).getBody();
+                coreInstitutionApiRestClient._getInstitutionsUsingGET(delegation.getTo(), null, null, null, null, null).getBody();
 
         if (institutionsResponse != null) {
             List<Institution> institutions = institutionsResponse.getInstitutions()
