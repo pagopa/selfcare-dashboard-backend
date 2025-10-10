@@ -62,7 +62,8 @@
                 "vatNumber": "vat123",
                 "recipientCode": "rec123",
                 "publicServices": true
-            }
+            },
+            "createdAt": "2023-06-12T10:15:30Z"
         },
         {
             "productId": "prod456",
@@ -72,7 +73,8 @@
                 "vatNumber": "vat456",
                 "recipientCode": "rec456",
                 "publicServices": false
-            }
+            },
+            "createdAt": "2024-05-13T12:15:30Z"
         }
     ],
     "rootParent": {
