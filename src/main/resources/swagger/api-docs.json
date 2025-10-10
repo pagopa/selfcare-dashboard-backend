@@ -4271,6 +4271,10 @@
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
           },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
           "institutionType" : {
             "type" : "string",
             "enum" : [ "AS", "CON", "GPU", "GSP", "PA", "PG", "PRV", "PRV_PF", "PSP", "PT", "REC", "SA", "SCEC", "SCP" ]
@@ -4311,6 +4315,10 @@
           },
           "billing" : {
             "$ref" : "#/components/schemas/Billing"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
           },
           "institutionType" : {
             "type" : "string",

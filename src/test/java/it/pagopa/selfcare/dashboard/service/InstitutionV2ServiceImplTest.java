@@ -170,6 +170,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Institution result = institutionV2Service.findInstitutionById(institutionId);
         Assertions.assertNotNull(result.getOnboarding().get(0).getUserProductActions());
         Assertions.assertEquals(2, result.getOnboarding().get(0).getUserProductActions().size());
+        Assertions.assertNotNull(result.getOnboarding().get(0).getCreatedAt());
         Mockito.verify(userApiRestClient, Mockito.times(1))
                 ._getUserInstitutionWithPermission(institutionId, userId, null);
         Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))

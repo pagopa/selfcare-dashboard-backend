@@ -43,6 +43,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
@@ -702,6 +704,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         onboardingResponse1.setOrigin("IPA");
         onboardingResponse1.setOriginId("c_d277");
         onboardingResponse1.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PT);
+        onboardingResponse1.setCreatedAt(OffsetDateTime.of(2025,9,10,12,12,12,12, ZoneOffset.UTC));
 
         onboardingsResponse.setOnboardings(List.of(onboardingResponse, onboardingResponse1));
 

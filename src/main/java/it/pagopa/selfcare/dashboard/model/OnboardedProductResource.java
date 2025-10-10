@@ -6,6 +6,7 @@ import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
@@ -28,4 +29,6 @@ public class OnboardedProductResource {
     private String originId;
 
     private InstitutionType institutionType;
+
+    private OffsetDateTime createdAt;
 }
