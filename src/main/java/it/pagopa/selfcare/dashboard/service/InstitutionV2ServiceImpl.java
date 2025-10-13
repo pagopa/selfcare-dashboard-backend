@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -39,6 +40,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     static final String REQUIRED_INSTITUTION_MESSAGE = "An Institution id is required";
     private static final String REQUIRED_USER_ID = "A user id is required";
     private static final String A_USER_INFO_FILTER_OBJECT_IS_REQUIRED = "A UserInfoFilter object is required";
+    public static final String ISSUER_PAGOPA = "PAGOPA";
 
     private final List<RelationshipState> allowedStates;
     private final UserApiRestClient userApiRestClient;
@@ -100,13 +102,24 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         log.trace("findInstitutionById start");
         log.debug("findInstitutionById institutionId = {}", Encode.forJava(institutionId));
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
-        String userId = ((SelfCareUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
         Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         log.debug("getInstitution result = {}", institution);
         log.trace("getInstitution end");
         log.trace("getUserInstitutionWithActions start");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+        String issuer = selfCareUser.getIssuer();
+
+        if (ISSUER_PAGOPA.equalsIgnoreCase(issuer)) {
+            log.debug("Issuer is PAGOPA, skipping user-institution permission checks");
+            return institution;
+        }
+
+        String userId = selfCareUser.getId();
+
         UserInstitutionWithActionsDto userInstitutionWithActionsDto = userMapper.toUserInstitutionWithActionsDto(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null).getBody());
 
         if (Objects.isNull(userInstitutionWithActionsDto))

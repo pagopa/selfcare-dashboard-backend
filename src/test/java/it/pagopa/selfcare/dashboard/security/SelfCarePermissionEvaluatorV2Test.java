@@ -87,4 +87,24 @@ class SelfCarePermissionEvaluatorV2Test {
 
         assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), "Selc:ViewBilling"));
     }
+
+    @Test
+    void hasPermissionReturnsTrueForIssuerPagoPA() {
+        Authentication authentication = mock(Authentication.class);
+        SelfCareUser user = SelfCareUser.builder("userId").issuer("PAGOPA").build();
+
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", null, null), "Selc:ViewInstitutionData"));
+    }
+
+    @Test
+    void hasPermissionReturnsFalseForIssuerPagoPA() {
+        Authentication authentication = mock(Authentication.class);
+        SelfCareUser user = SelfCareUser.builder("userId").issuer("PAGOPA").build();
+
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", null, null), "Selc:ViewBilling"));
+    }
 }

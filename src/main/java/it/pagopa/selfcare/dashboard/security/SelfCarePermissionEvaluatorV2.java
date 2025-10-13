@@ -29,6 +29,10 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
     private final UserGroupRestClient userGroupRestClient;
     private final UserApiRestClient userApiRestClient;
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
+    private static final String ISSUER_PAGOPA = "PAGOPA";
+    private static final List<String> PAGOPA_ALLOWED_PERMISSIONS = List.of(
+            "Selc:ViewInstitutionData"
+    );
 
 
     public SelfCarePermissionEvaluatorV2(UserGroupRestClient restClient, UserApiRestClient userApiRestClient) {
@@ -73,7 +77,22 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "hasPermission authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
         Assert.notNull(permission, "A permission type is required");
         boolean result = false;
-        String userId = ((SelfCareUser) authentication.getPrincipal()).getId();
+
+        SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+        String userId = selfCareUser.getId();
+        String issuer = selfCareUser.getIssuer();
+
+        if (ISSUER_PAGOPA.equalsIgnoreCase(issuer)) {
+            log.debug("Issuer is PAGOPA, evaluating permission {}", permission);
+
+            boolean isAllowed = PAGOPA_ALLOWED_PERMISSIONS.stream()
+                    .anyMatch(p -> p.equalsIgnoreCase(permission.toString()));
+
+            log.debug("PAGOPA permission {} → {}", permission, isAllowed ? "GRANTED" : "DENIED");
+            log.trace("check Permission end (issuer PAGOPA)");
+            return isAllowed;
+        }
+
         if (targetDomainObject instanceof FilterAuthorityDomain filterAuthorityDomain) {
             if (StringUtils.hasText(filterAuthorityDomain.getGroupId())) {
                 UserGroupInfo userGroupInfo = getUserGroupById(filterAuthorityDomain.getGroupId());
