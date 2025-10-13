@@ -33,7 +33,7 @@ Feature: Institution
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
       | products[0].institutionType | PT                                    |
-      | products[0].createdAt       | 2022-06-10T15:29:10.462+02:00         |
+      | products[0].createdAt       | 2022-06-10T13:29:10.462Z              |
     And The response body contains the list "products" of size 4
     # Field institutionType not present if productId not specified in request
     And The response body doesn't contain field "institutionType"
@@ -64,7 +64,7 @@ Feature: Institution
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
       | products[0].institutionType | PT                                    |
-      | products[0].createdAt       | 2022-06-10T15:29:10.462+02:00         |
+      | products[0].createdAt       | 2022-06-10T13:29:10.462Z              |
     And The response body contains the list "products" of size 4
     # Field institutionType not present if productId not specified in request
     And The response body doesn't contain field "institutionType"
