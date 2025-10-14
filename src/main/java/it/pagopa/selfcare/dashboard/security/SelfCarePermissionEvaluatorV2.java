@@ -31,7 +31,8 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
     private static final String ISSUER_PAGOPA = "PAGOPA";
     private static final List<String> PAGOPA_ALLOWED_PERMISSIONS = List.of(
-            "Selc:ViewInstitutionData"
+            "Selc:ViewInstitutionData",
+            "Selc:AccessProductBackofficeAdmin"
     );
 
 
