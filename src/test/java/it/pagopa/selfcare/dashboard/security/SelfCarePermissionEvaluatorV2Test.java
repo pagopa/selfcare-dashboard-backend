@@ -8,6 +8,8 @@ import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActi
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -88,14 +90,15 @@ class SelfCarePermissionEvaluatorV2Test {
         assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), "Selc:ViewBilling"));
     }
 
-    @Test
-    void hasPermissionReturnsTrueForIssuerPagoPA() {
+    @ParameterizedTest
+    @ValueSource(strings = {"Selc:ViewInstitutionData", "Selc:AccessProductBackofficeAdmin"})
+    void hasPermissionReturnsTrueForIssuerPagoPA(String permission) {
         Authentication authentication = mock(Authentication.class);
         SelfCareUser user = SelfCareUser.builder("userId").issuer("PAGOPA").build();
 
         when(authentication.getPrincipal()).thenReturn(user);
 
-        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", null, null), "Selc:ViewInstitutionData"));
+        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", null, null), permission));
     }
 
     @Test
