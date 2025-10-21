@@ -14,7 +14,7 @@ tags = {
 }
 
 container_app = {
-  min_replicas = 1
+  min_replicas = 3
   max_replicas = 5
   scale_rules = [
     {
