@@ -80,7 +80,7 @@ public class TokenV2Controller {
                                           String lang) {
 
         log.trace("exchangeBackofficeAdmin start");
-        log.debug("exchangeBackofficeAdmin institutionId = {}, productId = {}", institutionId, productId);
+        log.debug("exchangeBackofficeAdmin institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
 
         final ExchangedToken exchangedToken = exchangeTokenService.exchangeBackofficeAdmin(institutionId, productId, environment);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl()
