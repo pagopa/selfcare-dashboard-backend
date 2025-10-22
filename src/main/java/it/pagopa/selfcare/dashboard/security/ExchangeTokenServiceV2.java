@@ -77,6 +77,8 @@ public class ExchangeTokenServiceV2 {
     private final InstitutionResourceMapper institutionResourceMapper;
     private final InstitutionMapper institutionMapper;
     private final ProductMapper productMapper;
+    private static final String PARTY_ROLE_SUPPORT = "SUPPORT";
+    private static final String PRODUCT_ROLE_SUPPORT = "support";
 
     public ExchangeTokenServiceV2(JwtService jwtService,
                                   InstitutionService institutionService,
@@ -144,6 +146,40 @@ public class ExchangeTokenServiceV2 {
                 .orElse(product.getUrlBO());
 
         log.trace("exchange end");
+        return new ExchangedToken(jwts, urlBO);
+    }
+
+    public ExchangedToken exchangeBackofficeAdmin(String institutionId, String productId, Optional<String> environment) {
+        log.trace("exchangeBackofficeAdmin start");
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin institutionId = {}, productId = {}", institutionId, productId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException("Authentication is required");
+        }
+        SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+
+        it.pagopa.selfcare.dashboard.model.institution.Institution institution = institutionService.getInstitutionById(institutionId);
+        Assert.notNull(institution, "Institution info is required");
+        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, new ArrayList<>(), false);
+
+        RoleBackofficeAdmin institutionRole = new RoleBackofficeAdmin();
+        institutionRole.setPartyRole(PARTY_ROLE_SUPPORT);
+        institutionRole.setProductRole(PRODUCT_ROLE_SUPPORT);
+        institutionExchange.setRoles(List.of(institutionRole));
+
+        TokenExchangeClaims claims = retrieveAndSetBackofficeAdminClaims(authentication.getCredentials().toString(), institutionExchange,  selfCareUser);
+
+        Product product = productService.getProduct(productId);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct result = {}", product);
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        String jwts = createJwts(claims);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
+
+        final String urlBO = environment.map(env -> product.getBackOfficeEnvironmentConfigurations().get(env).getUrl())
+                .orElse(product.getUrlBO());
+
+        log.trace("exchangeBackofficeAdmin end");
         return new ExchangedToken(jwts, urlBO);
     }
 
@@ -218,6 +254,29 @@ public class ExchangeTokenServiceV2 {
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
         claims.setSubject(UUID.fromString(userId).toString());
+        claims.setType(ID);
+
+        return claims;
+    }
+
+    private TokenExchangeClaims retrieveAndSetBackofficeAdminClaims(String credential, InstitutionBackofficeAdmin institution, SelfCareUser selfCareUser) {
+        String userId = Objects.equals(selfCareUser.getId(), "uid_not_provided") ? selfCareUser.getId() : UUID.fromString(selfCareUser.getId()).toString();
+        Claims selcClaims = jwtService.getClaims(credential);
+        Assert.notNull(selcClaims, "Session token claims is required");
+        TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
+        claims.setId(UUID.randomUUID().toString());
+
+        claims.setIssuer(selfCareUser.getIssuer());
+
+        String email = Optional.ofNullable(selfCareUser.getEmail()).orElse(userId);
+
+        claims.setEmail(email);
+        claims.setInstitution(institution);
+
+        claims.setDesiredExpiration(claims.getExpiration());
+        claims.setIssuedAt(new Date());
+        claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
+        claims.setSubject(userId);
         claims.setType(ID);
 
         return claims;
@@ -353,6 +412,28 @@ public class ExchangeTokenServiceV2 {
     }
 
     @Data
+    @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class InstitutionBackofficeAdmin implements Serializable {
+        private String id;
+        @JsonProperty("fiscal_code")
+        private String taxCode;
+        private String name;
+        private List<RoleBackofficeAdmin> roles;
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private List<String> groups;
+        private String subUnitCode;
+        private String subUnitType;
+        private String aooParent;
+        @Deprecated
+        private String parentDescription;
+        @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RootParent.class)
+        private RootParent rootParent;
+        @JsonProperty("ipaCode")
+        private String originId;
+    }
+
+    @Data
     public static class RootParent implements Serializable {
         private String id;
         private String description;
@@ -362,6 +443,15 @@ public class ExchangeTokenServiceV2 {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Role implements Serializable {
         private PartyRole partyRole;
+        @JsonProperty("role")
+        private String productRole;
+        private String productId;
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class RoleBackofficeAdmin implements Serializable {
+        private String partyRole;
         @JsonProperty("role")
         private String productRole;
         private String productId;
@@ -384,6 +474,11 @@ public class ExchangeTokenServiceV2 {
         }
 
         public Claims setInstitution(Institution institution) {
+            setValue(INSTITUTION, institution);
+            return this;
+        }
+
+        public Claims setInstitution(InstitutionBackofficeAdmin institution) {
             setValue(INSTITUTION, institution);
             return this;
         }

@@ -25,6 +25,7 @@ Feature: Product
     When I send a GET request to "/v2/products/{productId}/back-office" to retrieve back-office URL
     Then the response status should be 200
     And the response should contain a back-office URL with selfcare token
+    And the response should contain a "de" query param for language
 
   Scenario: Retrieving the back-office URL with an invalid environment parameter
     Given user login with username "j.doe" and password "test"

@@ -62,6 +62,37 @@ public class TokenV2Controller {
         return identityToken;
     }
 
+    @GetMapping(value = "exchange/back-office/admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "${swagger.dashboard.token.api.exchange.backoffice.admin}", notes = "${swagger.dashboard.token.api.exchange.backoffice.admin}", nickname = "v2ExchangeBackofficeAdmin")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:AccessProductBackofficeAdmin')")
+    public URI exchangeBackofficeAdmin(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                          @RequestParam("institutionId")
+                                          String institutionId,
+                                          @ApiParam("${swagger.dashboard.products.model.id}")
+                                          @RequestParam("productId")
+                                          String productId,
+                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
+                                          @RequestParam(value = "environment", required = false)
+                                          Optional<String> environment,
+                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.lang}")
+                                          @RequestParam(value = "lang", required = false, defaultValue = "it")
+                                          String lang) {
+
+        log.trace("exchangeBackofficeAdmin start");
+        log.debug("exchangeBackofficeAdmin institutionId = {}, productId = {}", institutionId, productId);
+
+        final ExchangedToken exchangedToken = exchangeTokenService.exchangeBackofficeAdmin(institutionId, productId, environment);
+        final URI location = URI.create(exchangedToken.getBackOfficeUrl()
+                .replace("<IdentityToken>", exchangedToken.getIdentityToken())
+                .replace("<lang>", lang));
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin result = {}", Encode.forJava(String.valueOf(location)));
+        log.trace("exchangeBackofficeAdmin end");
+
+        return location;
+    }
+
     @GetMapping(value = "exchange/fatturazione", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.billingToken}")
