@@ -89,6 +89,56 @@ class TokenV2ControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void exchangeBackofficeAdmin() throws Exception {
+        // given
+        String institutionId = "inst1";
+        String productId = "prod1";
+        Mockito.when(exchangeTokenServiceMock.exchangeBackofficeAdmin(institutionId, productId, Optional.empty()))
+                .thenReturn(new ExchangedToken("token", "urlBO"));
+        // when
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/exchange/back-office/admin")
+                        .param("institutionId", institutionId)
+                        .param("productId", productId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        URI resource = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
+        assertNotNull(resource);
+        assertEquals("urlBO", resource.toString());
+        verify(exchangeTokenServiceMock, Mockito.times(1))
+                .exchangeBackofficeAdmin(institutionId, productId, Optional.empty());
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
+    }
+
+    @Test
+    void exchangeBackofficeAdmin_emptyIdentityToken() throws Exception {
+        // given
+        String institutionId = "inst1";
+        String productId = "prod1";
+        Mockito.when(exchangeTokenServiceMock.exchangeBackofficeAdmin(institutionId, productId, Optional.empty()))
+                .thenReturn(new ExchangedToken("", ""));
+        // when
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/exchange/back-office/admin")
+                        .param("institutionId", institutionId)
+                        .param("productId", productId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        URI resource = objectMapper.readValue(result.getResponse().getContentAsString(), URI.class);
+        assertNotNull(resource);
+        assertEquals("", resource.toString());
+        verify(exchangeTokenServiceMock, Mockito.times(1))
+                .exchangeBackofficeAdmin(institutionId, productId, Optional.empty());
+        verifyNoMoreInteractions(exchangeTokenServiceMock);
+    }
+
+    @Test
     void billingExchange() throws Exception {
         // given
         String institutionId = "inst1";

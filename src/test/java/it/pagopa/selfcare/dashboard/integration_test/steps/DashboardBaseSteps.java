@@ -232,5 +232,9 @@ public class DashboardBaseSteps{
         Assertions.assertEquals(expectedSize, responseList.size());
     }
 
-
+    @And("the response should contain a {string} query param for language")
+    public void theResponseShouldContainAValidLanguage(String lang) {
+        String uri = dashboardStepsUtil.responses.getBackOfficeUrl().toString();
+        Assertions.assertTrue(uri.contains("lang="+lang));
+    }
 }

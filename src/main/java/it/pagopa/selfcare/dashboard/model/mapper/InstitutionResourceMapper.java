@@ -102,9 +102,17 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "roles", expression = "java(toRoles(productGrantedAuthorities, isBillingToken))")
     ExchangeTokenServiceV2.Institution toInstitution(Institution institution, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken);
 
+    @Mapping(target = "name", source = "institution.description")
+    @Mapping(target = "aooParent", source = "institution.aooParentCode")
+    @Mapping(target = "subUnitType", source = "institution.subunitType")
+    @Mapping(target = "subUnitCode", source = "institution.subunitCode")
+    @Mapping(target = "rootParent", expression = "java(toRootParent(institution))")
+    @Mapping(target = "roles", expression = "java(toRolesBackofficeAdmin())")
+    InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution);
+
     @Named("toRootParent")
-    default ExchangeTokenServiceV2.RootParent toRootParent(Institution institutionInfo) {
-        ExchangeTokenServiceV2.RootParent rootParent = new ExchangeTokenServiceV2.RootParent();
+    default RootParent toRootParent(Institution institutionInfo) {
+        RootParent rootParent = new RootParent();
         if(institutionInfo != null && institutionInfo.getRootParent() != null) {
             rootParent.setId(institutionInfo.getRootParent().getId());
             rootParent.setDescription(institutionInfo.getRootParent().getDescription());
@@ -119,6 +127,14 @@ public interface InstitutionResourceMapper {
             roles.addAll(constructRole(authority, isBillingToken));
         }
         return roles;
+    }
+
+    default List<RoleBackofficeAdmin> toRolesBackofficeAdmin() {
+        RoleBackofficeAdmin institutionRole = new RoleBackofficeAdmin();
+        institutionRole.setPartyRole("SUPPORT");
+        institutionRole.setProductRole("support");
+
+        return List.of(institutionRole);
     }
 
     default List<ExchangeTokenServiceV2.Role> constructRole(ProductGrantedAuthority productGrantedAuthority, boolean isBillingToken) {

@@ -220,7 +220,7 @@
     },
     "status": "ACTIVE",
     "title": "SEND - Servizio Notifiche Digitali",
-    "urlBO": "https://mock.url/prod-pn/bo/#selfCareToken=<IdentityToken>",
+    "urlBO": "https://mock.url/prod-pn/bo/#selfCareToken=<IdentityToken>&lang=<lang>",
     "urlPublic": "https://mock.url/prod-pn/public",
     "userContractMappings": {
       "default": {
@@ -1103,7 +1103,7 @@
       "prod-interop-atst"
     ],
     "title": "Interoperabilità",
-    "urlBO": "https://mock.url/prod-interop/bo/#selfCareToken=<IdentityToken>",
+    "urlBO": "https://mock.url/prod-interop/bo/#selfCareToken=<IdentityToken>&lang=<lang>",
     "urlPublic": "https://mock.url/prod-interop/public",
     "userContractMappings": {
       "default": {

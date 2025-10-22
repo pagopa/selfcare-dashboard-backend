@@ -47,6 +47,48 @@ public class TokenApiSteps{
 
     }
 
+    @And("the response should contain a valid billing token")
+    public void theResponseShouldContainAValidBillingToken() {
+        String backOfficeUrl = dashboardStepsUtil.responses.getBackOfficeUrl().toString();
+        String token = backOfficeUrl.split("selfcareToken=")[1];
+        DecodedJWT decodedJWT = JWT.decode(token);
+        Map<String, Claim> payload = decodedJWT.getClaims();
+        Assertions.assertEquals("Doe",payload.get("family_name").asString());
+        Assertions.assertEquals("John",payload.get("name").asString());
+        Assertions.assertEquals("PRVTNT80A41H401T",payload.get("fiscal_number").asString());
+        Assertions.assertEquals("97a511a7-2acc-47b9-afed-2f3c65753b4a",payload.get("uid").asString());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544",payload.get("organization").as(Map.class).get("id"));
+        Assertions.assertEquals("Comune di Castelbuono",payload.get("organization").as(Map.class).get("name"));
+        Assertions.assertEquals("00310810825",payload.get("organization").as(Map.class).get("fiscal_code"));
+        Assertions.assertEquals("c_c067",payload.get("organization").as(Map.class).get("ipaCode"));
+        List<Object> list = (List<Object>) payload.get("organization").as(Map.class).get("roles");
+        Assertions.assertEquals(3,list.size());
+
+    }
+
+    @And("the response should contain a valid backoffice admin token")
+    public void theResponseShouldContainAValidBackofficeAdminToken() {
+        String backOfficeUrl = dashboardStepsUtil.responses.getBackOfficeUrl().toString();
+        String token = backOfficeUrl.split("#selfCareToken=")[1].split("&")[0];
+        DecodedJWT decodedJWT = JWT.decode(token);
+        Map<String, Claim> payload = decodedJWT.getClaims();
+        Assertions.assertEquals("PAGOPA",payload.get("iss").asString());
+        Assertions.assertEquals("api.dev.selfcare.pagopa.it",payload.get("aud").asString());
+        Assertions.assertNotNull(payload.get("jti").asString());
+        Assertions.assertEquals("35a78332-d038-4bfa-8e85-2cba7f6b7bf8",payload.get("uid").asString());
+        Assertions.assertEquals("35a78332-d038-4bfa-8e85-2cba7f6b7bf8",payload.get("email").asString());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544",payload.get("organization").as(Map.class).get("id"));
+        Assertions.assertEquals("Comune di Castelbuono",payload.get("organization").as(Map.class).get("name"));
+        Assertions.assertEquals("00310810825",payload.get("organization").as(Map.class).get("fiscal_code"));
+        Assertions.assertEquals("c_c067",payload.get("organization").as(Map.class).get("ipaCode"));
+        List<Object> list = (List<Object>) payload.get("organization").as(Map.class).get("roles");
+        Assertions.assertEquals(1,list.size());
+        Map<String, String> role = (Map<String, String>) list.get(0);
+        Assertions.assertEquals("SUPPORT", role.get("partyRole"));
+        Assertions.assertEquals("support", role.get("role"));
+
+    }
+
     @And("the institution ID is {string}")
     public void theInstitutionIDIs(String institutionId) {
         dashboardStepsUtil.filter.setInstitutionId(institutionId);
@@ -117,9 +159,38 @@ public class TokenApiSteps{
         }
     }
 
-    @And("the response should contain a {string} query param for language")
-    public void theResponseShouldContainAValidLanguage(String lang) {
-        String uri = dashboardStepsUtil.responses.getBackOfficeUrl().toString();
-        Assertions.assertTrue(uri.contains("lang="+lang));
+    @When("I send a GET request to {string} with the given details to retrieve back-office admin URL")
+    public void iSendAGETRequestToToRetrieveBackOfficeURL(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)) {
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+        if(Objects.nonNull(dashboardStepsUtil.filter.getLang())) {
+            requestSpecification.queryParam("lang", dashboardStepsUtil.filter.getLang());
+        }
+        if (Objects.nonNull(dashboardStepsUtil.filter.getInstitutionId())) {
+            requestSpecification.queryParam("institutionId", dashboardStepsUtil.filter.getInstitutionId());
+        }
+        if (Objects.nonNull(dashboardStepsUtil.filter.getProductId())) {
+            requestSpecification.queryParam("productId", dashboardStepsUtil.filter.getProductId());
+        }
+        if(Objects.nonNull(dashboardStepsUtil.filter.getEnvironment())) {
+            requestSpecification.queryParam("environment", dashboardStepsUtil.filter.getEnvironment());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if (dashboardStepsUtil.status == 200) {
+            dashboardStepsUtil.responses.setBackOfficeUrl(response.body().as(new TypeRef<>() {}));
+        } else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
     }
 }

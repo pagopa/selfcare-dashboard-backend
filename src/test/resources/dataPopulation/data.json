@@ -62,6 +62,21 @@
         "iss": "SPID",
         "jti": "_2f603a8bc36b1231b1a6"
       }
+    },
+    {
+      "username": "b.barnes",
+      "password": "test",
+      "jwtHeader": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "kid": "jwt_test_kid"
+      },
+      "jwtPayload": {
+        "uid": "35a78332-d038-4bfa-8e85-2cba7f6b7bf8",
+        "aud": "api.dev.selfcare.pagopa.it",
+        "iss": "PAGOPA",
+        "jti": "_2f603a8bc36b1231b1a6"
+      }
     }
   ]
 }

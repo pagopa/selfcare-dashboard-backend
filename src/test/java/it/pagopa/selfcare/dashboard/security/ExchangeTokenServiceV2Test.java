@@ -160,6 +160,7 @@ class ExchangeTokenServiceV2Test {
         String institutionId = "validInstitutionId";
         String productId = "validProductId";
         Optional<String> environment = Optional.of("validEnvironment");
+        SecurityContextHolder.getContext().setAuthentication(null);
 
         Assertions.assertThrows(IllegalStateException.class, () -> exchangeTokenServiceV2.exchange(institutionId, productId, environment), "Authentication is required");
     }
@@ -183,6 +184,50 @@ class ExchangeTokenServiceV2Test {
 
         assertThrows(IllegalArgumentException.class, () -> exchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty()));
     }
+
+    @Test
+    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() {
+        String jti = "id";
+        String sub = "subject";
+        String iss = "PAGOPA";
+        Date iat = Date.from(Instant.now().minusSeconds(1));
+        Date exp = Date.from(iat.toInstant().plusSeconds(5));
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String credential = "password";
+        String userId = UUID.randomUUID().toString();
+
+        it.pagopa.selfcare.dashboard.model.institution.Institution institution = mock(it.pagopa.selfcare.dashboard.model.institution.Institution.class);
+        Product product = mock(Product.class);
+
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(SelfCareUser.builder(userId).build(), "password"));
+        when(jwtService.getClaims(credential))
+                .thenReturn(Jwts.claims()
+                        .setId(jti)
+                        .setIssuer(iss)
+                        .setSubject(sub)
+                        .setIssuedAt(iat)
+                        .setExpiration(exp));
+
+        when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
+        when(productService.getProduct(productId)).thenReturn(product);
+
+        ExchangedToken result = exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, Optional.empty());
+
+        assertNotNull(result);
+        assertNotNull(result.getIdentityToken());
+    }
+
+        @Test
+        void exchangeBackofficeAdmin_noAuth() {
+            // Arrange
+            String institutionId = "validInstitutionId";
+            String productId = "validProductId";
+            Optional<String> environment = Optional.of("validEnvironment");
+            SecurityContextHolder.getContext().setAuthentication(null);
+
+            Assertions.assertThrows(IllegalStateException.class, () -> exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, environment), "Authentication is required");
+        }
 
     @Test
     void testRetrieveBillingExchangedToken_AuthenticationMissing() {
