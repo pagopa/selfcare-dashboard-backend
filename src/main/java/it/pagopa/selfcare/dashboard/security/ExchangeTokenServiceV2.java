@@ -170,11 +170,11 @@ public class ExchangeTokenServiceV2 {
         TokenExchangeClaims claims = retrieveAndSetBackofficeAdminClaims(authentication.getCredentials().toString(), institutionExchange,  selfCareUser);
 
         Product product = productService.getProduct(productId);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getProduct result = {}", product);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin getProduct result = {}", product);
 
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged claims = {}", claims);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin exchanged claims = {}", claims);
         String jwts = createJwts(claims);
-        log.debug(LogUtils.CONFIDENTIAL_MARKER, "Exchanged token = {}", jwts);
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin exchanged token = {}", jwts);
 
         final String urlBO = environment.map(env -> product.getBackOfficeEnvironmentConfigurations().get(env).getUrl())
                 .orElse(product.getUrlBO());
