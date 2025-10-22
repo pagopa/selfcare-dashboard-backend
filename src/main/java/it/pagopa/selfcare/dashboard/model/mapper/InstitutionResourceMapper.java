@@ -108,11 +108,11 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "subUnitCode", source = "institution.subunitCode")
     @Mapping(target = "rootParent", expression = "java(toRootParent(institution))")
     @Mapping(target = "roles", expression = "java(toRolesBackofficeAdmin(productGrantedAuthorities, isBillingToken))")
-    ExchangeTokenServiceV2.InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken);
+    InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution, List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken);
 
     @Named("toRootParent")
-    default ExchangeTokenServiceV2.RootParent toRootParent(Institution institutionInfo) {
-        ExchangeTokenServiceV2.RootParent rootParent = new ExchangeTokenServiceV2.RootParent();
+    default RootParent toRootParent(Institution institutionInfo) {
+        RootParent rootParent = new RootParent();
         if(institutionInfo != null && institutionInfo.getRootParent() != null) {
             rootParent.setId(institutionInfo.getRootParent().getId());
             rootParent.setDescription(institutionInfo.getRootParent().getDescription());
@@ -129,8 +129,8 @@ public interface InstitutionResourceMapper {
         return roles;
     }
 
-    default List<ExchangeTokenServiceV2.RoleBackofficeAdmin> toRolesBackofficeAdmin(List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken) {
-        List<ExchangeTokenServiceV2.RoleBackofficeAdmin> roles = new ArrayList<>();
+    default List<RoleBackofficeAdmin> toRolesBackofficeAdmin(List<ProductGrantedAuthority> productGrantedAuthorities, boolean isBillingToken) {
+        List<RoleBackofficeAdmin> roles = new ArrayList<>();
 
         for (ProductGrantedAuthority authority : productGrantedAuthorities) {
             roles.addAll(constructRoleBackofficeAdmin(authority, isBillingToken));
@@ -151,10 +151,10 @@ public interface InstitutionResourceMapper {
                 }).toList();
     }
 
-    default List<ExchangeTokenServiceV2.RoleBackofficeAdmin> constructRoleBackofficeAdmin(ProductGrantedAuthority productGrantedAuthority, boolean isBillingToken) {
+    default List<RoleBackofficeAdmin> constructRoleBackofficeAdmin(ProductGrantedAuthority productGrantedAuthority, boolean isBillingToken) {
         return productGrantedAuthority.getProductRoles().stream()
                 .map(productRoleCode -> {
-                    ExchangeTokenServiceV2.RoleBackofficeAdmin role = new ExchangeTokenServiceV2.RoleBackofficeAdmin();
+                    RoleBackofficeAdmin role = new RoleBackofficeAdmin();
                     role.setPartyRole(productGrantedAuthority.getPartyRole().toString());
                     role.setProductRole(productRoleCode);
                     if (isBillingToken) {

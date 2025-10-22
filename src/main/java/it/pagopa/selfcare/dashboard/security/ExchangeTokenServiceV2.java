@@ -10,6 +10,9 @@ import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
+import it.pagopa.selfcare.dashboard.model.institution.InstitutionBackofficeAdmin;
+import it.pagopa.selfcare.dashboard.model.institution.RoleBackofficeAdmin;
+import it.pagopa.selfcare.dashboard.model.institution.RootParent;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.exception.InvalidRequestException;
 import it.pagopa.selfcare.dashboard.model.groups.UserGroup;
@@ -62,6 +65,7 @@ public class ExchangeTokenServiceV2 {
     private static final String PRIVATE_KEY_FOOTER_TEMPLATE = "-----END %s-----";
     private static final String INSTITUTION_REQUIRED_MESSAGE = "Institution info is required";
     private static final String AUTHENTICATION_REQUIRED_MESSAGE = "Authentication is required";
+    private static final String TOKEN_CLAIMS_REQUIRED_MESSAGE = "Session token claims is required";
     private static final String ID = "ID";
     private final String billingUrl;
     private final String billingAudience;
@@ -223,7 +227,7 @@ public class ExchangeTokenServiceV2 {
 
     private TokenExchangeClaims retrieveAndSetClaims(String credential, Institution institution, String userId, String userMailUuid) {
         Claims selcClaims = jwtService.getClaims(credential);
-        Assert.notNull(selcClaims, "Session token claims is required");
+        Assert.notNull(selcClaims, TOKEN_CLAIMS_REQUIRED_MESSAGE);
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
         claims.setIssuer(issuer);
@@ -250,7 +254,7 @@ public class ExchangeTokenServiceV2 {
     private TokenExchangeClaims retrieveAndSetBackofficeAdminClaims(String credential, InstitutionBackofficeAdmin institution, SelfCareUser selfCareUser) {
         String userId = Objects.equals(selfCareUser.getId(), "uid_not_provided") ? selfCareUser.getId() : UUID.fromString(selfCareUser.getId()).toString();
         Claims selcClaims = jwtService.getClaims(credential);
-        Assert.notNull(selcClaims, "Session token claims is required");
+        Assert.notNull(selcClaims, TOKEN_CLAIMS_REQUIRED_MESSAGE);
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
         claims.setId(UUID.randomUUID().toString());
 
@@ -269,7 +273,6 @@ public class ExchangeTokenServiceV2 {
 
         return claims;
     }
-
 
     private Map<String, ProductGrantedAuthority> retrieveProductsFromInstitutionAndUser(UserInstitution userInstitution) {
         Map<String, ProductGrantedAuthority> map = new HashMap<>();
@@ -419,46 +422,9 @@ public class ExchangeTokenServiceV2 {
     }
 
     @Data
-    @ToString
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class InstitutionBackofficeAdmin implements Serializable {
-        private String id;
-        @JsonProperty("fiscal_code")
-        private String taxCode;
-        private String name;
-        private List<RoleBackofficeAdmin> roles;
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private List<String> groups;
-        private String subUnitCode;
-        private String subUnitType;
-        private String aooParent;
-        @Deprecated
-        private String parentDescription;
-        @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RootParent.class)
-        private RootParent rootParent;
-        @JsonProperty("ipaCode")
-        private String originId;
-    }
-
-    @Data
-    public static class RootParent implements Serializable {
-        private String id;
-        private String description;
-    }
-
-    @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Role implements Serializable {
         private PartyRole partyRole;
-        @JsonProperty("role")
-        private String productRole;
-        private String productId;
-    }
-
-    @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class RoleBackofficeAdmin implements Serializable {
-        private String partyRole;
         @JsonProperty("role")
         private String productRole;
         private String productId;
