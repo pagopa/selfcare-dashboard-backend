@@ -83,8 +83,6 @@ public class ExchangeTokenServiceV2 {
     private final InstitutionResourceMapper institutionResourceMapper;
     private final InstitutionMapper institutionMapper;
     private final ProductMapper productMapper;
-    private static final String PARTY_ROLE_SUPPORT = "SUPPORT";
-    private static final String PRODUCT_ROLE_SUPPORT = "support";
 
     public ExchangeTokenServiceV2(JwtService jwtService,
                                   InstitutionService institutionService,
@@ -153,12 +151,7 @@ public class ExchangeTokenServiceV2 {
 
         it.pagopa.selfcare.dashboard.model.institution.Institution institution = institutionService.getInstitutionById(institutionId);
         Assert.notNull(institution, INSTITUTION_REQUIRED_MESSAGE);
-        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, new ArrayList<>(), false);
-
-        RoleBackofficeAdmin institutionRole = new RoleBackofficeAdmin();
-        institutionRole.setPartyRole(PARTY_ROLE_SUPPORT);
-        institutionRole.setProductRole(PRODUCT_ROLE_SUPPORT);
-        institutionExchange.setRoles(List.of(institutionRole));
+        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution);
 
         TokenExchangeClaims claims = retrieveAndSetBackofficeAdminClaims(authentication.getCredentials().toString(), institutionExchange,  selfCareUser);
 
