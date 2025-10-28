@@ -406,9 +406,9 @@ public class ExchangeTokenServiceV2 {
         private String subUnitType;
         private String aooParent;
         /**
-         * @deprecated This field is deprecated and will be removed in a future version.
+         * @deprecated This field is deprecated and may be removed in a future version.
          */
-        @Deprecated(since = "1.1.8", forRemoval = true)
+        @Deprecated(since = "1.1.8", forRemoval = false)
         private String parentDescription;
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RootParent.class)
         private RootParent rootParent;
