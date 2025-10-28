@@ -158,6 +158,8 @@ public class ExchangeTokenServiceV2 {
         Product product = productService.getProduct(productId);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin getProduct result = {}", product);
 
+        setAudience(claims, product, environment);
+
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin exchanged claims = {}", claims);
         String jwts = createJwts(claims);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "exchangeBackofficeAdmin exchanged token = {}", jwts);
@@ -245,7 +247,6 @@ public class ExchangeTokenServiceV2 {
     }
 
     private TokenExchangeClaims retrieveAndSetBackofficeAdminClaims(String credential, InstitutionBackofficeAdmin institution, SelfCareUser selfCareUser) {
-        String userId = Objects.equals(selfCareUser.getId(), "uid_not_provided") ? selfCareUser.getId() : UUID.fromString(selfCareUser.getId()).toString();
         Claims selcClaims = jwtService.getClaims(credential);
         Assert.notNull(selcClaims, TOKEN_CLAIMS_REQUIRED_MESSAGE);
         TokenExchangeClaims claims = new TokenExchangeClaims(selcClaims);
@@ -253,15 +254,13 @@ public class ExchangeTokenServiceV2 {
 
         claims.setIssuer(selfCareUser.getIssuer());
 
-        String email = Optional.ofNullable(selfCareUser.getEmail()).orElse(userId);
-
-        claims.setEmail(email);
+        claims.setEmail(selfCareUser.getEmail());
         claims.setInstitution(institution);
 
         claims.setDesiredExpiration(claims.getExpiration());
         claims.setIssuedAt(new Date());
         claims.setExpiration(Date.from(claims.getIssuedAt().toInstant().plus(duration)));
-        claims.setSubject(userId);
+        claims.setSubject(UUID.fromString(selfCareUser.getId()).toString());
         claims.setType(ID);
 
         return claims;

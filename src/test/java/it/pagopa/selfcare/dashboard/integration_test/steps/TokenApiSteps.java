@@ -73,10 +73,10 @@ public class TokenApiSteps{
         DecodedJWT decodedJWT = JWT.decode(token);
         Map<String, Claim> payload = decodedJWT.getClaims();
         Assertions.assertEquals("PAGOPA",payload.get("iss").asString());
-        Assertions.assertEquals("api.dev.selfcare.pagopa.it",payload.get("aud").asString());
+        Assertions.assertEquals("api.interop.selfcare.pagopa.it",payload.get("aud").asString());
         Assertions.assertNotNull(payload.get("jti").asString());
         Assertions.assertEquals("35a78332-d038-4bfa-8e85-2cba7f6b7bf8",payload.get("uid").asString());
-        Assertions.assertEquals("35a78332-d038-4bfa-8e85-2cba7f6b7bf8",payload.get("email").asString());
+        Assertions.assertEquals("test@t.it",payload.get("email").asString());
         Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544",payload.get("organization").as(Map.class).get("id"));
         Assertions.assertEquals("Comune di Castelbuono",payload.get("organization").as(Map.class).get("name"));
         Assertions.assertEquals("00310810825",payload.get("organization").as(Map.class).get("fiscal_code"));
