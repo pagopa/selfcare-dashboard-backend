@@ -408,7 +408,7 @@ public class ExchangeTokenServiceV2 {
         /**
          * @deprecated This field is deprecated and will be removed in a future version.
          */
-        @Deprecated
+        @Deprecated(since = "1.1.8", forRemoval = true)
         private String parentDescription;
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RootParent.class)
         private RootParent rootParent;
