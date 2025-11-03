@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.config;
 
+import it.pagopa.selfcare.dashboard.client.IamRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.security.SelfCarePermissionEvaluatorV2;
@@ -15,17 +16,19 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     private final UserGroupRestClient userGroupRestClient;
     private final UserApiRestClient userApiRestClient;
+    private final IamRestClient iamRestClient;
 
 
-    public MethodSecurityConfig(UserGroupRestClient userGroupRestClient, UserApiRestClient userApiRestClient) {
+    public MethodSecurityConfig(UserGroupRestClient userGroupRestClient, UserApiRestClient userApiRestClient, IamRestClient iamRestClient) {
         this.userGroupRestClient = userGroupRestClient;
         this.userApiRestClient = userApiRestClient;
+        this.iamRestClient = iamRestClient;
     }
 
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
-        expressionHandler.setPermissionEvaluator(new SelfCarePermissionEvaluatorV2(userGroupRestClient, userApiRestClient));
+        expressionHandler.setPermissionEvaluator(new SelfCarePermissionEvaluatorV2(userGroupRestClient, userApiRestClient, iamRestClient));
         return expressionHandler;
     }
 

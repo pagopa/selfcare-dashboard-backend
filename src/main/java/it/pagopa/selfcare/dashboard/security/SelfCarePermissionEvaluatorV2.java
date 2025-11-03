@@ -3,6 +3,7 @@ package it.pagopa.selfcare.dashboard.security;
 import io.github.resilience4j.retry.annotation.Retry;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.client.IamRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserGroupRestClient;
 import it.pagopa.selfcare.dashboard.model.groups.UserGroupInfo;
@@ -21,6 +22,7 @@ import org.springframework.util.StringUtils;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Slf4j
@@ -28,17 +30,14 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
 
     private final UserGroupRestClient userGroupRestClient;
     private final UserApiRestClient userApiRestClient;
+    private final IamRestClient iamRestClient;
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
     private static final String ISSUER_PAGOPA = "PAGOPA";
-    private static final List<String> PAGOPA_ALLOWED_PERMISSIONS = List.of(
-            "Selc:ViewInstitutionData",
-            "Selc:AccessProductBackofficeAdmin"
-    );
 
-
-    public SelfCarePermissionEvaluatorV2(UserGroupRestClient restClient, UserApiRestClient userApiRestClient) {
+    public SelfCarePermissionEvaluatorV2(UserGroupRestClient restClient, UserApiRestClient userApiRestClient,IamRestClient iamRestClient) {
         this.userGroupRestClient = restClient;
         this.userApiRestClient = userApiRestClient;
+        this.iamRestClient = iamRestClient;
     }
 
     static final Function<UserGroupResource, UserGroupInfo> GROUP_RESPONSE_TO_GROUP_INFO = groupResponse -> {
@@ -86,8 +85,18 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         if (ISSUER_PAGOPA.equalsIgnoreCase(issuer)) {
             log.debug("Issuer is PAGOPA, evaluating permission {}", permission);
 
-            boolean isAllowed = PAGOPA_ALLOWED_PERMISSIONS.stream()
-                    .anyMatch(p -> p.equalsIgnoreCase(permission.toString()));
+            FilterAuthorityDomain filterAuthorityDomain = Optional.ofNullable(targetDomainObject)
+                    .filter(FilterAuthorityDomain.class::isInstance)
+                    .map(FilterAuthorityDomain.class::cast)
+                    .orElseGet(() -> new FilterAuthorityDomain(null, null, null));
+
+            boolean isAllowed = Optional.ofNullable(iamRestClient._hasIAMUserPermission(permission.toString(),
+                            userId,
+                            filterAuthorityDomain.getInstitutionId(),
+                            filterAuthorityDomain.getProductId())
+                        .getBody())
+                    .map(Boolean.TRUE::equals)
+                    .orElse(false);
 
             log.debug("PAGOPA permission {} → {}", permission, isAllowed ? "GRANTED" : "DENIED");
             log.trace("check Permission end (issuer PAGOPA)");

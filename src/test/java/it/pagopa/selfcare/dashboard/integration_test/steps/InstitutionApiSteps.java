@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.integration_test.steps;
 
+import io.cucumber.java.BeforeAll;
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.When;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class InstitutionApiSteps {
 
@@ -54,7 +56,12 @@ public class InstitutionApiSteps {
     public UserCountResource convertUserCountResource(Map<String, String> entry) {
         return dashboardStepsUtil.toUserCountResource(entry);
     }
-
+/*
+    @BeforeAll
+    public static void setTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    }
+*/
     @When("I send a PUT request to {string} to save institutions logo")
     public void whenISendAPutRequestWithInstitutionLogo(String url) throws IOException {
         String institutionId = dashboardStepsUtil.filter.getInstitutionId();

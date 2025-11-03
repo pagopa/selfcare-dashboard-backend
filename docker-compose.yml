@@ -96,6 +96,18 @@ services:
     depends_on:
       - mongodb
 
+  iamms:
+    image: ghcr.io/pagopa/selfcare-iam-ms:latest
+    pull_policy: always
+    ports:
+      - '8085:8080'
+    env_file:
+      - "./src/test/resources/iamenv"
+    networks:
+      - develop-network
+    depends_on:
+      - mongodb
+
 networks:
   develop-network:
     name: selfcare-develop-network

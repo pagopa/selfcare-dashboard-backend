@@ -1,6 +1,7 @@
 package it.pagopa.selfcare.dashboard.security;
 
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
+import it.pagopa.selfcare.dashboard.client.IamRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserGroupRestClient;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
@@ -31,6 +32,8 @@ class SelfCarePermissionEvaluatorV2Test {
     UserGroupRestClient userGroupRestClient;
     @Mock
     UserApiRestClient userApiRestClient;
+    @Mock
+    IamRestClient iamRestClient;
     @InjectMocks
     SelfCarePermissionEvaluatorV2 permissionEvaluator;
 
@@ -90,24 +93,31 @@ class SelfCarePermissionEvaluatorV2Test {
         assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", "productId", null), "Selc:ViewBilling"));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"Selc:ViewInstitutionData", "Selc:AccessProductBackofficeAdmin"})
-    void hasPermissionReturnsTrueForIssuerPagoPA(String permission) {
+    @Test
+    void hasPermissionReturnsTrueForIssuerPagoPA() {
         Authentication authentication = mock(Authentication.class);
         SelfCareUser user = SelfCareUser.builder("userId").issuer("PAGOPA").build();
+        FilterAuthorityDomain domain = new FilterAuthorityDomain("institutionId", "productId", null);
+        String permission = "Selc:AccessProductBackofficeAdmin";
 
         when(authentication.getPrincipal()).thenReturn(user);
+        when(iamRestClient._hasIAMUserPermission(permission, user.getId(), domain.getInstitutionId(), domain.getProductId()))
+                .thenReturn(ResponseEntity.ok(true));
 
-        assertTrue(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", null, null), permission));
+        assertTrue(permissionEvaluator.hasPermission(authentication, domain, permission));
     }
 
     @Test
     void hasPermissionReturnsFalseForIssuerPagoPA() {
         Authentication authentication = mock(Authentication.class);
         SelfCareUser user = SelfCareUser.builder("userId").issuer("PAGOPA").build();
+        FilterAuthorityDomain domain = new FilterAuthorityDomain("institutionId", null, null);
+        String permission = "Selc:ViewBilling";
 
         when(authentication.getPrincipal()).thenReturn(user);
+        when(iamRestClient._hasIAMUserPermission(permission,  user.getId(), domain.getInstitutionId(), domain.getProductId()))
+                .thenReturn(ResponseEntity.ok(false));
 
-        assertFalse(permissionEvaluator.hasPermission(authentication, new FilterAuthorityDomain("institutionId", null, null), "Selc:ViewBilling"));
+        assertFalse(permissionEvaluator.hasPermission(authentication, domain, permission));
     }
 }

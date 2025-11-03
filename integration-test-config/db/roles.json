@@ -1,0 +1,27 @@
+[
+  {
+    "_id": "ADMIN",
+    "permissions": [
+      "admin",
+      "read:users",
+      "write:users",
+      "delete:users",
+      "Selc:ViewInstitutionData",
+      "Selc:AccessProductBackofficeAdmin"
+    ]
+  },
+  {
+    "_id": "OPERATOR",
+    "permissions": [
+      "read:users",
+      "Selc:AccessProductBackofficeAdmin"
+    ]
+  },
+  {
+    "_id": "SUPPORT",
+    "permissions": [
+      "read:users",
+      "write:users"
+    ]
+  }
+]
