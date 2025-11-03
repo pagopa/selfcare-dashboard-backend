@@ -56,12 +56,7 @@ public class InstitutionApiSteps {
     public UserCountResource convertUserCountResource(Map<String, String> entry) {
         return dashboardStepsUtil.toUserCountResource(entry);
     }
-/*
-    @BeforeAll
-    public static void setTimezone() {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-    }
-*/
+
     @When("I send a PUT request to {string} to save institutions logo")
     public void whenISendAPutRequestWithInstitutionLogo(String url) throws IOException {
         String institutionId = dashboardStepsUtil.filter.getInstitutionId();
