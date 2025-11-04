@@ -134,6 +134,10 @@ app_settings = [
   {
     name  = "FEATURE_VIEWCONTRACT_ENABLED"
     value = "true"
+  },
+  {
+    name  = "IAM_URL"
+    value = "http://selc-d-iam-ms-ca"
   }
 ]
 

@@ -75,6 +75,11 @@ Feature: Institution
     When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
     Then the response status should be 404
 
+  Scenario: Attempt to retrieve institution by institutionId v2 without permission (IAM user permission)
+    Given user login with username "r.balboa" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
+    Then the response status should be 404
 
   Scenario: Successfully update institution geo-taxonomy by institutionId
     Given user login with username "j.doe" and password "test"

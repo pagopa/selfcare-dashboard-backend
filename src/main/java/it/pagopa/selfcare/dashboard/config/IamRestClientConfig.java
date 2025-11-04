@@ -1,0 +1,15 @@
+package it.pagopa.selfcare.dashboard.config;
+
+import it.pagopa.selfcare.commons.connector.rest.config.RestClientBaseConfig;
+import it.pagopa.selfcare.dashboard.client.IamRestClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+
+@Configuration
+@Import(RestClientBaseConfig.class)
+@EnableFeignClients(clients = IamRestClient.class)
+@PropertySource("classpath:config/iam-rest-client.properties")
+public class IamRestClientConfig {
+}

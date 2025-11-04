@@ -50,6 +50,12 @@ Feature: Token API
     And the response should contain a valid backoffice admin token
     And the response should contain a "de" query param for language
 
+  Scenario: Attempt to retrieve backoffice admin token without permission (IAM user permission)
+    Given user login with username "b.barnes" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "product-A"
+    When I send a GET request to "/v2/token/exchange/back-office/admin" with the given details to retrieve back-office admin URL
+    Then the response status should be 403
 
   Scenario: Attempt to backoffice admin token exchange without institution ID
     Given user login with username "j.doe" and password "test"
