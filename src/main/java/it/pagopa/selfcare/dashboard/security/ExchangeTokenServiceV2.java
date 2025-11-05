@@ -2,6 +2,8 @@ package it.pagopa.selfcare.dashboard.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
@@ -9,9 +11,9 @@ import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.client.IamExternalRestClient;
 import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBackofficeAdmin;
-import it.pagopa.selfcare.dashboard.model.institution.RoleBackofficeAdmin;
 import it.pagopa.selfcare.dashboard.model.institution.RootParent;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.exception.InvalidRequestException;
@@ -28,6 +30,7 @@ import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.dashboard.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.UserClaims;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
@@ -78,18 +81,20 @@ public class ExchangeTokenServiceV2 {
     public final UserV2Service userService;
     private final ProductService productService;
     private final UserInstitutionApiRestClient userInstitutionApiRestClient;
+    private final IamExternalRestClient iamExternalRestClient;
     private final String issuer;
 
     private final InstitutionResourceMapper institutionResourceMapper;
     private final InstitutionMapper institutionMapper;
     private final ProductMapper productMapper;
+    private final ObjectMapper objectMapper;
 
     public ExchangeTokenServiceV2(JwtService jwtService,
                                   InstitutionService institutionService,
                                   UserGroupV2Service groupService,
                                   ExchangeTokenProperties properties,
-                                  UserV2Service userService, ProductService productService, UserInstitutionApiRestClient userInstitutionApiRestClient,
-                                  InstitutionResourceMapper institutionResourceMapper, InstitutionMapper institutionMapper, ProductMapper productMapper)
+                                  UserV2Service userService, ProductService productService, UserInstitutionApiRestClient userInstitutionApiRestClient, IamExternalRestClient iamExternalRestClient,
+                                  InstitutionResourceMapper institutionResourceMapper, InstitutionMapper institutionMapper, ProductMapper productMapper, ObjectMapper objectMapper)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.billingUrl = properties.getBillingUrl();
         this.billingAudience = properties.getBillingAudience();
@@ -103,9 +108,11 @@ public class ExchangeTokenServiceV2 {
         this.userService = userService;
         this.productService = productService;
         this.userInstitutionApiRestClient = userInstitutionApiRestClient;
+        this.iamExternalRestClient = iamExternalRestClient;
         this.institutionResourceMapper = institutionResourceMapper;
         this.institutionMapper = institutionMapper;
         this.productMapper = productMapper;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -151,7 +158,15 @@ public class ExchangeTokenServiceV2 {
 
         it.pagopa.selfcare.dashboard.model.institution.Institution institution = institutionService.getInstitutionById(institutionId);
         Assert.notNull(institution, INSTITUTION_REQUIRED_MESSAGE);
-        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution);
+
+        UserClaims userClaims;
+        try {
+            userClaims = objectMapper.readValue(iamExternalRestClient._getIAMUser(selfCareUser.getId(), productId).getBody(), UserClaims.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(String.format("User Claims are required for product '%s' and institution '%s'", productId, institutionId));
+        }
+
+        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, userClaims.getProductRoles());
 
         TokenExchangeClaims claims = retrieveAndSetBackofficeAdminClaims(authentication.getCredentials().toString(), institutionExchange,  selfCareUser);
 

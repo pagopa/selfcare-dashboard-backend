@@ -2,11 +2,10 @@
   {
     "_id": "35a78332-d038-4bfa-8e85-2cba7f6b7bf8",
     "email": "EEFF4l3KRN2cJKm8PDpdMjrVeWG00GeYY6JCbxHlcAPSpQ==",
-    "name": "user-001",
     "productRoles": [{
       "productId": "prod-interop",
       "roles": [
-        "ADMIN"
+        "SUPPORT"
       ]
     }]
   },
@@ -18,7 +17,7 @@
       {
         "productId": "product-A",
         "roles": [
-          "OPERATOR"
+          "ADMIN"
         ]
       },
       {

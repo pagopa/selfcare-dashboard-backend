@@ -21,7 +21,9 @@
     "_id": "SUPPORT",
     "permissions": [
       "read:users",
-      "write:users"
+      "write:users",
+      "Selc:ViewInstitutionData",
+      "Selc:AccessProductBackofficeAdmin"
     ]
   }
 ]
