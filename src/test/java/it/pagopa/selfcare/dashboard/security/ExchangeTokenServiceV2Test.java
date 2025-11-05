@@ -240,16 +240,46 @@ class ExchangeTokenServiceV2Test {
         assertNotNull(result.getIdentityToken());
     }
 
-        @Test
-        void exchangeBackofficeAdmin_noAuth() {
-            // Arrange
-            String institutionId = "validInstitutionId";
-            String productId = "validProductId";
-            Optional<String> environment = Optional.of("validEnvironment");
-            SecurityContextHolder.getContext().setAuthentication(null);
+    @Test
+    void exchangeBackofficeAdmin_noAuth() {
+        // Arrange
+        String institutionId = "validInstitutionId";
+        String productId = "validProductId";
+        Optional<String> environment = Optional.of("validEnvironment");
+        SecurityContextHolder.getContext().setAuthentication(null);
 
-            Assertions.assertThrows(IllegalStateException.class, () -> exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, environment), "Authentication is required");
-        }
+        Assertions.assertThrows(IllegalStateException.class, () -> exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, environment), "Authentication is required");
+    }
+
+    @Test
+    void exchangeBackofficeAdmin_noUserClaims_throwsIllegalArgumentException() {
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String credential = "password";
+        String userId = UUID.randomUUID().toString();
+
+        it.pagopa.selfcare.dashboard.model.institution.Institution institution = mock(it.pagopa.selfcare.dashboard.model.institution.Institution.class);
+
+        TestSecurityContextHolder.setAuthentication(new TestingAuthenticationToken(SelfCareUser.builder(userId).build(), credential));
+
+        when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
+        when(iamExternalRestClient._getIAMUser(userId, productId))
+                .thenReturn(ResponseEntity.ok("invalid json response"));
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> exchangeTokenServiceV2.exchangeBackofficeAdmin(
+                        institutionId,
+                        productId,
+                        Optional.empty()
+                )
+        );
+
+        Assertions.assertEquals(
+                String.format("User Claims are required for product '%s' and institution '%s'", productId, institutionId),
+                exception.getMessage()
+        );
+    }
 
     @Test
     void testRetrieveBillingExchangedToken_AuthenticationMissing() {
