@@ -9,6 +9,7 @@ import it.pagopa.selfcare.dashboard.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.model.UpdateInstitutionDto;
 import it.pagopa.selfcare.dashboard.model.institution.*;
 import it.pagopa.selfcare.dashboard.security.ExchangeTokenServiceV2;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRoles;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,8 +19,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.PENDING;
 import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.TOBEVALIDATED;
@@ -107,8 +110,8 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "subUnitType", source = "institution.subunitType")
     @Mapping(target = "subUnitCode", source = "institution.subunitCode")
     @Mapping(target = "rootParent", expression = "java(toRootParent(institution))")
-    @Mapping(target = "roles", expression = "java(toRolesBackofficeAdmin())")
-    InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution);
+    @Mapping(target = "roles", expression = "java(toRolesBackofficeAdmin(productRoles))")
+    InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution, List<ProductRoles> productRoles);
 
     @Named("toRootParent")
     default RootParent toRootParent(Institution institutionInfo) {
@@ -129,12 +132,20 @@ public interface InstitutionResourceMapper {
         return roles;
     }
 
-    default List<RoleBackofficeAdmin> toRolesBackofficeAdmin() {
-        RoleBackofficeAdmin institutionRole = new RoleBackofficeAdmin();
-        institutionRole.setPartyRole("SUPPORT");
-        institutionRole.setProductRole("support");
+    default List<RoleBackofficeAdmin> toRolesBackofficeAdmin(List<ProductRoles> productRoles) {
+        return  Optional.ofNullable(productRoles)
+                .orElse(Collections.emptyList())
+                .stream()
+                .flatMap(productRole -> productRole.getRoles().stream()
+                        .map(this::constructRoleBackofficeAdmin))
+                .collect(Collectors.toList());
+    }
 
-        return List.of(institutionRole);
+    default RoleBackofficeAdmin constructRoleBackofficeAdmin(String role) {
+        RoleBackofficeAdmin roleBackofficeAdmin = new RoleBackofficeAdmin();
+        roleBackofficeAdmin.setPartyRole(role);
+        roleBackofficeAdmin.setProductRole(role.toLowerCase());
+        return roleBackofficeAdmin;
     }
 
     default List<ExchangeTokenServiceV2.Role> constructRole(ProductGrantedAuthority productGrantedAuthority, boolean isBillingToken) {

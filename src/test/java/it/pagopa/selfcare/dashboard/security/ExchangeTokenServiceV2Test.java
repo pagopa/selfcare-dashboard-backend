@@ -1,10 +1,13 @@
 package it.pagopa.selfcare.dashboard.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
+import it.pagopa.selfcare.dashboard.client.IamExternalRestClient;
 import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
 import it.pagopa.selfcare.dashboard.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.model.ExchangedToken;
@@ -16,6 +19,8 @@ import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRoles;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.UserClaims;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse;
@@ -59,6 +64,9 @@ class ExchangeTokenServiceV2Test {
     private UserInstitutionApiRestClient userInstitutionApiRestClient;
 
     @Mock
+    private IamExternalRestClient iamExternalRestClient;
+
+    @Mock
     private InstitutionService institutionService;
 
     @Mock
@@ -88,8 +96,11 @@ class ExchangeTokenServiceV2Test {
 
     private ExchangeTokenServiceV2 exchangeTokenServiceV2;
 
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() throws Exception {
+        objectMapper = new ObjectMapper();
         when(exchangeTokenProperties.getBillingAudience()).thenReturn("aud");
         when(exchangeTokenProperties.getBillingUrl()).thenReturn("url");
         when(exchangeTokenProperties.getDuration()).thenReturn("PT20H30M");
@@ -105,7 +116,7 @@ class ExchangeTokenServiceV2Test {
 
         exchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtService,
                 institutionService,userGroupV2Service,exchangeTokenProperties,userV2Service,productService,
-                userInstitutionApiRestClient,institutionResourceMapper,institutionMapper, productMapper);
+                userInstitutionApiRestClient,iamExternalRestClient,institutionResourceMapper,institutionMapper, productMapper, objectMapper);
     }
 
 
@@ -186,7 +197,7 @@ class ExchangeTokenServiceV2Test {
     }
 
     @Test
-    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() {
+    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() throws JsonProcessingException {
         String jti = "id";
         String sub = "subject";
         String iss = "PAGOPA";
@@ -196,6 +207,15 @@ class ExchangeTokenServiceV2Test {
         String productId = "productId";
         String credential = "password";
         String userId = UUID.randomUUID().toString();
+        UserClaims userClaims = new UserClaims();
+        List<ProductRoles> productRoles = List.of(
+                ProductRoles.builder()
+                        .productId(productId)
+                        .roles(List.of("SUPPORT"))
+                        .build()
+        );
+        userClaims.setProductRoles(productRoles);
+        String userClaimsJson = objectMapper.writeValueAsString(userClaims);
 
         it.pagopa.selfcare.dashboard.model.institution.Institution institution = mock(it.pagopa.selfcare.dashboard.model.institution.Institution.class);
         Product product = mock(Product.class);
@@ -211,6 +231,8 @@ class ExchangeTokenServiceV2Test {
 
         when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
         when(productService.getProduct(productId)).thenReturn(product);
+        when(iamExternalRestClient._getIAMUser(userId, productId))
+                .thenReturn(ResponseEntity.ok(userClaimsJson));
 
         ExchangedToken result = exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, Optional.empty());
 
