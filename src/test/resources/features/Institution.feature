@@ -88,6 +88,12 @@ Feature: Institution
       | mailAddress                    | protocollo@pec.comune.dernice.al.it                                                       |
       | address                        | Via Roma N.17                                                                             |
       | zipCode                        | 15056                                                                                     |
+      | products[0].productId          | prod-io                                                                                   |
+      | products[0].authorized         | false                                                                                      |
+      | products[1].productId          | prod-pagopa                                                                               |
+      | products[1].authorized         | false                                                                                     |
+      | products[2].productId          | prod-pagopa                                                                               |
+      | products[2].authorized         | false                                                                                      |
       | products[3].origin             | IPA                                                                                       |
       | products[3].originId           | c_d277                                                                                    |
       | products[3].productId          | prod-interop                                                                              |
