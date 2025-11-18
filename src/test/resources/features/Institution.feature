@@ -32,6 +32,7 @@ Feature: Institution
       | zipCode                     | 15056                                 |
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
+      | products[0].productId       | prod-io                               |
       | products[0].institutionType | PT                                    |
       | products[0].createdAt       | 2022-06-10T13:29:10.462Z              |
     And The response body contains the list "products" of size 4
@@ -63,11 +64,77 @@ Feature: Institution
       | zipCode                     | 15056                                 |
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
+      | products[0].productId       | prod-io                               |
       | products[0].institutionType | PT                                    |
       | products[0].createdAt       | 2022-06-10T13:29:10.462Z              |
     And The response body contains the list "products" of size 4
     # Field institutionType not present if productId not specified in request
     And The response body doesn't contain field "institutionType"
+
+  Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with interop permission
+    Given user login with username "b.barnes" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
+    Then the response status should be 200
+    And The response body contains:
+      | id                             | 067327d3-bdd6-408d-8655-87e8f1960046                                                      |
+      | externalId                     | 99000870064                                                                               |
+      | originId                       | c_d277                                                                                    |
+      | origin                         | IPA                                                                                       |
+      | name                           | comune di dernice                                                                         |
+      | category                       | Comuni e loro Consorzi e Associazioni                                                     |
+      | categoryCode                   | L6                                                                                        |
+      | fiscalCode                     | 99000870064                                                                               |
+      | mailAddress                    | protocollo@pec.comune.dernice.al.it                                                       |
+      | address                        | Via Roma N.17                                                                             |
+      | zipCode                        | 15056                                                                                     |
+      | products[3].origin             | IPA                                                                                       |
+      | products[3].originId           | c_d277                                                                                    |
+      | products[3].productId          | prod-interop                                                                              |
+      | products[3].institutionType    | PT                                                                                        |
+      | products[3].userRole           | SUPPORT                                                                                   |
+      | products[3].userProductActions | [read:users, write:users, Selc:ViewInstitutionData, Selc:AccessProductBackofficeAdmin]    |
+    And The response body contains the list "products" of size 4
+    # Field institutionType not present if productId not specified in request
+    And The response body doesn't contain field "institutionType"
+    And The response body doesn't contain field "products[0].userProductActions"
+    And The response body doesn't contain field "products[1].userProductActions"
+    And The response body doesn't contain field "products[2].userProductActions"
+
+  Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with both interop and all permissions
+    Given user login with username "b.king" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
+    Then the response status should be 200
+    And The response body contains:
+      | id                             | 067327d3-bdd6-408d-8655-87e8f1960046                                                      |
+      | externalId                     | 99000870064                                                                               |
+      | originId                       | c_d277                                                                                    |
+      | origin                         | IPA                                                                                       |
+      | name                           | comune di dernice                                                                         |
+      | category                       | Comuni e loro Consorzi e Associazioni                                                     |
+      | categoryCode                   | L6                                                                                        |
+      | fiscalCode                     | 99000870064                                                                               |
+      | mailAddress                    | protocollo@pec.comune.dernice.al.it                                                       |
+      | address                        | Via Roma N.17                                                                             |
+      | zipCode                        | 15056                                                                                     |
+      | products[0].productId          | prod-io                                                                                   |
+      | products[0].userRole           | SUPPORT                                                                                   |
+      | products[0].authorized         | true                                                                                      |
+      | products[0].userProductActions | [read:users, write:users, Selc:ViewInstitutionData, Selc:AccessProductBackofficeAdmin]    |
+      | products[1].productId          | prod-pagopa                                                                               |
+      | products[1].authorized         | false                                                                                     |
+      | products[2].productId          | prod-pagopa                                                                               |
+      | products[2].authorized         | true                                                                                      |
+      | products[2].userProductActions | [read:users, write:users, Selc:ViewInstitutionData, Selc:AccessProductBackofficeAdmin]    |
+      | products[3].productId          | prod-interop                                                                              |
+      | products[3].userRole           | OPERATOR                                                                                  |
+      | products[3].authorized         | true                                                                                      |
+      | products[3].userProductActions | [read:users, Selc:AccessProductBackofficeAdmin]                                           |
+    And The response body contains the list "products" of size 4
+    # Field institutionType not present if productId not specified in request
+    And The response body doesn't contain field "institutionType"
+    And The response body doesn't contain field "products[1].userProductActions"
 
   Scenario: Attempt to retrieve institution by institutionId v2 without permission (not onboarded)
     Given user login with username "r.balboa" and password "test"

@@ -7,16 +7,15 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.InstitutionResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
-import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
-import it.pagopa.selfcare.dashboard.client.OnboardingRestClient;
-import it.pagopa.selfcare.dashboard.client.TokenRestClient;
-import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.client.*;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGet;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
 import it.pagopa.selfcare.product.service.ProductService;
@@ -52,8 +51,7 @@ import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.PENDING;
 import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.TOBEVALIDATED;
 import static it.pagopa.selfcare.onboarding.common.ProductId.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class InstitutionV2ServiceImplTest extends BaseServiceTest {
@@ -66,6 +64,8 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     private CoreInstitutionApiRestClient coreInstitutionApiRestClient;
     @Mock
     private OnboardingRestClient onboardingRestClient;
+    @Mock
+    private IamExternalRestClient iamExternalRestClient;
     @Mock
     private ProductService productService;
     @Mock
@@ -134,7 +134,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         UserInfo actualUserInfo = institutionV2Service.getInstitutionUser("institutionId", "userId", "loggedUserId");
         assertEquals(userInfo.get(0).getId(), actualUserInfo.getId());
-        Mockito.verify(userV2Service, Mockito.times(1)).getUsers(institutionId, userInfoFilter, loggedUserId);
+        verify(userV2Service, Mockito.times(1)).getUsers(institutionId, userInfoFilter, loggedUserId);
     }
 
     @Test
@@ -171,10 +171,164 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Assertions.assertNotNull(result.getOnboarding().get(0).getUserProductActions());
         Assertions.assertEquals(2, result.getOnboarding().get(0).getUserProductActions().size());
         Assertions.assertNotNull(result.getOnboarding().get(0).getCreatedAt());
-        Mockito.verify(userApiRestClient, Mockito.times(1))
+        verify(userApiRestClient, Mockito.times(1))
                 ._getUserInstitutionWithPermission(institutionId, userId, null);
-        Mockito.verify(coreInstitutionApiRestClient, Mockito.times(1))
+        verify(coreInstitutionApiRestClient, Mockito.times(1))
                 ._retrieveInstitutionByIdUsingGET(institutionId, null);
+    }
+
+    @Test
+    void findInstitutionById_issuerPagoPA() throws IOException {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+
+        // Mock SelfCareUser with issuer = PAGOPA
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn(userId);
+        when(principal.getIssuer()).thenReturn("PAGOPA");
+
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Stub InstitutionResponse
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        InstitutionResponse institutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(institutionResponse));
+
+        // Stub IAM response
+        ProductRolePermissions perm = ProductRolePermissions.builder()
+                .productId("productId")
+                .role("SUPPORT")
+                .permissions(List.of("read", "write"))
+                .build();
+
+        ProductRolePermissionsList iamPermissions = ProductRolePermissionsList.builder()
+                .items(List.of(perm))
+                .build();
+
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(userId, null))
+                .thenReturn(ResponseEntity.ok(iamPermissions));
+
+        // when
+        Institution result = institutionV2Service.findInstitutionById(institutionId);
+
+        // then
+        assertNotNull(result);
+        assertNotNull(result.getOnboarding());
+        assertFalse(result.getOnboarding().isEmpty());
+
+        // Find the product
+        var product = result.getOnboarding().stream()
+                .filter(p -> "productId".equals(p.getProductId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertTrue(product.isAuthorized());
+        assertEquals("SUPPORT", product.getUserRole());
+        assertEquals(List.of("read", "write"), product.getUserProductActions());
+
+        // Checks
+        verify(userApiRestClient, never())._getUserInstitutionWithPermission(any(), any(), any());
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
+        verify(iamExternalRestClient, times(1))._getIAMProductRolePermissionsList(userId, null);
+    }
+
+    @Test
+    void findInstitutionById_issuerPagoPA_noPermissions() throws IOException {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+
+        // Mock SelfCareUser with issuer = PAGOPA
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn(userId);
+        when(principal.getIssuer()).thenReturn("PAGOPA");
+
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Stub InstitutionResponse
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        InstitutionResponse institutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(institutionResponse));
+
+        // Stub IAM response
+        ProductRolePermissionsList iamPermissions = ProductRolePermissionsList.builder()
+                .items(Collections.emptyList())
+                .build();
+
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(userId, null))
+                .thenReturn(ResponseEntity.ok(iamPermissions));
+
+        // verify
+        assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById(institutionId));
+    }
+
+    @Test
+    void findInstitutionById_issuerPagoPA_allPermissions() throws IOException {
+        // given
+        String institutionId = "institutionId";
+        String userId = "userId";
+
+        // Mock SelfCareUser with issuer = PAGOPA
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getId()).thenReturn(userId);
+        when(principal.getIssuer()).thenReturn("PAGOPA");
+
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Stub InstitutionResponse
+        ClassPathResource resource = new ClassPathResource("stubs/InstitutionResponse.json");
+        byte[] resourceStream = Files.readAllBytes(resource.getFile().toPath());
+        InstitutionResponse institutionResponse = objectMapper.readValue(resourceStream, new TypeReference<>() {});
+
+        when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(institutionResponse));
+
+        // Stub IAM response
+        ProductRolePermissions perm = ProductRolePermissions.builder()
+                .productId("all")
+                .role("SUPPORT")
+                .permissions(List.of("read"))
+                .build();
+
+        ProductRolePermissionsList iamPermissions = ProductRolePermissionsList.builder()
+                .items(List.of(perm))
+                .build();
+
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(userId, null))
+                .thenReturn(ResponseEntity.ok(iamPermissions));
+
+        // when
+        Institution result = institutionV2Service.findInstitutionById(institutionId);
+
+        // then
+        assertNotNull(result);
+        assertNotNull(result.getOnboarding());
+        assertFalse(result.getOnboarding().isEmpty());
+
+        // Find the product
+        var product = result.getOnboarding().stream()
+                .filter(p -> "productId".equals(p.getProductId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertTrue(product.isAuthorized());
+        assertEquals("SUPPORT", product.getUserRole());
+        assertEquals(List.of("read"), product.getUserProductActions());
+
+        // Checks
+        verify(userApiRestClient, never())._getUserInstitutionWithPermission(any(), any(), any());
+        verify(coreInstitutionApiRestClient, times(1))._retrieveInstitutionByIdUsingGET(institutionId, null);
+        verify(iamExternalRestClient, times(1))._getIAMProductRolePermissionsList(userId, null);
     }
 
     @Test
@@ -199,7 +353,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         when(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null)).thenReturn(ResponseEntity.ok(institutionResponse));
         when(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null)).thenReturn(ResponseEntity.ok().build());
         assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById(institutionId));
-        Mockito.verify(userApiRestClient, Mockito.times(1))._getUserInstitutionWithPermission(institutionId, userId, null);
+        verify(userApiRestClient, Mockito.times(1))._getUserInstitutionWithPermission(institutionId, userId, null);
     }
 
     @Test
@@ -286,7 +440,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         Institution result = institutionV2Service.findInstitutionById(institutionId);
         Assertions.assertEquals("LIMITED", result.getOnboarding().get(0).getUserRole());
-        Mockito.verify(userApiRestClient, Mockito.times(1))._getUserInstitutionWithPermission(institutionId, userId, null);
+        verify(userApiRestClient, Mockito.times(1))._getUserInstitutionWithPermission(institutionId, userId, null);
     }
 
     @Test
@@ -306,7 +460,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding(taxCode, subunitCode, productId);
 
         assertTrue(actualResponse);
-        Mockito.verify(onboardingRestClient, Mockito.times(1))
+        verify(onboardingRestClient, Mockito.times(1))
                 ._getOnboardingWithFilter(null, null, null, null, productId, null, 1, null, PENDING.name(), subunitCode, taxCode, null, null);
     }
 
@@ -344,9 +498,9 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Boolean actualResponse = institutionV2Service.verifyIfExistsPendingOnboarding("test-institution", null, "test-product");
 
         assertTrue(actualResponse);
-        Mockito.verify(onboardingRestClient, Mockito.times(1))
+        verify(onboardingRestClient, Mockito.times(1))
                 ._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, PENDING.name(), null, "test-institution", null, null);
-        Mockito.verify(onboardingRestClient, Mockito.times(1))
+        verify(onboardingRestClient, Mockito.times(1))
                 ._getOnboardingWithFilter(null, null, null, null, "test-product", null, 1, null, TOBEVALIDATED.name(), null, "test-institution", null, null);
     }
 

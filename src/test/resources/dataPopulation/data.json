@@ -78,6 +78,22 @@
         "iss": "PAGOPA",
         "jti": "_2f603a8bc36b1231b1a6"
       }
+    },
+    {
+      "username": "b.king",
+      "password": "test",
+      "jwtHeader": {
+        "alg": "RS256",
+        "typ": "JWT",
+        "kid": "jwt_test_kid"
+      },
+      "jwtPayload": {
+        "uid": "9f2b6b54-6c2b-4b36-8d83-4cd1d6fcf3e8",
+        "aud": "api.dev.selfcare.pagopa.it",
+        "email": "test@tt.tt",
+        "iss": "PAGOPA",
+        "jti": "_2f603a8bc36b1231b1a6"
+      }
     }
   ]
 }
