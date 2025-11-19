@@ -3,10 +3,7 @@ package it.pagopa.selfcare.dashboard.service;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
-import it.pagopa.selfcare.dashboard.client.CoreInstitutionApiRestClient;
-import it.pagopa.selfcare.dashboard.client.OnboardingRestClient;
-import it.pagopa.selfcare.dashboard.client.TokenRestClient;
-import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
+import it.pagopa.selfcare.dashboard.client.*;
 import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
@@ -15,6 +12,8 @@ import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.user.OnboardedProductWithActions;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.dashboard.model.user.UserInstitutionWithActionsDto;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
@@ -46,6 +45,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     private final UserApiRestClient userApiRestClient;
     private final CoreInstitutionApiRestClient coreInstitutionApiRestClient;
     private final OnboardingRestClient onboardingRestClient;
+    private final IamExternalRestClient iamExternalRestClient;
     private final TokenRestClient tokenRestClient;
     private final UserMapper userMapper;
     private final InstitutionMapper institutionMapper;
@@ -56,6 +56,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
                                     UserApiRestClient userApiRestClient,
                                     CoreInstitutionApiRestClient coreInstitutionApiRestClient,
                                     OnboardingRestClient onboardingRestClient,
+                                    IamExternalRestClient iamExternalRestClient,
                                     TokenRestClient tokenRestClient,
                                     UserMapper userMapper,
                                     InstitutionMapper institutionMapper,
@@ -64,6 +65,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         this.userApiRestClient = userApiRestClient;
         this.coreInstitutionApiRestClient = coreInstitutionApiRestClient;
         this.onboardingRestClient = onboardingRestClient;
+        this.iamExternalRestClient = iamExternalRestClient;
         this.tokenRestClient = tokenRestClient;
         this.userMapper = userMapper;
         this.institutionMapper = institutionMapper;
@@ -112,13 +114,12 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
         String issuer = selfCareUser.getIssuer();
+        String userId = selfCareUser.getId();
 
         if (ISSUER_PAGOPA.equalsIgnoreCase(issuer)) {
-            log.debug("Issuer is PAGOPA, skipping user-institution permission checks");
-            return institution;
+            log.debug("Issuer is PAGOPA, using IAM to check permissions");
+            return getInstitutionWithActionsIam(institutionId, userId, institution);
         }
-
-        String userId = selfCareUser.getId();
 
         UserInstitutionWithActionsDto userInstitutionWithActionsDto = userMapper.toUserInstitutionWithActionsDto(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null).getBody());
 
@@ -142,6 +143,35 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         log.trace("findInstitutionById end");
         return institution;
     }
+
+    private Institution getInstitutionWithActionsIam(String institutionId, String userId, Institution institution) {
+
+        List<ProductRolePermissions> productRolePermissions = Optional.ofNullable(
+                        iamExternalRestClient._getIAMProductRolePermissionsList(userId, null).getBody())
+                .map(ProductRolePermissionsList::getItems)
+                .filter(list -> !list.isEmpty())
+                .orElseThrow(() -> new AccessDeniedException(
+                        String.format("User %s has not permission on institution %s", userId, institutionId)));
+
+        ProductRolePermissions globalPermission = productRolePermissions.stream()
+                .filter(p -> "ALL".equals(p.getProductId()))
+                .findFirst().orElse(null);
+
+        institution.getOnboarding().stream()
+                .filter(p -> RelationshipState.ACTIVE.equals(p.getStatus()))
+                .forEach(p -> productRolePermissions.stream()
+                        .filter(iam -> iam.getProductId().equals(p.getProductId()))
+                        .findFirst()
+                        .or(() -> Optional.ofNullable(globalPermission))
+                        .ifPresent(iam -> {
+                            p.setAuthorized(true);
+                            p.setUserRole(iam.getRole());
+                            p.setUserProductActions(iam.getPermissions());
+                        }));
+
+        return institution;
+    }
+
 
     @Override
     public OnboardingsResponse getOnboardingsInfoResponse(String institutionId, List<String> products) {

@@ -10,6 +10,21 @@
     }]
   },
   {
+    "_id": "9f2b6b54-6c2b-4b36-8d83-4cd1d6fcf3e8",
+    "email": "EEFF4l3KRN2cJKm8PDpdMjrVeWG00GeYY6JCbxHlcAPSpQ==",
+    "productRoles": [{
+      "productId": "prod-interop",
+      "roles": [
+        "OPERATOR"
+      ]},
+      {
+        "productId": "ALL",
+        "roles": [
+          "SUPPORT"
+        ]
+      }]
+  },
+  {
     "_id": "a0530f76-3454-418c-9d65-eb3162075495",
     "email": "EEFF4l3KRN6cJKm8PDpdMjrVx7KTMZG/p/OjXGPw8gHYAg==",
     "name": "user-002",
