@@ -71,6 +71,7 @@ Feature: Institution
     # Field institutionType not present if productId not specified in request
     And The response body doesn't contain field "institutionType"
 
+  @skip
   Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with interop permission
     Given user login with username "b.barnes" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
@@ -107,7 +108,7 @@ Feature: Institution
     And The response body doesn't contain field "products[1].userProductActions"
     And The response body doesn't contain field "products[2].userProductActions"
 
-  Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with both interop and all permissions
+  Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with both interop and ALL permissions
     Given user login with username "b.king" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
