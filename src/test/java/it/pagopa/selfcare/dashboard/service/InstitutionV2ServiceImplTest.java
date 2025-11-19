@@ -295,7 +295,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         // Stub IAM response
         ProductRolePermissions perm = ProductRolePermissions.builder()
-                .productId("all")
+                .productId("ALL")
                 .role("SUPPORT")
                 .permissions(List.of("read"))
                 .build();

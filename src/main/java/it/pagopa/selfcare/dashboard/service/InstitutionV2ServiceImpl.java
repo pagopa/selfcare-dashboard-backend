@@ -154,7 +154,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
                         String.format("User %s has not permission on institution %s", userId, institutionId)));
 
         ProductRolePermissions globalPermission = productRolePermissions.stream()
-                .filter(p -> "all".equalsIgnoreCase(p.getProductId()))
+                .filter(p -> "ALL".equals(p.getProductId()))
                 .findFirst().orElse(null);
 
         institution.getOnboarding().stream()
