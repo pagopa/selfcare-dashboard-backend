@@ -137,7 +137,7 @@ app_settings = [
   },
   {
     name  = "FEATURE_VIEWCONTRACT_ENABLED"
-    value = "false"
+    value = "true"
   },
   {
     name  = "IAM_URL"
