@@ -111,9 +111,9 @@
     "taxCode": "85000870064",
     "onboarding": [
       {
-        "productId": "prod-io",
+        "productId": "prod-pagopa",
         "status": "ACTIVE",
-        "tokenId": "21f73488-d0df-4a3d-9b6f-9adf634780b5",
+        "tokenId": "string",
         "billing": {
           "vatNumber": "85000870064",
           "recipientCode": "c_d277",
@@ -124,7 +124,7 @@
         "contract": "parties/docs/21f73488-d0df-4a3d-9b6f-9adf634780b5/App IO_accordo_adesione.pdf",
         "origin": "IPA",
         "originId": "c_d277",
-        "institutionType": "PA"
+        "institutionType": "PSP"
       },
       {
         "productId": "prod-pagopa",
@@ -163,7 +163,7 @@
         "_class": "it.pagopa.selfcare.mscore.model.institution.Onboarding",
         "origin": "IPA",
         "originId": "c_d277",
-        "institutionType": "PA"
+        "institutionType": "PSP"
       },
       {
         "productId": "prod-interop",
@@ -448,7 +448,7 @@
       {
         "productId": "prod-io",
         "status": "ACTIVE",
-        "tokenId": "21f73488-d0df-4a3d-9b6f-9adf634780b5",
+        "tokenId": "string",
         "billing": {
           "vatNumber": "85000870064",
           "recipientCode": "c_d277",
@@ -459,7 +459,7 @@
         "contract": "parties/docs/21f73488-d0df-4a3d-9b6f-9adf634780b5/App IO_accordo_adesione.pdf",
         "origin": "IPA",
         "originId": "c_d277",
-        "institutionType": "PT"
+        "institutionType": "PSP"
       },
       {
         "productId": "prod-pagopa",
@@ -483,7 +483,7 @@
       },
       {
         "productId": "prod-pagopa",
-        "tokenId": "string",
+        "tokenId": "21f73488-d0df-4a3d-9b6f-9adf634780b5",
         "status": "ACTIVE",
         "contract": "string",
         "pricingPlan": "string",
@@ -498,7 +498,7 @@
         "_class": "it.pagopa.selfcare.mscore.model.institution.Onboarding",
         "origin": "IPA",
         "originId": "c_d277",
-        "institutionType": "PT"
+        "institutionType": "PSP"
       },
       {
         "productId": "prod-interop",
