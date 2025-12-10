@@ -600,7 +600,6 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         String institutionId = "inst1";
         String productId = "prod1";
         String tokenId = "token123";
-        Resource expectedContract = new ByteArrayResource("contract".getBytes());
 
         OnboardingResponse onboarding = new OnboardingResponse();
         onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
