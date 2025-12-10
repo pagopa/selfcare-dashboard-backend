@@ -577,13 +577,73 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         OnboardingResponse onboarding = new OnboardingResponse();
         onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setProductId(productId);
         onboarding.setCreatedAt(OffsetDateTime.now());
         onboarding.setTokenId(tokenId);
+        onboarding.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PSP);
 
         OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
         onboardingsResponse.setOnboardings(List.of(onboarding));
 
-        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+        when(tokenRestClient._getContractSigned(tokenId))
+                .thenReturn(ResponseEntity.ok(expectedContract));
+
+        Resource result = institutionV2Service.getContract(institutionId, productId);
+
+        assertEquals(expectedContract, result);
+    }
+
+    @Test
+    void getContract_shouldThrowException_whenActiveOnboardingExists_noPSP() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String tokenId = "token123";
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setCreatedAt(OffsetDateTime.now());
+        onboarding.setProductId(productId);
+        onboarding.setTokenId(tokenId);
+        onboarding.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.GSP);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+
+        assertThrows(AccessDeniedException.class, () ->
+                institutionV2Service.getContract(institutionId, productId)
+        );
+    }
+
+    @Test
+    void getContract_shouldThrowException_whenActiveOnboardingExists_noPSP_issuerPAGOPA() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String tokenId = "token123";
+        Resource expectedContract = new ByteArrayResource("contract".getBytes());
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setCreatedAt(OffsetDateTime.now());
+        onboarding.setProductId(productId);
+        onboarding.setTokenId(tokenId);
+        onboarding.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.GSP);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        // Mock SelfCareUser with issuer = PAGOPA
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getIssuer()).thenReturn("PAGOPA");
+
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
         when(tokenRestClient._getContractSigned(tokenId))
                 .thenReturn(ResponseEntity.ok(expectedContract));
@@ -600,11 +660,12 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         OnboardingResponse onboarding = new OnboardingResponse();
         onboarding.setStatus(OnboardingResponse.StatusEnum.DELETED);
+        onboarding.setProductId(productId);
 
         OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
         onboardingsResponse.setOnboardings(List.of(onboarding));
 
-        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -617,7 +678,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         String institutionId = "inst1";
         String productId = "prod1";
 
-        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(null));
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -636,16 +697,19 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         older.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
         older.setCreatedAt(OffsetDateTime.now().minusDays(1));
         older.setTokenId("token-old");
+        older.setProductId(productId);
+
 
         OnboardingResponse newer = new OnboardingResponse();
         newer.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
         newer.setCreatedAt(OffsetDateTime.now());
         newer.setTokenId(tokenId);
+        newer.setProductId(productId);
 
         OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
         onboardingsResponse.setOnboardings(List.of(older, newer));
 
-        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId))
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
         when(tokenRestClient._getContractSigned(tokenId))
                 .thenReturn(ResponseEntity.ok(expectedContract));

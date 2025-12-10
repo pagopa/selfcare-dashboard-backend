@@ -33,7 +33,7 @@ Feature: Institution
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
       | products[0].productId       | prod-io                               |
-      | products[0].institutionType | PT                                    |
+      | products[0].institutionType | PSP                                   |
       | products[0].createdAt       | 2022-06-10T13:29:10.462Z              |
     And The response body contains the list "products" of size 4
     # Field institutionType not present if productId not specified in request
@@ -65,7 +65,7 @@ Feature: Institution
       | products[0].origin          | IPA                                   |
       | products[0].originId        | c_d277                                |
       | products[0].productId       | prod-io                               |
-      | products[0].institutionType | PT                                    |
+      | products[0].institutionType | PSP                                   |
       | products[0].createdAt       | 2022-06-10T13:29:10.462Z              |
     And The response body contains the list "products" of size 4
     # Field institutionType not present if productId not specified in request
@@ -423,7 +423,6 @@ Feature: Institution
     When I send a GET request to "/v2/institutions/{institutionId}/products/{productId}/users/count" to get users count
     Then the response status should be 404
 
-  @skip
   Scenario: Successfully get Onboardings Info without products filter
     Given user login with username "j.doe" and password "test"
     And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046"
@@ -433,13 +432,13 @@ Feature: Institution
       | [0].productId         | prod-io      |
       | [0].status            | ACTIVE       |
       | [0].contractAvailable | true         |
-      | [0].institutionType   | PT           |
+      | [0].institutionType   | PSP          |
       | [0].origin            | IPA          |
       | [0].originId          | c_d277       |
       | [1].productId         | prod-pagopa  |
       | [1].status            | ACTIVE       |
       | [1].contractAvailable | true         |
-      | [1].institutionType   | PT           |
+      | [1].institutionType   | PSP          |
       | [1].origin            | IPA          |
       | [1].originId          | c_d277       |
       | [2].productId         | prod-interop |
@@ -450,7 +449,6 @@ Feature: Institution
       | [2].originId          | c_d277       |
     And The response body is a list of size 3
 
-  @skip
   Scenario: Successfully get Onboardings Info with products filter
     Given user login with username "j.doe" and password "test"
     And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046"
@@ -461,13 +459,13 @@ Feature: Institution
     | [0].productId         | prod-io     |
     | [0].status            | ACTIVE      |
     | [0].contractAvailable | true        |
-    | [0].institutionType   | PT          |
+    | [0].institutionType   | PSP         |
     | [0].origin            | IPA         |
     | [0].originId          | c_d277      |
     | [1].productId         | prod-pagopa |
     | [1].status            | ACTIVE      |
     | [1].contractAvailable | true        |
-    | [1].institutionType   | PT          |
+    | [1].institutionType   | PSP         |
     | [1].origin            | IPA         |
     | [1].originId          | c_d277      |
     And The response body is a list of size 2
@@ -478,10 +476,9 @@ Feature: Institution
     When I send a GET request to "/v2/institutions/{institutionId}/onboardings-info" to get onboardings info
     Then the response status should be 403
 
-  @skip
   Scenario: Successfully get Contract
     Given user login with username "j.doe" and password "test"
-    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-io"
+    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-pagopa"
     When I send a GET request to "/v2/institutions/{institutionId}/contract" to get contract
     Then the response status should be 200
 
@@ -491,10 +488,9 @@ Feature: Institution
     When I send a GET request to "/v2/institutions/{institutionId}/contract" to get contract
     Then the response status should be 403
 
-  @skip
   Scenario: Attempt to get a non-available contract
-    Given user login with username "j.doe" and password "test"
-    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-pagopa"
+    Given user login with username "r.balboa" and password "test"
+    And the institution ID is "467ac77d-7faa-47bf-a60e-38ea74bd5fd2" and the product ID is "prod-pagopa"
     When I send a GET request to "/v2/institutions/{institutionId}/contract" to get contract
     Then the response status should be 404
 

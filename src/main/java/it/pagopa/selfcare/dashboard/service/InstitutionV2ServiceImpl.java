@@ -200,7 +200,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     @Override
     public Resource getContract(String institutionId, String productId) {
         OnboardingsResponse onboardingsResponse = Optional.ofNullable(
-                coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, productId).getBody()
+                coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null).getBody()
         ).orElseGet(() -> {
             OnboardingsResponse emptyResponse = new OnboardingsResponse();
             emptyResponse.setOnboardings(Collections.emptyList());
@@ -209,14 +209,28 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
         OnboardingResponse onboarding = Optional.ofNullable(onboardingsResponse.getOnboardings())
                 .orElse(Collections.emptyList()).stream()
+                .filter(onb -> productId.equals(onb.getProductId()))
                 .filter(onb -> OnboardingResponse.StatusEnum.ACTIVE.equals(onb.getStatus()))
                 .max(Comparator.comparing(OnboardingResponse::getCreatedAt))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No active onboarding found for institution " + institutionId + " and product " + productId
                 ));
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+        String issuer = selfCareUser.getIssuer();
+
+        if (!ISSUER_PAGOPA.equalsIgnoreCase(issuer)
+                && onboarding.getInstitutionType() != OnboardingResponse.InstitutionTypeEnum.PSP) {
+            throw new AccessDeniedException(
+                    "Operation not allowed: institutionType " + onboarding.getInstitutionType()
+                            + " not permitted for issuer " + issuer
+            );
+        }
+
         return tokenRestClient._getContractSigned(onboarding.getTokenId()).getBody();
     }
+
 
 
     private OnboardedProductWithActions getOnBoardedProductWithActions(String productId, UserInstitutionWithActionsDto userInstitutionWithActionsDto) {
