@@ -12,12 +12,14 @@ import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationRestClientMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,7 +71,7 @@ public class DelegationServiceImpl implements DelegationService {
         return delegationId;
     }
 
-    private void setToInstitutionId(DelegationRequest delegation) {
+    void setToInstitutionId(DelegationRequest delegation) {
         log.trace("getInstitution start");
         log.debug("getInstitution institutionId = {}", Encode.forJava(delegation.getTo()));
         Assert.hasText(delegation.getTo(), REQUIRED_TAX_CODE_MESSAGE);
@@ -90,12 +92,24 @@ public class DelegationServiceImpl implements DelegationService {
                                             delegation.getProductId().equals(onb.getProductId())
                                                     && RelationshipState.ACTIVE.equals(onb.getStatus())
                                     )
-                    )
-                    .findFirst()
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            String.format(INSTITUTION_TAX_CODE_NOT_FOUND, delegation.getTo()))
-                    );
+                    // Prefer institution with onboarding of type PT
+                    // Keep in mind that false < true in boolean comparison
+                    ).min(Comparator.comparing(inst -> inst.getOnboarding().stream()
+                            .noneMatch(onb ->
+                                    delegation.getProductId().equals(onb.getProductId()) &&
+                                    RelationshipState.ACTIVE.equals(onb.getStatus()) &&
+                                    InstitutionType.PT.equals(onb.getInstitutionType())
+                            )
+                    ))
+                    .orElseThrow(() -> {
+                        log.warn("(setToInstitutionId) Cannot find Institution for taxCode {}", Encode.forJava(delegation.getTo()));
+                        return new ResourceNotFoundException(String.format(INSTITUTION_TAX_CODE_NOT_FOUND, delegation.getTo()));
+                    });
 
+            if (institutions.size() > 1) {
+                log.warn("(setToInstitutionId) Multiple institutions found for taxCode {}: selected institutionId {}",
+                        Encode.forJava(delegation.getTo()), Encode.forJava(partner.getId()));
+            }
             delegation.setTo(partner.getId());
         }
     }
