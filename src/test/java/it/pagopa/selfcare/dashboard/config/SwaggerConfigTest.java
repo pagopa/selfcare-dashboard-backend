@@ -91,6 +91,9 @@ class SwaggerConfigTest {
     @MockBean
     private OnboardingMapper onboardingMapper;
 
+    @MockBean
+    private ContractService contractServiceMock;
+
     @Autowired
     WebApplicationContext context;
 

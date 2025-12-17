@@ -20,6 +20,9 @@
     }
   } ],
   "tags" : [ {
+    "name" : "contracts",
+    "description" : "Contracts operations"
+  }, {
     "name" : "delegations",
     "description" : "Delegation Controller"
   }, {
@@ -51,6 +54,280 @@
     "description" : "UserGroups operations"
   } ],
   "paths" : {
+    "/v1/contracts" : {
+      "get" : {
+        "tags" : [ "contracts" ],
+        "summary" : "getContractsListUsingGET",
+        "description" : "List contract templates available",
+        "operationId" : "listContractTemplates",
+        "parameters" : [ {
+          "name" : "name",
+          "in" : "query",
+          "description" : "name",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "version",
+          "in" : "query",
+          "description" : "version",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ContractsResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "contracts" ],
+        "summary" : "uploadContractTemplateUsingPOST",
+        "description" : "Upload a new contract template version",
+        "operationId" : "postUploadContract",
+        "parameters" : [ {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "description" : "name",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "pattern" : "^[a-zA-Z0-9 ]+$",
+            "type" : "string"
+          }
+        }, {
+          "name" : "description",
+          "in" : "query",
+          "description" : "description",
+          "required" : false,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "version",
+          "in" : "query",
+          "description" : "version",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "pattern" : "^\\d+\\.\\d+\\.\\d+$",
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "multipart/form-data" : {
+              "schema" : {
+                "required" : [ "file" ],
+                "type" : "object",
+                "properties" : {
+                  "file" : {
+                    "type" : "string",
+                    "description" : "file",
+                    "format" : "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
+    "/v1/contracts/{contractId}" : {
+      "get" : {
+        "tags" : [ "contracts" ],
+        "summary" : "downloadContractTemplateUsingGET",
+        "description" : "Download a contract template version",
+        "operationId" : "downloadContractTemplate",
+        "parameters" : [ {
+          "name" : "contractId",
+          "in" : "path",
+          "description" : "Contract template's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "query",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "contractName",
+          "in" : "query",
+          "description" : "Contract template's name",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/octet-stream" : {
+                "schema" : {
+                  "type" : "string",
+                  "format" : "byte"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/v1/delegations" : {
       "post" : {
         "tags" : [ "delegations" ],
@@ -3755,6 +4032,43 @@
             "type" : "boolean",
             "description" : "Boolean indicating the presence of a user given its fiscal code, institutionId and productId",
             "example" : false
+          }
+        }
+      },
+      "ContractInfo" : {
+        "title" : "ContractInfo",
+        "type" : "object",
+        "properties" : {
+          "contractTemplateId" : {
+            "type" : "string"
+          },
+          "contractTemplatePath" : {
+            "type" : "string"
+          },
+          "contractTemplateVersion" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "createdBy" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ContractsResponse" : {
+        "title" : "ContractsResponse",
+        "type" : "object",
+        "properties" : {
+          "contracts" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "object"
+            }
           }
         }
       },
