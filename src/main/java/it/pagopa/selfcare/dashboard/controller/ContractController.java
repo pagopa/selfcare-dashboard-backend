@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class ContractController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "uploadContractTemplateUsingPOST", notes = "Upload a new contract template version", nickname = "postUploadContract")
-    //@PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, #productId, null), 'Selc:ViewContract')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, #productId, null), 'Selc:ViewContract')")
     public void uploadContract(@ApiParam("${swagger.dashboard.products.model.id}")
                                                        @RequestParam(value = "productId")
                                                        String productId,
@@ -67,7 +68,7 @@ public class ContractController {
     @GetMapping(value = "/{contractId}",produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "downloadContractTemplateUsingGET", notes = "Download a contract template version", nickname = "downloadContractTemplate")
-    //@PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, #productId, null), 'Selc:ViewContract')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, #productId, null), 'Selc:ViewContract')")
     public ResponseEntity<byte[]> downloadContract(@ApiParam("${swagger.dashboard.contract.model.id}")
                                                  @PathVariable("contractId")
                                                  String contractId,
