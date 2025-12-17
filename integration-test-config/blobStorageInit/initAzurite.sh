@@ -18,7 +18,7 @@ az storage blob upload-batch --overwrite --destination resources --source /works
 az storage blob upload --overwrite \
   --container-name resources \
   --file /workspace/signed_IO_accordo_adesione.pdf \
-  --name 'parties/docs/21f73488-d0df-4a3d-9b6f-9adf634780b5/signed_IO_accordo_adesione.pdf' \
+  --name 'parties/docs/21f73488-d0df-4a3d-9b6f-9adf634780b5/signed_PAGOPA_accordo_adesione.pdf' \
   --account-name devstoreaccount1 \
   --account-key Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg== \
   --connection-string 'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCD9I1QhZT4gRjAAHEDPazjFIwtg==;BlobEndpoint=http://azurite:10000/devstoreaccount1;'

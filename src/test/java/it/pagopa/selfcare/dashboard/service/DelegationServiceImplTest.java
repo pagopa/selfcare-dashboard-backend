@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static it.pagopa.selfcare.onboarding.common.ProductId.PROD_PAGOPA;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -249,6 +250,113 @@ class DelegationServiceImplTest extends BaseServiceTest {
         Assertions.assertEquals(delegationWithPagination.getDelegations().get(0).getId(), response.getDelegations().get(0).getId());
         Mockito.verify(coreDelegationApiRestClient, Mockito.times(1))
                 ._getDelegationsUsingGET1(any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void testSetToInstitutionIdWithSingleResult() {
+        final DelegationRequest delegationRequest = new DelegationRequest();
+        delegationRequest.setTo("to");
+        delegationRequest.setProductId("prod-1");
+
+        final InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        institutionsResponse.setInstitutions(List.of(
+                getInstitutionResponse("institutionId", List.of(
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.GSP),
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.DELETED, OnboardedProductResponse.InstitutionTypeEnum.GSP),
+                        getOnboardedProductResponse("prod-2", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.GSP)
+                ))
+        ));
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(institutionsResponse));
+
+        delegationServiceImpl.setToInstitutionId(delegationRequest);
+        assertEquals("institutionId", delegationRequest.getTo());
+    }
+
+    @Test
+    void testSetToInstitutionIdWithMultipleResultsWithPT() {
+        final DelegationRequest delegationRequest = new DelegationRequest();
+        delegationRequest.setTo("to");
+        delegationRequest.setProductId("prod-1");
+
+        final InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        institutionsResponse.setInstitutions(List.of(
+                getInstitutionResponse("institutionId1", List.of(
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.GSP),
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.DELETED, OnboardedProductResponse.InstitutionTypeEnum.PT),
+                        getOnboardedProductResponse("prod-2", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.GSP)
+                )),
+                getInstitutionResponse("institutionId2", List.of(
+                        getOnboardedProductResponse("prod-2", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.PSP),
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.PT)
+                )),
+                getInstitutionResponse("institutionId3", List.of(
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.PSP)
+                ))
+        ));
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(institutionsResponse));
+
+        delegationServiceImpl.setToInstitutionId(delegationRequest);
+        assertEquals("institutionId2", delegationRequest.getTo());
+    }
+
+    @Test
+    void testSetToInstitutionIdWithMultipleResultsWithoutPT() {
+        final DelegationRequest delegationRequest = new DelegationRequest();
+        delegationRequest.setTo("to");
+        delegationRequest.setProductId("prod-1");
+
+        final InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        institutionsResponse.setInstitutions(List.of(
+                getInstitutionResponse("institutionId1", List.of(
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.GSP),
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.DELETED, OnboardedProductResponse.InstitutionTypeEnum.PT),
+                        getOnboardedProductResponse("prod-2", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.GSP)
+                )),
+                getInstitutionResponse("institutionId2", List.of(
+                        getOnboardedProductResponse("prod-2", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.PSP),
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.DELETED, OnboardedProductResponse.InstitutionTypeEnum.PT)
+                )),
+                getInstitutionResponse("institutionId3", List.of(
+                        getOnboardedProductResponse("prod-1", OnboardedProductResponse.StatusEnum.ACTIVE, OnboardedProductResponse.InstitutionTypeEnum.PSP)
+                ))
+        ));
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(institutionsResponse));
+
+        delegationServiceImpl.setToInstitutionId(delegationRequest);
+        assertEquals("institutionId1", delegationRequest.getTo());
+    }
+
+    @Test
+    void testSetToInstitutionIdWithoutResults() {
+        final DelegationRequest delegationRequest = new DelegationRequest();
+        delegationRequest.setTo("to");
+        delegationRequest.setProductId("prod-1");
+
+        final InstitutionsResponse institutionsResponse = new InstitutionsResponse();
+        institutionsResponse.setInstitutions(List.of());
+        when(coreInstitutionApiRestClient._getInstitutionsUsingGET(any(), any(), any(), any(), any(), any()))
+                .thenReturn(ResponseEntity.ok(institutionsResponse));
+
+        assertThrows(ResourceNotFoundException.class, () -> delegationServiceImpl.setToInstitutionId(delegationRequest));
+    }
+
+    private InstitutionResponse getInstitutionResponse(String institutionId, List<OnboardedProductResponse> onboardings) {
+        final InstitutionResponse institutionResponse = new InstitutionResponse();
+        institutionResponse.setId(institutionId);
+        institutionResponse.setOnboarding(onboardings);
+        return institutionResponse;
+    }
+
+    private OnboardedProductResponse getOnboardedProductResponse(String productId, OnboardedProductResponse.StatusEnum status,
+                                                                 OnboardedProductResponse.InstitutionTypeEnum institutionType) {
+        final OnboardedProductResponse onb = new OnboardedProductResponse();
+        onb.setProductId(productId);
+        onb.setStatus(status);
+        onb.setInstitutionType(institutionType);
+        return onb;
     }
 
 }
