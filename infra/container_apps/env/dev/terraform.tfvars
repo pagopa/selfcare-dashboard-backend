@@ -138,6 +138,10 @@ app_settings = [
   {
     name  = "IAM_URL"
     value = "http://selc-d-iam-ms-ca"
+  },
+  {
+    name = "PRODUCT_URL"
+    value = "http://selc-d-product-ms-ca"
   }
 ]
 
