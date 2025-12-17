@@ -153,13 +153,13 @@
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
             <artifactId>onboarding-sdk-common</artifactId>
-            <version>0.13.0</version>
+            <version>0.14.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
             <artifactId>onboarding-sdk-product</artifactId>
-            <version>0.13.0</version>
+            <version>0.14.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
