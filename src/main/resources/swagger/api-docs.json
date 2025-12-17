@@ -4035,6 +4035,21 @@
           }
         }
       },
+      "ContractGroup" : {
+        "title" : "ContractGroup",
+        "type" : "object",
+        "properties" : {
+          "contractsInfo" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ContractInfo"
+            }
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
       "ContractInfo" : {
         "title" : "ContractInfo",
         "type" : "object",
@@ -4065,9 +4080,9 @@
         "type" : "object",
         "properties" : {
           "contracts" : {
-            "type" : "object",
-            "additionalProperties" : {
-              "type" : "object"
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductContracts"
             }
           }
         }
@@ -4930,6 +4945,21 @@
           }
         },
         "description" : "A \"problem detail\" as a way to carry machine-readable details of errors (https://datatracker.ietf.org/doc/html/rfc7807)"
+      },
+      "ProductContracts" : {
+        "title" : "ProductContracts",
+        "type" : "object",
+        "properties" : {
+          "contracts" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ContractGroup"
+            }
+          },
+          "productId" : {
+            "type" : "string"
+          }
+        }
       },
       "ProductInfoResource" : {
         "title" : "ProductInfoResource",
