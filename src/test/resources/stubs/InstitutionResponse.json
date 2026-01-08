@@ -35,6 +35,7 @@
     {
       "productId": "productId",
       "isAggregator": true,
+      "tokenId": "id1",
       "status": "ACTIVE",
       "createdAt": "2024-06-11T10:09:30.154695400+02:00",
       "billing": {

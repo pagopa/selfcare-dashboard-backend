@@ -4396,6 +4396,9 @@
             "type" : "string",
             "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
           },
+          "tokenId" : {
+            "type" : "string"
+          },
           "userProductActions" : {
             "type" : "array",
             "items" : {
@@ -4440,6 +4443,9 @@
           "productOnBoardingStatus" : {
             "type" : "string",
             "enum" : [ "ACTIVE", "DELETED", "PENDING", "REJECTED", "SUSPENDED", "TOBEVALIDATED" ]
+          },
+          "tokenId" : {
+            "type" : "string"
           },
           "userProductActions" : {
             "type" : "array",

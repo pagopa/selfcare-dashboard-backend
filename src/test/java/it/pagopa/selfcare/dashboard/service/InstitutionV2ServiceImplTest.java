@@ -141,6 +141,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     void findInstitutionById() throws IOException {
         String institutionId = "institutionId";
         String userId = "userId";
+        String tokenId = "id1";
 
         ProductGrantedAuthority productGrantedAuthority = new ProductGrantedAuthority(MANAGER, "productRole", "productId");
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
@@ -171,6 +172,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Assertions.assertNotNull(result.getOnboarding().get(0).getUserProductActions());
         Assertions.assertEquals(2, result.getOnboarding().get(0).getUserProductActions().size());
         Assertions.assertNotNull(result.getOnboarding().get(0).getCreatedAt());
+        Assertions.assertEquals(tokenId, result.getOnboarding().get(0).getTokenId());
         verify(userApiRestClient, Mockito.times(1))
                 ._getUserInstitutionWithPermission(institutionId, userId, null);
         verify(coreInstitutionApiRestClient, Mockito.times(1))
