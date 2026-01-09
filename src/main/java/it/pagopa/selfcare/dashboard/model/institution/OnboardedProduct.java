@@ -19,4 +19,5 @@ public class OnboardedProduct {
     private String originId;
     private InstitutionType institutionType;
     private OffsetDateTime createdAt;
+    private String tokenId;
 }

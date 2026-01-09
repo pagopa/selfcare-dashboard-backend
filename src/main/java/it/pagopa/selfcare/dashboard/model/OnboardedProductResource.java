@@ -31,4 +31,6 @@ public class OnboardedProductResource {
     private InstitutionType institutionType;
 
     private OffsetDateTime createdAt;
+
+    private String tokenId;
 }
