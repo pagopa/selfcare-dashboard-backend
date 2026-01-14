@@ -20,6 +20,7 @@ import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -199,22 +200,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
     @Override
     public Resource getContract(String institutionId, String productId) {
-        OnboardingsResponse onboardingsResponse = Optional.ofNullable(
-                coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null).getBody()
-        ).orElseGet(() -> {
-            OnboardingsResponse emptyResponse = new OnboardingsResponse();
-            emptyResponse.setOnboardings(Collections.emptyList());
-            return emptyResponse;
-        });
-
-        OnboardingResponse onboarding = Optional.ofNullable(onboardingsResponse.getOnboardings())
-                .orElse(Collections.emptyList()).stream()
-                .filter(onb -> productId.equals(onb.getProductId()))
-                .filter(onb -> OnboardingResponse.StatusEnum.ACTIVE.equals(onb.getStatus()))
-                .max(Comparator.comparing(OnboardingResponse::getCreatedAt))
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "No active onboarding found for institution " + institutionId + " and product " + productId
-                ));
+        OnboardingResponse onboarding = getOnboardingResponse(institutionId, productId);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
@@ -232,6 +218,38 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     }
 
 
+    @Override
+    public Boolean checkAttachmentStatus(String institutionId, String productId, String attachmentName) {
+
+        OnboardingResponse onboarding = getOnboardingResponse(institutionId, productId);
+
+        try {
+            return  tokenRestClient
+                    ._headAttachment(onboarding.getTokenId(), attachmentName)
+                    .getStatusCode() == HttpStatus.NO_CONTENT;
+        } catch (Exception e) {
+            return Boolean.FALSE;
+        }
+    }
+
+    private OnboardingResponse getOnboardingResponse(String institutionId, String productId) {
+        OnboardingsResponse onboardingsResponse = Optional.ofNullable(
+                coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null).getBody()
+        ).orElseGet(() -> {
+            OnboardingsResponse emptyResponse = new OnboardingsResponse();
+            emptyResponse.setOnboardings(Collections.emptyList());
+            return emptyResponse;
+        });
+
+        return Optional.ofNullable(onboardingsResponse.getOnboardings())
+                .orElse(Collections.emptyList()).stream()
+                .filter(onb -> productId.equals(onb.getProductId()))
+                .filter(onb -> OnboardingResponse.StatusEnum.ACTIVE.equals(onb.getStatus()))
+                .max(Comparator.comparing(OnboardingResponse::getCreatedAt))
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No active onboarding found for institution " + institutionId + " and product " + productId
+                ));
+    }
 
     private OnboardedProductWithActions getOnBoardedProductWithActions(String productId, UserInstitutionWithActionsDto userInstitutionWithActionsDto) {
         return userInstitutionWithActionsDto.getProducts().stream().filter(product -> product.getProductId().equals(productId)).findFirst().orElse(null);

@@ -10,6 +10,7 @@ import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.model.user.CheckAttachmentResponse;
 import it.pagopa.selfcare.dashboard.model.user.CheckUserResponse;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import org.apache.commons.collections4.CollectionUtils;
@@ -258,6 +259,37 @@ public class UserApiSteps{
         dashboardStepsUtil.status = response.statusCode();
         if(dashboardStepsUtil.status == 200){
             dashboardStepsUtil.responses.setCheckUserResponse(response.as(CheckUserResponse.class));
+        }else{
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
+    @When("I send a GET request to {string} to check attachment status from attachment name")
+    public void iSendAGETRequestToCheckAttachmentStatus(String url) {
+
+
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        if (StringUtils.isNotBlank(dashboardStepsUtil.filter.getName())) {
+            requestSpecification.queryParam("name", dashboardStepsUtil.filter.getName());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
+                .pathParam("productId", dashboardStepsUtil.filter.getProductId())
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 200){
+            dashboardStepsUtil.responses.setCheckAttachmentResponse(response.as(CheckAttachmentResponse.class));
         }else{
             dashboardStepsUtil.errorMessage = response.body().asString();
         }

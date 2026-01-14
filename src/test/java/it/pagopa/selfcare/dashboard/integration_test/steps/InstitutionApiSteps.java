@@ -421,4 +421,10 @@ public class InstitutionApiSteps {
         Assertions.assertEquals(expected, dashboardStepsUtil.getResponses().getCheckUserResponse().getIsUserOnboarded().toString());
     }
 
+    @And("the response of check-attachment should be {string}")
+    public void theCheckAttachmentResponseShouldBeString(String expected) {
+        Assertions.assertEquals(expected, dashboardStepsUtil.getResponses().getCheckAttachmentResponse().getIsAttachmentAvailable().toString());
+    }
+
+
 }
