@@ -16,4 +16,6 @@ public interface InstitutionV2Service {
     Boolean verifyIfExistsPendingOnboarding(String taxCode, String subunitCode, String productId);
     OnboardingsResponse getOnboardingsInfoResponse(String institutionId, List<String> products);
     Resource getContract(String institutionId, String productId);
+    Boolean checkAttachmentStatus(String institutionId, String productId, String attachmentName);
+
 }

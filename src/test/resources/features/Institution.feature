@@ -537,3 +537,26 @@ Feature: Institution
     And the fiscalCode is "blbrki80A41H401T"
     When I send a POST request to "v2/institutions/{institutionId}/product/{productId}/check-user" to check user from taxCode
     Then the response status should be 403
+
+  Scenario: Successfully check attachment status when attachment is already uploaded
+    Given user login with username "j.doe" and password "test"
+    And the institution ID is "067327d3-bdd6-408d-8655-87e8f1960046" and the product ID is "prod-pagopa"
+    And the attachmentName is "Dichiarazione_sostitutiva_certificazione"
+    When I send a GET request to "v2/institutions/{institutionId}/product/{productId}/attachment/status" to check attachment status from attachment name
+    Then the response status should be 200
+    And the response of check-attachment should be "true"
+
+  Scenario: Successfully check attachment status when attachment is not uploaded
+    Given user login with username "j.doe" and password "test"
+    And the institution ID is "c9a50656-f345-4c81-84be-5b2474470544" and the product ID is "prod-pagopa"
+    And the attachmentName is "Dichiarazione_sostitutiva_certificazione"
+    When I send a GET request to "v2/institutions/{institutionId}/product/{productId}/attachment/status" to check attachment status from attachment name
+    Then the response status should be 200
+    And the response of check-attachment should be "false"
+
+  Scenario: Attempt to attachment status without permission
+    Given user login with username "r.balboa" and password "test"
+    And the institution ID is "c9a50656-f345-4c81-84be-5b2474470544" and the product ID is "prod-io"
+    And the attachmentName is "Dichiarazione_sostitutiva_certificazione"
+    When I send a GET request to "v2/institutions/{institutionId}/product/{productId}/attachment/status" to check attachment status from attachment name
+    Then the response status should be 403

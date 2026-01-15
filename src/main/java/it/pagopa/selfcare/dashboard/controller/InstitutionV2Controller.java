@@ -324,5 +324,19 @@ public class InstitutionV2Controller {
         return ResponseEntity.ok().body(new CheckUserResponse(isUserAlreadyOnboarded));
     }
 
+    @GetMapping(value = "/{institutionId}/product/{productId}/attachment/status")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.checkAttachmentStatus}", nickname = "v2CheckAttachment")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewContract')")
+    public ResponseEntity<CheckAttachmentResponse> checkAttachmentStatus(@ApiParam("${swagger.dashboard.institutions.model.id}")
+                                              @PathVariable("institutionId") String institutionId,
+                                              @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                              @PathVariable(name = "productId") String productId,
+                                              @RequestParam(name = "name") String name) {
+        log.trace("checkAttachmentStatus start");
+        log.debug("checkAttachmentStatus institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
+        Boolean response = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);
+        return ResponseEntity.ok().body(new CheckAttachmentResponse(response));
+    }
 
 }

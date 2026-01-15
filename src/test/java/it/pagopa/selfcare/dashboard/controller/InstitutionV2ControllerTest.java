@@ -661,6 +661,54 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
     }
 
+    @Test
+    void checkAttachment_true() throws Exception {
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String name = "name";
+
+        when(institutionV2ServiceMock.checkAttachmentStatus(institutionId, productId, name)).thenReturn(Boolean.TRUE);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/product/{productId}/attachment/status", institutionId, productId)
+                        .queryParam("name", name))
+                .andExpect(status().isOk())
+                .andExpect(content().string("{\"isAttachmentAvailable\":true}"))
+                .andReturn();
+
+        verify(institutionV2ServiceMock, times(1)).checkAttachmentStatus(institutionId, productId, name);
+    }
+
+    @Test
+    void checkAttachment_false() throws Exception {
+        String institutionId = "institutionId";
+        String productId = "productId";
+        String name = "name";
+
+        when(institutionV2ServiceMock.checkAttachmentStatus(institutionId, productId, name)).thenReturn(Boolean.FALSE);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/product/{productId}/attachment/status", institutionId, productId)
+                        .queryParam("name", name))
+                .andExpect(status().isOk())
+                .andExpect(content().string("{\"isAttachmentAvailable\":false}"))
+                .andReturn();
+
+        verify(institutionV2ServiceMock, times(1)).checkAttachmentStatus(institutionId, productId, name);
+    }
+
+    @Test
+    void checkAttachment_noName() throws Exception {
+        String institutionId = "institutionId";
+        String productId = "productId";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/{institutionId}/product/{productId}/attachment/status", institutionId, productId))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+    }
+
     private static UsersCountResponse getUsersCountResponse() {
         final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(MANAGER, DELEGATE);
         final List<OnboardedProductState> expectedStatus = List.of(OnboardedProductState.PENDING, OnboardedProductState.ACTIVE);

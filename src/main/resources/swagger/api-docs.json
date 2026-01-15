@@ -1201,6 +1201,97 @@
         } ]
       }
     },
+    "/v2/institutions/{institutionId}/product/{productId}/attachment/status" : {
+      "get" : {
+        "tags" : [ "institutions" ],
+        "summary" : "checkAttachmentStatus",
+        "description" : "Service to verify if the attachment is already uploaded or not",
+        "operationId" : "v2CheckAttachment",
+        "parameters" : [ {
+          "name" : "institutionId",
+          "in" : "path",
+          "description" : "Institution's unique internal identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "productId",
+          "in" : "path",
+          "description" : "Product's unique identifier",
+          "required" : true,
+          "style" : "simple",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "name",
+          "in" : "query",
+          "description" : "name",
+          "required" : true,
+          "style" : "form",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CheckAttachmentResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/v2/institutions/{institutionId}/product/{productId}/check-user" : {
       "post" : {
         "tags" : [ "institutions" ],
@@ -3744,6 +3835,17 @@
           "value" : {
             "type" : "string",
             "description" : "Field value"
+          }
+        }
+      },
+      "CheckAttachmentResponse" : {
+        "title" : "CheckAttachmentResponse",
+        "type" : "object",
+        "properties" : {
+          "isAttachmentAvailable" : {
+            "type" : "boolean",
+            "description" : "Boolean indicating the presence of an uploaded attachment given its name, institutionId and productId",
+            "example" : false
           }
         }
       },

@@ -33,10 +33,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -719,5 +721,87 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         Resource result = institutionV2Service.getContract(institutionId, productId);
 
         assertEquals(expectedContract, result);
+    }
+
+    @Test
+    void checkAttachmentStatus_true() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String name = "name";
+        String tokenId = "token123";
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setProductId(productId);
+        onboarding.setCreatedAt(OffsetDateTime.now());
+        onboarding.setTokenId(tokenId);
+        onboarding.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PSP);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+        when(tokenRestClient._headAttachment(tokenId, name))
+                .thenReturn(ResponseEntity.noContent().build());
+
+        Boolean result = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);
+
+        assertEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    void checkAttachmentStatus_false() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String name = "name";
+        String tokenId = "token123";
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setProductId(productId);
+        onboarding.setCreatedAt(OffsetDateTime.now());
+        onboarding.setTokenId(tokenId);
+        onboarding.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PSP);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+        when(tokenRestClient._headAttachment(tokenId, name))
+                .thenReturn(ResponseEntity.notFound().build());
+
+        Boolean result = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);
+
+        assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    void checkAttachmentStatus_exception() {
+        String institutionId = "inst1";
+        String productId = "prod1";
+        String name = "name";
+        String tokenId = "token123";
+
+        OnboardingResponse onboarding = new OnboardingResponse();
+        onboarding.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
+        onboarding.setProductId(productId);
+        onboarding.setCreatedAt(OffsetDateTime.now());
+        onboarding.setTokenId(tokenId);
+        onboarding.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PSP);
+
+        OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
+        onboardingsResponse.setOnboardings(List.of(onboarding));
+
+        when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
+                .thenReturn(ResponseEntity.ok(onboardingsResponse));
+
+        when(tokenRestClient._headAttachment(tokenId, name))
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        Boolean result = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);
+
+        assertEquals(Boolean.FALSE, result);
     }
 }

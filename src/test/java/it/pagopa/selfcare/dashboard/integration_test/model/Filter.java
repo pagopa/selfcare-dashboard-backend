@@ -31,4 +31,5 @@ public class Filter {
     private String email;
     private String mobilePhone;
     private List<String> products;
+    private String name;
 }

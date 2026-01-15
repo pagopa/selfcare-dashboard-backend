@@ -129,6 +129,11 @@ public class DashboardBaseSteps{
         dashboardStepsUtil.filter.setTaxCode(taxCode);
     }
 
+    @And("the attachmentName is {string}")
+    public void theAttachmentNameIs(String attachmentName) {
+        dashboardStepsUtil.filter.setName(attachmentName);
+    }
+
     @And("the fields are {string}")
     public void theFieldsAre(String fields) {
         String[] fieldsArray = fields.split(",");
