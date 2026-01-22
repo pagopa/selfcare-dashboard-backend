@@ -6,7 +6,7 @@
     <parent>
         <groupId>it.pagopa.selfcare</groupId>
         <artifactId>selc-starter-parent</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.3.1-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>selc-dashboard</artifactId>
@@ -15,7 +15,7 @@
     <description>Self Care Dashboard Backend</description>
 
     <properties>
-        <selc-commons.version>2.5.12</selc-commons.version>
+        <selc-commons.version>2.9.2</selc-commons.version>
         <sonar.host.url>https://sonarcloud.io/</sonar.host.url>
     </properties>
 
@@ -250,6 +250,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -283,6 +284,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -316,6 +318,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -349,6 +352,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -385,6 +389,7 @@
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
                                 <dateLibrary>custom</dateLibrary>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                             <typeMappings>
                                 <typeMapping>DateTime=Instant</typeMapping>
@@ -424,6 +429,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
