@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;

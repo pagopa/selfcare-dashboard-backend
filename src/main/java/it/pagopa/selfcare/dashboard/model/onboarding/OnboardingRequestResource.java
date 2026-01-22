@@ -6,8 +6,8 @@ import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.UUID;
 

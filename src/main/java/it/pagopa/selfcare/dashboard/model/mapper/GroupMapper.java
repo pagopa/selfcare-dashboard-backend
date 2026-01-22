@@ -15,7 +15,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

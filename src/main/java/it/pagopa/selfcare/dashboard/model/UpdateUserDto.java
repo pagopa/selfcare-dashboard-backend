@@ -3,8 +3,8 @@ package it.pagopa.selfcare.dashboard.model;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 
 @Data
 public class UpdateUserDto {
