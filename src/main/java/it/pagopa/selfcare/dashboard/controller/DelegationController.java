@@ -1,28 +1,26 @@
 package it.pagopa.selfcare.dashboard.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationId;
-import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationIdResource;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationRequestDto;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationMapper;
+import it.pagopa.selfcare.dashboard.service.DelegationService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-
 @Slf4j
 @RestController
 @RequestMapping(value = "/v1/delegations", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = "delegations")
+@Tag(name = "delegations")
 public class DelegationController {
 
     private final DelegationService delegationService;
@@ -36,9 +34,9 @@ public class DelegationController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.delegation.api.createDelegation}")
+    @Operation(summary = "createDelegation", description = "${swagger.dashboard.delegation.api.createDelegation}")
     @ApiResponses({
-            @ApiResponse(code = HttpServletResponse.SC_CONFLICT, message = "Conflict")
+            @ApiResponse(responseCode = "409", description = "Conflict")
     })
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#delegationRequest.getFrom(), #delegationRequest.getProductId(), null), 'Selc:CreateDelegation')")
     public DelegationIdResource createDelegation(@RequestBody @Valid DelegationRequestDto delegationRequest) {
