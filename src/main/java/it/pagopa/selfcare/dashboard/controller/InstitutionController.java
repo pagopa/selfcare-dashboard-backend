@@ -4,23 +4,23 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
-import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
-import it.pagopa.selfcare.dashboard.model.delegation.Order;
-import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomyList;
-import it.pagopa.selfcare.dashboard.model.institution.Institution;
-import it.pagopa.selfcare.dashboard.model.product.ProductTree;
-import it.pagopa.selfcare.dashboard.service.DelegationService;
-import it.pagopa.selfcare.dashboard.service.FileStorageService;
-import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.model.UpdateInstitutionDto;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationResource;
+import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
+import it.pagopa.selfcare.dashboard.model.delegation.Order;
+import it.pagopa.selfcare.dashboard.model.institution.GeographicTaxonomyList;
+import it.pagopa.selfcare.dashboard.model.institution.Institution;
 import it.pagopa.selfcare.dashboard.model.mapper.DelegationMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.GeographicTaxonomyMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.ProductsMapper;
+import it.pagopa.selfcare.dashboard.model.product.ProductTree;
 import it.pagopa.selfcare.dashboard.model.product.ProductsResource;
+import it.pagopa.selfcare.dashboard.service.DelegationService;
+import it.pagopa.selfcare.dashboard.service.FileStorageService;
+import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +99,7 @@ public class InstitutionController {
     @PutMapping(value = "/{institutionId}/geographic-taxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:UpdateGeoTaxonomy')")
     public void updateInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
                                                     @PathVariable("institutionId")
                                                     String institutionId,
