@@ -1,15 +1,15 @@
 package it.pagopa.selfcare.dashboard.model.product;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class BackOfficeConfigurationsResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.product-backoffice-configurations.model.environment}")
+    @Schema(description = "${swagger.dashboard.product-backoffice-configurations.model.environment}")
     private String environment;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.urlBO}")
+    @Schema(description = "${swagger.dashboard.products.model.urlBO}")
     private String url;
 
 }

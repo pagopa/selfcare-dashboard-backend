@@ -12,13 +12,13 @@
 
 package it.pagopa.selfcare.dashboard.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class InstitutionUserDetailsResource extends InstitutionUserResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
+    @Schema(description = "${swagger.dashboard.user.model.fiscalCode}")
     private String fiscalCode;
 
 }

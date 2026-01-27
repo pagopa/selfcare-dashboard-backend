@@ -1,28 +1,28 @@
 package it.pagopa.selfcare.dashboard.model.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.Data;
 
 @Data
 public class OnboardingInfo {
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.id}")
+    @Schema(description = "${swagger.dashboard.products.model.id}")
     private String productId;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}")
+    @Schema(description = "${swagger.dashboard.products.model.status}")
     private String status;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.contract.available}")
+    @Schema(description = "${swagger.dashboard.products.model.contract.available}")
     private Boolean contractAvailable;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.origin}")
+    @Schema(description = "${swagger.dashboard.products.model.origin}")
     private String origin;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.originId}")
+    @Schema(description = "${swagger.dashboard.products.model.originId}")
     private String originId;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.institutionType}")
+    @Schema(description = "${swagger.dashboard.products.model.institutionType}")
     private InstitutionType institutionType;
 
 

@@ -1,12 +1,11 @@
 package it.pagopa.selfcare.dashboard.model;
 
-import io.swagger.annotations.ApiModelProperty;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 @Data
 public class SupportContactResource {
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.supportContact.supportEmail}")
+    @Schema(description = "${swagger.dashboard.institutions.model.supportContact.supportEmail}")
     private String supportEmail;
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.supportContact.supportPhone}")
+    @Schema(description = "${swagger.dashboard.institutions.model.supportContact.supportPhone}")
     private String supportPhone;
 }

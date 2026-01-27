@@ -1,10 +1,10 @@
 package it.pagopa.selfcare.dashboard.model.user;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class WorkContactResource {
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalEmail}")
+    @Schema(description = "${swagger.dashboard.user.model.institutionalEmail}")
     private CertifiedFieldResource<String> email;
 }

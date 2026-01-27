@@ -1,18 +1,18 @@
 package it.pagopa.selfcare.dashboard.model.product;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class BrokerResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.brokers.model.code}")
+    @Schema(description = "${swagger.dashboard.brokers.model.code}")
     private String code;
 
-    @ApiModelProperty(value = "${swagger.dashboard.brokers.model.description}")
+    @Schema(description = "${swagger.dashboard.brokers.model.description}")
     private String description;
 
-    @ApiModelProperty(value = "${swagger.dashboard.brokers.model.enabled}")
+    @Schema(description = "${swagger.dashboard.brokers.model.enabled}")
     private Boolean enabled;
 
 }

@@ -1,15 +1,15 @@
 package it.pagopa.selfcare.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
 public class GeographicTaxonomyListDto {
-    @ApiModelProperty(value = "${swagger.dashboard.geographicTaxonomyList.model.geographicTaxonomyDtoList}", required = true)
+    @Schema(description = "${swagger.dashboard.geographicTaxonomyList.model.geographicTaxonomyDtoList}")
     @JsonProperty(required = true)
     @NotNull
     private List<GeographicTaxonomyDto> geographicTaxonomyDtoList;

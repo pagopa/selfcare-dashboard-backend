@@ -1,11 +1,11 @@
 package it.pagopa.selfcare.dashboard.model.user_groups;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class UserGroupIdResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user-group.model.id}", required = true)
+    @Schema(description = "${swagger.dashboard.user-group.model.id}")
     private String id;
 }

@@ -1,41 +1,41 @@
 package it.pagopa.selfcare.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+
 import java.util.Set;
 
 @Data
 public class CreateUserDto {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
+    @Schema(description = "${swagger.dashboard.user.model.name}")
     private String name;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
+    @Schema(description = "${swagger.dashboard.user.model.surname}")
     private String surname;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
+    @Schema(description = "${swagger.dashboard.user.model.fiscalCode}")
     @JsonProperty(required = true)
     @NotBlank
     private String taxCode;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.email}")
+    @Schema(description = "${swagger.dashboard.user.model.email}")
     @Email
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.role}")
+    @Schema(description = "${swagger.dashboard.user.model.role}")
     String role;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.productRoles}", required = true)
+    @Schema(description = "${swagger.dashboard.user.model.productRoles}")
     @JsonProperty(required = true)
     @NotEmpty
     private Set<String> productRoles;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.toAddOnAggregates}")
+    @Schema(description = "${swagger.dashboard.user.model.toAddOnAggregates}")
     private Boolean toAddOnAggregates;
 
 }
