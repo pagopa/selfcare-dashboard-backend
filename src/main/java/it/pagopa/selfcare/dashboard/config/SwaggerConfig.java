@@ -1,36 +1,36 @@
 package it.pagopa.selfcare.dashboard.config;
 
-import com.fasterxml.classmate.TypeResolver;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.SpecVersion;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.servers.ServerVariable;
+import io.swagger.v3.oas.models.servers.ServerVariables;
+import io.swagger.v3.oas.models.tags.Tag;
 import it.pagopa.selfcare.commons.web.model.Problem;
-import it.pagopa.selfcare.commons.web.security.JwtAuthenticationToken;
-import it.pagopa.selfcare.commons.web.swagger.BaseSwaggerConfig;
+import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.core.Authentication;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.AuthorizationScope;
-import springfox.documentation.service.HttpAuthenticationScheme;
-import springfox.documentation.service.SecurityReference;
-import springfox.documentation.service.Tag;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
 
-import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
-
-import static it.pagopa.selfcare.commons.web.swagger.BaseSwaggerConfig.*;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * The Class SwaggerConfig.
  */
 @Configuration
-@Import(BaseSwaggerConfig.class)
 public class SwaggerConfig {
 
     private static final String AUTH_SCHEMA_NAME = "bearerAuth";
@@ -57,48 +57,136 @@ public class SwaggerConfig {
 
 
     @Bean
-    public Docket swaggerSpringPlugin(@Autowired TypeResolver typeResolver) {
-        return (new Docket(DocumentationType.OAS_30))
-                .apiInfo(new ApiInfoBuilder()
+    @Primary
+    public OpenAPI swaggerSpringPlugin() {
+        return (new OpenAPI(SpecVersion.V30))
+                .info(new Info()
                         .title("${openapi_title}")
                         .description(environment.getProperty("swagger.description", "Api and Models"))
                         .version(environment.getProperty("swagger.version", environment.getProperty("spring.application.version")))
-                        .build())
-                .select().apis(RequestHandlerSelectors.basePackage("it.pagopa.selfcare.dashboard.controller")).build()
-                .tags(new Tag("institutions", environment.getProperty("swagger.dashboard.institutions.api.description")),
-                        new Tag("pnPGInstitutions", environment.getProperty("swagger.dashboard.pnPGInstitutions.api.description")),
-                        new Tag("token", environment.getProperty("swagger.dashboard.token.api.description")),
-                        new Tag("products", environment.getProperty("swagger.dashboard.product.api.description")),
-                        new Tag("relationships", environment.getProperty("swagger.dashboard.relationships.api.description")),
-                        new Tag("user-groups", environment.getProperty("swagger.dashboard.user-groups.api.description")),
-                        new Tag("onboarding", environment.getProperty("swagger.dashboard.onboarding.api.description")))
-                .directModelSubstitute(LocalTime.class, String.class)
-                .ignoredParameterTypes(Pageable.class)
-                .ignoredParameterTypes(Authentication.class)
-                .ignoredParameterTypes(JwtAuthenticationToken.class)
-                .forCodeGeneration(true)
-                .useDefaultResponseMessages(false)
-                .globalResponses(HttpMethod.GET, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE, NOT_FOUND_RESPONSE))
-                .globalResponses(HttpMethod.DELETE, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE))
-                .globalResponses(HttpMethod.POST, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE))
-                .globalResponses(HttpMethod.PUT, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE))
-                .globalResponses(HttpMethod.PATCH, List.of(INTERNAL_SERVER_ERROR_RESPONSE, UNAUTHORIZED_RESPONSE, BAD_REQUEST_RESPONSE))
-                .additionalModels(typeResolver.resolve(Problem.class))
-                .securityContexts(Collections.singletonList(SecurityContext.builder()
-                        .securityReferences(defaultAuth())
-                        .build()))
-                .securitySchemes(Collections.singletonList(HttpAuthenticationScheme.JWT_BEARER_BUILDER
-                        .name(AUTH_SCHEMA_NAME)
-                        .description(environment.getProperty("swagger.security.schema.bearer.description"))
-                        .build()));
+                )
+                .servers(List.of(
+                        new Server().url("{url}:{port}{basePath}").variables(new ServerVariables()
+                                .addServerVariable("url", new ServerVariable()._default("http://localhost"))
+                                .addServerVariable("port", new ServerVariable()._default("80"))
+                                .addServerVariable("basePath", new ServerVariable()._default(""))
+                        )
+                ))
+                .tags(List.of(
+                        new Tag().name("delegations").description(environment.getProperty("swagger.dashboard.delegations.api.description")),
+                        new Tag().name("institutions").description(environment.getProperty("swagger.dashboard.institutions.api.description")),
+                        new Tag().name("onboarding").description(environment.getProperty("swagger.dashboard.onboarding.api.description")),
+                        new Tag().name("pnPGInstitutions").description(environment.getProperty("swagger.dashboard.pnPGInstitutions.api.description")),
+                        new Tag().name("products").description(environment.getProperty("swagger.dashboard.product.api.description")),
+                        new Tag().name("relationships").description(environment.getProperty("swagger.dashboard.relationships.api.description")),
+                        new Tag().name("support").description(environment.getProperty("swagger.dashboard.support.api.description")),
+                        new Tag().name("token").description(environment.getProperty("swagger.dashboard.token.api.description")),
+                        new Tag().name("user").description(environment.getProperty("swagger.dashboard.user.api.description")),
+                        new Tag().name("user-groups").description(environment.getProperty("swagger.dashboard.user-groups.api.description"))
+                ))
+                .components(new Components()
+                        .addSecuritySchemes(
+                                AUTH_SCHEMA_NAME,
+                                new SecurityScheme()
+                                        .name(AUTH_SCHEMA_NAME)
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .description(environment.getProperty("swagger.security.schema.bearer.description"))
+                        )
+                );
     }
 
+    @Bean
+    public GroupedOpenApi dashboardApi() {
+        return GroupedOpenApi.builder()
+                .group("dashboard")
+                .packagesToScan("it.pagopa.selfcare.dashboard.controller")
+                .build();
+    }
 
-    private List<SecurityReference> defaultAuth() {
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        return Collections.singletonList(new SecurityReference(AUTH_SCHEMA_NAME, authorizationScopes));
+    @Bean
+    public OpenApiCustomizer openApiCustomizer() {
+        final Map<String, Schema> problemComponent = ModelConverters.getInstance().read(Problem.class);
+        final Schema<?> problemSchema = new Schema<>().$ref("#/components/schemas/Problem").jsonSchemaImpl(Problem.class);
+        final Content problemContent = new Content().addMediaType("application/problem+json", new MediaType().schema(problemSchema));
+        return openApi -> {
+            openApi.getPaths().values().forEach(pathItem ->
+                    pathItem.readOperationsMap().forEach((httpMethod, operation) -> {
+                        final ApiResponses responses = operation.getResponses();
+
+                        // Remove 404 for non-GET methods
+                        if (!httpMethod.name().equalsIgnoreCase("GET")) {
+                            responses.remove("404");
+                        }
+
+                        // Handle forced 404 response
+                        if (responses.containsKey("#404")) {
+                            final ApiResponse forced404Response = responses.get("#404");
+                            responses.remove("#404");
+                            responses.addApiResponse("404", forced404Response);
+                        }
+
+                        // Include HTTP method in operationId (if it doesn't start with # and not already present)
+                        Optional.ofNullable(operation.getOperationId()).ifPresent(opid -> {
+                            if (opid.startsWith("#")) {
+                                operation.setOperationId(opid.replace("#", ""));
+                            } else if (!opid.endsWith("Using" + httpMethod.name())) {
+                                operation.setOperationId(opid + "Using" + httpMethod.name());
+                            }
+                        });
+
+                        // Set parameter descriptions to parameter names if missing
+                        Optional.ofNullable(operation.getParameters()).ifPresent(params -> {
+                            params.forEach(p -> {
+                                if (p.getDescription() == null) {
+                                    p.setDescription(p.getName());
+                                }
+                            });
+                        });
+
+                        // Standard error responses
+                        Optional.ofNullable(responses.get("400"))
+                                .ifPresent(r -> r.description("Bad Request").content(problemContent));
+                        Optional.ofNullable(responses.get("401"))
+                                .ifPresent(r -> r.description("Unauthorized").content(problemContent));
+                        Optional.ofNullable(responses.get("404"))
+                                .ifPresent(r -> r.description("Not Found").content(problemContent));
+                        Optional.ofNullable(responses.get("409"))
+                                .ifPresent(r -> r.description("Conflict").content(problemContent));
+                        Optional.ofNullable(responses.get("500"))
+                                .ifPresent(r -> r.description("Internal Server Error").content(problemContent));
+
+                        // Security requirement
+                        operation.addSecurityItem(new SecurityRequirement().addList("bearerAuth", List.of("global")));
+                    })
+            );
+
+            // Add Problem to components
+            openApi.getComponents().addSchemas("Problem", problemComponent.get("Problem"));
+
+            // Sort components alphabetically
+            //openApi.getComponents().setSchemas(new TreeMap<>(openApi.getComponents().getSchemas()));
+
+            // Resolve description placeholders in schemas
+            openApi.getComponents().getSchemas().values().forEach(c -> {
+                resolveSchemaDescriptionPlaceholder(c);
+                if (c.getProperties() != null) {
+                    final Map<String, Schema<?>> properties = c.getProperties();
+                    properties.forEach((k, v) -> resolveSchemaDescriptionPlaceholder(v));
+                }
+            });
+        };
+    }
+
+    private void resolveSchemaDescriptionPlaceholder(Schema<?> s) {
+        if (s.getDescription() != null && s.getDescription().startsWith("${")) {
+            s.setDescription(environment.resolvePlaceholders(s.getDescription()));
+        }
+
+        if (s.getItems() != null) {
+            resolveSchemaDescriptionPlaceholder(s.getItems());
+        }
     }
 
 }
