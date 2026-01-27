@@ -189,6 +189,15 @@ Feature: Institution
     When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
     Then the response status should be 404
 
+  Scenario: Attempt to update institution geo-taxonomy by institutionId without permissions (PAGOPA issuer)
+    Given user login with username "b.barnes" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    And the following geo-taxonomy request details:
+      | code   | desc          |
+      | 058091 | ROMA - COMUNE |
+    When I send a PUT request to "/v1/institutions/{institutionId}/geographic-taxonomy" to update institutions geo-taxonomy
+    Then the response status should be 403
+
   Scenario: Successfully update institution description by institutionId
     Given user login with username "s.froid" and password "test"
     And the institutionId is "f94c0589-b07e-4ee7-a509-fda5fe91faa2"
