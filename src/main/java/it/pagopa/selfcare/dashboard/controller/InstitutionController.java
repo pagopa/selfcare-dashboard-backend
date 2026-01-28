@@ -99,7 +99,7 @@ public class InstitutionController {
     @PutMapping(value = "/{institutionId}/geographic-taxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "updateInstitutionGeographicTaxonomy", description = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:UpdateGeoTaxonomy')")
     public void updateInstitutionGeographicTaxonomy(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                     @PathVariable("institutionId")
                                                     String institutionId,
