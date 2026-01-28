@@ -5216,6 +5216,20 @@
           }
         },
         "description" : "A \"problem detail\" as a way to carry machine-readable details of errors (https://datatracker.ietf.org/doc/html/rfc7807)"
+      },
+      "InvalidParam" : {
+        "required" : [ "name", "reason" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "description" : "Invalid parameter name."
+          },
+          "reason" : {
+            "type" : "string",
+            "description" : "Invalid parameter reason."
+          }
+        }
       }
     },
     "securitySchemes" : {

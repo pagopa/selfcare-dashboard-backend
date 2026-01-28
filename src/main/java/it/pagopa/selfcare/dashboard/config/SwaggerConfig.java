@@ -108,6 +108,7 @@ public class SwaggerConfig {
     @Bean
     public OpenApiCustomizer openApiCustomizer() {
         final Map<String, Schema> problemComponent = ModelConverters.getInstance().read(Problem.class);
+        final Map<String, Schema> invalidParamComponent = ModelConverters.getInstance().read(Problem.InvalidParam.class);
         final Schema<?> problemSchema = new Schema<>().$ref("#/components/schemas/Problem").jsonSchemaImpl(Problem.class);
         final Content problemContent = new Content().addMediaType("application/problem+json", new MediaType().schema(problemSchema));
         return openApi -> {
@@ -164,6 +165,7 @@ public class SwaggerConfig {
 
             // Add Problem to components
             openApi.getComponents().addSchemas("Problem", problemComponent.get("Problem"));
+            openApi.getComponents().addSchemas("InvalidParam", invalidParamComponent.get("InvalidParam"));
 
             // Sort components alphabetically
             //openApi.getComponents().setSchemas(new TreeMap<>(openApi.getComponents().getSchemas()));
