@@ -66,7 +66,7 @@ public class UserGroupV2Controller {
     public void deleteUserGroup(@Parameter(description = "${swagger.dashboard.user-group.model.id}")
                                 @PathVariable("id") String id) {
         log.trace("deleteGroup start");
-        log.debug("deleteGroup id = {}", id);
+        log.debug("deleteGroup id = {}", Encode.forJava(id));
         groupService.delete(id);
         log.trace("deleteGroup end");
 
@@ -79,7 +79,7 @@ public class UserGroupV2Controller {
     public void activateUserGroup(@Parameter(description = "${swagger.dashboard.user-group.model.id}")
                                   @PathVariable("id") String id) {
         log.trace("activateGroup start");
-        log.debug("activateGroup id = {}", id);
+        log.debug("activateGroup id = {}", Encode.forJava(id));
         groupService.activate(id);
         log.trace("activateGroup end");
     }
@@ -91,7 +91,7 @@ public class UserGroupV2Controller {
     public void suspendUserGroup(@Parameter(description = "${swagger.dashboard.user-group.model.id}")
                                  @PathVariable("id") String id) {
         log.trace("suspendGroup start");
-        log.debug("suspendGroup id = {}", id);
+        log.debug("suspendGroup id = {}", Encode.forJava(id));
         groupService.suspend(id);
         log.trace("suspendGroup end");
     }
@@ -122,7 +122,7 @@ public class UserGroupV2Controller {
                                      @Parameter(description = "${swagger.dashboard.user.model.id}")
                                      @PathVariable("userId") UUID member) {
         log.trace("addMemberToUserGroup start");
-        log.debug("addMemberToUserGroup id = {}", id);
+        log.debug("addMemberToUserGroup id = {}", Encode.forJava(id));
         groupService.addMemberToUserGroup(id, member);
         log.trace("addMemberToUserGroup end");
     }
@@ -209,7 +209,7 @@ public class UserGroupV2Controller {
                                           @Parameter(description = "${swagger.dashboard.user.model.id}")
                                           @PathVariable("userId") UUID memberId) {
         log.trace("deleteMemberFromUserGroup start");
-        log.debug("deleteMemberFromUserGroup userGroupId = {}, memberId = {}", userGroupId, memberId);
+        log.debug("deleteMemberFromUserGroup userGroupId = {}, memberId = {}", Encode.forJava(userGroupId), Encode.forJava(memberId.toString()));
         groupService.deleteMemberFromUserGroup(userGroupId, memberId);
         log.trace("deleteMemberFromUserGroup end");
     }
