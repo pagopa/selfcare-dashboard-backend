@@ -6,7 +6,7 @@
     <parent>
         <groupId>it.pagopa.selfcare</groupId>
         <artifactId>selc-starter-parent</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.3.2-SNAPSHOT</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>selc-dashboard</artifactId>
@@ -15,7 +15,7 @@
     <description>Self Care Dashboard Backend</description>
 
     <properties>
-        <selc-commons.version>2.5.12</selc-commons.version>
+        <selc-commons.version>2.9.3</selc-commons.version>
         <sonar.host.url>https://sonarcloud.io/</sonar.host.url>
     </properties>
 
@@ -129,16 +129,6 @@
             <artifactId>spring-data-commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.14.0</version>
-        </dependency>
-        <dependency>
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
             <version>4.18.1</version>
@@ -177,11 +167,6 @@
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-annotations</artifactId>
             <version>1.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version> <!-- Ensure this is the latest version -->
         </dependency>
         <dependency>
             <groupId>com.auth0</groupId>
@@ -250,6 +235,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -283,6 +269,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -316,6 +303,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -349,6 +337,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>
@@ -385,6 +374,7 @@
                                 <swaggerAnnotations>false</swaggerAnnotations>
                                 <openApiNullable>false</openApiNullable>
                                 <dateLibrary>custom</dateLibrary>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                             <typeMappings>
                                 <typeMapping>DateTime=Instant</typeMapping>
@@ -424,6 +414,7 @@
                                 <openApiNullable>false</openApiNullable>
                                 <skipDefaultInterface>false</skipDefaultInterface>
                                 <useTags>true</useTags>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                         </configuration>
                     </execution>

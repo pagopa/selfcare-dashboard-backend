@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.*;
 )
 @ContextConfiguration(
         initializers = UserGroupRestClientTest.RandomPortInitializer.class,
-        classes = {UserGroupRestClientTestConfig.class, HttpClientConfiguration.class})
+        classes = {UserGroupRestClientTestConfig.class})
+@EnableFeignClients(clients = {UserGroupRestClient.class})
 class UserGroupRestClientTest extends BaseFeignRestClientTest {
 
     @Order(1)

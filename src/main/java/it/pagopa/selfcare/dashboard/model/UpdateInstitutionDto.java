@@ -1,15 +1,15 @@
 package it.pagopa.selfcare.dashboard.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class UpdateInstitutionDto {
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.description}")
+    @Schema(description = "${swagger.dashboard.institutions.model.description}")
     private String description;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.digitalAddress}")
+    @Schema(description = "${swagger.dashboard.institutions.model.digitalAddress}")
     private String digitalAddress;
 
 

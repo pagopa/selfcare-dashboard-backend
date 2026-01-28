@@ -1,5 +1,6 @@
 package it.pagopa.selfcare.dashboard.client;
 
+import it.pagopa.selfcare.dashboard.config.restclient.UserRegistryRestClientConfig;
 import it.pagopa.selfcare.dashboard.model.user.MutableUserFieldsDto;
 import it.pagopa.selfcare.dashboard.model.user.SaveUserDto;
 import it.pagopa.selfcare.dashboard.model.user.User;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.EnumSet;
 import java.util.UUID;
 
-@FeignClient(name = "${rest-client.user-registry.serviceCode}", url = "${rest-client.user-registry.base-url}")
+@FeignClient(name = "${rest-client.user-registry.serviceCode}", url = "${rest-client.user-registry.base-url}", configuration = UserRegistryRestClientConfig.class)
 public interface UserRegistryRestClient {
 
     @PostMapping(value = "${rest-client.user-registry.getUserByExternalId.path}", consumes = MediaType.APPLICATION_JSON_VALUE)

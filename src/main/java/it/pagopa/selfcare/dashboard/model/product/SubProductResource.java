@@ -1,43 +1,43 @@
 package it.pagopa.selfcare.dashboard.model.product;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.pagopa.selfcare.product.entity.ProductStatus;
 import lombok.Data;
 
 @Data
 public class SubProductResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.id}")
+    @Schema(description = "${swagger.dashboard.products.model.id}")
     private String id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.title}")
+    @Schema(description = "${swagger.dashboard.products.model.title}")
     private String title;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.productOnBoardingStatus}")
+    @Schema(description = "${swagger.dashboard.products.model.productOnBoardingStatus}")
     private ProductOnBoardingStatus productOnBoardingStatus;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.status}")
+    @Schema(description = "${swagger.dashboard.products.model.status}")
     private ProductStatus status;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.delegable}")
+    @Schema(description = "${swagger.dashboard.products.model.delegable}")
     private boolean delegable;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.imageUrl}")
+    @Schema(description = "${swagger.dashboard.products.model.imageUrl}")
     private String imageUrl;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.logo}")
+    @Schema(description = "${swagger.dashboard.products.model.logo}")
     private String logo;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.logoBgColor}")
+    @Schema(description = "${swagger.dashboard.products.model.logoBgColor}")
     private String logoBgColor;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.description}")
+    @Schema(description = "${swagger.dashboard.products.model.description}")
     private String description;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.urlPublic}")
+    @Schema(description = "${swagger.dashboard.products.model.urlPublic}")
     private String urlPublic;
 
-    @ApiModelProperty(value = "${swagger.dashboard.products.model.invoiceable}")
+    @Schema(description = "${swagger.dashboard.products.model.invoiceable}")
     private boolean invoiceable;
 
 }

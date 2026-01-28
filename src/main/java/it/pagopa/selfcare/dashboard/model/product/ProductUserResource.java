@@ -12,7 +12,7 @@
 
 package it.pagopa.selfcare.dashboard.model.product;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import lombok.Data;
 
@@ -22,31 +22,31 @@ import java.util.UUID;
 @Data
 public class ProductUserResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.id}")
+    @Schema(description = "${swagger.dashboard.user.model.id}")
     private UUID id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
+    @Schema(description = "${swagger.dashboard.user.model.name}")
     private String name;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
+    @Schema(description = "${swagger.dashboard.user.model.surname}")
     private String surname;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}")
+    @Schema(description = "${swagger.dashboard.user.model.fiscalCode}")
     private String fiscalCode;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.email}")
+    @Schema(description = "${swagger.dashboard.user.model.email}")
     private String email;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.selcRole}")
+    @Schema(description = "${swagger.dashboard.user.model.selcRole}")
     private SelfCareAuthority role;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.product}")
+    @Schema(description = "${swagger.dashboard.user.model.product}")
     private ProductInfoResource product;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.status}")
+    @Schema(description = "${swagger.dashboard.user.model.status}")
     private String status;
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.createdAt}")
+    @Schema(description = "${swagger.dashboard.user.model.createdAt}")
     private LocalDateTime createdAt;
 
 

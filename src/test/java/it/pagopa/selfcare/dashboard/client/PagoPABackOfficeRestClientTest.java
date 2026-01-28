@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.commons.httpclient.HttpClientConfiguration;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
         })
 @ContextConfiguration(
         initializers = PagoPABackOfficeRestClientTest.RandomPortInitializer.class,
-        classes = {PagoPABackOfficeRestClientTestConfig.class, HttpClientConfiguration.class})
+        classes = {PagoPABackOfficeRestClientTestConfig.class})
+@EnableFeignClients(clients = {MsBackOfficeStationApiClient.class, MsBackOfficeChannelApiClient.class})
 class PagoPABackOfficeRestClientTest extends BaseFeignRestClientTest {
 
     @Order(1)

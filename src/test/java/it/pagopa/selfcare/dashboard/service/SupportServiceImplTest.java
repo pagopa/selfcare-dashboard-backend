@@ -44,7 +44,7 @@ public class SupportServiceImplTest extends BaseServiceTest {
     @Test
     void sendRequest() throws IOException {
 
-        ReflectionTestUtils.setField(supportServiceImpl, "supportApiKey", "testSupportApiKey");
+        ReflectionTestUtils.setField(supportServiceImpl, "supportApiKey", "testSupportApiKeyLongerThan256bitsToAllowHS256Encoding");
         ReflectionTestUtils.setField(supportServiceImpl, "returnTo", "testReturnTo");
         ReflectionTestUtils.setField(supportServiceImpl, "zendeskOrganization", "testZendeskOrganization");
         ReflectionTestUtils.setField(supportServiceImpl, "actionUrl", "testActionUrl");
@@ -77,7 +77,7 @@ public class SupportServiceImplTest extends BaseServiceTest {
     @Test
     void sendRequest_withData() throws IOException {
 
-        ReflectionTestUtils.setField(supportServiceImpl, "supportApiKey", "testSupportApiKey");
+        ReflectionTestUtils.setField(supportServiceImpl, "supportApiKey", "testSupportApiKeyLongerThan256bitsToAllowHS256Encoding");
         ReflectionTestUtils.setField(supportServiceImpl, "returnTo", "testReturnTo");
         ReflectionTestUtils.setField(supportServiceImpl, "zendeskOrganization", "testZendeskOrganization");
         ReflectionTestUtils.setField(supportServiceImpl, "actionUrl", "testActionUrl");

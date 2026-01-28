@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.DefaultClaims;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.PartyRole;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
@@ -13,23 +12,23 @@ import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.security.JwtService;
 import it.pagopa.selfcare.dashboard.client.IamExternalRestClient;
 import it.pagopa.selfcare.dashboard.client.UserInstitutionApiRestClient;
-import it.pagopa.selfcare.dashboard.model.institution.InstitutionBackofficeAdmin;
-import it.pagopa.selfcare.dashboard.model.institution.RootParent;
-import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
+import it.pagopa.selfcare.dashboard.config.ExchangeTokenProperties;
 import it.pagopa.selfcare.dashboard.exception.InvalidRequestException;
+import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
+import it.pagopa.selfcare.dashboard.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.model.groups.UserGroup;
+import it.pagopa.selfcare.dashboard.model.institution.InstitutionBackofficeAdmin;
 import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
+import it.pagopa.selfcare.dashboard.model.institution.RootParent;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
+import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
+import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
 import it.pagopa.selfcare.dashboard.model.user.OnboardedProduct;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
-import it.pagopa.selfcare.dashboard.exception.ResourceNotFoundException;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
-import it.pagopa.selfcare.dashboard.config.ExchangeTokenProperties;
-import it.pagopa.selfcare.dashboard.model.ExchangedToken;
-import it.pagopa.selfcare.dashboard.model.mapper.InstitutionResourceMapper;
 import it.pagopa.selfcare.iam.generated.openapi.v1.dto.UserClaims;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.service.ProductService;
@@ -298,8 +297,8 @@ public class ExchangeTokenServiceV2 {
 
     private String createJwts(TokenExchangeClaims claims) {
         return Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.RS256, jwtSigningKey)
+                .setClaims(claims.getClaims())
+                .signWith(jwtSigningKey, SignatureAlgorithm.RS256)
                 .setHeaderParam(JwsHeader.KEY_ID, kid)
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
@@ -440,40 +439,73 @@ public class ExchangeTokenServiceV2 {
         private String productId;
     }
 
-
-    static class TokenExchangeClaims extends DefaultClaims {
+    static class TokenExchangeClaims {
         public static final String DESIRED_EXPIRATION = "desired_exp";
         public static final String INSTITUTION = "organization";
         public static final String EMAIL = "email";
         public static final String TYPE = "typ";
 
-        public TokenExchangeClaims(Map<String, Object> map) {
-            super(map);
+        private final Claims claims;
+
+        public TokenExchangeClaims(Claims claims) {
+            this.claims = claims;
         }
 
-        public Claims setDesiredExpiration(Date desiredExp) {
-            setDate(DESIRED_EXPIRATION, desiredExp);
-            return this;
+        public Claims getClaims() {
+            return claims;
         }
 
-        public Claims setInstitution(Institution institution) {
-            setValue(INSTITUTION, institution);
-            return this;
+        public void setId(String id) {
+            claims.setId(id);
         }
 
-        public Claims setInstitution(InstitutionBackofficeAdmin institution) {
-            setValue(INSTITUTION, institution);
-            return this;
+        public void setIssuer(String issuer) {
+            claims.setIssuer(issuer);
         }
 
-        public Claims setEmail(String email) {
-            setValue(EMAIL, email);
-            return this;
+        public void setSubject(String subject) {
+            claims.setSubject(subject);
         }
 
-        public Claims setType(String type) {
-            setValue(TYPE, type);
-            return this;
+        public void setAudience(String audience) {
+            claims.setAudience(audience);
+        }
+
+        public void setIssuedAt(Date issuedAt) {
+            claims.setIssuedAt(issuedAt);
+        }
+
+        public Date getIssuedAt() {
+            return claims.getIssuedAt();
+        }
+
+        public void setExpiration(Date expiration) {
+            claims.setExpiration(expiration);
+        }
+
+        public Date getExpiration() {
+            return claims.getExpiration();
+        }
+
+        public void setDesiredExpiration(Date desiredExp) {
+            long seconds = desiredExp.getTime() / 1000L;
+            claims.put(DESIRED_EXPIRATION, seconds);
+        }
+
+        public void setInstitution(Institution institution) {
+            claims.put(INSTITUTION, institution);
+        }
+
+        public void setInstitution(InstitutionBackofficeAdmin institution) {
+            claims.put(INSTITUTION, institution);
+        }
+
+        public void setEmail(String email) {
+            claims.put(EMAIL, email);
+        }
+
+        public void setType(String type) {
+            claims.put(TYPE, type);
         }
 
     }

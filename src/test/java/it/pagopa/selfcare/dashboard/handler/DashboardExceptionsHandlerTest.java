@@ -14,7 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

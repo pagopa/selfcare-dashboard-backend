@@ -45,8 +45,12 @@ public class CucumberSuite {
         composeContainer = new ComposeContainer(new File("docker-compose.yml"))
                 .withLocalCompose(true)
                 .withPull(true)
-                .waitingFor("azure-cli", Wait.forLogMessage(".*BLOBSTORAGE INITIALIZED.*\\n", 1)
-                        .withStartupTimeout(Duration.ofMinutes(5)));
+                .waitingFor("azure-cli", Wait.forLogMessage(".*BLOBSTORAGE INITIALIZED.*\\n", 1).withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor("onboardingms", Wait.forLogMessage(".*onboarding-ms.*started in.*Listening on.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor("institutionms", Wait.forLogMessage(".*Started SelfCareCoreApplication.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor("usergroupms", Wait.forLogMessage(".*Started SelfCareUserGroupApplication.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor("userms", Wait.forLogMessage(".*user-ms.*started in.*Listening on.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor("iamms", Wait.forLogMessage(".*iam.*started in.*Listening on.*", 1).withStartupTimeout(Duration.ofMinutes(5)));
         composeContainer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(composeContainer::stop));
 
