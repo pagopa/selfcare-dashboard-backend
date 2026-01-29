@@ -109,7 +109,7 @@ public class UserGroupV2Controller {
         log.trace("updateUserGroup start");
         log.debug("updateUserGroup id = {}, groupDto = {}", Encode.forJava(id), Encode.forJava(groupDto.toString()));
         groupService.updateUserGroup(id, groupMapperV2.fromDto(groupDto));
-        log.debug("updateUserGroup result = {}", id);
+        log.debug("updateUserGroup result = {}", Encode.forJava(id));
         log.trace("updateUserGroup end");
     }
 

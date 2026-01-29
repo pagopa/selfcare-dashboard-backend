@@ -75,7 +75,7 @@ public class InstitutionV2Controller {
         log.trace("getInstitutionUser start");
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
 
-        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
+        log.debug("getInstitutionUser institutionId = {}, userId = {}", Encode.forJava(institutionId), Encode.forJava(userId));
         UserInfo userInfo = institutionV2Service.getInstitutionUser(institutionId, userId, loggedUserId);
         InstitutionUserDetailsResource result = userMapper.toInstitutionUserDetails(userInfo);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
@@ -143,7 +143,8 @@ public class InstitutionV2Controller {
                                     @Valid
                                     UserProductRoles userProductRoles) {
         log.trace("addUserProductRoles start");
-        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
+        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", Encode.forJava(institutionId),
+                Encode.forJava(productId), Encode.forJava(userId), Encode.forJava(userProductRoles.toString()));
         userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getToAddOnAggregates(), userProductRoles.getProductRoles(), userProductRoles.getRole());
         log.trace("addUserProductRoles end");
     }
@@ -156,7 +157,7 @@ public class InstitutionV2Controller {
                                               @PathVariable("institutionId")
                                               String institutionId) {
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
+        log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
 
         Institution institution = institutionV2Service.findInstitutionById(institutionId);
         InstitutionResource result = institutionResourceMapper.toResource(institution);

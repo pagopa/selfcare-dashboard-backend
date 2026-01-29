@@ -87,7 +87,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Institution updateInstitutionDescription(String institutionId, UpdateInstitutionResource updateInstitutionResource) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, updateInstitutionResource = {}", institutionId, updateInstitutionResource);
+        log.debug("updateInstitutionDescription institutionId = {}, updateInstitutionResource = {}", Encode.forJava(institutionId), updateInstitutionResource);
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Assert.notNull(updateInstitutionResource, REQUIRED_UPDATE_RESOURCE_MESSAGE);
         Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._updateInstitutionUsingPUT(institutionId, institutionMapper.toInstitutionPut(updateInstitutionResource)).getBody());
@@ -99,7 +99,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     @Override
     public Institution findInstitutionById(String institutionId) {
         log.trace("findInstitutionById start");
-        log.debug("findInstitutionById institutionId = {}", institutionId);
+        log.debug("findInstitutionById institutionId = {}", Encode.forJava(institutionId));
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
         Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
         if (institution != null) {
