@@ -69,7 +69,7 @@ public class InstitutionController {
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
 
         log.trace("saveInstitutionLogo start");
-        log.debug("saveInstitutionLogo institutionId = {}, logo = {}", institutionId, logo);
+        log.debug("saveInstitutionLogo institutionId = {}, logo = {}", Encode.forJava(institutionId), logo);
 
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         log.trace("saveInstitutionLogo end");
@@ -87,7 +87,7 @@ public class InstitutionController {
                                                       String institutionId) {
 
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
+        log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
         Institution institution = institutionService.findInstitutionById(institutionId);
         InstitutionResource result = institutionResourceMapper.toResource(institution);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
@@ -144,7 +144,7 @@ public class InstitutionController {
                                                     @Valid
                                                     UpdateInstitutionDto institutionDto) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
+        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", Encode.forJava(institutionId), institutionDto);
         Institution result = institutionService.updateInstitutionDescription(institutionId, institutionResourceMapper.toUpdateResource(institutionDto));
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
@@ -168,7 +168,7 @@ public class InstitutionController {
                                                                    @Parameter(description = "${swagger.dashboard.delegation.model.productId}")
                                                                    @RequestParam(name = "productId", required = false) String productId) {
         log.trace("getDelegationsUsingFrom start");
-        log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", institutionId, productId);
+        log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(productId));
         GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
                 .from(institutionId)
                 .productId(productId)
@@ -206,7 +206,7 @@ public class InstitutionController {
                                                                    @RequestParam(name = "page", required = false) Integer page,
                                                                    @RequestParam(name = "size", required = false) Integer size) {
         log.trace("getDelegationsUsingTo start");
-        log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
+        log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(productId));
 
         GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
                 .to(institutionId)

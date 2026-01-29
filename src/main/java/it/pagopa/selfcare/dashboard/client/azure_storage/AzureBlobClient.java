@@ -8,6 +8,7 @@ import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import it.pagopa.selfcare.dashboard.connector.api.FileStorageConnector;
 import it.pagopa.selfcare.dashboard.exception.FileUploadException;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ class AzureBlobClient implements FileStorageConnector {
     public void uploadInstitutionLogo(InputStream file, String fileName, String contentType) throws FileUploadException {
         if (log.isDebugEnabled()) {
             log.trace("uploadInstitutionLogo");
-            log.debug("uploadInstitutionLogo fileName = {}, contentType = {}", fileName, contentType);
+            log.debug("uploadInstitutionLogo fileName = {}, contentType = {}", Encode.forJava(fileName), Encode.forJava(contentType));
         }
 
         try {
@@ -52,7 +53,7 @@ class AzureBlobClient implements FileStorageConnector {
             final CloudBlockBlob blob = blobContainer.getBlockBlobReference(fileName);
             blob.getProperties().setContentType(contentType);
             blob.upload(file, file.available());
-            log.info("Uploaded {}", fileName);
+            log.info("Uploaded {}", Encode.forJava(fileName));
 
         } catch (StorageException | URISyntaxException | IOException e) {
             throw new FileUploadException(e);

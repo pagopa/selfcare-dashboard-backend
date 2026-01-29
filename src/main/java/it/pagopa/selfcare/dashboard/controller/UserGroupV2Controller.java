@@ -107,7 +107,7 @@ public class UserGroupV2Controller {
                                 @PathVariable("id") String id,
                                 @RequestBody @Valid UpdateUserGroupDto groupDto) {
         log.trace("updateUserGroup start");
-        log.debug("updateUserGroup id = {}, groupDto = {}", id, groupDto);
+        log.debug("updateUserGroup id = {}, groupDto = {}", Encode.forJava(id), groupDto);
         groupService.updateUserGroup(id, groupMapperV2.fromDto(groupDto));
         log.debug("updateUserGroup result = {}", id);
         log.trace("updateUserGroup end");

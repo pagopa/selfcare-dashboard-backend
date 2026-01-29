@@ -12,6 +12,7 @@ import it.pagopa.selfcare.dashboard.service.BrokerService;
 import it.pagopa.selfcare.dashboard.service.ProductService;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,7 +49,7 @@ public class ProductController {
                                                                   @Parameter(description = "${swagger.dashboard.institutions.model.institutionType}")
                                                                   @RequestParam(name = "institutionType", required = false) String institutionType) {
         log.trace("getProductRoles start");
-        log.debug("productId = {}", productId);
+        log.debug("productId = {}", Encode.forJava(productId));
         Collection<ProductRoleMappingsResource> result = ProductsMapper.toProductRoleMappingsResource(productService.getProductRoles(productId, institutionType));
         log.debug("getProductRoles result = {}", result);
         log.trace("getProductRoles end");
@@ -66,7 +67,7 @@ public class ProductController {
                                                         @PathVariable("institutionType")
                                                         String institutionType) {
         log.trace("getProductBrokers start");
-        log.debug("productId = {}, institutionType = {}", productId, institutionType);
+        log.debug("productId = {}, institutionType = {}", Encode.forJava(productId), Encode.forJava(institutionType));
 
         List<BrokerInfo> brokers = PAGO_PA_PRODUCT_ID.equals(productId)
             ?  brokerService.findAllByInstitutionType(InstitutionType.valueOf(institutionType).name())

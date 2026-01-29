@@ -18,6 +18,7 @@ import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,7 +52,8 @@ public class UserV2Controller {
                                     @RequestParam(value = "productRole", required = false) String productRole) {
 
         log.trace("suspendUser start");
-        log.debug("suspendUser {} for institution: {}, productId: {} and productRole: {}", userId, institutionId, productId, productRole);
+        log.debug("suspendUser {} for institution: {}, productId: {} and productRole: {}", Encode.forJava(userId),
+                Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(productRole));
         userService.suspendUserProduct(userId, institutionId, productId, productRole);
         log.trace("suspendUser end");
 
@@ -68,7 +70,8 @@ public class UserV2Controller {
                                      @RequestParam(value = "productRole", required = false) String productRole) {
 
         log.trace("activateUser start");
-        log.debug("activateUser {} for institution: {}, productId: {} and productRole: {}", userId, institutionId, productId, productRole);
+        log.debug("activateUser {} for institution: {}, productId: {} and productRole: {}", Encode.forJava(userId),
+                Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(productRole));
         userService.activateUserProduct(userId, institutionId, productId, productRole);
         log.trace("activateUser end");
 
@@ -84,7 +87,8 @@ public class UserV2Controller {
                                        @RequestParam(value = "productId") String productId,
                                        @RequestParam(value = "productRole", required = false) String productRole) {
         log.trace("deleteUser start");
-        log.debug("deleteUser {} for institution: {}, productId: {} and productRole: {}", userId, institutionId, productId, productRole);
+        log.debug("deleteUser {} for institution: {}, productId: {} and productRole: {}", Encode.forJava(userId),
+                Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(productRole));
         userService.deleteUserProduct(userId, institutionId, productId, productRole);
         log.trace("deleteUser end");
     }
@@ -103,7 +107,7 @@ public class UserV2Controller {
                                     @RequestParam(value = "fields", required = false)
                                     List<String> fields) {
         log.trace("getUserById start");
-        log.debug("getUserById id = {}", userId);
+        log.debug("getUserById id = {}", Encode.forJava(userId));
         User user = userService.getUserById(userId, institutionId, fields);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getUserById = {}", user);
         log.trace("getUserById end");
@@ -160,7 +164,7 @@ public class UserV2Controller {
                                               @RequestParam(value = "roles", required = false) List<String> roles,
                                               Authentication authentication) {
         log.trace("getUsers start");
-        log.debug("getUsers for institution: {} and product: {}", institutionId, productId);
+        log.debug("getUsers for institution: {} and product: {}", Encode.forJava(institutionId), Encode.forJava(productId));
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
 
         List<ProductUserResource> response = new ArrayList<>();

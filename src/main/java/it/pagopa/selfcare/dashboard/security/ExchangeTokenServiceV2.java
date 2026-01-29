@@ -37,6 +37,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
+import org.owasp.encoder.Encode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -308,10 +309,8 @@ public class ExchangeTokenServiceV2 {
         Page<UserGroup> groupInfos = groupService.getUserGroups(institutionId, productId, UUID.fromString(userId),
                 Pageable.ofSize(100));// 100 is a reasonably safe number to retrieve all groups related to a generic user
         if (groupInfos.hasNext()) {
-            log.warn(String.format("Current user (%s) is member of more than 100 groups related to institution %s and product %s. The Identity Token will contain only the first 100 records",
-                    userId,
-                    institutionId,
-                    productId));
+            log.warn("Current user ({}) is member of more than 100 groups related to institution {} and product {}. The Identity Token will contain only the first 100 records",
+                    Encode.forJava(userId), Encode.forJava(institutionId), Encode.forJava(productId));
         }
         if (!groupInfos.isEmpty()) {
             institution.setGroups(groupInfos.stream()

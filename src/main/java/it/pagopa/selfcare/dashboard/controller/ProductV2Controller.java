@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.dashboard.model.ExchangedToken;
 import it.pagopa.selfcare.dashboard.security.ExchangeTokenServiceV2;
 import lombok.extern.slf4j.Slf4j;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,7 +46,7 @@ public class ProductV2Controller {
                                          @RequestParam(value = "lang", required = false, defaultValue = "it")
                                          String lang) {
         log.trace("accessProductBackoffice start");
-        log.debug("accessProductBackoffice institutionId = {}, productId = {}", institutionId, productId);
+        log.debug("accessProductBackoffice institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
         final ExchangedToken exchangedToken = exchangeTokenService.exchange(institutionId, productId, environment);
         final URI location = URI.create(exchangedToken.getBackOfficeUrl()
                 .replace("<IdentityToken>", exchangedToken.getIdentityToken())
