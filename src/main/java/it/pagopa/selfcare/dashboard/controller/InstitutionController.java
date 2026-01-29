@@ -69,7 +69,7 @@ public class InstitutionController {
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
 
         log.trace("saveInstitutionLogo start");
-        log.debug("saveInstitutionLogo institutionId = {}, logo = {}", Encode.forJava(institutionId), logo);
+        log.debug("saveInstitutionLogo institutionId = {}", Encode.forJava(institutionId));
 
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         log.trace("saveInstitutionLogo end");
@@ -144,7 +144,7 @@ public class InstitutionController {
                                                     @Valid
                                                     UpdateInstitutionDto institutionDto) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", Encode.forJava(institutionId), institutionDto);
+        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(institutionDto.toString()));
         Institution result = institutionService.updateInstitutionDescription(institutionId, institutionResourceMapper.toUpdateResource(institutionDto));
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
