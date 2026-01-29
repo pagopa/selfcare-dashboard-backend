@@ -78,11 +78,10 @@
           "in" : "query",
           "description" : "Fields to retrieve from pdv when searching for user",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -1588,22 +1587,20 @@
           "in" : "query",
           "description" : "productRoles",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
           }
         }, {
           "name" : "roles",
           "in" : "query",
           "description" : "roles",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -2567,22 +2564,20 @@
           "in" : "query",
           "description" : "List of party roles (ex: roles=MANAGER,DELEGATE)",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
           }
         }, {
           "name" : "status",
           "in" : "query",
           "description" : "User's status list (ex: status=ACTIVE,SUSPENDED)",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -2749,11 +2744,10 @@
           "in" : "query",
           "description" : "Filtered product list",
           "required" : false,
+          "style" : "form",
+          "explode" : true,
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
           }
         } ],
         "responses" : {

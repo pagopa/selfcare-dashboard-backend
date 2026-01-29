@@ -5,9 +5,8 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.media.Content;
-import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -137,11 +136,23 @@ public class SwaggerConfig {
                             }
                         });
 
-                        // Set parameter descriptions to parameter names if missing
+                        // Set parameter descriptions to parameter names if missing and configure array query parameters
                         Optional.ofNullable(operation.getParameters()).ifPresent(params -> {
                             params.forEach(p -> {
                                 if (p.getDescription() == null) {
                                     p.setDescription(p.getName());
+                                }
+
+                                // Default springdoc style: param=element1&parma=element2
+                                // FE expects springfox style: param=element1,element2
+                                if (p.getIn() != null && p.getIn().equals("query")) {
+                                    if (p.getSchema() instanceof ArraySchema && p.getSchema().getItems() != null) {
+                                        if ("array".equals(p.getSchema().getType()) && "string".equals(p.getSchema().getItems().getType())) {
+                                            p.setStyle(Parameter.StyleEnum.FORM);
+                                            p.setExplode(true);
+                                            p.setSchema(new StringSchema());
+                                        }
+                                    }
                                 }
                             });
                         });
