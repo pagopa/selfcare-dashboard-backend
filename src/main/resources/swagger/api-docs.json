@@ -4118,6 +4118,7 @@
         }
       },
       "UserGroupIdResource" : {
+        "required" : [ "id" ],
         "type" : "object",
         "properties" : {
           "id" : {
