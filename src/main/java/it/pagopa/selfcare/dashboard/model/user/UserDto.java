@@ -1,29 +1,28 @@
 package it.pagopa.selfcare.dashboard.model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Data
 public class UserDto {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
+    @Schema(description = "${swagger.dashboard.user.model.name}")
     @JsonProperty(required = true)
     @NotBlank
     private String name;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}", required = true)
+    @Schema(description = "${swagger.dashboard.user.model.surname}")
     @JsonProperty(required = true)
     @NotBlank
     private String surname;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalEmail}", required = true)
+    @Schema(description = "${swagger.dashboard.user.model.institutionalEmail}")
     @JsonProperty(required = true)
     @NotBlank
     @Email
     private String email;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
+    @Schema(description = "${swagger.dashboard.user.model.fiscalCode}")
     @JsonProperty(required = true)
     @NotBlank
     private String fiscalCode;

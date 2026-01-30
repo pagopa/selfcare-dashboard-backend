@@ -1,24 +1,24 @@
 package it.pagopa.selfcare.dashboard.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
 public class InstitutionBaseResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.id}")
+    @Schema(description = "${swagger.dashboard.institutions.model.id}")
     private String id;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}")
+    @Schema(description = "${swagger.dashboard.institutions.model.name}")
     private String name;
 
-    @ApiModelProperty(value = "${swagger.dashboard.model.userRole}")
+    @Schema(description = "${swagger.dashboard.model.userRole}")
     private String userRole;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.status}")
+    @Schema(description = "${swagger.dashboard.institutions.model.status}")
     private String status;
 
-    @ApiModelProperty(value = "${swagger.dashboard.institutions.model.parentDescription}")
+    @Schema(description = "${swagger.dashboard.institutions.model.parentDescription}")
     private String parentDescription;
 
 }

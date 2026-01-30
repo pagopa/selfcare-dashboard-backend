@@ -2,7 +2,7 @@ package it.pagopa.selfcare.dashboard.model.delegation;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 public class DelegationId {

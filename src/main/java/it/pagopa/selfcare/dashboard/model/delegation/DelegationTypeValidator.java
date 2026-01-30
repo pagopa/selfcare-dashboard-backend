@@ -1,7 +1,7 @@
 package it.pagopa.selfcare.dashboard.model.delegation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 
 public class DelegationTypeValidator implements ConstraintValidator<DelegationTypeSubset, DelegationType> {

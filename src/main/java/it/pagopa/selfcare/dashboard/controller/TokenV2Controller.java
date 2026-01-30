@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.web.security.JwtAuthenticationToken;
 import it.pagopa.selfcare.dashboard.model.ExchangedToken;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping(value = "/v2/token", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = "token")
+@Tag(name = "token")
 public class TokenV2Controller {
 
     private final ExchangeTokenServiceV2 exchangeTokenService;
@@ -36,20 +36,20 @@ public class TokenV2Controller {
 
     @GetMapping(value = "exchange", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "${swagger.dashboard.token.api.exchange}", notes = "${swagger.dashboard.token.api.exchange}", nickname = "v2Exchange")
+    @Operation(summary = "${swagger.dashboard.token.api.exchange}", description = "${swagger.dashboard.token.api.exchange}", operationId = "#v2Exchange")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:AccessProductBackoffice')")
-    public IdentityTokenResource exchange(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public IdentityTokenResource exchange(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                           @RequestParam("institutionId")
                                           String institutionId,
-                                          @ApiParam("${swagger.dashboard.products.model.id}")
+                                          @Parameter(description = "${swagger.dashboard.products.model.id}")
                                           @RequestParam("productId")
                                           String productId,
-                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
+                                          @Parameter(description = "${swagger.dashboard.product-backoffice-configurations.model.environment}")
                                           @RequestParam(value = "environment", required = false)
                                           Optional<String> environment) {
 
         log.trace("exchange start");
-        log.debug("exchange institutionId = {}, productId = {}", institutionId, productId);
+        log.debug("exchange institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
 
         String token = exchangeTokenService.exchange(institutionId, productId, environment).getIdentityToken();
         IdentityTokenResource identityToken = new IdentityTokenResource();
@@ -64,18 +64,18 @@ public class TokenV2Controller {
 
     @GetMapping(value = "exchange/back-office/admin", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "${swagger.dashboard.token.api.exchange.backoffice.admin}", notes = "${swagger.dashboard.token.api.exchange.backoffice.admin}", nickname = "v2ExchangeBackofficeAdmin")
+    @Operation(summary = "${swagger.dashboard.token.api.exchange.backoffice.admin}", description = "${swagger.dashboard.token.api.exchange.backoffice.admin}", operationId = "#v2ExchangeBackofficeAdmin")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:AccessProductBackofficeAdmin')")
-    public URI exchangeBackofficeAdmin(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public URI exchangeBackofficeAdmin(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                           @RequestParam("institutionId")
                                           String institutionId,
-                                          @ApiParam("${swagger.dashboard.products.model.id}")
+                                          @Parameter(description = "${swagger.dashboard.products.model.id}")
                                           @RequestParam("productId")
                                           String productId,
-                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
+                                          @Parameter(description = "${swagger.dashboard.product-backoffice-configurations.model.environment}")
                                           @RequestParam(value = "environment", required = false)
                                           Optional<String> environment,
-                                          @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.lang}")
+                                          @Parameter(description = "${swagger.dashboard.product-backoffice-configurations.model.lang}")
                                           @RequestParam(value = "lang", required = false, defaultValue = "it")
                                           String lang) {
 
@@ -95,16 +95,16 @@ public class TokenV2Controller {
 
     @GetMapping(value = "exchange/fatturazione", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.token.api.billingToken}")
+    @Operation(summary = "billingToken", description = "${swagger.dashboard.token.api.billingToken}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewBilling')")
-    public URI billingToken(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public URI billingToken(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                             @RequestParam("institutionId")
                             String institutionId,
-                            @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.environment}")
+                            @Parameter(description = "${swagger.dashboard.product-backoffice-configurations.model.environment}")
                             @RequestParam(value = "environment", required = false)
                             Optional<String> environment,
                             JwtAuthenticationToken jwtAuthenticationToken,
-                            @ApiParam("${swagger.dashboard.product-backoffice-configurations.model.lang}")
+                            @Parameter(description = "${swagger.dashboard.product-backoffice-configurations.model.lang}")
                             @RequestParam(value = "lang", required = false)
                             String lang) {
 

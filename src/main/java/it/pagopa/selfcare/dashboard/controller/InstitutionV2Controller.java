@@ -1,14 +1,14 @@
 package it.pagopa.selfcare.dashboard.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.aspect.ApiFeatureFlag;
-import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.*;
+import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationWithPagination;
 import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.model.delegation.Order;
@@ -23,6 +23,8 @@ import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -36,8 +38,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -48,7 +48,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 @Slf4j
 @RestController
 @RequestMapping(value = "/v2/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = "institutions")
+@Tag(name = "institutions")
 @RequiredArgsConstructor
 public class InstitutionV2Controller {
 
@@ -62,12 +62,12 @@ public class InstitutionV2Controller {
 
     @GetMapping(value = "/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionUser}", nickname = "v2RetrieveInstitutionUser")
+    @Operation(summary = "getInstitutionUser", description = "${swagger.dashboard.institutions.api.getInstitutionUser}", operationId = "#v2RetrieveInstitutionUser")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListProductUsers')")
-    public InstitutionUserDetailsResource getInstitutionUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public InstitutionUserDetailsResource getInstitutionUser(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                              @PathVariable("institutionId")
                                                              String institutionId,
-                                                             @ApiParam("${swagger.dashboard.user.model.id}")
+                                                             @Parameter(description = "${swagger.dashboard.user.model.id}")
                                                              @PathVariable("userId")
                                                              String userId,
                                                              Authentication authentication) {
@@ -75,7 +75,7 @@ public class InstitutionV2Controller {
         log.trace("getInstitutionUser start");
         String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
 
-        log.debug("getInstitutionUser institutionId = {}, userId = {}", institutionId, userId);
+        log.debug("getInstitutionUser institutionId = {}, userId = {}", Encode.forJava(institutionId), Encode.forJava(userId));
         UserInfo userInfo = institutionV2Service.getInstitutionUser(institutionId, userId, loggedUserId);
         InstitutionUserDetailsResource result = userMapper.toInstitutionUserDetails(userInfo);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
@@ -85,7 +85,7 @@ public class InstitutionV2Controller {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutions}", nickname = "v2RetrieveUserInstitutions")
+    @Operation(summary = "getInstitutions", description = "${swagger.dashboard.institutions.api.getInstitutions}", operationId = "#v2RetrieveUserInstitutions")
     public List<InstitutionBaseResource> getInstitutions(Authentication authentication) {
 
         log.trace("getInstitutions start");
@@ -103,12 +103,12 @@ public class InstitutionV2Controller {
 
     @PostMapping(value = "/{institutionId}/products/{productId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.createInstitutionProductUser}", nickname = "v2PostCreateInstitutionProductUser")
+    @Operation(summary = "createInstitutionProductUser", description = "${swagger.dashboard.institutions.api.createInstitutionProductUser}", operationId = "#v2PostCreateInstitutionProductUser")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:CreateProductUsers')")
-    public UserIdResource createInstitutionProductUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public UserIdResource createInstitutionProductUser(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                        @PathVariable("institutionId")
                                                        String institutionId,
-                                                       @ApiParam("${swagger.dashboard.products.model.id}")
+                                                       @Parameter(description = "${swagger.dashboard.products.model.id}")
                                                        @PathVariable("productId")
                                                        String productId,
                                                        @RequestBody
@@ -127,36 +127,37 @@ public class InstitutionV2Controller {
 
     @PutMapping(value = "/{institutionId}/products/{productId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.addUserProductRoles}", nickname = "v2AddUserProductRole")
+    @Operation(summary = "addUserProductRoles", description = "${swagger.dashboard.institutions.api.addUserProductRoles}", operationId = "#v2AddUserProductRole")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:CreateProductUsers')")
-    public void addUserProductRoles(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public void addUserProductRoles(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                     @PathVariable("institutionId")
                                     String institutionId,
-                                    @ApiParam("${swagger.dashboard.products.model.id}")
+                                    @Parameter(description = "${swagger.dashboard.products.model.id}")
                                     @PathVariable("productId")
                                     String productId,
-                                    @ApiParam("${swagger.dashboard.user.model.id}")
+                                    @Parameter(description = "${swagger.dashboard.user.model.id}")
                                     @PathVariable("userId")
                                     String userId,
-                                    @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                    @Parameter(description = "${swagger.dashboard.user.model.productRoles}")
                                     @RequestBody
                                     @Valid
                                     UserProductRoles userProductRoles) {
         log.trace("addUserProductRoles start");
-        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", institutionId, productId, userId, userProductRoles);
+        log.debug("institutionId = {}, productId = {}, userId = {}, userProductRoles = {}", Encode.forJava(institutionId),
+                Encode.forJava(productId), Encode.forJava(userId), Encode.forJava(userProductRoles.toString()));
         userService.addUserProductRoles(institutionId, productId, userId, userProductRoles.getToAddOnAggregates(), userProductRoles.getProductRoles(), userProductRoles.getRole());
         log.trace("addUserProductRoles end");
     }
 
     @GetMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "${swagger.dashboard.institutions.api.getInstitution}", notes = "${swagger.dashboard.institutions.api.getInstitution}", nickname = "v2GetInstitution")
+    @Operation(summary = "${swagger.dashboard.institutions.api.getInstitution}", description = "${swagger.dashboard.institutions.api.getInstitution}", operationId = "#v2GetInstitution")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
-    public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public InstitutionResource getInstitution(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                               String institutionId) {
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
+        log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
 
         Institution institution = institutionV2Service.findInstitutionById(institutionId);
         InstitutionResource result = institutionResourceMapper.toResource(institution);
@@ -166,16 +167,16 @@ public class InstitutionV2Controller {
         return result;
     }
 
-    @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
+    @Operation(summary = "${swagger.dashboard.institutions.delegations}", description = "${swagger.dashboard.institutions.delegations}", operationId = "#getDelegationsUsingToUsingGET_1")
     @GetMapping(value = "/{institutionId}/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewDelegations')")
-    public ResponseEntity<DelegationWithPagination> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
+    public ResponseEntity<DelegationWithPagination> getDelegationsUsingTo(@Parameter(description = "${swagger.dashboard.delegation.model.to}")
                                                                           @PathVariable("institutionId") String institutionId,
-                                                                          @ApiParam("${swagger.dashboard.delegation.model.productId}")
+                                                                          @Parameter(description = "${swagger.dashboard.delegation.model.productId}")
                                                                           @RequestParam(name = "productId", required = false) String productId,
-                                                                          @ApiParam("${swagger.dashboard.delegation.model.description}")
+                                                                          @Parameter(description = "${swagger.dashboard.delegation.model.description}")
                                                                           @RequestParam(name = "search", required = false) String search,
-                                                                          @ApiParam("${swagger.dashboard.delegation.delegations.order}")
+                                                                          @Parameter(description = "${swagger.dashboard.delegation.delegations.order}")
                                                                           @RequestParam(name = "order", required = false) Order order,
                                                                           @RequestParam(name = "page", required = false) @Min(0) Integer page,
                                                                           @RequestParam(name = "size", required = false) @Min(1) Integer size) {
@@ -200,12 +201,12 @@ public class InstitutionV2Controller {
 
     @GetMapping(value = "/onboardings/{productId}/pending", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionOnboardingPending}", nickname = "getInstitutionOnboardingPending")
-    public ResponseEntity<Void> getInstitutionOnboardingPending(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    @Operation(summary = "getInstitutionOnboardingPending", description = "${swagger.dashboard.institutions.api.getInstitutionOnboardingPending}", operationId = "#getInstitutionOnboardingPending")
+    public ResponseEntity<Void> getInstitutionOnboardingPending(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                                 @RequestParam(name = "taxCode") String taxCode,
                                                                 @RequestParam(name = "subunitCode", required = false) String subunitCode,
                                                                 @PathVariable("productId")
-                                                                @ApiParam("${swagger.dashboard.products.model.id}")
+                                                                @Parameter(description = "${swagger.dashboard.products.model.id}")
                                                                 String productId) {
 
         log.trace("getInstitutionOnboardingPending start");
@@ -224,17 +225,17 @@ public class InstitutionV2Controller {
 
     @GetMapping(value = "/{institutionId}/products/{productId}/users/count", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getUserCount}", nickname = "v2GetUserCount")
+    @Operation(summary = "getUserCount", description = "${swagger.dashboard.institutions.api.getUserCount}", operationId = "#v2GetUserCount")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListProductUsers')")
-    public UserCountResource getUserCount(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public UserCountResource getUserCount(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                           @PathVariable("institutionId")
                                           String institutionId,
-                                          @ApiParam("${swagger.dashboard.products.model.id}")
+                                          @Parameter(description = "${swagger.dashboard.products.model.id}")
                                           @PathVariable("productId")
                                           String productId,
-                                          @ApiParam(value = "${swagger.dashboard.product-role-mappings.model.partyRoleList}")
+                                          @Parameter(description = "${swagger.dashboard.product-role-mappings.model.partyRoleList}")
                                           @RequestParam(name = "roles", required = false) String[] roles,
-                                          @ApiParam(value = "${swagger.dashboard.user.model.statusList}")
+                                          @Parameter(description = "${swagger.dashboard.user.model.statusList}")
                                           @RequestParam(name = "status", required = false) String[] status) {
         log.trace("getUserCount start");
         UsersCountResponse userCount = userService.getUserCount(
@@ -251,12 +252,12 @@ public class InstitutionV2Controller {
 
     @GetMapping(value = "/{institutionId}/onboardings-info", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getOnboardingsInfo}", nickname = "v2GetOnboardingsInfo")
+    @Operation(summary = "getOnboardingsInfo", description = "${swagger.dashboard.institutions.api.getOnboardingsInfo}", operationId = "#v2GetOnboardingsInfo")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewContract')")
     @ApiFeatureFlag("feature.viewcontract.enabled")
-    public List<OnboardingInfo> getOnboardingsInfo(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public List<OnboardingInfo> getOnboardingsInfo(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                    @PathVariable("institutionId") String institutionId,
-                                                   @ApiParam(value = "${swagger.dashboard.institutions.model.products}")
+                                                   @Parameter(description = "${swagger.dashboard.institutions.model.products}")
                                                    @RequestParam(name = "products", required = false) String[] products) {
         log.trace("getOnboardingsInfo start");
         OnboardingsResponse onboardingsResponse =
@@ -277,12 +278,12 @@ public class InstitutionV2Controller {
 
     @GetMapping(value = "/{institutionId}/contract", produces = APPLICATION_OCTET_STREAM_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getContract}", nickname = "v2GetContract")
+    @Operation(summary = "getContract", description = "${swagger.dashboard.institutions.api.getContract}", operationId = "#v2GetContract")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewContract')")
     @ApiFeatureFlag("feature.viewcontract.enabled")
-    public ResponseEntity<byte[]> getContract(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public ResponseEntity<byte[]> getContract(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
-                                              @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                              @Parameter(description = "${swagger.dashboard.products.model.id}")
                                               @RequestParam(name = "productId") String productId) throws IOException {
         log.trace("getContract start");
         log.debug("getContract institutionId = {}, productId = {}", Encode.forJava(institutionId), Encode.forJava(productId));
@@ -307,13 +308,13 @@ public class InstitutionV2Controller {
 
     @PostMapping(value = "/{institutionId}/product/{productId}/check-user")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.checkUser}", nickname = "v2CheckUser")
+    @Operation(summary = "checkUser", description = "${swagger.dashboard.institutions.api.checkUser}", operationId = "#v2CheckUser")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListProductUsers')")
-    public ResponseEntity<CheckUserResponse> checkUser(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public ResponseEntity<CheckUserResponse> checkUser(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
-                                              @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                              @Parameter(description = "${swagger.dashboard.products.model.id}")
                                               @PathVariable(name = "productId") String productId,
-                                              @ApiParam("${swagger.dashboard.user.model.productRoles}")
+                                              @Parameter(description = "${swagger.dashboard.user.model.productRoles}")
                                               @RequestBody
                                               @Valid
                                               SearchUserDto searchUserDto) {
@@ -326,11 +327,11 @@ public class InstitutionV2Controller {
 
     @GetMapping(value = "/{institutionId}/product/{productId}/attachment/status")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.checkAttachmentStatus}", nickname = "v2CheckAttachment")
+    @Operation(summary = "checkAttachmentStatus", description = "${swagger.dashboard.institutions.api.checkAttachmentStatus}", operationId = "#v2CheckAttachment")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewContract')")
-    public ResponseEntity<CheckAttachmentResponse> checkAttachmentStatus(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public ResponseEntity<CheckAttachmentResponse> checkAttachmentStatus(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId") String institutionId,
-                                              @ApiParam(value = "${swagger.dashboard.products.model.id}")
+                                              @Parameter(description = "${swagger.dashboard.products.model.id}")
                                               @PathVariable(name = "productId") String productId,
                                               @RequestParam(name = "name") String name) {
         log.trace("checkAttachmentStatus start");

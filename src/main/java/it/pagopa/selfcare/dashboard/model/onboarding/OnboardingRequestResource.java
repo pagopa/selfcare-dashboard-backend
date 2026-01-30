@@ -1,13 +1,13 @@
 package it.pagopa.selfcare.dashboard.model.onboarding;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.pagopa.selfcare.onboarding.common.InstitutionType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,21 +15,21 @@ import java.util.UUID;
 public class OnboardingRequestResource {
 
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.status}", required = true)
+    @Schema(description = "${swagger.dashboard.onboarding-request.model.status}")
     @JsonProperty(required = true)
     private OnboardingStatus status;
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.institutionInfo}", required = true)
+    @Schema(description = "${swagger.dashboard.onboarding-request.model.institutionInfo}")
     @JsonProperty(required = true)
     private InstitutionInfo institutionInfo;
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.manager}")
+    @Schema(description = "${swagger.dashboard.onboarding-request.model.manager}")
     private UserInfo manager;
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.admins}")
+    @Schema(description = "${swagger.dashboard.onboarding-request.model.admins}")
     private List<UserInfo> admins;
 
-    @ApiModelProperty(value = "${swagger.dashboard.onboarding-request.model.productId}")
+    @Schema(description = "${swagger.dashboard.onboarding-request.model.productId}")
     private String productId;
 
 
@@ -37,108 +37,108 @@ public class OnboardingRequestResource {
     @EqualsAndHashCode(of = "id")
     public static class InstitutionInfo {
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.id}")
+        @Schema(description = "${swagger.dashboard.institutions.model.id}")
         private String id;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.name}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.name}")
         @JsonProperty(required = true)
         private String name;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.institutionType}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.institutionType}")
         @JsonProperty(required = true)
         private InstitutionType institutionType;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.address}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.address}")
         @JsonProperty(required = true)
         private String address;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.zipCode}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.zipCode}")
         @JsonProperty(required = true)
         private String zipCode;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.city}")
+        @Schema(description = "${swagger.dashboard.institutions.model.city}")
         private String city;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.country}")
+        @Schema(description = "${swagger.dashboard.institutions.model.country}")
         private String country;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.county}")
+        @Schema(description = "${swagger.dashboard.institutions.model.county}")
         private String county;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.mailAddress}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.mailAddress}")
         @JsonProperty(required = true)
         private String mailAddress;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.fiscalCode}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.fiscalCode}")
         @JsonProperty(required = true)
         private String fiscalCode;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.vatNumber}", required = true)
+        @Schema(description = "${swagger.dashboard.institutions.model.vatNumber}")
         @JsonProperty(required = true)
         private String vatNumber;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.recipientCode}")
+        @Schema(description = "${swagger.dashboard.institutions.model.recipientCode}")
         private String recipientCode;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData}")
+        @Schema(description = "${swagger.dashboard.institutions.model.pspData}")
         private PspData pspData;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.dpoData}")
+        @Schema(description = "${swagger.dashboard.institutions.model.dpoData}")
         private DpoData dpoData;
 
-        @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations}")
+        @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations}")
         private AdditionalInformations additionalInformations;
 
         @Data
         public static class AdditionalInformations{
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.belongRegulatedMarket}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.belongRegulatedMarket}")
             private boolean belongRegulatedMarket;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.regulatedMarketNote}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.regulatedMarketNote}")
             private String regulatedMarketNote;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.ipa}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.ipa}")
             private boolean ipa;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.ipaCode}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.ipaCode}")
             private String ipaCode;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvision}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvision}")
             private boolean establishedByRegulatoryProvision;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvisionNote}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.establishedByRegulatoryProvisionNote}")
             private String establishedByRegulatoryProvisionNote;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicService}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicService}")
             private boolean agentOfPublicService;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicServiceNote}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.agentOfPublicServiceNote}")
             private String agentOfPublicServiceNote;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.additionalInformations.otherNote}")
+            @Schema(description = "${swagger.dashboard.institutions.model.additionalInformations.otherNote}")
             private String otherNote;
         }
 
         @Data
         public static class PspData {
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData.businessRegisterNumber}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.pspData.businessRegisterNumber}")
             @JsonProperty(required = true)
             private String businessRegisterNumber;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData.legalRegisterName}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.pspData.legalRegisterName}")
             @JsonProperty(required = true)
             private String legalRegisterName;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData.legalRegisterNumber}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.pspData.legalRegisterNumber}")
             @JsonProperty(required = true)
             private String legalRegisterNumber;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData.abiCode}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.pspData.abiCode}")
             @JsonProperty(required = true)
             private String abiCode;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.pspData.vatNumberGroup}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.pspData.vatNumberGroup}")
             @JsonProperty(required = true)
             private Boolean vatNumberGroup;
         }
@@ -147,18 +147,18 @@ public class OnboardingRequestResource {
         @Data
         public static class DpoData {
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.dpoData.address}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.dpoData.address}")
             @JsonProperty(required = true)
             @NotBlank
             private String address;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.dpoData.pec}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.dpoData.pec}")
             @JsonProperty(required = true)
             @NotBlank
             @Email
             private String pec;
 
-            @ApiModelProperty(value = "${swagger.dashboard.institutions.model.dpoData.email}", required = true)
+            @Schema(description = "${swagger.dashboard.institutions.model.dpoData.email}")
             @JsonProperty(required = true)
             @NotBlank
             @Email
@@ -169,23 +169,23 @@ public class OnboardingRequestResource {
     @Data
     public static class UserInfo {
 
-        @ApiModelProperty(value = "${swagger.dashboard.user.model.id}", required = true)
+        @Schema(description = "${swagger.dashboard.user.model.id}")
         @JsonProperty(required = true)
         private UUID id;
 
-        @ApiModelProperty(value = "${swagger.dashboard.user.model.name}", required = true)
+        @Schema(description = "${swagger.dashboard.user.model.name}")
         @JsonProperty(required = true)
         private String name;
 
-        @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}", required = true)
+        @Schema(description = "${swagger.dashboard.user.model.surname}")
         @JsonProperty(required = true)
         private String surname;
 
-        @ApiModelProperty(value = "${swagger.dashboard.user.model.institutionalEmail}", required = true)
+        @Schema(description = "${swagger.dashboard.user.model.institutionalEmail}")
         @JsonProperty(required = true)
         private String email;
 
-        @ApiModelProperty(value = "${swagger.dashboard.user.model.fiscalCode}", required = true)
+        @Schema(description = "${swagger.dashboard.user.model.fiscalCode}")
         @JsonProperty(required = true)
         private String fiscalCode;
 

@@ -1,6 +1,6 @@
 package it.pagopa.selfcare.dashboard.model.user_groups;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.UUID;
@@ -8,11 +8,11 @@ import java.util.UUID;
 @Data
 public class PlainUserResource {
 
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.id}")
+    @Schema(description = "${swagger.dashboard.user.model.id}")
     private UUID id;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.name}")
+    @Schema(description = "${swagger.dashboard.user.model.name}")
     private String name;
-    @ApiModelProperty(value = "${swagger.dashboard.user.model.surname}")
+    @Schema(description = "${swagger.dashboard.user.model.surname}")
     private String surname;
 
 }

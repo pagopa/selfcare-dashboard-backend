@@ -1,8 +1,8 @@
 package it.pagopa.selfcare.dashboard.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.model.GeographicTaxonomyListDto;
 import it.pagopa.selfcare.dashboard.model.InstitutionResource;
@@ -21,6 +21,7 @@ import it.pagopa.selfcare.dashboard.model.product.ProductsResource;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.FileStorageService;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +39,7 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(value = "/v1/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = "institutions")
+@Tag(name = "institutions")
 public class InstitutionController {
 
     private final FileStorageService storageService;
@@ -61,15 +61,15 @@ public class InstitutionController {
 
     @PutMapping(value = "/{institutionId}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.saveInstitutionLogo}")
+    @Operation(summary = "saveInstitutionLogo", description = "${swagger.dashboard.institutions.api.saveInstitutionLogo}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:UploadLogo')")
-    public Object saveInstitutionLogo(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public Object saveInstitutionLogo(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                       @PathVariable("institutionId") String institutionId,
-                                      @ApiParam("${swagger.dashboard.institutions.model.logo}")
+                                      @Parameter(description = "${swagger.dashboard.institutions.model.logo}")
                                       @RequestPart("logo") MultipartFile logo) throws IOException {
 
         log.trace("saveInstitutionLogo start");
-        log.debug("saveInstitutionLogo institutionId = {}, logo = {}", institutionId, logo);
+        log.debug("saveInstitutionLogo institutionId = {}", Encode.forJava(institutionId));
 
         storageService.storeInstitutionLogo(institutionId, logo.getInputStream(), logo.getContentType(), logo.getOriginalFilename());
         log.trace("saveInstitutionLogo end");
@@ -80,14 +80,14 @@ public class InstitutionController {
 
     @GetMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitution}")
+    @Operation(summary = "getInstitution", description = "${swagger.dashboard.institutions.api.getInstitution}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ViewInstitutionData')")
-    public InstitutionResource getInstitution(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public InstitutionResource getInstitution(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                               @PathVariable("institutionId")
                                                       String institutionId) {
 
         log.trace("getInstitution start");
-        log.debug("getInstitution institutionId = {}", institutionId);
+        log.debug("getInstitution institutionId = {}", Encode.forJava(institutionId));
         Institution institution = institutionService.findInstitutionById(institutionId);
         InstitutionResource result = institutionResourceMapper.toResource(institution);
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
@@ -98,12 +98,12 @@ public class InstitutionController {
 
     @PutMapping(value = "/{institutionId}/geographic-taxonomy", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
+    @Operation(summary = "updateInstitutionGeographicTaxonomy", description = "${swagger.dashboard.institutions.api.updateInstitutionGeographicTaxonomy}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:UpdateGeoTaxonomy')")
-    public void updateInstitutionGeographicTaxonomy(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public void updateInstitutionGeographicTaxonomy(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                     @PathVariable("institutionId")
                                                     String institutionId,
-                                                    @ApiParam("${swagger.dashboard.institutions.model.geographicTaxonomy}")
+                                                    @Parameter(description = "${swagger.dashboard.institutions.model.geographicTaxonomy}")
                                                     @RequestBody
                                                     @Valid
                                                     GeographicTaxonomyListDto geographicTaxonomyListDto) {
@@ -117,7 +117,7 @@ public class InstitutionController {
 
     @GetMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
+    @Operation(summary = "getProductsTree", description = "${swagger.dashboard.institutions.api.getInstitutionProducts}")
     public List<ProductsResource> getProductsTree() {
         log.trace("getProducts start");
         log.debug("getProducts start");
@@ -135,16 +135,16 @@ public class InstitutionController {
 
     @PutMapping(value = "/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "", notes = "${swagger.dashboard.institutions.api.updateInstitutionDescription}")
+    @Operation(summary = "updateInstitutionDescription", description = "${swagger.dashboard.institutions.api.updateInstitutionDescription}")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:UpdateInstitutionData')")
-    public Institution updateInstitutionDescription(@ApiParam("${swagger.dashboard.institutions.model.id}")
+    public Institution updateInstitutionDescription(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                     @PathVariable("institutionId")
                                                     String institutionId,
                                                     @RequestBody
                                                     @Valid
                                                     UpdateInstitutionDto institutionDto) {
         log.trace("updateInstitutionDescription start");
-        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", institutionId, institutionDto);
+        log.debug("updateInstitutionDescription institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(institutionDto.toString()));
         Institution result = institutionService.updateInstitutionDescription(institutionId, institutionResourceMapper.toUpdateResource(institutionDto));
         log.debug("updateInstitutionDescription result = {}", result);
         log.trace("updateInstitutionDescription end");
@@ -160,15 +160,15 @@ public class InstitutionController {
      * * Code: 404, Message: Institution data not found, DataType: Problem
      * * Code: 400, Message: Bad Request, DataType: Problem
      */
-    @ApiOperation(value = "${swagger.dashboard.institutions.partners}", notes = "${swagger.dashboard.institutions.partners}")
+    @Operation(summary = "${swagger.dashboard.institutions.partners}", description = "${swagger.dashboard.institutions.partners}")
     @GetMapping(value = "/{institutionId}/partners", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewDelegations')")
-    public ResponseEntity<List<DelegationResource>> getDelegationsUsingFrom(@ApiParam("${swagger.dashboard.delegation.model.from}")
+    public ResponseEntity<List<DelegationResource>> getDelegationsUsingFrom(@Parameter(description = "${swagger.dashboard.delegation.model.from}")
                                                                    @PathVariable("institutionId") String institutionId,
-                                                                   @ApiParam("${swagger.dashboard.delegation.model.productId}")
+                                                                   @Parameter(description = "${swagger.dashboard.delegation.model.productId}")
                                                                    @RequestParam(name = "productId", required = false) String productId) {
         log.trace("getDelegationsUsingFrom start");
-        log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", institutionId, productId);
+        log.debug("getDelegationsUsingFrom institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(productId));
         GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
                 .from(institutionId)
                 .productId(productId)
@@ -192,21 +192,21 @@ public class InstitutionController {
      * * Code: 404, Message: Institution data not found, DataType: Problem
      * * Code: 400, Message: Bad Request, DataType: Problem
      */
-    @ApiOperation(value = "${swagger.dashboard.institutions.delegations}", notes = "${swagger.dashboard.institutions.delegations}")
+    @Operation(summary = "${swagger.dashboard.institutions.delegations}", description = "${swagger.dashboard.institutions.delegations}")
     @GetMapping(value = "/{institutionId}/institutions", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ViewDelegations')")
-    public ResponseEntity<List<DelegationResource>> getDelegationsUsingTo(@ApiParam("${swagger.dashboard.delegation.model.to}")
+    public ResponseEntity<List<DelegationResource>> getDelegationsUsingTo(@Parameter(description = "${swagger.dashboard.delegation.model.to}")
                                                                    @PathVariable("institutionId") String institutionId,
-                                                                   @ApiParam("${swagger.dashboard.delegation.model.productId}")
+                                                                   @Parameter(description = "${swagger.dashboard.delegation.model.productId}")
                                                                    @RequestParam(name = "productId", required = false) String productId,
-                                                                   @ApiParam("${swagger.dashboard.delegation.model.description}")
+                                                                   @Parameter(description = "${swagger.dashboard.delegation.model.description}")
                                                                    @RequestParam(name = "search", required = false) String search,
-                                                                   @ApiParam("${swagger.dashboard.delegation.delegations.order}")
+                                                                   @Parameter(description = "${swagger.dashboard.delegation.delegations.order}")
                                                                    @RequestParam(name = "order", required = false) Order order,
                                                                    @RequestParam(name = "page", required = false) Integer page,
                                                                    @RequestParam(name = "size", required = false) Integer size) {
         log.trace("getDelegationsUsingTo start");
-        log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", institutionId, productId);
+        log.debug("getDelegationsUsingTo institutionId = {}, institutionDto{}", Encode.forJava(institutionId), Encode.forJava(productId));
 
         GetDelegationParameters delegationParameters = GetDelegationParameters.builder()
                 .to(institutionId)
