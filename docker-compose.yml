@@ -88,7 +88,7 @@ services:
       - mongodb
 
   usergroupms:
-    image: ghcr.io/pagopa/selfcare-user-group-ms:latest
+    image: ghcr.io/pagopa/selfcare-user-group-ms:test-amazoncorretto
     pull_policy: always
     platform: linux/amd64
     ports:
