@@ -3720,7 +3720,7 @@
         "properties" : {
           "role" : {
             "type" : "string",
-            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA]"
           },
           "productRoles" : {
             "uniqueItems" : true,
@@ -4143,7 +4143,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]"
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA]"
           },
           "productRoles" : {
             "uniqueItems" : true,
@@ -4299,6 +4299,20 @@
             "type" : "string",
             "description" : "User's Selfcare role, available values: [ADMIN, ADMIN_EA, LIMITED]",
             "enum" : [ "ADMIN", "LIMITED", "ADMIN_EA" ]
+          },
+          "partyRole" : {
+            "type" : "string",
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA]"
+          },
+          "createdAt" : {
+            "type" : "string",
+            "description" : "User's role creation date associated with a product",
+            "format" : "date-time"
+          },
+          "updatedAt" : {
+            "type" : "string",
+            "description" : "User's role last update date",
+            "format" : "date-time"
           }
         },
         "description" : "User's role infos in product"
@@ -4341,7 +4355,7 @@
           },
           "createdAt" : {
             "type" : "string",
-            "description" : "User's creation date associated with a product",
+            "description" : "User's role creation date associated with a product",
             "format" : "date-time"
           }
         }
@@ -4766,7 +4780,7 @@
           },
           "role" : {
             "type" : "string",
-            "description" : "User's role, available values: [MANAGER, DELEGATE, SUBDELEGATE, OPERATOR, ADMIN_EA]",
+            "description" : "User's role, available values: [MANAGER, DELEGATE, SUB_DELEGATE, OPERATOR, ADMIN_EA]",
             "enum" : [ "ADMIN", "LIMITED", "ADMIN_EA" ]
           },
           "status" : {

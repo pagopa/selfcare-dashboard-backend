@@ -1,7 +1,6 @@
 package it.pagopa.selfcare.dashboard.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
@@ -98,7 +97,7 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
 
         ClassPathResource resource = new ClassPathResource("json/UserInfo.json");
         byte[] userInfoStream = Files.readAllBytes(resource.getFile().toPath());
-        UserInfo userInfo = new ObjectMapper().readValue(userInfoStream, UserInfo.class);
+        UserInfo userInfo = objectMapper.readValue(userInfoStream, UserInfo.class);
 
         String loggedUserId = "loggedUserId";
         Authentication authentication = mock(Authentication.class);
