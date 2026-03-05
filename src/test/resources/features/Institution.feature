@@ -236,14 +236,42 @@ Feature: Institution
     And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
     When I send a GET request to "/v2/institutions/{institutionId}/users/{userId}" to retrieve institution user
     Then the response status should be 200
-    And The response body contains:
-      | id         | 97a511a7-2acc-47b9-afed-2f3c65753b4a |
-      | name       | john                                 |
-      | surname    | Doe                                  |
-      | role       | ADMIN                                |
-      | status     | ACTIVE                               |
-      | fiscalCode | PRVTNT80A41H401T                     |
     And The response body contains the list "products" of size 4
+    And The response body contains:
+      | id                                 | 97a511a7-2acc-47b9-afed-2f3c65753b4a |
+      | name                               | john                                 |
+      | surname                            | Doe                                  |
+      | role                               | ADMIN                                |
+      | status                             | ACTIVE                               |
+      | fiscalCode                         | PRVTNT80A41H401T                     |
+      | products[0].id                     | prod-io                              |
+      | products[0].roleInfos[0].role      | admin                                |
+      | products[0].roleInfos[0].status    | ACTIVE                               |
+      | products[0].roleInfos[0].selcRole  | ADMIN                                |
+      | products[0].roleInfos[0].partyRole | DELEGATE                             |
+      | products[0].roleInfos[0].createdAt | 2024-10-28T12:25:53.228              |
+      | products[0].roleInfos[0].updatedAt | 2024-10-28T12:25:53.228              |
+      | products[1].id                     | prod-pagopa                          |
+      | products[1].roleInfos[0].role      | admin                                |
+      | products[1].roleInfos[0].status    | ACTIVE                               |
+      | products[1].roleInfos[0].selcRole  | ADMIN                                |
+      | products[1].roleInfos[0].partyRole | DELEGATE                             |
+      | products[1].roleInfos[0].createdAt | 2024-10-28T12:25:53.228              |
+      | products[1].roleInfos[0].updatedAt | 2024-10-28T12:25:53.228              |
+      | products[2].id                     | prod-pn                              |
+      | products[2].roleInfos[0].role      | admin                                |
+      | products[2].roleInfos[0].status    | ACTIVE                               |
+      | products[2].roleInfos[0].selcRole  | ADMIN                                |
+      | products[2].roleInfos[0].partyRole | DELEGATE                             |
+      | products[2].roleInfos[0].createdAt | 2024-10-28T12:25:53.228              |
+      | products[2].roleInfos[0].updatedAt | 2024-10-28T12:25:53.228              |
+      | products[3].id                     | prod-interop                         |
+      | products[3].roleInfos[0].role      | admin                                |
+      | products[3].roleInfos[0].status    | ACTIVE                               |
+      | products[3].roleInfos[0].selcRole  | ADMIN                                |
+      | products[3].roleInfos[0].partyRole | MANAGER                              |
+      | products[3].roleInfos[0].createdAt | 2024-10-28T12:25:53.228              |
+      | products[3].roleInfos[0].updatedAt | 2024-10-28T12:25:53.228              |
 
   Scenario: Attempt to retrieve institution user by institutionId without permissions (not onboarded)
     Given user login with username "j.doe" and password "test"

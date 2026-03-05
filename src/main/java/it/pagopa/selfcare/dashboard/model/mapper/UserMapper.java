@@ -98,6 +98,9 @@ public interface UserMapper {
                     roleInfo.setRole(onboardedProduct.getProductRole());
                     roleInfo.setStatus(onboardedProduct.getStatus().name());
                     roleInfo.setSelcRole(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProduct.getRole()).getSelfCareAuthority());
+                    roleInfo.setPartyRole(onboardedProduct.getRole());
+                    roleInfo.setCreatedAt(onboardedProduct.getCreatedAt());
+                    roleInfo.setUpdatedAt(onboardedProduct.getUpdatedAt());
                     if (productInfo.getRoleInfos() == null)
                         productInfo.setRoleInfos(new ArrayList<>());
                     productInfo.getRoleInfos().add(roleInfo);
@@ -143,6 +146,9 @@ public interface UserMapper {
             resource.setRole(model.getRole());
             resource.setSelcRole(model.getSelcRole());
             resource.setStatus(model.getStatus());
+            resource.setPartyRole(model.getPartyRole());
+            resource.setCreatedAt(model.getCreatedAt());
+            resource.setUpdatedAt(model.getUpdatedAt());
         }
         return resource;
     }

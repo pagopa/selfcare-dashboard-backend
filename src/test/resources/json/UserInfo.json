@@ -38,7 +38,10 @@
           "relationshipId": "rel123",
           "role": "string",
           "status": "string",
-          "selcRole": "LIMITED"
+          "selcRole": "LIMITED",
+          "partyRole": "ADMIN_EA",
+          "createdAt": "2026-03-05T10:51:01.955",
+          "updatedAt": "2026-03-05T10:51:01.955"
         }
       ]
     }
