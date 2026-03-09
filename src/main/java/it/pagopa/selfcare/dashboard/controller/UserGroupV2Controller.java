@@ -3,7 +3,6 @@ package it.pagopa.selfcare.dashboard.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.commons.web.model.Page;
@@ -44,9 +43,7 @@ public class UserGroupV2Controller {
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "createUserGroup", description = "${swagger.dashboard.user-group.api.createUserGroup}")
-    @ApiResponses({
-            @ApiResponse(responseCode = "409", description = "Conflict")
-    })
+    @ApiResponse(responseCode = "409", description = "Conflict")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#group.getInstitutionId(), #group.getProductId(), null), 'Selc:ManageProductGroups')")
     public UserGroupIdResource createUserGroup(@RequestBody @Valid CreateUserGroupDto group) {
         log.trace("createGroup start");
@@ -99,9 +96,7 @@ public class UserGroupV2Controller {
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "updateUserGroup", description = "${swagger.dashboard.user-group.api.updateUserGroup}")
-    @ApiResponses({
-            @ApiResponse(responseCode = "409", description = "Conflict")
-    })
+    @ApiResponse(responseCode = "409", description = "Conflict")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
     public void updateUserGroup(@Parameter(description = "${swagger.dashboard.user-group.model.id}")
                                 @PathVariable("id") String id,
