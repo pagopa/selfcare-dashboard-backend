@@ -130,7 +130,7 @@ public class UserGroupV2Controller {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "getUserGroupById", description = "${swagger.dashboard.user-group.api.getUserGroup}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, #id), 'Selc:ListAllProductGroups')")
     public UserGroupResource getUserGroupById(@Parameter(description = "${swagger.dashboard.user-group.model.id}")
                                               @PathVariable("id") String id) {
         log.trace("getUserGroup start");
@@ -162,7 +162,7 @@ public class UserGroupV2Controller {
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "getUserGroups", description = "${swagger.dashboard.user-group.api.getUserGroups}")
-    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ManageProductGroups')")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListAllProductGroups')")
     public Page<UserGroupPlainResource> getUserGroups(@Parameter(description = "${swagger.dashboard.user-group.model.institutionId}")
                                                       @RequestParam(value = "institutionId") String institutionId,
                                                       @Parameter(description = "${swagger.dashboard.user-group.model.productId}")
