@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationId;
@@ -35,9 +34,7 @@ public class DelegationController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "createDelegation", description = "${swagger.dashboard.delegation.api.createDelegation}")
-    @ApiResponses({
-            @ApiResponse(responseCode = "409", description = "Conflict")
-    })
+    @ApiResponse(responseCode = "409", description = "Conflict")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#delegationRequest.getFrom(), #delegationRequest.getProductId(), null), 'Selc:CreateDelegation')")
     public DelegationIdResource createDelegation(@RequestBody @Valid DelegationRequestDto delegationRequest) {
         log.trace("createDelegation start");
