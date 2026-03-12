@@ -197,7 +197,7 @@ class ExchangeTokenServiceV2Test {
     }
 
     @Test
-    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() throws JsonProcessingException {
+    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() {
         String jti = "id";
         String sub = "subject";
         String iss = "PAGOPA";
