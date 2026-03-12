@@ -100,7 +100,6 @@ class ExchangeTokenServiceV2Test {
 
     @BeforeEach
     void setUp() throws Exception {
-        objectMapper = new ObjectMapper();
         when(exchangeTokenProperties.getBillingAudience()).thenReturn("aud");
         when(exchangeTokenProperties.getBillingUrl()).thenReturn("url");
         when(exchangeTokenProperties.getDuration()).thenReturn("PT20H30M");
@@ -116,7 +115,7 @@ class ExchangeTokenServiceV2Test {
 
         exchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtService,
                 institutionService,userGroupV2Service,exchangeTokenProperties,userV2Service,productService,
-                userInstitutionApiRestClient,iamExternalRestClient,institutionResourceMapper,institutionMapper, productMapper, objectMapper);
+                userInstitutionApiRestClient,iamExternalRestClient,institutionResourceMapper,institutionMapper, productMapper);
     }
 
 
@@ -197,7 +196,7 @@ class ExchangeTokenServiceV2Test {
     }
 
     @Test
-    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() throws JsonProcessingException {
+    void exchangeBackofficeAdmin_validInputs_returnsExchangedToken() {
         String jti = "id";
         String sub = "subject";
         String iss = "PAGOPA";
@@ -215,7 +214,6 @@ class ExchangeTokenServiceV2Test {
                         .build()
         );
         userClaims.setProductRoles(productRoles);
-        String userClaimsJson = objectMapper.writeValueAsString(userClaims);
 
         it.pagopa.selfcare.dashboard.model.institution.Institution institution = mock(it.pagopa.selfcare.dashboard.model.institution.Institution.class);
         Product product = mock(Product.class);
@@ -232,7 +230,7 @@ class ExchangeTokenServiceV2Test {
         when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
         when(productService.getProduct(productId)).thenReturn(product);
         when(iamExternalRestClient._getIAMUser(userId, productId))
-                .thenReturn(ResponseEntity.ok(userClaimsJson));
+                .thenReturn(ResponseEntity.ok(userClaims));
 
         ExchangedToken result = exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, Optional.empty());
 
@@ -264,7 +262,7 @@ class ExchangeTokenServiceV2Test {
 
         when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
         when(iamExternalRestClient._getIAMUser(userId, productId))
-                .thenReturn(ResponseEntity.ok("invalid json response"));
+                .thenReturn(ResponseEntity.notFound().build());
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -275,9 +273,7 @@ class ExchangeTokenServiceV2Test {
                 )
         );
 
-        Assertions.assertEquals(
-                String.format("User Claims are required for product '%s' and institution '%s'", productId, institutionId),
-                exception.getMessage()
+        Assertions.assertEquals("Session token claims is required", exception.getMessage()
         );
     }
 

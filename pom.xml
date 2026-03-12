@@ -182,7 +182,7 @@
         <dependency>
             <groupId>it.pagopa.selfcare</groupId>
             <artifactId>cucumber-sdk</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.13</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

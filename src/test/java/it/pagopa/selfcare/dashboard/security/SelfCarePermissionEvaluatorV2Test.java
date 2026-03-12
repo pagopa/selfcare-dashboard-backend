@@ -5,6 +5,7 @@ import it.pagopa.selfcare.dashboard.client.IamRestClient;
 import it.pagopa.selfcare.dashboard.client.UserApiRestClient;
 import it.pagopa.selfcare.dashboard.client.UserGroupRestClient;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.PermissionResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductWithActions;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
 import org.junit.jupiter.api.Test;
@@ -100,7 +101,7 @@ class SelfCarePermissionEvaluatorV2Test {
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(iamRestClient._hasIAMUserPermission(permission, user.getId(), domain.getInstitutionId(), domain.getProductId()))
-                .thenReturn(ResponseEntity.ok(true));
+                .thenReturn(ResponseEntity.ok(new PermissionResponse(true)));
 
         assertTrue(permissionEvaluator.hasPermission(authentication, domain, permission));
     }
@@ -114,7 +115,7 @@ class SelfCarePermissionEvaluatorV2Test {
 
         when(authentication.getPrincipal()).thenReturn(user);
         when(iamRestClient._hasIAMUserPermission(permission,  user.getId(), domain.getInstitutionId(), domain.getProductId()))
-                .thenReturn(ResponseEntity.ok(false));
+                .thenReturn(ResponseEntity.ok(new PermissionResponse(false)));
 
         assertFalse(permissionEvaluator.hasPermission(authentication, domain, permission));
     }
