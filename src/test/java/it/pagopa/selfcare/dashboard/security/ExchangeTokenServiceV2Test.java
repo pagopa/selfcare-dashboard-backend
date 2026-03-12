@@ -100,7 +100,6 @@ class ExchangeTokenServiceV2Test {
 
     @BeforeEach
     void setUp() throws Exception {
-        objectMapper = new ObjectMapper();
         when(exchangeTokenProperties.getBillingAudience()).thenReturn("aud");
         when(exchangeTokenProperties.getBillingUrl()).thenReturn("url");
         when(exchangeTokenProperties.getDuration()).thenReturn("PT20H30M");
@@ -116,7 +115,7 @@ class ExchangeTokenServiceV2Test {
 
         exchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtService,
                 institutionService,userGroupV2Service,exchangeTokenProperties,userV2Service,productService,
-                userInstitutionApiRestClient,iamExternalRestClient,institutionResourceMapper,institutionMapper, productMapper, objectMapper);
+                userInstitutionApiRestClient,iamExternalRestClient,institutionResourceMapper,institutionMapper, productMapper);
     }
 
 

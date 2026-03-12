@@ -2,7 +2,6 @@ package it.pagopa.selfcare.dashboard.security;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import it.pagopa.selfcare.commons.base.logging.LogUtils;
@@ -89,14 +88,13 @@ public class ExchangeTokenServiceV2 {
     private final InstitutionResourceMapper institutionResourceMapper;
     private final InstitutionMapper institutionMapper;
     private final ProductMapper productMapper;
-    private final ObjectMapper objectMapper;
 
     public ExchangeTokenServiceV2(JwtService jwtService,
                                   InstitutionService institutionService,
                                   UserGroupV2Service groupService,
                                   ExchangeTokenProperties properties,
                                   UserV2Service userService, ProductService productService, UserInstitutionApiRestClient userInstitutionApiRestClient, IamExternalRestClient iamExternalRestClient,
-                                  InstitutionResourceMapper institutionResourceMapper, InstitutionMapper institutionMapper, ProductMapper productMapper, ObjectMapper objectMapper)
+                                  InstitutionResourceMapper institutionResourceMapper, InstitutionMapper institutionMapper, ProductMapper productMapper)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         this.billingUrl = properties.getBillingUrl();
         this.billingAudience = properties.getBillingAudience();
@@ -114,7 +112,6 @@ public class ExchangeTokenServiceV2 {
         this.institutionResourceMapper = institutionResourceMapper;
         this.institutionMapper = institutionMapper;
         this.productMapper = productMapper;
-        this.objectMapper = objectMapper;
     }
 
 
