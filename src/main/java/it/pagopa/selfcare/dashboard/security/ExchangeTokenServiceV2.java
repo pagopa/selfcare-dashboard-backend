@@ -159,7 +159,7 @@ public class ExchangeTokenServiceV2 {
 
         UserClaims userClaims;
         userClaims = iamExternalRestClient._getIAMUser(selfCareUser.getId(), productId).getBody();
-        @Valid List<ProductRoles> productRoles = Objects.isNull(userClaims) ? List.of() : userClaims.getProductRoles();
+        List<ProductRoles> productRoles = Objects.isNull(userClaims) ? List.of() : userClaims.getProductRoles();
 
         InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, productRoles);
 
