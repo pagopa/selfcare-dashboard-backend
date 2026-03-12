@@ -29,10 +29,12 @@ import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRoles;
 import it.pagopa.selfcare.iam.generated.openapi.v1.dto.UserClaims;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -160,13 +162,10 @@ public class ExchangeTokenServiceV2 {
         Assert.notNull(institution, INSTITUTION_REQUIRED_MESSAGE);
 
         UserClaims userClaims;
-        try {
-            userClaims = objectMapper.readValue(iamExternalRestClient._getIAMUser(selfCareUser.getId(), productId).getBody(), UserClaims.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(String.format("User Claims are required for product '%s' and institution '%s'", productId, institutionId));
-        }
+        userClaims = iamExternalRestClient._getIAMUser(selfCareUser.getId(), productId).getBody();
+        @Valid List<ProductRoles> productRoles = Objects.isNull(userClaims) ? List.of() : userClaims.getProductRoles();
 
-        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, userClaims.getProductRoles());
+        InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, productRoles);
 
         TokenExchangeClaims claims = retrieveAndSetBackofficeAdminClaims(authentication.getCredentials().toString(), institutionExchange,  selfCareUser);
 

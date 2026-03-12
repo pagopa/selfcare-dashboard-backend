@@ -215,7 +215,6 @@ class ExchangeTokenServiceV2Test {
                         .build()
         );
         userClaims.setProductRoles(productRoles);
-        String userClaimsJson = objectMapper.writeValueAsString(userClaims);
 
         it.pagopa.selfcare.dashboard.model.institution.Institution institution = mock(it.pagopa.selfcare.dashboard.model.institution.Institution.class);
         Product product = mock(Product.class);
@@ -232,7 +231,7 @@ class ExchangeTokenServiceV2Test {
         when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
         when(productService.getProduct(productId)).thenReturn(product);
         when(iamExternalRestClient._getIAMUser(userId, productId))
-                .thenReturn(ResponseEntity.ok(userClaimsJson));
+                .thenReturn(ResponseEntity.ok(userClaims));
 
         ExchangedToken result = exchangeTokenServiceV2.exchangeBackofficeAdmin(institutionId, productId, Optional.empty());
 
@@ -264,7 +263,7 @@ class ExchangeTokenServiceV2Test {
 
         when(institutionService.getInstitutionById(institutionId)).thenReturn(institution);
         when(iamExternalRestClient._getIAMUser(userId, productId))
-                .thenReturn(ResponseEntity.ok("invalid json response"));
+                .thenReturn(ResponseEntity.notFound().build());
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -275,9 +274,7 @@ class ExchangeTokenServiceV2Test {
                 )
         );
 
-        Assertions.assertEquals(
-                String.format("User Claims are required for product '%s' and institution '%s'", productId, institutionId),
-                exception.getMessage()
+        Assertions.assertEquals("Session token claims is required", exception.getMessage()
         );
     }
 

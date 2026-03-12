@@ -11,6 +11,7 @@ import it.pagopa.selfcare.dashboard.model.groups.UserGroupStatus;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
 import it.pagopa.selfcare.group.generated.openapi.v1.dto.UserGroupResource;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.PermissionResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.PermissionEvaluator;
@@ -95,7 +96,7 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
                             filterAuthorityDomain.getInstitutionId(),
                             filterAuthorityDomain.getProductId())
                         .getBody())
-                    .map(Boolean.TRUE::equals)
+                    .map(PermissionResponse::getHasPermission)
                     .orElse(false);
 
             log.debug("PAGOPA permission {} → {}", permission, isAllowed ? "GRANTED" : "DENIED");
