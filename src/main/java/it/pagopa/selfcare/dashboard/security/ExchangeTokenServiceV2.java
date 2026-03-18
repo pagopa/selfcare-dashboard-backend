@@ -27,12 +27,11 @@ import it.pagopa.selfcare.dashboard.model.user.UserInstitution;
 import it.pagopa.selfcare.dashboard.service.InstitutionService;
 import it.pagopa.selfcare.dashboard.service.UserGroupV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
-import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRoles;
-import it.pagopa.selfcare.iam.generated.openapi.v1.dto.UserClaims;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.service.ProductService;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionResponse;
-import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -157,9 +156,8 @@ public class ExchangeTokenServiceV2 {
         it.pagopa.selfcare.dashboard.model.institution.Institution institution = institutionService.getInstitutionById(institutionId);
         Assert.notNull(institution, INSTITUTION_REQUIRED_MESSAGE);
 
-        UserClaims userClaims;
-        userClaims = iamExternalRestClient._getIAMUser(selfCareUser.getId(), productId).getBody();
-        List<ProductRoles> productRoles = Objects.isNull(userClaims) ? List.of() : userClaims.getProductRoles();
+        final ProductRolePermissionsList permissions = iamExternalRestClient._getIAMProductRolePermissionsList(selfCareUser.getId(), productId).getBody();
+        final List<ProductRolePermissions> productRoles = permissions == null || permissions.getItems() == null ? List.of() : permissions.getItems();
 
         InstitutionBackofficeAdmin institutionExchange = institutionResourceMapper.toInstitutionBackofficeAdmin(institution, productRoles);
 
