@@ -1,6 +1,5 @@
 package it.pagopa.selfcare.dashboard.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import it.pagopa.selfcare.commons.base.security.ProductGrantedAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
@@ -95,8 +94,6 @@ class ExchangeTokenServiceV2Test {
 
     private ExchangeTokenServiceV2 exchangeTokenServiceV2;
 
-    private ObjectMapper objectMapper;
-
     @BeforeEach
     void setUp() throws Exception {
         when(exchangeTokenProperties.getBillingAudience()).thenReturn("aud");
@@ -108,9 +105,6 @@ class ExchangeTokenServiceV2Test {
         File file = ResourceUtils.getFile("classpath:certs/PKCS8key.pem");
         String jwtSigningKey = Files.readString(file.toPath(), Charset.defaultCharset());
         when(exchangeTokenProperties.getSigningKey()).thenReturn(jwtSigningKey);
-
-        File file2 = ResourceUtils.getFile("classpath:certs/pubkey.pem");
-        String publicKey = Files.readString(file2.toPath(), Charset.defaultCharset());
 
         exchangeTokenServiceV2 = new ExchangeTokenServiceV2(jwtService,
                 institutionService,userGroupV2Service,exchangeTokenProperties,userV2Service,productService,
