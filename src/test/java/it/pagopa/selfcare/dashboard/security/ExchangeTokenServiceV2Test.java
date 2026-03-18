@@ -185,7 +185,8 @@ class ExchangeTokenServiceV2Test {
 
         when(userInstitutionApiRestClient._retrieveUserInstitutions(any(), any(), any(), any(), any(), any())).thenReturn(ResponseEntity.ok(List.of(userInstitution)));
 
-        assertThrows(IllegalArgumentException.class, () -> exchangeTokenServiceV2.exchange(institutionId, productId, Optional.empty()));
+        final Optional<String> environment = Optional.empty();
+        assertThrows(IllegalArgumentException.class, () -> exchangeTokenServiceV2.exchange(institutionId, productId, environment));
     }
 
     @Test
@@ -255,12 +256,13 @@ class ExchangeTokenServiceV2Test {
         when(iamExternalRestClient._getIAMProductRolePermissionsList(userId, productId))
                 .thenReturn(ResponseEntity.notFound().build());
 
+        final Optional<String> environment = Optional.empty();
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> exchangeTokenServiceV2.exchangeBackofficeAdmin(
                         institutionId,
                         productId,
-                        Optional.empty()
+                        environment
                 )
         );
 
