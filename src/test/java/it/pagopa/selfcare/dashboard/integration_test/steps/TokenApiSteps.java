@@ -86,7 +86,28 @@ public class TokenApiSteps{
         Map<String, String> role = (Map<String, String>) list.get(0);
         Assertions.assertEquals("SUPPORT", role.get("partyRole"));
         Assertions.assertEquals("support", role.get("role"));
+    }
 
+    @And("the response should contain a valid backoffice admin token with non default group")
+    public void theResponseShouldContainAValidBackofficeAdminTokenWithNonDefaultGroup() {
+        String backOfficeUrl = dashboardStepsUtil.responses.getBackOfficeUrl().toString();
+        String token = backOfficeUrl.split("#selfCareToken=")[1].split("&")[0];
+        DecodedJWT decodedJWT = JWT.decode(token);
+        Map<String, Claim> payload = decodedJWT.getClaims();
+        Assertions.assertEquals("PAGOPA",payload.get("iss").asString());
+        Assertions.assertEquals("api.interop.selfcare.pagopa.it",payload.get("aud").asString());
+        Assertions.assertNotNull(payload.get("jti").asString());
+        Assertions.assertEquals("9f2b6b54-6c2b-4b36-8d83-4cd1d6fcf3e8",payload.get("uid").asString());
+        Assertions.assertEquals("test@tt.tt",payload.get("email").asString());
+        Assertions.assertEquals("c9a50656-f345-4c81-84be-5b2474470544",payload.get("organization").as(Map.class).get("id"));
+        Assertions.assertEquals("Comune di Castelbuono",payload.get("organization").as(Map.class).get("name"));
+        Assertions.assertEquals("00310810825",payload.get("organization").as(Map.class).get("fiscal_code"));
+        Assertions.assertEquals("c_c067",payload.get("organization").as(Map.class).get("ipaCode"));
+        List<Object> list = (List<Object>) payload.get("organization").as(Map.class).get("roles");
+        Assertions.assertEquals(1,list.size());
+        Map<String, String> role = (Map<String, String>) list.get(0);
+        Assertions.assertEquals("OPERATOR", role.get("partyRole"));
+        Assertions.assertEquals("operator", role.get("role"));
     }
 
     @And("the institution ID is {string}")

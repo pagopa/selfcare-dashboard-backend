@@ -1,6 +1,7 @@
 [
   {
     "_id": "ADMIN",
+    "group": "admin",
     "permissions": [
       "admin",
       "read:users",
@@ -12,6 +13,7 @@
   },
   {
     "_id": "OPERATOR",
+    "group": "operator",
     "permissions": [
       "read:users",
       "Selc:AccessProductBackofficeAdmin"
