@@ -1,10 +1,7 @@
 package it.pagopa.selfcare.dashboard.service;
 
 import it.pagopa.selfcare.dashboard.model.institution.InstitutionBase;
-import it.pagopa.selfcare.dashboard.model.user.UpdateUserRequestDto;
-import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserToCreate;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 
 import java.util.Collection;
@@ -28,6 +25,8 @@ public interface UserV2Service {
     void updateUser(String id, String institutionId, UpdateUserRequestDto userDto);
 
     Collection<UserInfo> getUsersByInstitutionId(String institutionId, String productId, List<String> productRoles, List<String> roles , String loggedUserId);
+
+    List<UserInstitutionRole> getAllUsersByInstitutionId(String institutionId, String productId, List<String> states, List<String> roles);
 
     String createUsers(String institutionId, String productId, UserToCreate userToCreate);
 

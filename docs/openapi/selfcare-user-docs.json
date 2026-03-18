@@ -532,7 +532,7 @@
     },
     "/institutions/{institutionId}/users" : {
       "get" : {
-        "tags" : [ "support", "support-pnpg", "Institution" ],
+        "tags" : [ "Institution", "support", "support-pnpg" ],
         "summary" : "Retrieve user's information including product role details",
         "description" : "Fetches detailed information about users associated with a specific institution, including their roles on various products. This endpoint is useful for administrators to obtain comprehensive user-role mappings within an institution.",
         "operationId" : "getInstitutionUsersUsingGET",
@@ -540,6 +540,30 @@
           "name" : "institutionId",
           "in" : "path",
           "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "products",
+          "in" : "query",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "roles",
+          "in" : "query",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "userId",
+          "in" : "query",
           "schema" : {
             "type" : "string"
           }
@@ -1212,7 +1236,7 @@
     },
     "/users/{id}/user-registry" : {
       "put" : {
-        "tags" : [ "User" ],
+        "tags" : [ "User", "support", "support-pnpg" ],
         "summary" : "Update user registry and send notification upon data update",
         "description" : "Service to update user in user-registry and send notification when user data gets updated",
         "operationId" : "updateUserRegistryAndSendNotification",
@@ -1540,7 +1564,7 @@
     },
     "/users/{userId}/onboarding" : {
       "post" : {
-        "tags" : [ "User" ],
+        "tags" : [ "internal-v1", "User" ],
         "summary" : "Check if the user is manager or Update/create a user by userId with a new role",
         "description" : "Checks if the user is already a manager for the specified product and, if not, creates or updates the user with a new role.",
         "operationId" : "createUserByUserId",
@@ -1563,13 +1587,101 @@
         },
         "responses" : {
           "200" : {
-            "description" : "The user is already a manager for the specified product.",
+            "description" : "The user is already onboarded for the specified product.",
             "content" : {
               "application/json" : { }
             }
           },
           "201" : {
             "description" : "The user has been created or updated with a new role."
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/users/{userId}/send-mail-otp" : {
+      "post" : {
+        "tags" : [ "User" ],
+        "summary" : "Send an email with OTP",
+        "description" : "The sendEmailOtp function is used to send email containing a One Time Password for account verification",
+        "operationId" : "sendEmailOtp",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SendEmailOtpDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "202" : {
+            "description" : "Email send accepted!"
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "security" : [ {
+          "SecurityScheme" : [ ]
+        } ]
+      }
+    },
+    "/users/{userId}/send-mail-request" : {
+      "post" : {
+        "tags" : [ "User" ],
+        "summary" : "Sends an email notification to a user when the institution receives an onboarding request.",
+        "description" : "Sends an email notification to a user when the institution receives an onboarding request.",
+        "operationId" : "sendMailRequest",
+        "parameters" : [ {
+          "name" : "userId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/SendMailDto"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
           },
           "401" : {
             "description" : "Not Authorized"
@@ -1689,6 +1801,9 @@
       "OnboardedProductResponse" : {
         "type" : "object",
         "properties" : {
+          "roleId" : {
+            "type" : "string"
+          },
           "productId" : {
             "type" : "string"
           },
@@ -1723,6 +1838,9 @@
       "OnboardedProductWithActions" : {
         "type" : "object",
         "properties" : {
+          "roleId" : {
+            "type" : "string"
+          },
           "productId" : {
             "type" : "string"
           },
@@ -1858,6 +1976,38 @@
         "type" : "object",
         "properties" : {
           "fiscalCode" : {
+            "type" : "string"
+          }
+        }
+      },
+      "SendEmailOtpDto" : {
+        "required" : [ "otp", "institutionalEmail" ],
+        "type" : "object",
+        "properties" : {
+          "otp" : {
+            "minLength" : 1,
+            "type" : "string"
+          },
+          "institutionalEmail" : {
+            "minLength" : 1,
+            "type" : "string"
+          }
+        }
+      },
+      "SendMailDto" : {
+        "required" : [ "userMailUuid", "institutionName", "productId" ],
+        "type" : "object",
+        "properties" : {
+          "userMailUuid" : {
+            "minLength" : 1,
+            "type" : "string"
+          },
+          "institutionName" : {
+            "minLength" : 1,
+            "type" : "string"
+          },
+          "productId" : {
+            "minLength" : 1,
             "type" : "string"
           }
         }
@@ -2120,6 +2270,12 @@
           "email" : {
             "type" : "string"
           },
+          "mobilePhone" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
           "products" : {
             "type" : "array",
             "items" : {
@@ -2239,6 +2395,12 @@
         "type" : "object",
         "properties" : {
           "email" : {
+            "$ref" : "#/components/schemas/CertifiableFieldResponseString"
+          },
+          "mobilePhone" : {
+            "$ref" : "#/components/schemas/CertifiableFieldResponseString"
+          },
+          "telephone" : {
             "$ref" : "#/components/schemas/CertifiableFieldResponseString"
           }
         }

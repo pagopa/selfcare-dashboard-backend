@@ -35,6 +35,7 @@ public class Responses {
     private UserGroupResource userGroupResource;
     private UserResource userResource;
     private List<ProductUserResource> productUserResource;
+    private List<UserInstitutionRole> userInstitutionRoles;
     private InstitutionResource institutionResource;
     private Institution institution;
     private InstitutionUserDetailsResource institutionUserDetailsResource;

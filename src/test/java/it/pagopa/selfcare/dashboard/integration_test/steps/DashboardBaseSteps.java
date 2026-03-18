@@ -158,6 +158,12 @@ public class DashboardBaseSteps{
         dashboardStepsUtil.filter.setRoles(List.of(fieldsArray));
     }
 
+    @And("the states are {string}")
+    public void theStatesAre(String roles) {
+        String[] fieldsArray = roles.split(",");
+        dashboardStepsUtil.filter.setStates(List.of(fieldsArray));
+    }
+
     @And("the language is {string}")
     public void languageIs(String lang) {
         dashboardStepsUtil.filter.setLang(lang);

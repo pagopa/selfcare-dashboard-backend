@@ -160,6 +160,41 @@ public class UserApiSteps{
 
     }
 
+    @When("I send a GET request to {string} to retrieve all user product data")
+    public void iSendAGETRequestToToRetrieveAllUserProductData(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.filter.getProductId())){
+            requestSpecification.queryParam("productId", dashboardStepsUtil.filter.getProductId());
+        }
+        if(!CollectionUtils.isEmpty(dashboardStepsUtil.filter.getRoles())){
+            requestSpecification.queryParam("roles", dashboardStepsUtil.filter.getRoles());
+        }
+        if(!CollectionUtils.isEmpty(dashboardStepsUtil.filter.getStates())){
+            requestSpecification.queryParam("states", dashboardStepsUtil.filter.getStates());
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .pathParam("institutionId", dashboardStepsUtil.filter.getInstitutionId())
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 200){
+            dashboardStepsUtil.responses.setUserInstitutionRoles(response.as(new TypeRef<>() {}));
+        }else{
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+
+    }
+
     @When("I send a POST request to {string} to retrieve user data from taxCode")
     public void iSendAPOSTRequestToToRetrieveUserDataFromTaxCode(String url) {
 
@@ -351,6 +386,11 @@ public class UserApiSteps{
     @And("the response should contain {int} items")
     public void theResponseShouldContainItems(int items) {
         assertEquals(items, dashboardStepsUtil.responses.getProductUserResource().size());
+    }
+
+    @And("the response should contain {int} userInstitutionRoles items")
+    public void theResponseShouldContainUserInstitutionRolesItems(int items) {
+        assertEquals(items, dashboardStepsUtil.responses.getUserInstitutionRoles().size());
     }
 
     @And("the user email should be updated")

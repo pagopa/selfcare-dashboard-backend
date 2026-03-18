@@ -178,6 +178,26 @@ public class UserV2ServiceImpl implements UserV2Service {
         return result;
     }
 
+    @Override
+    public List<UserInstitutionRole> getAllUsersByInstitutionId(String institutionId, String productId, List<String> states, List<String> roles) {
+        log.trace("getAllUsersByInstitutionId start");
+        log.debug("getAllUsersByInstitutionId institutionId = {} with productId = {}, states = {}, roles = {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(states != null ? states.toString() : null), Encode.forJava(roles != null ? roles.toString() : null));
+        UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setProductId(productId);
+        userInfoFilter.setRoles(roles);
+
+        List<UserInstitutionRole> result = getAllUsers(institutionId, userInfoFilter)
+                .stream()
+                .map(userInstitution ->
+                        userMapper.toUserInstitutionRole(userInstitution,
+                                getLatestProduct(userInstitution)))
+                .toList();
+
+        log.info("getAllUsersByInstitutionId result size = {}", result.size());
+        log.trace("getAllUsersByInstitutionId end");
+        return result;
+    }
+
     public Collection<UserInfo> getUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
@@ -195,6 +215,20 @@ public class UserV2ServiceImpl implements UserV2Service {
                 .map(userDataResponses -> userDataResponses.stream()
                         .map(userMapper::toUserInfo)
                         .toList())
+                .orElse(Collections.emptyList());
+    }
+
+    public Collection<UserProductResponse > getAllUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
+        log.trace("getUsers start");
+        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
+
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
+
+        return Optional.ofNullable(userInstitutionApiRestClient._getInstitutionUsersUsingGET(institutionId,
+                                List.of(userInfoFilter.getProductId()),
+                                userInfoFilter.getRoles(),
+                                userInfoFilter.getUserId())
+                        .getBody())
                 .orElse(Collections.emptyList());
     }
 
@@ -371,6 +405,17 @@ public class UserV2ServiceImpl implements UserV2Service {
                 .map(i -> product)
                 // If any of the previous filters fail ==> throw exception
                 .orElseThrow(() -> new InvalidProductRoleException("The product doesn't allow adding users directly with these role and productRoles"));
+    }
+
+    private OnboardedProductResponse getLatestProduct(UserProductResponse user) {
+        if (user == null || user.getProducts() == null) {
+            return null;
+        }
+
+        return user.getProducts().stream()
+                .filter(p -> p.getCreatedAt() != null)
+                .max(Comparator.comparing(OnboardedProductResponse::getCreatedAt))
+                .orElse(null);
     }
 
 }
