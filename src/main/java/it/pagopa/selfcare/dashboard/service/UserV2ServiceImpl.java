@@ -184,13 +184,14 @@ public class UserV2ServiceImpl implements UserV2Service {
         log.debug("getAllUsersByInstitutionId institutionId = {} with productId = {}, states = {}, roles = {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(states != null ? states.toString() : null), Encode.forJava(roles != null ? roles.toString() : null));
         UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
         userInfoFilter.setProductId(productId);
-        userInfoFilter.setRoles(roles);
 
         List<UserInstitutionRole> result = getAllUsers(institutionId, userInfoFilter)
                 .stream()
                 .map(userInstitution ->
                         userMapper.toUserInstitutionRole(userInstitution,
                                 getLatestProduct(userInstitution)))
+                .filter(userInstitutionRole -> CollectionUtils.isEmpty(states) || states.contains(userInstitutionRole.getStatus()))
+                .filter(userInstitutionRole -> CollectionUtils.isEmpty(roles) || roles.contains(userInstitutionRole.getPartyRole()))
                 .toList();
 
         log.info("getAllUsersByInstitutionId result size = {}", result.size());
