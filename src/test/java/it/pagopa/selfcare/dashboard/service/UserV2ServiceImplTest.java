@@ -40,6 +40,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static it.pagopa.selfcare.commons.utils.TestUtils.mockInstance;
@@ -222,6 +223,85 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         Collection<UserInfo> result = userV2ServiceImpl.getUsersByInstitutionId(institutionId, productId, productRoles, null, loggedUserId);
         Assertions.assertEquals(userInfo.size(), result.size());
         Mockito.verify(userApiRestClient, Mockito.times(1))._retrieveUsers(institutionId, loggedUserId, null, productRoles, List.of(productId), null, null);
+    }
+
+
+    @Test
+    void getAllUsersByInstitutionIdWithoutInstitutionId() {
+        String productId = "productId";
+        List<String> roles = new ArrayList<>();
+
+        Executable executable = () -> userV2ServiceImpl.getAllUsersByInstitutionId("", productId, null, roles);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("An Institution id is required", e.getMessage());
+    }
+
+    @Test
+    void getAllUsersByInstitutionIdEmptyUserInfo() {
+
+        String institutionId = "institutionId";
+        String productId = "productId";
+        List<String> roles = List.of("MANAGER");
+        List<String> states = List.of("ACTIVE", "DELETED");
+
+        when(userInstitutionApiRestClient._getInstitutionUsersUsingGET(institutionId, List.of(productId), null, null)).thenReturn(ResponseEntity.ok(new ArrayList<>()));
+
+        Collection<UserInstitutionRole> result = userV2ServiceImpl.getAllUsersByInstitutionId(institutionId, productId, states, roles);
+        Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getAllUsersByInstitutionId() {
+
+        String institutionId = "institutionId";
+        String productId = "prod-io";
+        List<String> roles = List.of("MANAGER");
+        List<String> states = List.of("ACTIVE", "DELETED");
+
+        it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse product1 = new it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse();
+        product1.setRole("MANAGER");
+        product1.setProductId("prod-io");
+        product1.setStatus(OnboardedProductState.ACTIVE);
+        product1.setCreatedAt(LocalDateTime.now().minusDays(2));
+        it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse product2 = new it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse();
+        product2.setRole("OPERATOR");
+        product2.setProductId("prod-io");
+        product2.setStatus(OnboardedProductState.DELETED);
+        product2.setCreatedAt(LocalDateTime.now());
+
+        UserProductResponse userProductResponse1 = new UserProductResponse();
+        userProductResponse1.setId("userId1");
+        userProductResponse1.setName("name1");
+        userProductResponse1.setSurname("surname1");
+        userProductResponse1.setTaxCode("taxCode1");
+        userProductResponse1.setEmail("email1");
+        userProductResponse1.setProducts(List.of(product1,product2));
+
+        UserProductResponse userProductResponse2 = new UserProductResponse();
+        userProductResponse2.setId("userId2");
+        userProductResponse2.setName("name2");
+        userProductResponse2.setSurname("surname2");
+        userProductResponse2.setTaxCode("taxCode2");
+        userProductResponse2.setEmail("email2");
+        userProductResponse2.setProducts(List.of(product1));
+
+        UserInstitutionRole expectedResponse = new UserInstitutionRole();
+        expectedResponse.setId(userProductResponse2.getId());
+        expectedResponse.setName(userProductResponse2.getName());
+        expectedResponse.setSurname(userProductResponse2.getSurname());
+        expectedResponse.setFiscalCode(userProductResponse2.getTaxCode());
+        expectedResponse.setEmail(userProductResponse2.getEmail());
+        expectedResponse.setStatus(product1.getStatus().name());
+        expectedResponse.setPartyRole(product1.getRole());
+
+
+        when(userInstitutionApiRestClient._getInstitutionUsersUsingGET(institutionId, List.of(productId), null, null))
+                .thenReturn(ResponseEntity.ok(List.of(userProductResponse1, userProductResponse2)));
+
+        Collection<UserInstitutionRole> result = userV2ServiceImpl.getAllUsersByInstitutionId(institutionId, productId, states, roles);
+        Assertions.assertEquals(List.of(expectedResponse), result.stream().toList());
+        Mockito.verify(userInstitutionApiRestClient, Mockito.times(1))._getInstitutionUsersUsingGET(institutionId, List.of(productId), null, null);
     }
 
     @Test

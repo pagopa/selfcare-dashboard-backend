@@ -219,7 +219,7 @@ public class UserV2ServiceImpl implements UserV2Service {
                 .orElse(Collections.emptyList());
     }
 
-    public Collection<UserProductResponse > getAllUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
+    public Collection<UserProductResponse> getAllUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
         log.trace("getUsers start");
         log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
 

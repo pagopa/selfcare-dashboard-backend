@@ -188,7 +188,7 @@ public class UserApiSteps{
 
         dashboardStepsUtil.status = response.statusCode();
         if(dashboardStepsUtil.status == 200){
-            dashboardStepsUtil.responses.setUserInstitutionRoles(response.as(new TypeRef<>() {}));
+            dashboardStepsUtil.setResponse(response);
         }else{
             dashboardStepsUtil.errorMessage = response.body().asString();
         }

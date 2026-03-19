@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.model.institution.*;
 import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
 import it.pagopa.selfcare.dashboard.model.support.SupportRequestDto;
 import it.pagopa.selfcare.dashboard.model.user.UserCountResource;
+import it.pagopa.selfcare.dashboard.model.user.UserInstitutionRole;
 import it.pagopa.selfcare.dashboard.model.user.UserProductRoles;
 import it.pagopa.selfcare.dashboard.model.user_groups.CreateUserGroupDto;
 import it.pagopa.selfcare.dashboard.model.user_groups.UpdateUserGroupDto;
@@ -324,6 +325,21 @@ public class DashboardStepsUtil {
         supportRequestDto.setProductId(entry.get("productId"));
         supportRequestDto.setData(entry.get("data"));
         return supportRequestDto;
+    }
+
+    public UserInstitutionRole toUserInstitutionRole(Map<String, String> entry) {
+        UserInstitutionRole userInstitutionRole = new UserInstitutionRole();
+
+        userInstitutionRole.setId(entry.get("id"));
+        userInstitutionRole.setName(entry.get("name"));
+        userInstitutionRole.setSurname(entry.get("surname"));
+        userInstitutionRole.setEmail(entry.get("email"));
+        userInstitutionRole.setStatus(entry.get("status"));
+        userInstitutionRole.setPartyRole(entry.get("partyRole"));
+        userInstitutionRole.setFiscalCode(entry.get("fiscalCode"));
+
+        return userInstitutionRole;
+
     }
 
 }

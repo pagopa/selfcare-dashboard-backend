@@ -1668,7 +1668,7 @@
         "tags" : [ "user" ],
         "summary" : "getAllUsers",
         "description" : "Service to get all the users related to a specific institution",
-        "operationId" : "v2GetUsersUsingGET_1UsingGET",
+        "operationId" : "v2GetAllUsersUsingGET",
         "parameters" : [ {
           "name" : "institutionId",
           "in" : "path",
