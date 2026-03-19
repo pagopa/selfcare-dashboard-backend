@@ -388,11 +388,6 @@ public class UserApiSteps{
         assertEquals(items, dashboardStepsUtil.responses.getProductUserResource().size());
     }
 
-    @And("the response should contain {int} userInstitutionRoles items")
-    public void theResponseShouldContainUserInstitutionRolesItems(int items) {
-        assertEquals(items, dashboardStepsUtil.responses.getUserInstitutionRoles().size());
-    }
-
     @And("the user email should be updated")
     public void theUserEmailShouldBeUpdated() {
         institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");
