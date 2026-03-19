@@ -331,6 +331,36 @@ class UserV2ControllerTest extends BaseControllerTest {
         verifyNoMoreInteractions(userServiceMock);
     }
 
+    @Test
+    void getAllUsers_institutionIdWithoutOptionalFilters() throws Exception {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        Authentication authentication = mock(Authentication.class);
+
+        Path userInstitutionRolesPath = Paths.get(FILE_JSON_PATH + "UserInstitutionRoles.json");
+        byte[] userInstitutionRolesStream = Files.readAllBytes(userInstitutionRolesPath);
+        UserInstitutionRole userInstitutionRole = objectMapper.readValue(userInstitutionRolesStream, UserInstitutionRole.class);
+        List<UserInstitutionRole> userInstitutionRoles = List.of(userInstitutionRole);
+
+        when(userServiceMock.getAllUsersByInstitutionId(institutionId, productId, null, null)).thenReturn(userInstitutionRoles);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/all/institution/" + institutionId)
+                        .principal(authentication)
+                        .queryParam("productId", productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(userInstitutionRoles)));
+
+        // then
+        verify(userServiceMock, times(1))
+                .getAllUsersByInstitutionId(institutionId, productId, null, null);
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
 
     @Test
     void getAllUsers_withoutProductId() throws Exception {
