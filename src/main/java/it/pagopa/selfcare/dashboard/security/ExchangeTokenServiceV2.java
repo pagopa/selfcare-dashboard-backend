@@ -415,7 +415,7 @@ public class ExchangeTokenServiceV2 {
          * @deprecated This field is deprecated and may be removed in a future version.
          */
         @Deprecated(since = "1.1.8", forRemoval = false)
-        private String parentDescription;
+        private String parentDescription; // NOSONAR
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RootParent.class)
         private RootParent rootParent;
         @JsonProperty("ipaCode")
