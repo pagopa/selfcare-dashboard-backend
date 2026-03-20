@@ -9,7 +9,7 @@ import it.pagopa.selfcare.dashboard.model.InstitutionResource;
 import it.pagopa.selfcare.dashboard.model.UpdateInstitutionDto;
 import it.pagopa.selfcare.dashboard.model.institution.*;
 import it.pagopa.selfcare.dashboard.security.ExchangeTokenServiceV2;
-import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRoles;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -111,7 +111,7 @@ public interface InstitutionResourceMapper {
     @Mapping(target = "subUnitCode", source = "institution.subunitCode")
     @Mapping(target = "rootParent", expression = "java(toRootParent(institution))")
     @Mapping(target = "roles", expression = "java(toRolesBackofficeAdmin(productRoles))")
-    InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution, List<ProductRoles> productRoles);
+    InstitutionBackofficeAdmin toInstitutionBackofficeAdmin(Institution institution, List<ProductRolePermissions> productRoles);
 
     @Named("toRootParent")
     default RootParent toRootParent(Institution institutionInfo) {
@@ -132,19 +132,18 @@ public interface InstitutionResourceMapper {
         return roles;
     }
 
-    default List<RoleBackofficeAdmin> toRolesBackofficeAdmin(List<ProductRoles> productRoles) {
+    default List<RoleBackofficeAdmin> toRolesBackofficeAdmin(List<ProductRolePermissions> productRoles) {
         return  Optional.ofNullable(productRoles)
                 .orElse(Collections.emptyList())
                 .stream()
-                .flatMap(productRole -> productRole.getRoles().stream()
-                        .map(this::constructRoleBackofficeAdmin))
+                .map(pr -> constructRoleBackofficeAdmin(pr.getRole(), pr.getGroup()))
                 .collect(Collectors.toList());
     }
 
-    default RoleBackofficeAdmin constructRoleBackofficeAdmin(String role) {
+    default RoleBackofficeAdmin constructRoleBackofficeAdmin(String role, String group) {
         RoleBackofficeAdmin roleBackofficeAdmin = new RoleBackofficeAdmin();
         roleBackofficeAdmin.setPartyRole(role);
-        roleBackofficeAdmin.setProductRole(role.toLowerCase());
+        roleBackofficeAdmin.setProductRole(Optional.ofNullable(group).orElse("support"));
         return roleBackofficeAdmin;
     }
 
