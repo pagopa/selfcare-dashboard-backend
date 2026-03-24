@@ -25,7 +25,8 @@
       "read:users",
       "write:users",
       "Selc:ViewInstitutionData",
-      "Selc:AccessProductBackofficeAdmin"
+      "Selc:AccessProductBackofficeAdmin",
+      "Selc:ListAllProductUsers"
     ]
   }
 ]

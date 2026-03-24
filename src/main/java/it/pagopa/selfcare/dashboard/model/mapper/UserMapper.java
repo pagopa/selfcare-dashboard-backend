@@ -1,11 +1,12 @@
 package it.pagopa.selfcare.dashboard.model.mapper;
 
-import it.pagopa.selfcare.dashboard.model.user.*;
-import it.pagopa.selfcare.dashboard.model.*;
-import it.pagopa.selfcare.dashboard.model.CreateUserDto;
-import it.pagopa.selfcare.dashboard.model.product.*;
-import it.pagopa.selfcare.dashboard.model.user.ProductInfo;
+import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionUserResource;
+import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
+import it.pagopa.selfcare.dashboard.model.product.ProductRoleInfoResource;
+import it.pagopa.selfcare.dashboard.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.model.user.User;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -47,7 +48,14 @@ public interface UserMapper {
     @Mapping(target = "user.workContacts", expression = "java(toUserInfoContacts(userResponse.getWorkContacts()))")
     @Mapping(target = "role", expression = "java(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(userDashboardResponse.getRole()).getSelfCareAuthority())")
     @Mapping(target = "products", expression = "java(toProductInfoMap(userDashboardResponse.getProducts()))")
-    @Mapping(target = "user.mobilePhone", expression = "java(toCertifiedField(userResponse.getMobilePhone()))")    UserInfo toUserInfo(UserDataResponse userDashboardResponse);
+    @Mapping(target = "user.mobilePhone", expression = "java(toCertifiedField(userResponse.getMobilePhone()))")
+    UserInfo toUserInfo(UserDataResponse userDashboardResponse);
+
+    @Mapping(target = "fiscalCode", source = "user.taxCode")
+    @Mapping(target = "partyRole", expression = "java(mapPartyRole(latest))")
+    @Mapping(target = "status", expression = "java(mapStatus(latest))")
+    UserInstitutionRole toUserInstitutionRole(UserProductResponse user, OnboardedProductResponse latest);
+
     UserInstitutionWithActionsDto toUserInstitutionWithActionsDto(UserInstitutionWithActions userInstitutionWithActions);
 
     @Named("toUserInfoContacts")
@@ -153,35 +161,6 @@ public interface UserMapper {
         return resource;
     }
 
-    default UserIdResource toIdResource(UserId model) {
-        UserIdResource resource = null;
-        if (model != null) {
-            resource = new UserIdResource();
-            resource.setId(model.getId());
-        }
-        return resource;
-    }
-
-    default UserResource toUserResource(User model, String institutionId) {
-        UserResource resource = null;
-        if (model != null) {
-            resource = new UserResource();
-            resource.setId(UUID.fromString(model.getId()));
-            resource.setFiscalCode(model.getFiscalCode());
-            resource.setName(CertifiedFieldMapper.map(model.getName()));
-            resource.setFamilyName(CertifiedFieldMapper.map(model.getFamilyName()));
-            Optional.ofNullable(model.getWorkContact(institutionId))
-                    .map(WorkContact::getEmail)
-                    .map(CertifiedFieldMapper::map)
-                    .ifPresent(resource::setEmail);
-        }
-        return resource;
-    }
-
-    default InstitutionUserResource toInstitutionUser(UserInfo model) {
-        return toInstitutionUser(model, InstitutionUserResource::new);
-    }
-
     default InstitutionUserDetailsResource toInstitutionUserDetails(UserInfo model) {
         InstitutionUserDetailsResource resource = toInstitutionUser(model, InstitutionUserDetailsResource::new);
         if (resource != null) {
@@ -267,90 +246,14 @@ public interface UserMapper {
         return response;
     }
 
-    default it.pagopa.selfcare.dashboard.model.user.CreateUserDto fromCreateUserDto(CreateUserDto dto, String institutionId) {
-        it.pagopa.selfcare.dashboard.model.user.CreateUserDto model = null;
-        if (dto != null) {
-            model = new it.pagopa.selfcare.dashboard.model.user.CreateUserDto();
-            model.setName(dto.getName() == null ? "" : dto.getName());//TODO: remove after Party API changes
-            model.setSurname(dto.getSurname() == null ? "" : dto.getSurname());//TODO: remove after Party API changes
-            model.setTaxCode(dto.getTaxCode() == null ? "" : dto.getTaxCode());//TODO: remove after Party API changes
-            model.setEmail(dto.getEmail() == null ? "" : dto.getEmail());//TODO: remove after Party API changes
-            if (dto.getProductRoles() != null) {
-                model.setRoles(dto.getProductRoles().stream()
-                        .map(productRole -> {
-                            it.pagopa.selfcare.dashboard.model.user.CreateUserDto.Role role = new it.pagopa.selfcare.dashboard.model.user.CreateUserDto.Role();
-                            role.setProductRole(productRole);
-                            return role;
-                        }).collect(Collectors.toSet()));
-            }
-            model.setUser(toSaveUserDto(dto, institutionId));
-        }
-
-        return model;
+    default String mapPartyRole(OnboardedProductResponse product) {
+        return product != null ? product.getRole() : null;
     }
 
-    default it.pagopa.selfcare.dashboard.model.user.CreateUserDto toCreateUserDto(UserProductRoles roles) {
-        it.pagopa.selfcare.dashboard.model.user.CreateUserDto resource = null;
-        if (roles != null) {
-            resource = new it.pagopa.selfcare.dashboard.model.user.CreateUserDto();
-            resource.setName("");
-            resource.setSurname("");
-            resource.setEmail("");
-            resource.setTaxCode("");
-            if (roles.getProductRoles() != null)
-                resource.setRoles(roles.getProductRoles().stream().map(productRole -> {
-                    it.pagopa.selfcare.dashboard.model.user.CreateUserDto.Role role = new it.pagopa.selfcare.dashboard.model.user.CreateUserDto.Role();
-                    role.setProductRole(productRole);
-                    return role;
-                }).collect(Collectors.toSet()));
-        }
-        return resource;
+    default String mapStatus(OnboardedProductResponse product) {
+        return product != null && product.getStatus() != null
+                ? product.getStatus().name()
+                : null;
     }
 
-    default SaveUserDto toSaveUserDto(CreateUserDto model, String institutionId) {
-        SaveUserDto resource = null;
-        if (model != null) {
-            resource = new SaveUserDto();
-            resource.setFiscalCode(model.getTaxCode());
-            resource.setName(CertifiedFieldMapper.map(model.getName()));
-            resource.setFamilyName(CertifiedFieldMapper.map(model.getSurname()));
-            if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(CertifiedFieldMapper.map(model.getEmail()));
-                resource.setWorkContacts(Map.of(institutionId, contact));
-            }
-        }
-        return resource;
-    }
-
-    default MutableUserFieldsDto fromUpdateUser(UpdateUserDto userDto, String institutionId) {
-        MutableUserFieldsDto resource = null;
-        if (userDto != null) {
-            resource = new MutableUserFieldsDto();
-            resource.setName(CertifiedFieldMapper.map(userDto.getName()));
-            resource.setFamilyName(CertifiedFieldMapper.map(userDto.getSurname()));
-            if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(CertifiedFieldMapper.map(userDto.getEmail()));
-                resource.setWorkContacts(Map.of(institutionId, contact));
-            }
-        }
-        return resource;
-    }
-
-    default SaveUserDto map(UserDto model, String institutionId) {
-        SaveUserDto resource = null;
-        if (model != null) {
-            resource = new SaveUserDto();
-            resource.setName(CertifiedFieldMapper.map(model.getName()));
-            resource.setFamilyName(CertifiedFieldMapper.map(model.getSurname()));
-            resource.setFiscalCode(model.getFiscalCode());
-            if (institutionId != null) {
-                WorkContact contact = new WorkContact();
-                contact.setEmail(CertifiedFieldMapper.map(model.getEmail()));
-                resource.setWorkContacts(Map.of(institutionId, contact));
-            }
-        }
-        return resource;
-    }
 }

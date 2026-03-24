@@ -8,6 +8,7 @@ import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.model.user.UserInstitutionRole;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -294,6 +296,83 @@ class UserV2ControllerTest extends BaseControllerTest {
         verify(userServiceMock, times(1))
                 .getUsersByInstitutionId(institutionId, productId, null, List.of(PartyRole.MANAGER.name()), "userId");
         verifyNoMoreInteractions(userServiceMock);
+    }
+
+
+    @Test
+    void getAllUsers_institutionIdProductIdAndFiltersValid() throws Exception {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        Authentication authentication = mock(Authentication.class);
+
+        Path userInstitutionRolesPath = Paths.get(FILE_JSON_PATH + "UserInstitutionRoles.json");
+        byte[] userInstitutionRolesStream = Files.readAllBytes(userInstitutionRolesPath);
+        UserInstitutionRole userInstitutionRole = objectMapper.readValue(userInstitutionRolesStream, UserInstitutionRole.class);
+        List<UserInstitutionRole> userInstitutionRoles = List.of(userInstitutionRole);
+
+        when(userServiceMock.getAllUsersByInstitutionId(institutionId, productId, List.of("ACTIVE", "DELETED"), List.of(PartyRole.MANAGER.name()))).thenReturn(userInstitutionRoles);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/all/institution/" + institutionId)
+                        .principal(authentication)
+                        .queryParam("productId", productId)
+                        .queryParam("roles", PartyRole.MANAGER.name())
+                        .queryParam("states", "ACTIVE,DELETED")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(userInstitutionRoles)));
+
+        // then
+        verify(userServiceMock, times(1))
+                .getAllUsersByInstitutionId(institutionId, productId, List.of("ACTIVE", "DELETED"), List.of(PartyRole.MANAGER.name()));
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
+    @Test
+    void getAllUsers_institutionIdWithoutOptionalFilters() throws Exception {
+        // given
+        final String institutionId = "institutionId";
+        final String productId = "productId";
+        Authentication authentication = mock(Authentication.class);
+
+        Path userInstitutionRolesPath = Paths.get(FILE_JSON_PATH + "UserInstitutionRoles.json");
+        byte[] userInstitutionRolesStream = Files.readAllBytes(userInstitutionRolesPath);
+        UserInstitutionRole userInstitutionRole = objectMapper.readValue(userInstitutionRolesStream, UserInstitutionRole.class);
+        List<UserInstitutionRole> userInstitutionRoles = List.of(userInstitutionRole);
+
+        when(userServiceMock.getAllUsersByInstitutionId(institutionId, productId, null, null)).thenReturn(userInstitutionRoles);
+
+        // when
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/all/institution/" + institutionId)
+                        .principal(authentication)
+                        .queryParam("productId", productId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(userInstitutionRoles)));
+
+        // then
+        verify(userServiceMock, times(1))
+                .getAllUsersByInstitutionId(institutionId, productId, null, null);
+        verifyNoMoreInteractions(userServiceMock);
+    }
+
+
+    @Test
+    void getAllUsers_withoutProductId() throws Exception {
+        final String institutionId = "institutionId";
+        Authentication authentication = mock(Authentication.class);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/all/institution/" + institutionId)
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

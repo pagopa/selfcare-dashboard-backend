@@ -231,6 +231,56 @@ Feature: User
     Then the response status should be 200
     And the response should contain 0 items
 
+  Scenario: Unsuccessfully retrieve all users for given institutionId without productId filter for AR Backstage
+    Given user login with username "b.king" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
+    Then the response status should be 400
+
+  Scenario: Successfully retrieve all users for given institutionId with productId filter for AR Backstage
+    Given user login with username "b.king" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    And the productId is "prod-interop"
+    When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
+    Then the response status should be 200
+    And The response body contains the list "" of size 2
+
+  Scenario: Successfully retrieve all users for given institutionId with roles and product filter for AR Backstage
+    Given user login with username "b.king" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
+    And the roles are "DELEGATE"
+    When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
+    Then the response status should be 200
+    And The response body contains the list "" of size 1
+
+  Scenario: Successfully retrieve all users for given institutionId with productId, roles and states filters for AR Backstage
+    Given user login with username "b.king" and password "test"
+    And the institutionId is "2a4c94f1-5d11-41f1-89e9-9fef0de4fbfe"
+    And the productId is "prod-io"
+    And the roles are "OPERATOR,DELEGATE"
+    And the states are "SUSPENDED"
+    When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
+    Then the response status should be 200
+    And The response body contains the list "" of size 1
+
+  Scenario: Successfully retrieve all users for given institutionId with productId, roles and productRoles filters, no users found for AR Backstage
+    Given user login with username "b.king" and password "test"
+    And the institutionId is "c9a50656-f345-4c81-84be-5b2474470544"
+    And the productId is "prod-io"
+    And the roles are "OPERATOR"
+    And the states are "SUSPENDED"
+    When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
+    Then the response status should be 200
+    And The response body contains the list "" of size 0
+
+  Scenario: Unsuccessfully retrieve all users for given institutionId with productId filter for AR Backstage when user has no permission
+    Given user login with username "b.barnes" and password "test"
+    And the productId is "prod-io"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
+    Then the response status should be 403
+
   Scenario: Successfully update user email for given userId and institutionId
     Given user login with username "j.doe" and password "test"
     And the userId is "97a511a7-2acc-47b9-afed-2f3c65753b4a"

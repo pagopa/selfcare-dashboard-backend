@@ -13,6 +13,7 @@ import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.model.product.ProductUserResource;
 import it.pagopa.selfcare.dashboard.model.user.User;
 import it.pagopa.selfcare.dashboard.model.user.UserInfo;
+import it.pagopa.selfcare.dashboard.model.user.UserInstitutionRole;
 import it.pagopa.selfcare.dashboard.model.user.UserResource;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import jakarta.validation.Valid;
@@ -174,5 +175,23 @@ public class UserV2Controller {
         log.trace("getUsers end");
 
         return response;
+    }
+
+    @GetMapping(value = "/all/institution/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getAllUsers", description = "${swagger.dashboard.institutions.api.getInstitutionUsers}", operationId = "v2GetAllUsersUsingGET")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, #productId, null), 'Selc:ListAllProductUsers')")
+    public List<UserInstitutionRole> getAllUsers(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
+                                                 @PathVariable("institutionId") String institutionId,
+                                                 @RequestParam(value = "productId") String productId,
+                                                 @RequestParam(value = "states", required = false) List<String> states,
+                                                 @RequestParam(value = "roles", required = false) List<String> roles) {
+        log.trace("getAllUsers start");
+        log.debug("getAllUsers for institution: {} and product: {} with states: {} and roles: {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(states!=null ? states.toString(): null), Encode.forJava(roles != null ? roles.toString(): null));
+
+        List<UserInstitutionRole> userRoles = userService.getAllUsersByInstitutionId(institutionId, productId, states, roles);
+        log.debug("getAllUsers result = {}", userRoles);
+        log.trace("getAllUsers end");
+        return userRoles;
     }
 }
