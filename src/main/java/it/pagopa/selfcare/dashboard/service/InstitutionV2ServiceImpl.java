@@ -99,7 +99,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
                 .orElseThrow(() -> new ResourceNotFoundException("No User found for the given userId and institutionId"));
 
         final ProductRolePermissionsList roles = Optional.ofNullable(iamExternalRestClient._getIAMProductRolePermissionsList(loggedUserId, null).getBody())
-                .filter(l -> !l.getItems().isEmpty())
+                .filter(l -> l.getItems() != null && !l.getItems().isEmpty())
                 .orElseThrow(() -> new AccessDeniedException("Not authorized to list users: No IAM permissions found"));
 
         final Set<String> authorizedProductIds = roles.getItems().stream()

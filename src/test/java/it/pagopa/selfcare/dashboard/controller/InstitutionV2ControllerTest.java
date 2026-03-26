@@ -6,6 +6,7 @@ import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingResponse;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.delegation.*;
 import it.pagopa.selfcare.dashboard.model.institution.Institution;
@@ -18,8 +19,7 @@ import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductState;
-import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.*;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -121,6 +122,96 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
         verify(institutionV2ServiceMock, times(1))
                 .getInstitutionUser(institutionId, userId, loggedUserId);
         verifyNoMoreInteractions(institutionV2ServiceMock);
+    }
+
+    @Test
+    void getAllInstitutionUser() throws Exception {
+        final String institutionId = "institutionId";
+        final String userId = UUID.randomUUID().toString();
+        final String loggedUserId = "loggedUserId";
+        final Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(loggedUserId).build());
+
+        final UserProductResponse userProductResponse = buildUserProductResponse(userId);
+        when(institutionV2ServiceMock.getAllInstitutionUser(institutionId, userId, loggedUserId)).thenReturn(userProductResponse);
+
+        final var response = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/all/{institutionId}/users/{userId}", institutionId, userId)
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        final InstitutionUserDetailsResource actualResponse = objectMapper.readValue(response.getResponse().getContentAsString(), InstitutionUserDetailsResource.class);
+        assertEquals(userId, actualResponse.getId().toString());
+        assertEquals("name", actualResponse.getName());
+        assertEquals("surname", actualResponse.getSurname());
+        assertEquals("test@test.com", actualResponse.getEmail());
+        assertEquals("ABC123", actualResponse.getFiscalCode());
+        assertEquals("1234567890", actualResponse.getMobilePhone());
+        assertNull(actualResponse.getStatus());
+        assertNull(actualResponse.getRole());
+        assertEquals(2, actualResponse.getProducts().size());
+
+        // prod-y
+        assertEquals("prod-y", actualResponse.getProducts().get(0).getId());
+        // prod-y role 0
+        assertEquals("admin", actualResponse.getProducts().get(0).getRoleInfos().get(0).getRole());
+        assertEquals("DELEGATE", actualResponse.getProducts().get(0).getRoleInfos().get(0).getPartyRole());
+        assertEquals("ACTIVE", actualResponse.getProducts().get(0).getRoleInfos().get(0).getStatus());
+        // prod-y role 1
+        assertEquals("operator", actualResponse.getProducts().get(0).getRoleInfos().get(1).getRole());
+        assertEquals("OPERATOR", actualResponse.getProducts().get(0).getRoleInfos().get(1).getPartyRole());
+        assertEquals("DELETED", actualResponse.getProducts().get(0).getRoleInfos().get(1).getStatus());
+
+        // prod-x
+        assertEquals("prod-x", actualResponse.getProducts().get(1).getId());
+        // prod-x role 0
+        assertEquals("operator3", actualResponse.getProducts().get(1).getRoleInfos().get(0).getRole());
+        assertEquals("OPERATOR", actualResponse.getProducts().get(1).getRoleInfos().get(0).getPartyRole());
+        assertEquals("ACTIVE", actualResponse.getProducts().get(1).getRoleInfos().get(0).getStatus());
+        // prod-x role 1
+        assertEquals("operator1", actualResponse.getProducts().get(1).getRoleInfos().get(1).getRole());
+        assertEquals("OPERATOR", actualResponse.getProducts().get(1).getRoleInfos().get(1).getPartyRole());
+        assertEquals("DELETED", actualResponse.getProducts().get(1).getRoleInfos().get(1).getStatus());
+        // prod-x role 2
+        assertEquals("operator2", actualResponse.getProducts().get(1).getRoleInfos().get(2).getRole());
+        assertEquals("OPERATOR", actualResponse.getProducts().get(1).getRoleInfos().get(2).getPartyRole());
+        assertEquals("SUSPENDED", actualResponse.getProducts().get(1).getRoleInfos().get(2).getStatus());
+    }
+
+    private UserProductResponse buildUserProductResponse(String userId) {
+        final UserProductResponse userProductResponse = new UserProductResponse();
+        userProductResponse.setId(userId);
+        userProductResponse.setEmail("test@test.com");
+        userProductResponse.setName("name");
+        userProductResponse.setSurname("surname");
+        userProductResponse.setMobilePhone("1234567890");
+        userProductResponse.setTelephone("0987654321");
+        userProductResponse.setTaxCode("ABC123");
+        userProductResponse.setProducts(List.of(
+                buildOnboardedProductResponse("prod-x", "OPERATOR", "operator3", OnboardedProductState.ACTIVE),
+                buildOnboardedProductResponse("prod-x", "OPERATOR", "operator1", OnboardedProductState.DELETED),
+                buildOnboardedProductResponse("prod-x", "OPERATOR", "operator2", OnboardedProductState.SUSPENDED),
+                buildOnboardedProductResponse("prod-y", "DELEGATE", "admin", OnboardedProductState.ACTIVE),
+                buildOnboardedProductResponse("prod-y", "OPERATOR", "operator", OnboardedProductState.DELETED)
+        ));
+        return userProductResponse;
+    }
+
+    private OnboardedProductResponse buildOnboardedProductResponse(String productId, String role, String productRole, OnboardedProductState status) {
+        final OnboardedProductResponse onboardedProductResponse = new OnboardedProductResponse();
+        onboardedProductResponse.setRoleId(UUID.randomUUID().toString());
+        onboardedProductResponse.setTokenId(UUID.randomUUID().toString());
+        onboardedProductResponse.setProductId(productId);
+        onboardedProductResponse.setEnv(Env.ROOT);
+        onboardedProductResponse.setRole(role);
+        onboardedProductResponse.setProductRole(productRole);
+        onboardedProductResponse.setStatus(status);
+        onboardedProductResponse.setCreatedAt(LocalDateTime.now());
+        onboardedProductResponse.setUpdatedAt(LocalDateTime.now());
+        return onboardedProductResponse;
     }
 
     /**
