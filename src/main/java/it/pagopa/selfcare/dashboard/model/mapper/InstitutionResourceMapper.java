@@ -6,10 +6,15 @@ import it.pagopa.selfcare.commons.base.security.SelfCareAuthority;
 import it.pagopa.selfcare.commons.base.security.SelfCareGrantedAuthority;
 import it.pagopa.selfcare.dashboard.model.InstitutionBaseResource;
 import it.pagopa.selfcare.dashboard.model.InstitutionResource;
+import it.pagopa.selfcare.dashboard.model.InstitutionUserDetailsResource;
 import it.pagopa.selfcare.dashboard.model.UpdateInstitutionDto;
 import it.pagopa.selfcare.dashboard.model.institution.*;
+import it.pagopa.selfcare.dashboard.model.product.ProductInfoResource;
+import it.pagopa.selfcare.dashboard.model.product.ProductRoleInfoResource;
 import it.pagopa.selfcare.dashboard.security.ExchangeTokenServiceV2;
 import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,10 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.dashboard.model.institution.RelationshipState.PENDING;
@@ -159,4 +161,25 @@ public interface InstitutionResourceMapper {
                     return role;
                 }).toList();
     }
+
+    @Mapping(target = "fiscalCode", source = "taxCode")
+    InstitutionUserDetailsResource toInstitutionUserDetailsResponse(UserProductResponse userProductResponse);
+
+    default List<ProductInfoResource> toProductInfoResourceList(List<OnboardedProductResponse> roles) {
+        return roles.stream().collect(Collectors.collectingAndThen(
+                Collectors.groupingBy(OnboardedProductResponse::getProductId),
+                map -> map.entrySet().stream().map(e -> {
+                    final ProductInfoResource productInfoResource = new ProductInfoResource();
+                    productInfoResource.setId(e.getKey());
+                    productInfoResource.setRoleInfos(e.getValue().stream().map(this::toProductRoleInfoResource).toList());
+                    return productInfoResource;
+                })
+        )).toList();
+    }
+
+    @Mapping(target = "role", source = "productRole")
+    @Mapping(target = "partyRole", source = "role")
+    @Mapping(target = "selcRole", source = "role", qualifiedByName = "toUserRole")
+    ProductRoleInfoResource toProductRoleInfoResource(OnboardedProductResponse onboardedProductResponse);
+
 }

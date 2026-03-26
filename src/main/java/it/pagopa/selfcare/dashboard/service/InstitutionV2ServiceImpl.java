@@ -15,6 +15,7 @@ import it.pagopa.selfcare.dashboard.model.user.UserInstitutionWithActionsDto;
 import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
 import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.PENDING;
 import static it.pagopa.selfcare.onboarding.common.OnboardingStatus.TOBEVALIDATED;
@@ -86,6 +88,29 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
         return getUserInfo(institutionId, userInfoFilter, loggedUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("No User found for the given userId"));
+    }
+
+    @Override
+    public UserProductResponse getAllInstitutionUser(String institutionId, String userId, String loggedUserId) {
+        final UserInfo.UserInfoFilter userInfoFilter = new UserInfo.UserInfoFilter();
+        userInfoFilter.setUserId(userId);
+
+        final UserProductResponse userProductResponse = userV2Service.getAllUsers(institutionId, userInfoFilter).stream().findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("No User found for the given userId and institutionId"));
+
+        final ProductRolePermissionsList roles = Optional.ofNullable(iamExternalRestClient._getIAMProductRolePermissionsList(loggedUserId, null).getBody())
+                .filter(l -> l.getItems() != null && !l.getItems().isEmpty())
+                .orElseThrow(() -> new AccessDeniedException("Not authorized to list users: No IAM permissions found"));
+
+        final Set<String> authorizedProductIds = roles.getItems().stream()
+                .map(ProductRolePermissions::getProductId)
+                .collect(Collectors.toSet());
+        log.debug("getAllInstitutionUser - Authorized product ids for user {}: {}", Encode.forJava(loggedUserId), authorizedProductIds);
+        if (!authorizedProductIds.contains("ALL")) {
+            userProductResponse.getProducts().removeIf(p -> !authorizedProductIds.contains(p.getProductId()));
+        }
+
+        return userProductResponse;
     }
 
     private Optional<UserInfo> getUserInfo(String institutionId, UserInfo.UserInfoFilter userInfoFilter, String loggedUserId) {

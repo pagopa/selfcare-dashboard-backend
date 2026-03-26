@@ -19,8 +19,10 @@ import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsLis
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGet;
 import it.pagopa.selfcare.onboarding.generated.openapi.v1.dto.OnboardingGetResponse;
 import it.pagopa.selfcare.product.service.ProductService;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserDataResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserInstitutionWithActions;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,6 +139,82 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         UserInfo actualUserInfo = institutionV2Service.getInstitutionUser("institutionId", "userId", "loggedUserId");
         assertEquals(userInfo.get(0).getId(), actualUserInfo.getId());
         verify(userV2Service, Mockito.times(1)).getUsers(institutionId, userInfoFilter, loggedUserId);
+    }
+
+    @Test
+    void getAllInstitutionUser() {
+        final String institutionId = "institutionId";
+        final String userId = "userId";
+        final String loggedUserId = "loggedUserId";
+
+        final UserProductResponse user = new UserProductResponse();
+        user.setId(userId);
+        final OnboardedProductResponse product1 = new OnboardedProductResponse();
+        product1.setProductId("prod-1");
+        user.addProductsItem(product1);
+        final OnboardedProductResponse product2 = new OnboardedProductResponse();
+        product2.setProductId("prod-2");
+        user.addProductsItem(product2);
+        final List<UserProductResponse> allUsers = List.of(user, new UserProductResponse());
+        when(userV2Service.getAllUsers(any(), any())).thenReturn(allUsers);
+
+        final ProductRolePermissionsList iamPermissions = new ProductRolePermissionsList();
+        final ProductRolePermissions permission1 = new ProductRolePermissions();
+        permission1.setProductId("prod-2");
+        final ProductRolePermissions permission2 = new ProductRolePermissions();
+        permission2.setProductId("prod-3");
+        iamPermissions.setItems(List.of(permission1, permission2));
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(any(), any())).thenReturn(ResponseEntity.ok(iamPermissions));
+
+        final UserProductResponse response = institutionV2Service.getAllInstitutionUser(institutionId, userId, loggedUserId);
+        assertEquals(1, response.getProducts().size());
+        assertEquals("prod-2", response.getProducts().get(0).getProductId());
+    }
+
+    @Test
+    void getAllInstitutionUser_withALL() {
+        final String institutionId = "institutionId";
+        final String userId = "userId";
+        final String loggedUserId = "loggedUserId";
+
+        final UserProductResponse user = new UserProductResponse();
+        user.setId(userId);
+        final OnboardedProductResponse product1 = new OnboardedProductResponse();
+        product1.setProductId("prod-1");
+        user.addProductsItem(product1);
+        final OnboardedProductResponse product2 = new OnboardedProductResponse();
+        product2.setProductId("prod-2");
+        user.addProductsItem(product2);
+        final List<UserProductResponse> allUsers = List.of(user, new UserProductResponse());
+        when(userV2Service.getAllUsers(any(), any())).thenReturn(allUsers);
+
+        final ProductRolePermissionsList iamPermissions = new ProductRolePermissionsList();
+        final ProductRolePermissions permission1 = new ProductRolePermissions();
+        permission1.setProductId("prod-2");
+        final ProductRolePermissions permission2 = new ProductRolePermissions();
+        permission2.setProductId("ALL");
+        final ProductRolePermissions permission3 = new ProductRolePermissions();
+        permission3.setProductId("prod-3");
+        iamPermissions.setItems(List.of(permission1, permission2, permission3));
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(any(), any())).thenReturn(ResponseEntity.ok(iamPermissions));
+
+        final UserProductResponse response = institutionV2Service.getAllInstitutionUser(institutionId, userId, loggedUserId);
+        assertEquals(2, response.getProducts().size());
+        assertEquals("prod-1", response.getProducts().get(0).getProductId());
+        assertEquals("prod-2", response.getProducts().get(1).getProductId());
+    }
+
+    @Test
+    void getAllInstitutionUser_noUser() {
+        when(userV2Service.getAllUsers(any(), any())).thenReturn(List.of());
+        assertThrows(ResourceNotFoundException.class, () -> institutionV2Service.getAllInstitutionUser("institutionId", "userId", "loggedUserId"));
+    }
+
+    @Test
+    void getAllInstitutionUser_noIamPermissions() {
+        when(userV2Service.getAllUsers(any(), any())).thenReturn(List.of(new UserProductResponse()));
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(any(), any())).thenReturn(ResponseEntity.ok(new ProductRolePermissionsList().items(List.of())));
+        assertThrows(AccessDeniedException.class, () -> institutionV2Service.getAllInstitutionUser("institutionId", "userId", "loggedUserId"));
     }
 
     @Test

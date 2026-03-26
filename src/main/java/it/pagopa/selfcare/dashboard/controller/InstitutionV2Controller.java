@@ -22,6 +22,7 @@ import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.service.DelegationService;
 import it.pagopa.selfcare.dashboard.service.InstitutionV2Service;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
+import it.pagopa.selfcare.user.generated.openapi.v1.dto.UserProductResponse;
 import it.pagopa.selfcare.user.generated.openapi.v1.dto.UsersCountResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -81,6 +82,24 @@ public class InstitutionV2Controller {
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitutionUser result = {}", result);
         log.trace("getInstitutionUser end");
         return result;
+    }
+
+    @GetMapping(value = "/all/{institutionId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getAllInstitutionUser", description = "${swagger.dashboard.institutions.api.getAllInstitutionUser}", operationId = "#v2RetrieveAllInstitutionUser")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(#institutionId, null, null), 'Selc:ListAllProductUsers')")
+    public InstitutionUserDetailsResource getAllInstitutionUser(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
+                                                                @PathVariable("institutionId")
+                                                                String institutionId,
+                                                                @Parameter(description = "${swagger.dashboard.user.model.id}")
+                                                                @PathVariable("userId")
+                                                                String userId,
+                                                                Authentication authentication) {
+
+        final String loggedUserId = ((SelfCareUser) authentication.getPrincipal()).getId();
+        log.debug("getAllInstitutionUser institutionId = {}, userId = {}, loggedUserId = {}", Encode.forJava(institutionId), Encode.forJava(userId), Encode.forJava(loggedUserId));
+        final UserProductResponse userProductResponse = institutionV2Service.getAllInstitutionUser(institutionId, userId, loggedUserId);
+        return institutionResourceMapper.toInstitutionUserDetailsResponse(userProductResponse);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

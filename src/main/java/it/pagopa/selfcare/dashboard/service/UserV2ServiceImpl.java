@@ -219,14 +219,14 @@ public class UserV2ServiceImpl implements UserV2Service {
                 .orElse(Collections.emptyList());
     }
 
-    public Collection<UserProductResponse> getAllUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
-        log.trace("getUsers start");
-        log.debug("getUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
+    public List<UserProductResponse> getAllUsers(String institutionId, UserInfo.UserInfoFilter userInfoFilter) {
+        log.trace("getAllUsers start");
+        log.debug("getAllUsers institutionId = {}, userInfoFilter = {}", Encode.forJava(institutionId), userInfoFilter);
 
         Assert.hasText(institutionId, REQUIRED_INSTITUTION_ID_MESSAGE);
 
         return Optional.ofNullable(userInstitutionApiRestClient._getInstitutionUsersUsingGET(institutionId,
-                                List.of(userInfoFilter.getProductId()),
+                                Optional.ofNullable(userInfoFilter.getProductId()).map(List::of).orElse(null),
                                 userInfoFilter.getRoles(),
                                 userInfoFilter.getUserId())
                         .getBody())
