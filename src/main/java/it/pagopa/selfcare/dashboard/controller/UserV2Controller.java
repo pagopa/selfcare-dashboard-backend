@@ -188,7 +188,6 @@ public class UserV2Controller {
                                                  @RequestParam(value = "roles", required = false) List<String> roles) {
         log.trace("getAllUsers start");
         log.debug("getAllUsers for institution: {} and product: {} with states: {} and roles: {}", Encode.forJava(institutionId), Encode.forJava(productId), Encode.forJava(states!=null ? states.toString(): null), Encode.forJava(roles != null ? roles.toString(): null));
-
         List<UserInstitutionRole> userRoles = userService.getAllUsersByInstitutionId(institutionId, productId, states, roles);
         log.debug("getAllUsers result = {}", userRoles);
         log.trace("getAllUsers end");

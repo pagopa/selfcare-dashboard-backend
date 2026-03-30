@@ -414,9 +414,19 @@ public class UserV2ServiceImpl implements UserV2Service {
         }
 
         return user.getProducts().stream()
-                .filter(p -> p.getCreatedAt() != null)
-                .max(Comparator.comparing(OnboardedProductResponse::getCreatedAt))
-                .orElse(null);
+                .filter(p -> OnboardedProductState.ACTIVE.equals(p.getStatus()))
+                .findFirst()
+                .orElseGet(() ->
+                        user.getProducts().stream()
+                                .filter(p -> OnboardedProductState.SUSPENDED.equals(p.getStatus()))
+                                .findFirst()
+                                .orElseGet(() ->
+                                        user.getProducts().stream()
+                                                .filter(p -> p.getCreatedAt() != null)
+                                                .max(Comparator.comparing(OnboardedProductResponse::getCreatedAt))
+                                                .orElse(null)
+                                )
+                );
     }
 
 }

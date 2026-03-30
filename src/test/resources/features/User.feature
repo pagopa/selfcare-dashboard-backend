@@ -237,13 +237,17 @@ Feature: User
     When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
     Then the response status should be 400
 
-  Scenario: Successfully retrieve all users for given institutionId with productId filter for AR Backstage
+  Scenario: Successfully retrieve all users for given institutionId with productId filter for AR Backstage (users with 2 roles on same product, returning only last valid status)
     Given user login with username "b.king" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     And the productId is "prod-interop"
     When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
     Then the response status should be 200
     And The response body contains the list "" of size 2
+    And The response body contains at path "" the following list of objects in any order:
+      | id                                   | name  | surname | fiscalCode       | email                                        | partyRole | status    |
+      | 97a511a7-2acc-47b9-afed-2f3c65753b4a | john  | Doe     | PRVTNT80A41H401T | 8370aa38-a2ab-404b-9b8a-10487167332e@test.it | OPERATOR  | ACTIVE    |
+      | 97a511a7-2acc-47b9-afed-2f3c65753ccc | Mario | Test    | MRATST80M15F205E | 8370aa38-a2ab-404b-9b8a-10487167332e@test.it | OPERATOR  | SUSPENDED |
 
   Scenario: Successfully retrieve all users for given institutionId with roles and product filter for AR Backstage
     Given user login with username "b.king" and password "test"
@@ -253,6 +257,9 @@ Feature: User
     When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
     Then the response status should be 200
     And The response body contains the list "" of size 1
+    And The response body contains at path "" the following list of objects in any order:
+      | id                                   | name  | surname | fiscalCode       | email                                        | partyRole | status |
+      | 97a511a7-2acc-47b9-afed-2f3c65753b4a | john  | Doe     | PRVTNT80A41H401T | 8370aa38-a2ab-404b-9b8a-10487167332e@test.it | DELEGATE  | ACTIVE |
 
   Scenario: Successfully retrieve all users for given institutionId with productId, roles and states filters for AR Backstage
     Given user login with username "b.king" and password "test"
@@ -263,6 +270,9 @@ Feature: User
     When I send a GET request to "/v2/users/all/institution/{institutionId}" to retrieve all user product data
     Then the response status should be 200
     And The response body contains the list "" of size 1
+    And The response body contains at path "" the following list of objects in any order:
+      | id                                   | name  | surname | fiscalCode       | email  | partyRole | status    |
+      | 35a78332-d038-4bfa-8e85-2cba7f6b7bf7 | rocky | Balboa  | blbrki80A41H401T |        | OPERATOR  | SUSPENDED |
 
   Scenario: Successfully retrieve all users for given institutionId with productId, roles and productRoles filters, no users found for AR Backstage
     Given user login with username "b.king" and password "test"

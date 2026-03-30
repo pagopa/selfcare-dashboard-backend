@@ -2,6 +2,7 @@ package it.pagopa.selfcare.dashboard.integration_test.steps;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
@@ -21,10 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class DashboardBaseSteps{
@@ -58,6 +57,26 @@ public class DashboardBaseSteps{
     public void checkResponseBodyListSize(String expectedJsonPath, int expectedSize) {
         final int currentSize = dashboardStepsUtil.getResponse().body().jsonPath().getList(expectedJsonPath).size();
         Assertions.assertEquals(expectedSize, currentSize);
+    }
+
+
+    @And("The response body contains at path {string} the following list of objects in any order:")
+    public void checkResponseBodyObjectList(String expectedJsonPath, List<Map<String, Object>> expectedObjects) {
+        List<Map<String, Object>> currentObjects = dashboardStepsUtil.getResponse().body().jsonPath().getList(expectedJsonPath);
+        Assertions.assertEquals(expectedObjects.size(), currentObjects.size(), String.format("The lists have different sizes. Expected: %s, Current: %s", expectedObjects, currentObjects));
+        ObjectMapper objMapper = new ObjectMapper();
+        Set<String> expectedKeySet = ((Map)expectedObjects.get(0)).keySet();
+        Set<String> expectedJsonSet = (Set)expectedObjects.stream().map(obj -> {
+            return this.filterExpectedObject(obj, expectedKeySet);
+        }).map(obj -> {
+            return this.toJson(objMapper, obj);
+        }).collect(Collectors.toSet());
+        Set<String> currentJsonSet = (Set)currentObjects.stream().map(obj -> {
+            return this.filterCurrentObject(obj, expectedKeySet);
+        }).map(obj -> {
+            return this.toJson(objMapper, obj);
+        }).collect(Collectors.toSet());
+        Assertions.assertEquals(expectedJsonSet, currentJsonSet, String.format("The lists contain different objects. Expected: %s, Current: %s", expectedJsonSet, currentJsonSet));
     }
 
     @And("The response body doesn't contain field {string}")
@@ -247,5 +266,72 @@ public class DashboardBaseSteps{
     public void theResponseShouldContainAValidLanguage(String lang) {
         String uri = dashboardStepsUtil.responses.getBackOfficeUrl().toString();
         Assertions.assertTrue(uri.contains("lang="+lang));
+    }
+
+    private Map<String, Object> filterExpectedObject(Map<String, Object> obj, Set<String> expectedKeys) {
+        Map<String, Object> filteredMap = new HashMap();
+        Iterator var4 = expectedKeys.iterator();
+
+        while(var4.hasNext()) {
+            String key = (String)var4.next();
+            if (obj.containsKey(key) && Objects.nonNull(obj.get(key))) {
+                Object value = obj.get(key);
+                if (value instanceof String) {
+                    if (Boolean.TRUE.toString().equalsIgnoreCase((String)value)) {
+                        value = true;
+                    } else if (Boolean.FALSE.toString().equalsIgnoreCase((String)value)) {
+                        value = false;
+                    }
+                }
+
+                filteredMap.put(key, value);
+            }
+        }
+
+        return filteredMap;
+    }
+
+    private Object getNestedValue(Map<String, Object> obj, String key) {
+        String[] keys = key.split("\\.");
+        Object value = obj;
+        String[] var5 = keys;
+        int var6 = keys.length;
+
+        for(int var7 = 0; var7 < var6; ++var7) {
+            String k = var5[var7];
+            if (!(value instanceof Map)) {
+                return null;
+            }
+
+            value = ((Map)value).get(k);
+            if (value == null) {
+                return null;
+            }
+        }
+
+        return value;
+    }
+
+    private Map<String, Object> filterCurrentObject(Map<String, Object> obj, Set<String> expectedKeys) {
+        Map<String, Object> filteredMap = new HashMap();
+        Iterator var4 = expectedKeys.iterator();
+
+        while(var4.hasNext()) {
+            String key = (String)var4.next();
+            Object value = this.getNestedValue(obj, key);
+            if (value != null) {
+                filteredMap.put(key, value);
+            }
+        }
+
+        return filteredMap;
+    }
+
+    private String toJson(ObjectMapper objectMapper, Map<String, Object> obj) {
+        try {
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException var4) {
+            throw new RuntimeException("Error converting object to JSON", var4);
+        }
     }
 }
