@@ -156,15 +156,15 @@
       },
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228+00:00"
+          "$date": "2024-10-28T12:25:58.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
         "productRole": "api",
         "role": "OPERATOR",
-        "status": "ACTIVE",
+        "status": "SUSPENDED",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228+00:00"
+          "$date": "2024-10-28T12:25:58.228+00:00"
         }
       },
       {
@@ -219,15 +219,15 @@
     "products": [
       {
         "createdAt": {
-          "$date": "2024-10-28T12:25:53.228+00:00"
+          "$date": "2024-10-28T12:26:53.228+00:00"
         },
         "env": "ROOT",
         "productId": "prod-interop",
         "productRole": "security",
         "role": "OPERATOR",
-        "status": "ACTIVE",
+        "status": "DELETED",
         "updatedAt": {
-          "$date": "2024-10-28T12:25:53.228+00:00"
+          "$date": "2024-10-28T12:26:53.228+00:00"
         }
       },
       {
@@ -238,7 +238,7 @@
         "productId": "prod-interop",
         "productRole": "api",
         "role": "OPERATOR",
-        "status": "ACTIVE",
+        "status": "SUSPENDED",
         "updatedAt": {
           "$date": "2024-10-28T12:25:53.228+00:00"
         }

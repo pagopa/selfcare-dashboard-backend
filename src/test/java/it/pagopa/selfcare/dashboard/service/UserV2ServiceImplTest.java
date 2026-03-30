@@ -260,12 +260,12 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         List<String> states = List.of("ACTIVE", "DELETED");
 
         it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse product1 = new it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse();
-        product1.setRole("MANAGER");
+        product1.setRole("OPERATOR");
         product1.setProductId("prod-io");
         product1.setStatus(OnboardedProductState.ACTIVE);
         product1.setCreatedAt(LocalDateTime.now().minusDays(2));
         it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse product2 = new it.pagopa.selfcare.user.generated.openapi.v1.dto.OnboardedProductResponse();
-        product2.setRole("OPERATOR");
+        product2.setRole("MANAGER");
         product2.setProductId("prod-io");
         product2.setStatus(OnboardedProductState.DELETED);
         product2.setCreatedAt(LocalDateTime.now());
@@ -284,7 +284,7 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         userProductResponse2.setSurname("surname2");
         userProductResponse2.setTaxCode("taxCode2");
         userProductResponse2.setEmail("email2");
-        userProductResponse2.setProducts(List.of(product1));
+        userProductResponse2.setProducts(List.of(product2));
 
         UserInstitutionRole expectedResponse = new UserInstitutionRole();
         expectedResponse.setId(userProductResponse2.getId());
@@ -292,8 +292,8 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         expectedResponse.setSurname(userProductResponse2.getSurname());
         expectedResponse.setFiscalCode(userProductResponse2.getTaxCode());
         expectedResponse.setEmail(userProductResponse2.getEmail());
-        expectedResponse.setStatus(product1.getStatus().name());
-        expectedResponse.setPartyRole(product1.getRole());
+        expectedResponse.setStatus(product2.getStatus().name());
+        expectedResponse.setPartyRole(product2.getRole());
 
 
         when(userInstitutionApiRestClient._getInstitutionUsersUsingGET(institutionId, List.of(productId), null, null))
