@@ -64,17 +64,17 @@ public class DashboardBaseSteps{
     public void checkResponseBodyObjectList(String expectedJsonPath, List<Map<String, Object>> expectedObjects) {
         List<Map<String, Object>> currentObjects = dashboardStepsUtil.getResponse().body().jsonPath().getList(expectedJsonPath);
         Assertions.assertEquals(expectedObjects.size(), currentObjects.size(), String.format("The lists have different sizes. Expected: %s, Current: %s", expectedObjects, currentObjects));
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objMapper = new ObjectMapper();
         Set<String> expectedKeySet = ((Map)expectedObjects.get(0)).keySet();
-        Set<String> expectedJsonSet = (Set)expectedObjects.stream().map((obj) -> {
+        Set<String> expectedJsonSet = (Set)expectedObjects.stream().map(obj -> {
             return this.filterExpectedObject(obj, expectedKeySet);
-        }).map((obj) -> {
-            return this.toJson(objectMapper, obj);
+        }).map(obj -> {
+            return this.toJson(objMapper, obj);
         }).collect(Collectors.toSet());
-        Set<String> currentJsonSet = (Set)currentObjects.stream().map((obj) -> {
+        Set<String> currentJsonSet = (Set)currentObjects.stream().map(obj -> {
             return this.filterCurrentObject(obj, expectedKeySet);
-        }).map((obj) -> {
-            return this.toJson(objectMapper, obj);
+        }).map(obj -> {
+            return this.toJson(objMapper, obj);
         }).collect(Collectors.toSet());
         Assertions.assertEquals(expectedJsonSet, currentJsonSet, String.format("The lists contain different objects. Expected: %s, Current: %s", expectedJsonSet, currentJsonSet));
     }
