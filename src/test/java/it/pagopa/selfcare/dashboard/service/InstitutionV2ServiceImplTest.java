@@ -260,15 +260,13 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     }
 
     @Test
-    void findInstitutionById_issuerPagoPA() throws IOException {
+    void findAllInstitutionById() throws IOException {
         // given
         String institutionId = "institutionId";
         String userId = "userId";
 
-        // Mock SelfCareUser with issuer = PAGOPA
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
         when(principal.getId()).thenReturn(userId);
-        when(principal.getIssuer()).thenReturn("PAGOPA");
 
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -296,7 +294,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 .thenReturn(ResponseEntity.ok(iamPermissions));
 
         // when
-        Institution result = institutionV2Service.findInstitutionById(institutionId);
+        Institution result = institutionV2Service.findAllInstitutionById(institutionId);
 
         // then
         assertNotNull(result);
@@ -320,15 +318,13 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     }
 
     @Test
-    void findInstitutionById_issuerPagoPA_noPermissions() throws IOException {
+    void findInstitutionById_noIamPermissions() throws IOException {
         // given
         String institutionId = "institutionId";
         String userId = "userId";
 
-        // Mock SelfCareUser with issuer = PAGOPA
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
         when(principal.getId()).thenReturn(userId);
-        when(principal.getIssuer()).thenReturn("PAGOPA");
 
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -350,19 +346,17 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 .thenReturn(ResponseEntity.ok(iamPermissions));
 
         // verify
-        assertThrows(AccessDeniedException.class, () -> institutionV2Service.findInstitutionById(institutionId));
+        assertDoesNotThrow(() -> institutionV2Service.findAllInstitutionById(institutionId));
     }
 
     @Test
-    void findInstitutionById_issuerPagoPA_allPermissions() throws IOException {
+    void findAllInstitutionById_allIamPermissions() throws IOException {
         // given
         String institutionId = "institutionId";
         String userId = "userId";
 
-        // Mock SelfCareUser with issuer = PAGOPA
         SelfCareUser principal = Mockito.mock(SelfCareUser.class);
         when(principal.getId()).thenReturn(userId);
-        when(principal.getIssuer()).thenReturn("PAGOPA");
 
         TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -390,7 +384,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
                 .thenReturn(ResponseEntity.ok(iamPermissions));
 
         // when
-        Institution result = institutionV2Service.findInstitutionById(institutionId);
+        Institution result = institutionV2Service.findAllInstitutionById(institutionId);
 
         // then
         assertNotNull(result);
@@ -781,15 +775,21 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         older.setTokenId("token-old");
         older.setProductId(productId);
 
-
         OnboardingResponse newer = new OnboardingResponse();
         newer.setStatus(OnboardingResponse.StatusEnum.ACTIVE);
         newer.setCreatedAt(OffsetDateTime.now());
         newer.setTokenId(tokenId);
         newer.setProductId(productId);
+        newer.setInstitutionType(OnboardingResponse.InstitutionTypeEnum.PSP);
 
         OnboardingsResponse onboardingsResponse = new OnboardingsResponse();
         onboardingsResponse.setOnboardings(List.of(older, newer));
+
+        SelfCareUser principal = Mockito.mock(SelfCareUser.class);
+        when(principal.getIssuer()).thenReturn("PAGOPA");
+
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));

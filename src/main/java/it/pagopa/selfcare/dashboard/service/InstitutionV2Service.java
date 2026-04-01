@@ -12,9 +12,8 @@ public interface InstitutionV2Service {
 
     UserInfo getInstitutionUser(String institutionId, String userId, String loggedUserId);
     UserProductResponse getAllInstitutionUser(String institutionId, String userId, String loggedUserId);
-
     Institution findInstitutionById(String institutionId);
-
+    Institution findAllInstitutionById(String institutionId);
     Boolean verifyIfExistsPendingOnboarding(String taxCode, String subunitCode, String productId);
     OnboardingsResponse getOnboardingsInfoResponse(String institutionId, List<String> products);
     Resource getContract(String institutionId, String productId);
