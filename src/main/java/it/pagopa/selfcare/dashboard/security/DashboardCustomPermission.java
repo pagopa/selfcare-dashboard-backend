@@ -28,7 +28,7 @@ public class DashboardCustomPermission {
         }
 
         String issuer = selfCareUser.getIssuer();
-        boolean result = ISSUER_PAGOPA.equalsIgnoreCase(issuer);
+        boolean result = ISSUER_PAGOPA.equals(issuer);
 
         log.debug("Issuer={}, authorized={}", issuer, result);
         log.info("End authorization check for ARB");
