@@ -119,4 +119,36 @@ class SelfCarePermissionEvaluatorV2Test {
 
         assertFalse(permissionEvaluator.hasPermission(authentication, domain, permission));
     }
+
+    @Test
+    void hasPermissionReturnsFalseForARBWhenIssuerIsNotPagoPA() {
+        Authentication authentication = mock(Authentication.class);
+        SelfCareUser user = SelfCareUser.builder("userId")
+                .issuer("NO_PAGOPA")
+                .build();
+
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        assertFalse(permissionEvaluator.hasPermission(
+                authentication,
+                null,
+                "Selc:ARB"
+        ));
+    }
+
+    @Test
+    void hasPermissionReturnsTrueForARBWhenIssuerIsPagoPA() {
+        Authentication authentication = mock(Authentication.class);
+        SelfCareUser user = SelfCareUser.builder("userId")
+                .issuer("PAGOPA")
+                .build();
+
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        assertTrue(permissionEvaluator.hasPermission(
+                authentication,
+                null,
+                "Selc:ARB"
+        ));
+    }
 }

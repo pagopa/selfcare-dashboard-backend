@@ -189,7 +189,7 @@ public class InstitutionV2Controller {
     @GetMapping(value = "/all/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "${swagger.dashboard.institutions.api.getAllInstitution}", description = "${swagger.dashboard.institutions.api.getAllInstitution}", operationId = "#v2GetAllInstitution")
-    @PreAuthorize("@dashboardCustomPermission.hasPermissionARB()")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, null), 'Selc:ARB')")
     public InstitutionResource getAllInstitution(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
                                                  @PathVariable("institutionId") String institutionId) {
         log.trace("getAllInstitution start");

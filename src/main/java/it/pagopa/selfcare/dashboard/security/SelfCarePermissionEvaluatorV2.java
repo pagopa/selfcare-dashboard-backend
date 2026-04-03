@@ -34,6 +34,7 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
     private final IamRestClient iamRestClient;
     static final String REQUIRED_GROUP_ID_MESSAGE = "A user group id is required";
     private static final String ISSUER_PAGOPA = "PAGOPA";
+    private static final String PERMISSION_ARB = "Selc:ARB";
 
     public SelfCarePermissionEvaluatorV2(UserGroupRestClient restClient, UserApiRestClient userApiRestClient,IamRestClient iamRestClient) {
         this.userGroupRestClient = restClient;
@@ -65,9 +66,9 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         createdBy.setId(groupResponse.getCreatedBy());
         groupInfo.setCreatedBy(createdBy);
         if (groupResponse.getModifiedBy() != null) {
-            User userInfo = new User();
-            userInfo.setId(groupResponse.getModifiedBy());
-            groupInfo.setModifiedBy(userInfo);
+            User modifiedBy = new User();
+            modifiedBy.setId(groupResponse.getModifiedBy());
+            groupInfo.setModifiedBy(modifiedBy);
         }
         return groupInfo;
     };
@@ -77,46 +78,89 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         log.info("start check Permission");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "hasPermission authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
         Assert.notNull(permission, "A permission type is required");
-        boolean result = false;
 
         SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
         String userId = selfCareUser.getId();
         String issuer = selfCareUser.getIssuer();
+        String permissionValue = permission.toString();
 
-        if (ISSUER_PAGOPA.equalsIgnoreCase(issuer)) {
-            log.debug("Issuer is PAGOPA, evaluating permission {}", permission);
-
-            FilterAuthorityDomain filterAuthorityDomain = Optional.ofNullable(targetDomainObject)
-                    .filter(FilterAuthorityDomain.class::isInstance)
-                    .map(FilterAuthorityDomain.class::cast)
-                    .orElseGet(() -> new FilterAuthorityDomain(null, null, null));
-
-            boolean isAllowed = Optional.ofNullable(iamRestClient._hasIAMUserPermission(permission.toString(),
-                            userId,
-                            filterAuthorityDomain.getInstitutionId(),
-                            filterAuthorityDomain.getProductId())
-                        .getBody())
-                    .map(PermissionResponse::getHasPermission)
-                    .orElse(false);
-
-            log.debug("PAGOPA permission {} → {}", permission, isAllowed ? "GRANTED" : "DENIED");
-            log.trace("check Permission end (issuer PAGOPA)");
-            return isAllowed;
+        // If permission is ARB allow all users with issuer PagoPA
+        if (PERMISSION_ARB.equalsIgnoreCase(permissionValue)) {
+            boolean result = isPagoPaIssuer(issuer);
+            log.debug("Custom permission ARB {} -> {}", permissionValue, result ? "GRANTED" : "DENIED");
+            log.trace("Permission check end (custom ARB)");
+            return result;
         }
 
-        if (targetDomainObject instanceof FilterAuthorityDomain filterAuthorityDomain) {
-            if (StringUtils.hasText(filterAuthorityDomain.getGroupId())) {
-                UserGroupInfo userGroupInfo = getUserGroupById(filterAuthorityDomain.getGroupId());
-                if (Objects.nonNull(userGroupInfo)) {
-                    result = hasPermission1(userId, userGroupInfo.getInstitutionId(), userGroupInfo.getProductId(), permission.toString());
-                }
-            } else {
-                result = hasPermission1(userId, filterAuthorityDomain.getInstitutionId(), filterAuthorityDomain.getProductId(), permission.toString());
-            }
-            log.debug("check Permission result = {}", result);
-            log.trace("check Permission end");
+        // If issuer is PagoPA check IAM permission
+        if (isPagoPaIssuer(issuer)) {
+            boolean result = checkIamPermission(userId, targetDomainObject, permissionValue);
+            log.debug("PAGOPA permission {} -> {}", permissionValue, result ? "GRANTED" : "DENIED");
+            log.trace("Permission check end (issuer PAGOPA)");
+            return result;
         }
+
+        // If issuer is not PagoPA check User permission
+        boolean result = checkUserApiPermission(userId, targetDomainObject, permissionValue);
+        log.debug("Permission {} -> {}", permissionValue, result ? "GRANTED" : "DENIED");
+        log.trace("Permission check end");
+
         return result;
+    }
+
+    private boolean isPagoPaIssuer(String issuer) {
+        return ISSUER_PAGOPA.equalsIgnoreCase(issuer);
+    }
+
+    private boolean checkIamPermission(String userId, Object targetDomainObject, String permission) {
+        FilterAuthorityDomain filterAuthorityDomain = extractFilterAuthorityDomain(targetDomainObject);
+
+        return Optional.ofNullable(
+                        iamRestClient._hasIAMUserPermission(
+                                        permission,
+                                        userId,
+                                        filterAuthorityDomain.getInstitutionId(),
+                                        filterAuthorityDomain.getProductId())
+                                .getBody())
+                .map(PermissionResponse::getHasPermission)
+                .orElse(false);
+    }
+
+    private boolean checkUserApiPermission(String userId, Object targetDomainObject, String permission) {
+        if (!(targetDomainObject instanceof FilterAuthorityDomain filterAuthorityDomain)) {
+            log.warn("Target domain object is not FilterAuthorityDomain");
+            return false;
+        }
+
+        if (StringUtils.hasText(filterAuthorityDomain.getGroupId())) {
+            UserGroupInfo userGroupInfo = getUserGroupById(filterAuthorityDomain.getGroupId());
+
+            if (Objects.isNull(userGroupInfo)) {
+                log.warn("User group not found for groupId={}", filterAuthorityDomain.getGroupId());
+                return false;
+            }
+
+            return hasPermissionOnInstitutionProduct(
+                    userId,
+                    userGroupInfo.getInstitutionId(),
+                    userGroupInfo.getProductId(),
+                    permission
+            );
+        }
+
+        return hasPermissionOnInstitutionProduct(
+                userId,
+                filterAuthorityDomain.getInstitutionId(),
+                filterAuthorityDomain.getProductId(),
+                permission
+        );
+    }
+
+    private FilterAuthorityDomain extractFilterAuthorityDomain(Object targetDomainObject) {
+        return Optional.ofNullable(targetDomainObject)
+                .filter(FilterAuthorityDomain.class::isInstance)
+                .map(FilterAuthorityDomain.class::cast)
+                .orElseGet(() -> new FilterAuthorityDomain(null, null, null));
     }
 
     private UserGroupInfo getUserGroupById(String id) {
@@ -131,7 +175,7 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
     }
 
     @Retry(name = "retryTimeout")
-    private Boolean hasPermission1(String userId, String institutionId, String productId, String action) {
+    private Boolean hasPermissionOnInstitutionProduct(String userId, String institutionId, String productId, String action) {
         log.trace("permissionInstitutionIdPermissionGet start");
         log.debug("permissionInstitutionIdPermissionGet userId = {}, institutionId = {}, productId = {} for action = {}", userId, institutionId, productId, action);
         boolean result = false;
