@@ -130,6 +130,8 @@ public interface UserMapper {
     @Mapping(target = "role", expression = "java(it.pagopa.selfcare.commons.base.security.PartyRole.valueOf(onboardedProductResponse.getRole()))")
     OnboardedProduct toOnboardedProducts(OnboardedProductResponse onboardedProductResponse);
 
+    UserOtpEmailInfo toUserOtpEmailInfo(UserOtpEmailInfoResponse userOtpEmailInfoResponse);
+
     // Methods from the provided class with default implementations
     default ProductInfoResource toUserProductInfoResource(ProductInfo model) {
         ProductInfoResource resource = null;

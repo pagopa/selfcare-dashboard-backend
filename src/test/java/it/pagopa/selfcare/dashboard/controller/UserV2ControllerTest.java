@@ -6,10 +6,7 @@ import it.pagopa.selfcare.dashboard.model.SearchUserDto;
 import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperImpl;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2Impl;
-import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserInstitutionRole;
-import it.pagopa.selfcare.dashboard.model.user.UserResource;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import org.junit.jupiter.api.BeforeEach;
@@ -525,5 +522,19 @@ class UserV2ControllerTest extends BaseControllerTest {
         verifyNoMoreInteractions(userServiceMock);
     }
 
+    @Test
+    void getUserOtpEmailInfoTest() throws Exception {
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder("userId").build());
+        when(userServiceMock.getUserOtpEmailInfo(anyString())).thenReturn(UserOtpEmailInfo.builder().build());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get(BASE_URL + "/otp-info")
+                .principal(authentication))
+                .andExpect(status().isOk());
+
+        verify(userServiceMock, times(1)).getUserOtpEmailInfo(anyString());
+        verifyNoMoreInteractions(userServiceMock);
+    }
 
 }

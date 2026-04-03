@@ -832,6 +832,19 @@ class UserV2ServiceImplTest extends BaseServiceTest {
         verifyNoMoreInteractions(userInstitutionApiRestClient);
     }
 
+    @Test
+    void getUserOtpEmailInfoTest() {
+        when(userApiRestClient._getUserOtpEmailInfo(anyString())).thenReturn(ResponseEntity.ok(UserOtpEmailInfoResponse.builder()
+                .userId("userId").otpReferenceInstitutionId("institutionId").otpEmail("email").canUserChangeOtpEmail(true).build()));
+
+        final UserOtpEmailInfo response = userV2ServiceImpl.getUserOtpEmailInfo("userId");
+
+        assertEquals("userId", response.getUserId());
+        assertEquals("email", response.getOtpEmail());
+        assertEquals("institutionId", response.getOtpReferenceInstitutionId());
+        assertTrue(response.getCanUserChangeOtpEmail());
+    }
+
     private static UsersCountResponse getUsersCountResponse() {
         final List<it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole> expectedRoles = List.of(it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.MANAGER, it.pagopa.selfcare.user.generated.openapi.v1.dto.PartyRole.DELEGATE);
         final List<OnboardedProductState> expectedStatus = List.of(OnboardedProductState.PENDING, OnboardedProductState.ACTIVE);

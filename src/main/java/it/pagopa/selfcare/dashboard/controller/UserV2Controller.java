@@ -11,10 +11,7 @@ import it.pagopa.selfcare.dashboard.model.UpdateUserDto;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapperV2;
 import it.pagopa.selfcare.dashboard.model.product.ProductUserResource;
-import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.UserInfo;
-import it.pagopa.selfcare.dashboard.model.user.UserInstitutionRole;
-import it.pagopa.selfcare.dashboard.model.user.UserResource;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.service.UserV2Service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -193,4 +190,15 @@ public class UserV2Controller {
         log.trace("getAllUsers end");
         return userRoles;
     }
+
+    @GetMapping(value = "/otp-info")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "getUserOtpEmailInfo", description = "${swagger.dashboard.user.api.getUserOtpEmailInfo}")
+    public UserOtpEmailInfo getUserOtpEmailInfo(Authentication authentication) {
+        final SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+        final String userId = selfCareUser.getId();
+        log.debug("getUserOtpEmailInfo for userId: {}", Encode.forJava(userId));
+        return userService.getUserOtpEmailInfo(userId);
+    }
+
 }
