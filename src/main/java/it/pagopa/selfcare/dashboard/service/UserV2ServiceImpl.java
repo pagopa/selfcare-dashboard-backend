@@ -14,9 +14,9 @@ import it.pagopa.selfcare.dashboard.model.institution.RelationshipState;
 import it.pagopa.selfcare.dashboard.model.mapper.InstitutionMapper;
 import it.pagopa.selfcare.dashboard.model.mapper.UserMapper;
 import it.pagopa.selfcare.dashboard.model.product.mapper.ProductMapper;
+import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.dashboard.model.user.CreateUserDto;
 import it.pagopa.selfcare.dashboard.model.user.User;
-import it.pagopa.selfcare.dashboard.model.user.*;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.PHASE_ADDITION_ALLOWED;
 import it.pagopa.selfcare.product.entity.Product;
@@ -329,6 +329,13 @@ public class UserV2ServiceImpl implements UserV2Service {
         return userInstitutionApiRestClient._checkUserUsingPOST(institutionId, productId, searchUserDto).getBody();
     }
 
+    @Override
+    public UserOtpEmailInfo getUserOtpEmailInfo(String userId) {
+        return Optional.ofNullable(userApiRestClient._getUserOtpEmailInfo(userId))
+                .filter(o -> o.getStatusCode().is2xxSuccessful())
+                .map(o -> userMapper.toUserOtpEmailInfo(o.getBody()))
+                .orElseThrow(() -> new ResourceNotFoundException("Unable to retrieve user otp info for userId: " + Encode.forJava(userId)));
+    }
 
     private Institution verifyOnboardingStatus(String institutionId, String productId) {
         Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());

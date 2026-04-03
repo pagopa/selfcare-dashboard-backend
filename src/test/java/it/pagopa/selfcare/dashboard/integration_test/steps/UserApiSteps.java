@@ -330,6 +330,28 @@ public class UserApiSteps{
         }
     }
 
+    @When("I send a GET request to {string} to retrieve user otp info")
+    public void iSendAGETRequestToToRetrieveUserOtpInfo(String url) {
+        RequestSpecification requestSpecification = RestAssured.given();
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if (dashboardStepsUtil.status == 200){
+            dashboardStepsUtil.response = response;
+        } else{
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
     @And("the user product should be {string} only on filtered product roles")
     public void theUserShouldBeSuspendedOnlyOnFilteredProductRoles(String status) {
         institutionApiSteps.iSendAGETRequestToToRetrieveInstitutionUser("/v2/institutions/{institutionId}/users/{userId}");

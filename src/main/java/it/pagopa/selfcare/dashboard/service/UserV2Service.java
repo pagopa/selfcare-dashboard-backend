@@ -35,4 +35,7 @@ public interface UserV2Service {
     UsersCountResponse getUserCount(String institutionId, String productId, List<String> roles, List<String> status);
 
     Boolean checkUser(String fiscalCode, String institutionId, String productId);
+
+    UserOtpEmailInfo getUserOtpEmailInfo(String userId);
+
 }
