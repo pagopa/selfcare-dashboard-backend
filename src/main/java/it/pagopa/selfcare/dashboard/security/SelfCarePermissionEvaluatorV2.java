@@ -29,6 +29,8 @@ import java.util.function.Function;
 @Slf4j
 public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
 
+    public static final String GRANTED = "GRANTED";
+    public static final String DENIED = "DENIED";
     private final UserGroupRestClient userGroupRestClient;
     private final UserApiRestClient userApiRestClient;
     private final IamRestClient iamRestClient;
@@ -75,7 +77,7 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        log.info("start check Permission");
+        log.info("Start check Permission");
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "hasPermission authentication = {}, targetDomainObject = {}, permission = {}", authentication, targetDomainObject, permission);
         Assert.notNull(permission, "A permission type is required");
 
@@ -87,7 +89,7 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         // If permission is ARB allow all users with issuer PagoPA
         if (PERMISSION_ARB.equalsIgnoreCase(permissionValue)) {
             boolean result = isPagoPaIssuer(issuer);
-            log.debug("Custom permission ARB {} -> {}", permissionValue, result ? "GRANTED" : "DENIED");
+            log.debug("Custom permission ARB {} -> {}", permissionValue, result ? GRANTED : DENIED);
             log.trace("Permission check end (custom ARB)");
             return result;
         }
@@ -95,14 +97,14 @@ public class SelfCarePermissionEvaluatorV2 implements PermissionEvaluator {
         // If issuer is PagoPA check IAM permission
         if (isPagoPaIssuer(issuer)) {
             boolean result = checkIamPermission(userId, targetDomainObject, permissionValue);
-            log.debug("PAGOPA permission {} -> {}", permissionValue, result ? "GRANTED" : "DENIED");
+            log.debug("PAGOPA permission {} -> {}", permissionValue, result ? GRANTED : DENIED);
             log.trace("Permission check end (issuer PAGOPA)");
             return result;
         }
 
         // If issuer is not PagoPA check User permission
         boolean result = checkUserApiPermission(userId, targetDomainObject, permissionValue);
-        log.debug("Permission {} -> {}", permissionValue, result ? "GRANTED" : "DENIED");
+        log.debug("Permission {} -> {}", permissionValue, result ? GRANTED : DENIED);
         log.trace("Permission check end");
 
         return result;
