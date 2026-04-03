@@ -139,13 +139,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
-        String issuer = selfCareUser.getIssuer();
         String userId = selfCareUser.getId();
-
-        if (ISSUER_PAGOPA.equalsIgnoreCase(issuer)) {
-            log.debug("Issuer is PAGOPA, using IAM to check permissions");
-            return getInstitutionWithActionsIam(institutionId, userId, institution);
-        }
 
         UserInstitutionWithActionsDto userInstitutionWithActionsDto = userMapper.toUserInstitutionWithActionsDto(userApiRestClient._getUserInstitutionWithPermission(institutionId, userId, null).getBody());
 
@@ -170,14 +164,32 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         return institution;
     }
 
-    private Institution getInstitutionWithActionsIam(String institutionId, String userId, Institution institution) {
+    @Override
+    public Institution findAllInstitutionById(String institutionId) {
+        log.trace("findAllInstitutionById start");
+        log.debug("findAllInstitutionById institutionId = {}", Encode.forJava(institutionId));
+        Assert.hasText(institutionId, REQUIRED_INSTITUTION_MESSAGE);
+        log.trace("getAllInstitution start");
+        log.debug("getAllInstitution institutionId = {}", Encode.forJava(institutionId));
+        Institution institution = institutionMapper.toInstitution(coreInstitutionApiRestClient._retrieveInstitutionByIdUsingGET(institutionId, null).getBody());
+        log.debug("getAllInstitution result = {}", institution);
+        log.trace("getAllInstitution end");
+        log.trace("getAllInstitutionWithActionsIam start");
+        Institution institutionWithActions = getInstitutionWithActionsIam(institution);
+        log.debug("findAllInstitutionById result = {}", institutionWithActions);
+        log.trace("findAllInstitutionById end");
+        return institutionWithActions;
+    }
+
+    private Institution getInstitutionWithActionsIam(Institution institution) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SelfCareUser selfCareUser = (SelfCareUser) authentication.getPrincipal();
+        String userId = selfCareUser.getId();
 
         List<ProductRolePermissions> productRolePermissions = Optional.ofNullable(
                         iamExternalRestClient._getIAMProductRolePermissionsList(userId, null).getBody())
                 .map(ProductRolePermissionsList::getItems)
-                .filter(list -> !list.isEmpty())
-                .orElseThrow(() -> new AccessDeniedException(
-                        String.format("User %s has not permission on institution %s", userId, institutionId)));
+                .orElse(Collections.emptyList());
 
         ProductRolePermissions globalPermission = productRolePermissions.stream()
                 .filter(p -> "ALL".equals(p.getProductId()))

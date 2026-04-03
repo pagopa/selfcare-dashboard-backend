@@ -72,10 +72,16 @@ Feature: Institution
     # Field institutionType not present if productId not specified in request
     And The response body doesn't contain field "institutionType"
 
-  Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with interop permission
-    Given user login with username "b.barnes" and password "test"
+  Scenario: Unsuccessfully retrieve institution by institutionId v2 with PAGOPA issuer
+    Given user login with username "b.king" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
     When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
+    Then the response status should be 403
+
+  Scenario: Successfully retrieve all institution by institutionId v2 with PAGOPA issuer with interop permission
+    Given user login with username "b.barnes" and password "test"
+    And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
+    When I send a GET request to "/v2/institutions/all/{institutionId}" to retrieve institution
     Then the response status should be 200
     And The response body contains:
       | id                             | 067327d3-bdd6-408d-8655-87e8f1960046                                                                             |
@@ -100,7 +106,7 @@ Feature: Institution
       | products[3].productId          | prod-interop                                                                                                     |
       | products[3].institutionType    | PT                                                                                                               |
       | products[3].userRole           | SUPPORT                                                                                                          |
-      | products[3].userProductActions | [read:users, write:users, Selc:ViewInstitutionData, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers] |
+      | products[3].userProductActions | [read:users, write:users, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers]                           |
     And The response body contains the list "products" of size 4
     # Field institutionType not present if productId not specified in request
     And The response body doesn't contain field "institutionType"
@@ -108,10 +114,10 @@ Feature: Institution
     And The response body doesn't contain field "products[1].userProductActions"
     And The response body doesn't contain field "products[2].userProductActions"
 
-  Scenario: Successfully retrieve institution by institutionId v2 with PAGOPA issuer with both interop and ALL permissions
+  Scenario: Successfully retrieve all institution by institutionId v2 with PAGOPA issuer with both interop and ALL permissions
     Given user login with username "b.king" and password "test"
     And the institutionId is "067327d3-bdd6-408d-8655-87e8f1960046"
-    When I send a GET request to "/v2/institutions/{institutionId}" to retrieve institution
+    When I send a GET request to "/v2/institutions/all/{institutionId}" to retrieve institution
     Then the response status should be 200
     And The response body contains:
       | id                             | 067327d3-bdd6-408d-8655-87e8f1960046                                                                                |
@@ -129,13 +135,13 @@ Feature: Institution
       | products[0].userRole           | SUPPORT                                                                                                             |
       | products[0].tokenId            | string                                                                                                              |
       | products[0].authorized         | true                                                                                                                |
-      | products[0].userProductActions | [read:users, write:users, Selc:ViewInstitutionData, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers]    |
+      | products[0].userProductActions | [read:users, write:users, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers]    |
       | products[1].productId          | prod-pagopa                                                                                                         |
       | products[1].authorized         | false                                                                                                               |
       | products[1].tokenId            | string                                                                                                              |
       | products[2].productId          | prod-pagopa                                                                                                         |
       | products[2].authorized         | true                                                                                                                |
-      | products[2].userProductActions | [read:users, write:users, Selc:ViewInstitutionData, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers]    |
+      | products[2].userProductActions | [read:users, write:users, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers]    |
       | products[2].tokenId            | 21f73488-d0df-4a3d-9b6f-9adf634780b5                                                                                |
       | products[3].productId          | prod-interop                                                                                                        |
       | products[3].userRole           | OPERATOR                                                                                                            |

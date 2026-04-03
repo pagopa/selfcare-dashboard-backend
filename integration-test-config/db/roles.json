@@ -24,7 +24,6 @@
     "permissions": [
       "read:users",
       "write:users",
-      "Selc:ViewInstitutionData",
       "Selc:AccessProductBackofficeAdmin",
       "Selc:ListAllProductUsers"
     ]

@@ -7,8 +7,8 @@ import it.pagopa.selfcare.commons.base.logging.LogUtils;
 import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.core.generated.openapi.v1.dto.OnboardingsResponse;
 import it.pagopa.selfcare.dashboard.aspect.ApiFeatureFlag;
-import it.pagopa.selfcare.dashboard.model.*;
 import it.pagopa.selfcare.dashboard.model.CreateUserDto;
+import it.pagopa.selfcare.dashboard.model.*;
 import it.pagopa.selfcare.dashboard.model.delegation.DelegationWithPagination;
 import it.pagopa.selfcare.dashboard.model.delegation.GetDelegationParameters;
 import it.pagopa.selfcare.dashboard.model.delegation.Order;
@@ -183,6 +183,23 @@ public class InstitutionV2Controller {
 
         log.debug(LogUtils.CONFIDENTIAL_MARKER, "getInstitution result = {}", result);
         log.trace("getInstitution end");
+        return result;
+    }
+
+    @GetMapping(value = "/all/{institutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "${swagger.dashboard.institutions.api.getAllInstitution}", description = "${swagger.dashboard.institutions.api.getAllInstitution}", operationId = "#v2GetAllInstitution")
+    @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, null), 'Selc:ARB')")
+    public InstitutionResource getAllInstitution(@Parameter(description = "${swagger.dashboard.institutions.model.id}")
+                                                 @PathVariable("institutionId") String institutionId) {
+        log.trace("getAllInstitution start");
+        log.debug("getAllInstitution institutionId = {}", Encode.forJava(institutionId));
+
+        Institution institution = institutionV2Service.findAllInstitutionById(institutionId);
+        InstitutionResource result = institutionResourceMapper.toResource(institution);
+
+        log.debug(LogUtils.CONFIDENTIAL_MARKER, "getAllInstitution result = {}", result);
+        log.trace("getAllInstitution end");
         return result;
     }
 

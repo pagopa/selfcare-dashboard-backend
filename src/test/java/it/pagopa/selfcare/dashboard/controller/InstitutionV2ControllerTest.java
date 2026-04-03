@@ -281,6 +281,23 @@ class InstitutionV2ControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void getAllInstitution_institutionInfoNotNull() throws Exception {
+        String institutionId = "institutionId";
+        byte[] institutionStream = Files.readAllBytes(Paths.get(FILE_JSON_PATH + "Institution.json"));
+        Institution institution = objectMapper.readValue(institutionStream, Institution.class);
+
+        when(institutionV2ServiceMock.findAllInstitutionById(institutionId)).thenReturn(institution);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/all/{institutionId}", institutionId)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new String(Files.readAllBytes(Paths.get(FILE_JSON_PATH + "InstitutionResource.json")))))
+                .andReturn();
+    }
+
+    @Test
     void addUserProductRolesWithoutPartyRole_happyPath() throws Exception {
         // given
         final String institutionId = "institutionId";
