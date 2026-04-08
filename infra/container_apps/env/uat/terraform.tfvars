@@ -142,6 +142,10 @@ app_settings = [
   {
     name  = "IAM_URL"
     value = "http://selc-u-iam-ms-ca"
+  },
+  {
+    name  = "DOCUMENT_URL"
+    value = "http://selc-u-document-ms-ca"
   }
 ]
 

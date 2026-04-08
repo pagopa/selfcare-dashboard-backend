@@ -15,7 +15,7 @@ services:
       - develop-network
 
   azurite:
-    image: mcr.microsoft.com/azure-storage/azurite@sha256:0a47e12e3693483cef5c71f35468b91d751611f172d2f97414e9c69113b106d9
+    image: mcr.microsoft.com/azure-storage/azurite:latest@sha256:647c63a91102a9d8e8000aab803436e1fc85fbb285e7ce830a82ee5d6661cf37
     ports:
       - "10000:10000"
     command: "azurite --blobHost 0.0.0.0 --inMemoryPersistence"
@@ -69,6 +69,19 @@ services:
       - '8080:8080'
     env_file:
       - "./src/test/resources/onboardingenv"
+    networks:
+      - develop-network
+    depends_on:
+      - mongodb
+
+  documentms:
+    image: ghcr.io/pagopa/selfcare-document-ms:latest
+    pull_policy: always
+    platform: linux/amd64
+    ports:
+      - '8086:8080'
+    env_file:
+      - "./src/test/resources/documentenv"
     networks:
       - develop-network
     depends_on:
