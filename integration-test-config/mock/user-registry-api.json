@@ -210,6 +210,26 @@
       },
       "pathParameters": {
         "id": [
+          "9b8e2b3f-4c7d-4f91-a6e2-3d1f8a7c5b42"
+        ]
+      }
+    },
+    "httpResponseTemplate": {
+      "templateType": "VELOCITY",
+      "template": "{\"statusCode\":200,\"body\":{\"email\":{\"certification\":\"SPID\",\"value\":\"\"},\"familyName\":{\"certification\":\"SPID\",\"value\":\"Polo\"},\"fiscalCode\":\"PLOMRC99Z99Z999X\",\"id\":\"9b8e2b3f-4c7d-4f91-a6e2-3d1f8a7c5b42\",\"name\":{\"certification\":\"SPID\",\"value\":\"Marco\"},\"workContacts\":{\"ID_CONTACTS#3f7c1d2a-8b64-4f91-9a73-2d8e5b6c1f40\":{\"email\":{\"certification\":\"NONE\",\"value\":\"mail1@test.test\"},\"mobilePhone\":{\"certification\":\"NONE\",\"value\":\"0000000001\"}},\"ID_CONTACTS#a91e4c57-2d3b-4a8f-b6c1-7e2f9d0a5c13\":{\"email\":{\"certification\":\"NONE\",\"value\":\"mail2@test.test\"},\"mobilePhone\":{\"certification\":\"NONE\",\"value\":\"00000000002\"}},\"ID_CONTACTS#6b2f9a10-cd47-4e85-91ab-3f8d2c7e4b56\":{\"email\":{\"certification\":\"NONE\",\"value\":\"mail2@test.test\"},\"mobilePhone\":{\"certification\":\"NONE\",\"value\":\"0000000003\"}}}}}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/user-registry-mock/v1/users/{id}",
+      "queryStringParameters": {
+        "fl": [
+          "fiscalCode,familyName,email,name,workContacts"
+        ]
+      },
+      "pathParameters": {
+        "id": [
           "97a511a7-2acc-47b9-afed-2f3c65753ccc"
         ]
       }
