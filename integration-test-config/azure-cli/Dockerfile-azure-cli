@@ -3,6 +3,6 @@ FROM alpine/git AS git-stage
 WORKDIR /repo
 RUN git clone https://github.com/pagopa/selfcare-infra.git
 
-FROM mcr.microsoft.com/azure-cli@sha256:18ec5cf02ba6b46e9858ddff1125baaa1f14ba919f77ebc67c918c891f8df4a2
+FROM mcr.microsoft.com/azure-cli@sha256:5ecf42d8362e25717b35c994aa714ed399be7b4e6f6c2df2ba3591b717598f76
 COPY --from=git-stage /repo/selfcare-infra/src/core/resources /workspace/resources/resources
 CMD ["/bin/sh", "-c", "/initAzurite.sh"]

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("classpath:config/user-rest-client.properties")
 @PropertySource("classpath:config/user-group-rest-client.properties")
 @PropertySource("classpath:config/user-registry-rest-client.properties")
+@PropertySource("classpath:config/document-rest-client.properties")
 @EnableFeignClients(clients = {
         UserApiRestClient.class,
         IamExternalRestClient.class,
@@ -23,13 +24,14 @@ import org.springframework.context.annotation.PropertySource;
         CoreOnboardingApiRestClient.class,
         CoreManagementApiRestClient.class,
         OnboardingRestClient.class,
-        TokenRestClient.class,
         MsBackOfficeStationApiClient.class,
         MsBackOfficeChannelApiClient.class,
         UserGroupRestClient.class,
         UserInstitutionApiRestClient.class,
         UserPermissionRestClient.class,
-        UserRegistryRestClient.class
+        UserRegistryRestClient.class,
+        DocumentRestClient.class,
+        DocumentContentRestClient.class
 })
 public class FeignClientConfig {
 }

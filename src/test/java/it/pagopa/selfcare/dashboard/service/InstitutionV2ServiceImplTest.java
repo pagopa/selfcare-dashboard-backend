@@ -73,7 +73,9 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
     @Mock
     private ProductService productService;
     @Mock
-    private TokenRestClient tokenRestClient;
+    private DocumentContentRestClient documentContentRestClient;
+    @Mock
+    private DocumentRestClient documentRestClient;
     @Spy
     private InstitutionMapperImpl institutionMapper;
     @Spy
@@ -663,7 +665,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
-        when(tokenRestClient._getContractSigned(tokenId))
+        when(documentContentRestClient._getContractSigned(tokenId))
                 .thenReturn(ResponseEntity.ok(expectedContract));
 
         Resource result = institutionV2Service.getContract(institutionId, productId);
@@ -721,7 +723,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
-        when(tokenRestClient._getContractSigned(tokenId))
+        when(documentContentRestClient._getContractSigned(tokenId))
                 .thenReturn(ResponseEntity.ok(expectedContract));
 
         Resource result = institutionV2Service.getContract(institutionId, productId);
@@ -793,7 +795,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
-        when(tokenRestClient._getContractSigned(tokenId))
+        when(documentContentRestClient._getContractSigned(tokenId))
                 .thenReturn(ResponseEntity.ok(expectedContract));
 
         Resource result = institutionV2Service.getContract(institutionId, productId);
@@ -820,7 +822,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
-        when(tokenRestClient._headAttachment(tokenId, name))
+        when(documentRestClient._headAttachment(tokenId, name))
                 .thenReturn(ResponseEntity.noContent().build());
 
         Boolean result = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);
@@ -847,7 +849,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
 
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
-        when(tokenRestClient._headAttachment(tokenId, name))
+        when(documentRestClient._headAttachment(tokenId, name))
                 .thenReturn(ResponseEntity.notFound().build());
 
         Boolean result = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);
@@ -875,7 +877,7 @@ class InstitutionV2ServiceImplTest extends BaseServiceTest {
         when(coreInstitutionApiRestClient._getOnboardingsInstitutionUsingGET(institutionId, null))
                 .thenReturn(ResponseEntity.ok(onboardingsResponse));
 
-        when(tokenRestClient._headAttachment(tokenId, name))
+        when(documentRestClient._headAttachment(tokenId, name))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         Boolean result = institutionV2Service.checkAttachmentStatus(institutionId, productId, name);

@@ -366,14 +366,14 @@ Feature: User
     And the response should contain an error message "Il numero di telefono non è valido"
 
   Scenario: Successfully get user otp info
-    Given user login with username "j.doe" and password "test"
+    Given user login with username "m.polo" and password "test"
     When I send a GET request to "/v2/users/otp-info" to retrieve user otp info
     Then the response status should be 200
     And The response body contains:
-      | userId                    | 97a511a7-2acc-47b9-afed-2f3c65753b4a         |
-      | otpEmail                  | 8370aa38-a2ab-404b-9b8a-10487167332e@test.it |
-      | otpReferenceInstitutionId | c9a50656-f345-4c81-84be-5b2474470544         |
-      | canUserChangeOtpEmail     | true                                         |
+      | userId                    | 9b8e2b3f-4c7d-4f91-a6e2-3d1f8a7c5b42         |
+      | otpEmail                  | mail2@test.test                              |
+      | otpReferenceInstitutionId | 467ac77d-7faa-47bf-a60e-38ea74bd5fd2         |
+      | canUserChangeOtpEmail     | false                                        |
 
   Scenario: Unauthorized when i try to get user otp info with a bad token
     Given A bad jwt token

@@ -48,8 +48,9 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
     private final UserApiRestClient userApiRestClient;
     private final CoreInstitutionApiRestClient coreInstitutionApiRestClient;
     private final OnboardingRestClient onboardingRestClient;
+    private final DocumentRestClient documentRestClient;
+    private final DocumentContentRestClient documentContentRestClient;
     private final IamExternalRestClient iamExternalRestClient;
-    private final TokenRestClient tokenRestClient;
     private final UserMapper userMapper;
     private final InstitutionMapper institutionMapper;
     private final UserV2ServiceImpl userV2Service;
@@ -59,8 +60,9 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
                                     UserApiRestClient userApiRestClient,
                                     CoreInstitutionApiRestClient coreInstitutionApiRestClient,
                                     OnboardingRestClient onboardingRestClient,
+                                    DocumentRestClient documentRestClient,
+                                    DocumentContentRestClient documentContentRestClient,
                                     IamExternalRestClient iamExternalRestClient,
-                                    TokenRestClient tokenRestClient,
                                     UserMapper userMapper,
                                     InstitutionMapper institutionMapper,
                                     UserV2ServiceImpl userV2Service) {
@@ -68,8 +70,9 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         this.userApiRestClient = userApiRestClient;
         this.coreInstitutionApiRestClient = coreInstitutionApiRestClient;
         this.onboardingRestClient = onboardingRestClient;
+        this.documentRestClient = documentRestClient;
+        this.documentContentRestClient = documentContentRestClient;
         this.iamExternalRestClient = iamExternalRestClient;
-        this.tokenRestClient = tokenRestClient;
         this.userMapper = userMapper;
         this.institutionMapper = institutionMapper;
         this.userV2Service = userV2Service;
@@ -251,7 +254,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
             );
         }
 
-        return tokenRestClient._getContractSigned(onboarding.getTokenId()).getBody();
+        return documentContentRestClient._getContractSigned(onboarding.getTokenId()).getBody();
     }
 
 
@@ -261,7 +264,7 @@ public class InstitutionV2ServiceImpl implements InstitutionV2Service {
         OnboardingResponse onboarding = getOnboardingResponse(institutionId, productId);
 
         try {
-            return  tokenRestClient
+            return  documentRestClient
                     ._headAttachment(onboarding.getTokenId(), attachmentName)
                     .getStatusCode() == HttpStatus.NO_CONTENT;
         } catch (Exception e) {

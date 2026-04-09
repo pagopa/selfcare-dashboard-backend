@@ -47,6 +47,7 @@ public class CucumberSuite {
                 .withPull(true)
                 .waitingFor("azure-cli", Wait.forLogMessage(".*BLOBSTORAGE INITIALIZED.*\\n", 1).withStartupTimeout(Duration.ofMinutes(5)))
                 .waitingFor("onboardingms", Wait.forLogMessage(".*onboarding-ms.*started in.*Listening on.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor("documentms", Wait.forLogMessage(".*document-ms.*started in.*Listening on.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
                 .waitingFor("institutionms", Wait.forLogMessage(".*Started SelfCareCoreApplication.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
                 .waitingFor("usergroupms", Wait.forLogMessage(".*Started SelfCareUserGroupApplication.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
                 .waitingFor("userms", Wait.forLogMessage(".*user-ms.*started in.*Listening on.*", 1).withStartupTimeout(Duration.ofMinutes(5)))
