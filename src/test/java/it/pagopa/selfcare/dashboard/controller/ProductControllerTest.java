@@ -1,11 +1,14 @@
 package it.pagopa.selfcare.dashboard.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import it.pagopa.selfcare.commons.base.security.SelfCareUser;
 import it.pagopa.selfcare.dashboard.model.backoffice.BrokerInfo;
 import it.pagopa.selfcare.dashboard.model.mapper.BrokerResourceMapperImpl;
 import it.pagopa.selfcare.dashboard.model.product.BrokerResource;
 import it.pagopa.selfcare.dashboard.service.BrokerService;
 import it.pagopa.selfcare.dashboard.service.ProductService;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -146,6 +150,39 @@ class ProductControllerTest extends BaseControllerTest {
         verify(brokerServiceMock, times(1))
                 .findInstitutionsByProductAndType(productId, institutionType);
         verifyNoMoreInteractions(brokerServiceMock);
+    }
+
+    @Test
+    void getMyPermissions() throws Exception {
+        String loggedUserId = "loggedUserId";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(SelfCareUser.builder(loggedUserId).build());
+
+        ProductRolePermissionsList response = new ProductRolePermissionsList();
+        ProductRolePermissions productRolePermissions = new ProductRolePermissions();
+        productRolePermissions.setProductId("ALL");
+        productRolePermissions.setRole("SUPPORT");
+        productRolePermissions.setGroup("support");
+        productRolePermissions.setPermissions(List.of("Selc:AccessProductBackofficeAdmin"));
+        response.setItems(List.of(productRolePermissions));
+
+        when(productServiceMock.getMyPermissions(loggedUserId)).thenReturn(response);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(BASE_URL + "/my-permissions")
+                        .principal(authentication)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ProductRolePermissionsList resources = objectMapper.readValue(result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        assertEquals(response, resources);
+        verify(productServiceMock, times(1))
+                .getMyPermissions(loggedUserId);
     }
 
 }
