@@ -3573,6 +3573,69 @@
         } ]
       }
     },
+    "/v1/products/my-permissions" : {
+      "get" : {
+        "tags" : [ "products" ],
+        "summary" : "Service to retrieve the logged user's permissions for all products",
+        "description" : "Service to retrieve the logged user's permissions for all products",
+        "operationId" : "GetMyPermissions",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ProductRolePermissionsList"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/problem+json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ "global" ]
+        } ]
+      }
+    },
     "/v1/institutions/{institutionId}/partners" : {
       "get" : {
         "tags" : [ "institutions" ],
@@ -5387,6 +5450,37 @@
           "enabled" : {
             "type" : "boolean",
             "description" : "Partner's enabling"
+          }
+        }
+      },
+      "ProductRolePermissions" : {
+        "type" : "object",
+        "properties" : {
+          "productId" : {
+            "type" : "string"
+          },
+          "role" : {
+            "type" : "string"
+          },
+          "group" : {
+            "type" : "string"
+          },
+          "permissions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "ProductRolePermissionsList" : {
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ProductRolePermissions"
+            }
           }
         }
       },
