@@ -18,7 +18,7 @@
     "_id": "21f73488-d0df-4a3d-9b6f-9adf634780b6",
     "onboardingId": "21f73488-d0df-4a3d-9b6f-9adf634780b5",
     "type": "ATTACHMENT",
-    "name": "Dichiarazione_sostitutiva_certificazione",
+    "attachmentName": "Dichiarazione_sostitutiva_certificazione",
     "productId": "prod-pagopa",
     "contractVersion": "1.0.0",
     "contractTemplate": "contracts/dummy-accordo_di_adesione.html",
