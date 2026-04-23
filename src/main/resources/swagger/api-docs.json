@@ -3578,7 +3578,7 @@
         "tags" : [ "products" ],
         "summary" : "Service to retrieve the logged user's permissions for all products",
         "description" : "Service to retrieve the logged user's permissions for all products",
-        "operationId" : "GetMyPermissions",
+        "operationId" : "getMyPermissions",
         "responses" : {
           "200" : {
             "description" : "OK",

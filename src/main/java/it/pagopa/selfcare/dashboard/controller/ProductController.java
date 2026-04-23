@@ -86,7 +86,7 @@ public class ProductController {
 
     @GetMapping(value = "/my-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "${swagger.dashboard.product.api.getMyPermissions}", description = "${swagger.dashboard.product.api.getMyPermissions}", operationId = "#GetMyPermissions")
+    @Operation(summary = "${swagger.dashboard.product.api.getMyPermissions}", description = "${swagger.dashboard.product.api.getMyPermissions}", operationId = "#getMyPermissions")
     @PreAuthorize("hasPermission(new it.pagopa.selfcare.dashboard.security.FilterAuthorityDomain(null, null, null), 'Selc:ARB')")
     public ProductRolePermissionsList getMyPermissions(Authentication authentication) {
         log.trace("getMyPermissions start");
