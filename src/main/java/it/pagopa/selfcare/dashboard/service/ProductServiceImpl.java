@@ -1,5 +1,7 @@
 package it.pagopa.selfcare.dashboard.service;
 
+import it.pagopa.selfcare.dashboard.client.IamExternalRestClient;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
@@ -16,10 +18,12 @@ import java.util.Map;
 public class ProductServiceImpl implements ProductService {
 
     private final it.pagopa.selfcare.product.service.ProductService productService;
+    private final IamExternalRestClient iamExternalRestClient;
 
     @Autowired
-    ProductServiceImpl(it.pagopa.selfcare.product.service.ProductService productService) {
+    ProductServiceImpl(it.pagopa.selfcare.product.service.ProductService productService, IamExternalRestClient iamExternalRestClient) {
         this.productService = productService;
+        this.iamExternalRestClient = iamExternalRestClient;
     }
 
 
@@ -34,6 +38,16 @@ public class ProductServiceImpl implements ProductService {
         log.debug("getProductRoles result = {}", productRoleMappings);
         log.trace("getProductRoles end");
         return productRoleMappings;
+    }
+
+    @Override
+    public ProductRolePermissionsList getMyPermissions(String userId) {
+        log.trace("getMyPermissions start");
+        log.debug("getMyPermissions userId = {},", Encode.forJava(userId));
+        ProductRolePermissionsList result = iamExternalRestClient._getIAMProductRolePermissionsList(userId, null).getBody();
+        log.debug("getMyPermissions result = {}", result);
+        log.trace("getMyPermissions end");
+        return result;
     }
 
 }
