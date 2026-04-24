@@ -1,6 +1,9 @@
 package it.pagopa.selfcare.dashboard.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import it.pagopa.selfcare.dashboard.client.IamExternalRestClient;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissions;
+import it.pagopa.selfcare.iam.generated.openapi.v1.dto.ProductRolePermissionsList;
 import it.pagopa.selfcare.onboarding.common.PartyRole;
 import it.pagopa.selfcare.product.entity.Product;
 import it.pagopa.selfcare.product.entity.ProductRoleInfo;
@@ -13,10 +16,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.when;
@@ -29,6 +34,9 @@ class ProductServiceImplTest extends BaseServiceTest {
 
     @Mock
     private it.pagopa.selfcare.product.service.ProductService productServiceExternal;
+
+    @Mock
+    private IamExternalRestClient iamExternalRestClient;
 
 
 
@@ -62,6 +70,23 @@ class ProductServiceImplTest extends BaseServiceTest {
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> productService.getProductRoles(null, null));
         Mockito.verifyNoInteractions(productServiceExternal);
+    }
+
+    @Test
+    void getMyPermissions() {
+        String userId = "userId";
+
+        ProductRolePermissionsList response = new ProductRolePermissionsList();
+        ProductRolePermissions productRolePermissions = new ProductRolePermissions();
+        productRolePermissions.setProductId("ALL");
+        productRolePermissions.setRole("SUPPORT");
+        productRolePermissions.setGroup("support");
+        productRolePermissions.setPermissions(List.of("Selc:AccessProductBackofficeAdmin"));
+        response.setItems(List.of(productRolePermissions));
+
+        when(iamExternalRestClient._getIAMProductRolePermissionsList(userId, null)).thenReturn(ResponseEntity.ok(response));
+        Assertions.assertEquals(response, productService.getMyPermissions(userId));
+        Mockito.verify(iamExternalRestClient, Mockito.times(1))._getIAMProductRolePermissionsList(userId, null);
     }
 
 }

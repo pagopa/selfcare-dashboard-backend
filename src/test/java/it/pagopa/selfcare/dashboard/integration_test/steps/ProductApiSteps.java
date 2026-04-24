@@ -134,6 +134,29 @@ public class ProductApiSteps{
         }
     }
 
+    @When("I send a GET request to {string} to retrieve my permissions")
+    public void iSendAGETRequestToToRetrieveMyPermissions(String url) {
+        RequestSpecification requestSpecification = RestAssured.given()
+                .contentType("application/json");
+
+        if(StringUtils.isNotBlank(dashboardStepsUtil.token)){
+            requestSpecification.header("Authorization", "Bearer " + dashboardStepsUtil.token);
+        }
+
+        ExtractableResponse<?> response = requestSpecification
+                .when()
+                .get(url)
+                .then()
+                .extract();
+
+        dashboardStepsUtil.status = response.statusCode();
+        if(dashboardStepsUtil.status == 200) {
+            dashboardStepsUtil.setResponse(response);
+        }else {
+            dashboardStepsUtil.errorMessage = response.body().asString();
+        }
+    }
+
     @And("the response should not contain any product brokers")
     public void theResponseShouldNotContainAnyProductBrokers() {
         List<BrokerResource> brokers = dashboardStepsUtil.responses.getBrokerResource();

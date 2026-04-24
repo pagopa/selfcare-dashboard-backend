@@ -108,11 +108,26 @@ Feature: Product
     Then the response status should be 200
     And the response should not contain any product brokers
 
-
   Scenario: Successfully retrieving products tree
     Given user login with username "j.doe" and password "test"
     When I send a GET request to "/v1/institutions/products" to retrieve products tree
     Then the response status should be 200
 
+  Scenario: Successfully retrieving my permissions
+    Given user login with username "b.king" and password "test"
+    When I send a GET request to "/v1/products/my-permissions" to retrieve my permissions
+    Then the response status should be 200
+    And The response body contains the list "items" of size 2
+    And The response body contains:
+      | items[0].productId   | prod-interop                                                                               |
+      | items[0].role        | OPERATOR                                                                                   |
+      | items[0].group       | operator                                                                                   |
+      | items[0].permissions | [read:users, Selc:AccessProductBackofficeAdmin]                                            |
+      | items[1].productId   | ALL                                                                                        |
+      | items[1].role        | SUPPORT                                                                                    |
+      | items[1].permissions | [read:users, write:users, Selc:AccessProductBackofficeAdmin, Selc:ListAllProductUsers]     |
 
-
+  Scenario: Unsuccessfully retrieving my permissions without ARB permission
+    Given user login with username "j.doe" and password "test"
+    When I send a GET request to "/v1/products/my-permissions" to retrieve my permissions
+    Then the response status should be 403
